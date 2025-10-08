@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>血染钟楼剧本加载器</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #8B0000;
+            --primary-light: #f8d7da;
+            --secondary-color: #343a40;
+            --accent-color: #d9534f;
+            --background-light: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-dark: #333333;
+            --text-light: #6c757d;
+            --townsfolk-color: rgb(72, 42, 92);
+            --outsider-color: rgb(184, 160, 0);
+            --minion-color: rgb(186, 115, 1);
+            --demon-color: rgb(179, 0, 13);
+            --fabled-color: #FFD700;
+            --jinxed-color: #9370DB;
+            --traveler-color: #4169E1;
+            --traveler-left-color: #4169E1;
+            --traveler-right-color: #9370DB;
+            --card-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        :root[data-theme="dark"] {
+            --background-light: #121212;
+            --card-bg: #1e1e1e;
+            --text-dark: #f0f0f0;
+            --text-light: #a0a0a0;
+            --primary-light: #4a0f11;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--background-light);
+            color: var(--text-dark);
+            padding: 20px;
+            margin: 0;
+            min-height: 100vh;
+            line-height: 1.6;
+            transition: background-color 0.5s ease, color 0.5s ease;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            position: relative;
+        }
+
+        header::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            border-radius: 2px;
+        }
+
+        h1 {
+            font-size: 42px;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: var(--text-light);
+            max-width: 600px;
+            margin: 0 auto 25px;
+            font-weight: 500;
+        }
+
+        .file-upload {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 35px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 40px;
+            text-align: center;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(139, 0, 0, 0.1);
+        }
+
+        .file-upload::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+        }
+
+        .file-upload h2 {
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+            font-size: 24px;
+            position: relative;
+            display: inline-block;
+            padding: 0 15px;
+        }
+
+        .file-upload h2::after {
+            content: "";
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), transparent);
+            border-radius: 3px;
+        }
+
+        .upload-area {
+            border: 2px dashed rgba(139, 0, 0, 0.3);
+            border-radius: 14px;
+            padding: 45px 30px;
+            margin: 30px 0;
+            cursor: pointer;
+            transition: var(--transition);
+            background: rgba(248, 215, 218, 0.1);
+            position: relative;
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(248, 215, 218, 0.2);
+        }
+
+        .upload-area i {
+            font-size: 48px;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .upload-btn {
+            padding: 14px 36px;
+            background: linear-gradient(135deg, var(--primary-color), #700);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 15px;
+            box-shadow: 0 4px 12px rgba(139, 0, 0, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .upload-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(139, 0, 0, 0.4);
+            background: linear-gradient(135deg, #a00, #600);
+        }
+
+        .upload-btn i {
+            font-size: 20px;
+        }
+
+        .json-url {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        .json-url input {
+            flex: 1;
+            padding: 16px 18px;
+            border: 1px solid rgba(139, 0, 0, 0.2);
+            border-radius: 8px;
+            font-size: 16px;
+            background: var(--card-bg);
+            transition: var(--transition);
+            box-shadow: inset 0 1px 4px rgba(0,0,0,0.05);
+            color: var(--text-dark);
+        }
+
+        .json-url input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(139, 0, 0, 0.2);
+        }
+
+        .url-btn {
+            padding: 16px 28px;
+            background: linear-gradient(135deg, #343a40, #1d2124);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .url-btn:hover {
+            background: linear-gradient(135deg, #2d3238, #171a1d);
+            transform: translateY(-2px);
+        }
+
+        .control-panel {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #5a6268, #495057);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        }
+
+        .control-btn.active {
+            background: linear-gradient(135deg, var(--primary-color), #700);
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: var(--card-bg);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transition: var(--transition);
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .theme-toggle i {
+            font-size: 24px;
+            color: var(--primary-color);
+        }
+
+        .bottom-order-panels {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin: 40px 0 20px;
+        }
+
+        .bottom-order-panel {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+        }
+
+        .bottom-order-panel h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            white-space: nowrap;
+        }
+
+        .bottom-order-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 10px 0;
+        }
+
+        .bottom-order-item {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: rgba(248, 215, 218, 0.1);
+            transition: var(--transition);
+            font-size: 14px;
+            color: var(--text-dark);
+            border: 1px solid rgba(139, 0, 0, 0.1);
+        }
+
+        .bottom-order-item:hover {
+            background: rgba(248, 215, 218, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .script-display {
+            display: none;
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 40px;
+            animation: fadeIn 0.6s ease;
+            border: 1px solid rgba(139, 0, 0, 0.1);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(25px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .script-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 35px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid rgba(0,0,0,0.08);
+            gap: 30px;
+            position: relative;
+        }
+
+        .script-header::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 150px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            border-radius: 3px;
+        }
+
+        .header-left {
+            flex: 1;
+        }
+
+        .script-details h2 {
+            font-size: 36px;
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+        }
+
+        .script-author {
+            font-size: 18px;
+            color: var(--text-light);
+            font-weight: 500;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .script-author i {
+            color: var(--primary-color);
+        }
+
+        .script-description {
+            font-size: 17px;
+            color: #495057;
+            line-height: 1.8;
+            background: rgba(248, 215, 218, 0.1);
+            padding: 25px;
+            border-radius: 10px;
+            border-left: 4px solid var(--primary-color);
+            box-shadow: inset 0 1px 4px rgba(0,0,0,0.03);
+        }
+
+        .status-info {
+            background: linear-gradient(to right, rgba(248, 215, 218, 0.1), rgba(255,255,255,0.5));
+            padding: 25px;
+            border-radius: 10px;
+            font-size: 17px;
+            border-left: 4px solid var(--accent-color);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            width: 40%;
+            min-width: 300px;
+            margin-top: 0;
+        }
+
+        .status-title {
+            color: var(--accent-color);
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-title i {
+            font-size: 24px;
+        }
+
+        .script-top {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 25px;
+        }
+
+        .script-details {
+            flex: 1;
+        }
+
+        .role-section {
+            margin: 45px 0 25px;
+            padding-bottom: 12px;
+            position: relative;
+        }
+
+        .role-section::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 120px;
+            height: 4px;
+            border-radius: 2px;
+        }
+
+        .section-townsfork::after { background: var(--townsfolk-color); }
+        .section-outsider::after { background: var(--outsider-color); }
+        .section-minion::after { background: var(--minion-color); }
+        .section-demon::after { background: var(--demon-color); }
+        .section-fabled::after { background: var(--fabled-color); }
+        .section-jinxed::after { background: var(--jinxed-color); }
+        .section-traveler::after { background: var(--traveler-color); }
+
+        .role-section-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+            position: relative;
+            display: inline-block;
+            padding: 0 15px 10px 0;
+            background: transparent;
+            z-index: 1;
+        }
+
+        .roles-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .layout-1 .roles-container {
+            grid-template-columns: 1fr;
+        }
+
+        .layout-2 .roles-container {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .layout-3 .roles-container {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .layout-4 .roles-container {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        .role-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            min-height: 220px;
+            position: relative;
+            transition: var(--transition);
+            display: flex;
+            border-left: 5px solid;
+            transform: translateY(0);
+        }
+
+        .role-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+        }
+
+        .townsfolk { 
+            background-color: rgba(30, 144, 255, 0.1);
+            border-left-color: var(--townsfolk-color); 
+        }
+        .outsider { 
+            background-color: rgba(50, 205, 50, 0.1);
+            border-left-color: var(--outsider-color); 
+        }
+        .minion { 
+            background-color: rgba(255, 165, 0, 0.1);
+            border-left-color: var(--minion-color); 
+        }
+        .demon { 
+            background-color: rgba(255, 0, 0, 0.1);
+            border-left-color: var(--demon-color); 
+        }
+
+        .fabled {
+            background-color: rgba(255, 215, 0, 0.1);
+            border: 2px solid var(--fabled-color) !important;
+            border-left: none !important;
+        }
+
+        .jinxed {
+            background-color: rgba(147, 112, 219, 0.1);
+            border: 2px solid var(--jinxed-color) !important;
+            border-left: none !important;
+        }
+
+        .traveler {
+            background-color: rgba(65, 105, 225, 0.1);
+            border-left: 5px solid var(--traveler-left-color) !important;
+            border-right: 5px solid var(--traveler-right-color) !important;
+            border-top: none !important;
+            border-bottom: none !important;
+        }
+
+        .role-content {
+            padding: 22px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .role-header {
+            padding-bottom: 12px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(0,0,0,0.08);
+            display: flex;
+            align-items: center;
+        }
+
+        .role-icon {
+            width: 40px;
+            height: 40px;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .role-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .role-icon i {
+            font-size: 20px;
+            color: #777;
+        }
+
+        .role-name {
+            font-weight: 700;
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .townsfolk .role-name { color: var(--townsfolk-color); }
+        .outsider .role-name { color: var(--outsider-color); }
+        .minion .role-name { color: var(--minion-color); }
+        .demon .role-name { color: var(--demon-color); }
+        .fabled .role-name { color: var(--fabled-color); }
+        .jinxed .role-name { color: var(--jinxed-color); }
+        .traveler .role-name { 
+            background: linear-gradient(to right, var(--traveler-left-color), var(--traveler-right-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-fill-color: transparent;
+        }
+
+        .townsfolk .role-icon i { color: var(--townsfolk-color); }
+        .outsider .role-icon i { color: var(--outsider-color); }
+        .minion .role-icon i { color: var(--minion-color); }
+        .demon .role-icon i { color: var(--demon-color); }
+        .fabled .role-icon i { color: var(--fabled-color); }
+        .jinxed .role-icon i { color: var(--jinxed-color); }
+        .traveler .role-icon i { color: var(--traveler-color); }
+
+        .role-ability {
+            font-size: 14.5px;
+            line-height: 1.65;
+            color: var(--text-dark);
+            flex-grow: 1;
+            padding-top: 10px;
+        }
+
+        .script-footer {
+            text-align: center;
+            font-size: 15px;
+            color: var(--text-light);
+            margin-top: 45px;
+            padding-top: 25px;
+            border-top: 1px solid rgba(0,0,0,0.08);
+        }
+
+        .loader {
+            display: none;
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .loader-spinner {
+            border: 4px solid rgba(139, 0, 0, 0.2);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 1200px) {
+            .roles-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .script-top {
+                flex-direction: column;
+            }
+            
+            .status-info {
+                width: 100%;
+                min-width: auto;
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .script-header {
+                flex-direction: column;
+            }
+            
+            .status-info {
+                width: 100%;
+                margin-left: 0;
+                margin-top: 30px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .roles-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .json-url {
+                flex-direction: column;
+            }
+            
+            .control-panel {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            h1 {
+                font-size: 36px;
+            }
+            
+            .file-upload {
+                padding: 25px;
+            }
+            
+            .upload-area {
+                padding: 30px 20px;
+            }
+            
+            .script-display {
+                padding: 30px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 32px;
+            }
+            
+            .file-upload {
+                padding: 20px 15px;
+            }
+            
+            .script-display {
+                padding: 25px 20px;
+            }
+            
+            .script-details h2 {
+                font-size: 28px;
+            }
+            
+            .role-section-title {
+                font-size: 24px;
+            }
+            
+            .role-icon {
+                width: 35px;
+                height: 35px;
+                margin-right: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="theme-toggle" id="themeToggle">
+        <i class="fas fa-moon" id="themeIcon"></i>
+    </div>
+    
+    <div class="container">
+        <header>
+            <h1>血染钟楼剧本加载器</h1>
+            <p class="subtitle">加载并查看任何Blood on the Clocktower剧本的JSON文件</p>
+        </header>
+        
+        <div class="file-upload">
+            <h2><i class="fas fa-file-import"></i> 加载剧本文件</h2>
+            
+            <div class="upload-area" id="dropArea">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p>拖放JSON文件到此处</p>
+                <p>或</p>
+                <button class="upload-btn" id="uploadBtn"><i class="fas fa-folder-open"></i> 选择文件</button>
+            </div>
+            
+            <div class="json-url">
+                <input type="text" id="jsonUrl" placeholder="输入JSON文件URL...">
+                <button class="url-btn" id="loadUrlBtn"><i class="fas fa-link"></i> 加载URL</button>
+            </div>
+        </div>
+        
+        <div class="control-panel" id="controlPanel">
+            <button class="control-btn" id="toggleImagesBtn">
+                <i class="fas fa-eye-slash"></i> 隐藏角色图片
+            </button>
+            <button class="control-btn" id="toggleStateBtn">
+                <i class="fas fa-eye-slash"></i> 隐藏状态
+            </button>
+            <button class="control-btn" id="toggleOrderBtn">
+                <i class="fas fa-eye-slash"></i> 隐藏顺序
+            </button>
+            <button class="control-btn" id="toggleFabledBtn">
+                <i class="fas fa-eye-slash"></i> 隐藏传奇角色
+            </button>
+            <button class="control-btn" id="toggleJinxedBtn">
+                <i class="fas fa-eye-slash"></i> 隐藏相克
+            </button>
+            <button class="control-btn" id="toggleLayoutBtn">
+                <i class="fas fa-th"></i> 布局: 3列
+            </button>
+            <button class="control-btn" id="downloadImageBtn">
+                <i class="fas fa-download"></i> 下载剧本图片
+            </button>
+        </div>
+        
+        <div class="loader" id="loader">
+            <div class="loader-spinner"></div>
+            <p>正在加载剧本数据...</p>
+        </div>
+        
+        <div class="script-display" id="scriptDisplay">
+            <!-- 剧本信息将动态加载到这里 -->
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const uploadBtn = document.getElementById('uploadBtn');
+            const dropArea = document.getElementById('dropArea');
+            const loadUrlBtn = document.getElementById('loadUrlBtn');
+            const jsonUrl = document.getElementById('jsonUrl');
+            const scriptDisplay = document.getElementById('scriptDisplay');
+            const loader = document.getElementById('loader');
+            const toggleImagesBtn = document.getElementById('toggleImagesBtn');
+            const toggleStateBtn = document.getElementById('toggleStateBtn');
+            const toggleOrderBtn = document.getElementById('toggleOrderBtn');
+            const toggleFabledBtn = document.getElementById('toggleFabledBtn');
+            const toggleJinxedBtn = document.getElementById('toggleJinxedBtn');
+            const toggleLayoutBtn = document.getElementById('toggleLayoutBtn');
+            const downloadImageBtn = document.getElementById('downloadImageBtn');
+            const themeToggle = document.getElementById('themeToggle');
+            const themeIcon = document.getElementById('themeIcon');
+            
+            let hideImages = false;
+            let hideState = false;
+            let hideOrder = false;
+            let hideFabled = false;
+            let hideJinxed = false;
+            let columnLayout = 3;
+            let isDarkMode = false;
+            
+            const hiddenFileInput = document.createElement('input');
+            hiddenFileInput.type = 'file';
+            hiddenFileInput.accept = '.json';
+            hiddenFileInput.style.display = 'none';
+            document.body.appendChild(hiddenFileInput);
+            
+            uploadBtn.addEventListener('click', function() {
+                hiddenFileInput.click();
+            });
+            
+            hiddenFileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    loadScriptFile(file);
+                }
+            });
+            
+            dropArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                dropArea.style.borderColor = 'var(--primary-color)';
+                dropArea.style.backgroundColor = 'rgba(248, 215, 218, 0.2)';
+            });
+            
+            dropArea.addEventListener('dragleave', function() {
+                dropArea.style.borderColor = 'rgba(139, 0, 0, 0.3)';
+                dropArea.style.backgroundColor = '';
+            });
+            
+            dropArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                dropArea.style.borderColor = 'rgba(139, 0, 0, 0.3)';
+                dropArea.style.backgroundColor = '';
+                
+                const file = e.dataTransfer.files[0];
+                if (file && file.type === 'application/json') {
+                    loadScriptFile(file);
+                } else {
+                    alert('请上传有效的JSON文件');
+                }
+            });
+            
+            loadUrlBtn.addEventListener('click', function() {
+                const url = jsonUrl.value.trim();
+                if (url) {
+                    loadScriptFromUrl(url);
+                } else {
+                    alert('请输入有效的URL');
+                }
+            });
+            
+            toggleImagesBtn.addEventListener('click', function() {
+                hideImages = !hideImages;
+                updateUI();
+                
+                if (hideImages) {
+                    toggleImagesBtn.innerHTML = '<i class="fas fa-eye"></i> 显示角色图片';
+                    toggleImagesBtn.classList.add('active');
+                } else {
+                    toggleImagesBtn.innerHTML = '<i class="fas fa-eye-slash"></i> 隐藏角色图片';
+                    toggleImagesBtn.classList.remove('active');
+                }
+            });
+            
+            toggleStateBtn.addEventListener('click', function() {
+                hideState = !hideState;
+                updateUI();
+                
+                if (hideState) {
+                    toggleStateBtn.innerHTML = '<i class="fas fa-eye"></i> 显示状态';
+                    toggleStateBtn.classList.add('active');
+                } else {
+                    toggleStateBtn.innerHTML = '<i class="fas fa-eye-slash"></i> 隐藏状态';
+                    toggleStateBtn.classList.remove('active');
+                }
+            });
+            
+            toggleOrderBtn.addEventListener('click', function() {
+                hideOrder = !hideOrder;
+                updateUI();
+                
+                if (hideOrder) {
+                    toggleOrderBtn.innerHTML = '<i class="fas fa-eye"></i> 显示顺序';
+                    toggleOrderBtn.classList.add('active');
+                } else {
+                    toggleOrderBtn.innerHTML = '<i class="fas fa-eye-slash"></i> 隐藏顺序';
+                    toggleOrderBtn.classList.remove('active');
+                }
+            });
+            
+            toggleFabledBtn.addEventListener('click', function() {
+                hideFabled = !hideFabled;
+                updateUI();
+                
+                if (hideFabled) {
+                    toggleFabledBtn.innerHTML = '<i class="fas fa-eye"></i> 显示传奇角色';
+                    toggleFabledBtn.classList.add('active');
+                } else {
+                    toggleFabledBtn.innerHTML = '<i class="fas fa-eye-slash"></i> 隐藏传奇角色';
+                    toggleFabledBtn.classList.remove('active');
+                }
+            });
+            
+            toggleJinxedBtn.addEventListener('click', function() {
+                hideJinxed = !hideJinxed;
+                updateUI();
+                
+                if (hideJinxed) {
+                    toggleJinxedBtn.innerHTML = '<i class="fas fa-eye"></i> 显示相克';
+                    toggleJinxedBtn.classList.add('active');
+                } else {
+                    toggleJinxedBtn.innerHTML = '<i class="fas fa-eye-slash"></i> 隐藏相克';
+                    toggleJinxedBtn.classList.remove('active');
+                }
+            });
+            
+            toggleLayoutBtn.addEventListener('click', function() {
+                columnLayout = columnLayout % 4 + 1;
+                updateLayout();
+                toggleLayoutBtn.innerHTML = `<i class="fas fa-th"></i> 布局: ${columnLayout}列`;
+            });
+            
+            downloadImageBtn.addEventListener('click', function() {
+                if (scriptDisplay.style.display === 'none' || scriptDisplay.innerHTML.trim() === '') {
+                    alert('请先加载剧本数据');
+                    return;
+                }
+                
+                downloadImageBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 生成图片中...';
+                downloadImageBtn.disabled = true;
+                
+                const originalBackground = scriptDisplay.style.background;
+                scriptDisplay.style.background = isDarkMode ? '#1e1e1e' : '#ffffff';
+                
+                html2canvas(scriptDisplay, {
+                    scale: 3,
+                    useCORS: true,
+                    allowTaint: true,
+                    backgroundColor: isDarkMode ? '#1e1e1e' : '#ffffff',
+                    logging: false,
+                    width: scriptDisplay.scrollWidth,
+                    height: scriptDisplay.scrollHeight,
+                    scrollX: 0,
+                    scrollY: 0,
+                    windowWidth: scriptDisplay.scrollWidth,
+                    windowHeight: scriptDisplay.scrollHeight,
+                    onclone: function(clonedDoc) {
+                        const clonedDisplay = clonedDoc.getElementById('scriptDisplay');
+                        if (clonedDisplay) {
+                            clonedDisplay.style.background = isDarkMode ? '#1e1e1e' : '#ffffff';
+                        }
+                    }
+                }).then(canvas => {
+                    scriptDisplay.style.background = originalBackground;
+                    
+                    const link = document.createElement('a');
+                    link.download = '血染钟楼剧本.png';
+                    link.href = canvas.toDataURL('image/png', 1.0);
+                    link.click();
+                    
+                    downloadImageBtn.innerHTML = '<i class="fas fa-download"></i> 下载剧本图片';
+                    downloadImageBtn.disabled = false;
+                }).catch(error => {
+                    scriptDisplay.style.background = originalBackground;
+                    
+                    console.error('生成图片失败:', error);
+                    alert('生成图片失败，请重试');
+                    downloadImageBtn.innerHTML = '<i class="fas fa-download"></i> 下载剧本图片';
+                    downloadImageBtn.disabled = false;
+                });
+            });
+            
+            function updateLayout() {
+                scriptDisplay.classList.remove('layout-1', 'layout-2', 'layout-3', 'layout-4');
+                scriptDisplay.classList.add(`layout-${columnLayout}`);
+            }
+            
+            function updateUI() {
+                const roleCards = document.querySelectorAll('.role-card');
+                const stateInfo = document.querySelector('.status-info');
+                const orderPanels = document.querySelector('.bottom-order-panels');
+                const fabledSections = document.querySelectorAll('.section-fabled');
+                const jinxedSections = document.querySelectorAll('.section-jinxed');
+                
+                roleCards.forEach(card => {
+                    const roleIcon = card.querySelector('.role-icon');
+                    
+                    if (roleIcon) {
+                        if (hideImages) {
+                            roleIcon.style.display = 'none';
+                        } else {
+                            roleIcon.style.display = 'flex';
+                        }
+                    }
+                });
+                
+                if (stateInfo) {
+                    if (hideState) {
+                        stateInfo.style.display = 'none';
+                    } else {
+                        stateInfo.style.display = 'block';
+                    }
+                }
+                
+                if (orderPanels) {
+                    if (hideOrder) {
+                        orderPanels.style.display = 'none';
+                    } else {
+                        orderPanels.style.display = 'flex';
+                    }
+                }
+                
+                fabledSections.forEach(section => {
+                    if (hideFabled) {
+                        section.style.display = 'none';
+                    } else {
+                        section.style.display = 'block';
+                    }
+                });
+                
+                jinxedSections.forEach(section => {
+                    if (hideJinxed) {
+                        section.style.display = 'none';
+                    } else {
+                        section.style.display = 'block';
+                    }
+                });
+            }
+            
+            function initTheme() {
+                const savedTheme = localStorage.getItem('theme');
+                if (savedTheme === 'dark') {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    themeIcon.className = 'fas fa-sun';
+                    isDarkMode = true;
+                } else {
+                    document.documentElement.setAttribute('data-theme', 'light');
+                    themeIcon.className = 'fas fa-moon';
+                    isDarkMode = false;
+                }
+            }
+            
+            function toggleTheme() {
+                if (isDarkMode) {
+                    document.documentElement.setAttribute('data-theme', 'light');
+                    themeIcon.className = 'fas fa-moon';
+                    localStorage.setItem('theme', 'light');
+                    isDarkMode = false;
+                } else {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    themeIcon.className = 'fas fa-sun';
+                    localStorage.setItem('theme', 'dark');
+                    isDarkMode = true;
+                }
+            }
+            
+            themeToggle.addEventListener('click', toggleTheme);
+            initTheme();
+            
+            function loadScriptFile(file) {
+                const reader = new FileReader();
+                
+                loader.style.display = 'block';
+                
+                reader.onload = function(e) {
+                    try {
+                        const scriptData = JSON.parse(e.target.result);
+                        displayScript(scriptData);
+                        loader.style.display = 'none';
+                    } catch (error) {
+                        loader.style.display = 'none';
+                        alert('无法解析JSON文件: ' + error.message);
+                    }
+                };
+                
+                reader.onerror = function() {
+                    loader.style.display = 'none';
+                    alert('读取文件时发生错误');
+                };
+                
+                reader.readAsText(file);
+            }
+            
+            function loadScriptFromUrl(url) {
+                loader.style.display = 'block';
+                
+                fetch(url)
+                    .then(response => {
+                        if (!response.ok) throw new Error('网络响应错误: ' + response.status);
+                        return response.json();
+                    })
+                    .then(data => {
+                        displayScript(data);
+                        loader.style.display = 'none';
+                    })
+                    .catch(error => {
+                        loader.style.display = 'none';
+                        alert('加载JSON时出错: ' + error.message);
+                    });
+            }
+            
+            function displayScript(scriptData) {
+                const meta = scriptData.find(item => item.id === "_meta");
+                const roles = scriptData.filter(item => item.id !== "_meta");
+                
+                const townsfolk = roles.filter(role => role.team === "townsfolk");
+                const outsiders = roles.filter(role => role.team === "outsider");
+                const minions = roles.filter(role => role.team === "minion");
+                const demons = roles.filter(role => role.team === "demon");
+                const fabled = roles.filter(role => role.team === "fabled");
+                const jinxed = roles.filter(role => role.team === "a jinxed");
+                const travelers = roles.filter(role => role.team === "traveler");
+                
+                const firstNightRoles = roles.filter(role => role.firstNight && role.firstNight > 0)
+                    .sort((a, b) => a.firstNight - b.firstNight);
+                const otherNightRoles = roles.filter(role => role.otherNight && role.otherNight > 0)
+                    .sort((a, b) => a.otherNight - b.otherNight);
+                
+                let html = '';
+                
+                html += `
+                    <div class="script-header">
+                        <div class="header-left">
+                            <div class="script-top">
+                                <div class="script-details">
+                                    <h2>${meta?.name || '未命名剧本'}</h2>
+                                    ${meta?.author ? `<p class="script-author"><i class="fas fa-user-edit"></i> ${meta.author}</p>` : ''}
+                                    ${meta?.description ? `<p class="script-description">${meta.description}</p>` : ''}
+                                </div>
+                `;
+                
+                if (meta?.state?.length && !hideState) {
+                    html += `<div class="status-info">`;
+                    meta.state.forEach(state => {
+                        html += `
+                            <div class="state-section">
+                                <h3 class="status-title"><i class="fas fa-info-circle"></i> ${state.stateName}</h3>
+                                <p>${state.stateDescription}</p>
+                            </div>
+                        `;
+                    });
+                    html += `</div>`;
+                }
+                
+                html += `
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                html += createRoleSection('镇民', 'section-townsfork', townsfolk);
+                html += createRoleSection('外来者', 'section-outsider', outsiders);
+                html += createRoleSection('爪牙', 'section-minion', minions);
+                html += createRoleSection('恶魔', 'section-demon', demons);
+                if (!hideFabled) {
+                    html += createRoleSection('传奇角色', 'section-fabled', fabled);
+                }
+                if (!hideJinxed) {
+                    html += createRoleSection('相克', 'section-jinxed', jinxed);
+                }
+                html += createRoleSection('旅行者', 'section-traveler', travelers);
+                
+                if (!hideOrder) {
+                    html += `
+                        <div class="bottom-order-panels">
+                            <div class="bottom-order-panel">
+                                <h3><i class="fas fa-moon"></i> 首夜顺序</h3>
+                                <div class="bottom-order-list">
+                    `;
+                    
+                    if (firstNightRoles.length > 0) {
+                        firstNightRoles.forEach(role => {
+                            html += `<span class="bottom-order-item">${role.name}</span>`;
+                        });
+                    } else {
+                        html += `<span class="bottom-order-item">暂无首夜顺序信息</span>`;
+                    }
+                    
+                    html += `
+                                </div>
+                            </div>
+                            <div class="bottom-order-panel">
+                                <h3><i class="fas fa-star"></i> 他夜顺序</h3>
+                                <div class="bottom-order-list">
+                    `;
+                    
+                    if (otherNightRoles.length > 0) {
+                        otherNightRoles.forEach(role => {
+                            html += `<span class="bottom-order-item">${role.name}</span>`;
+                        });
+                    } else {
+                        html += `<span class="bottom-order-item">暂无他夜顺序信息</span>`;
+                    }
+                    
+                    html += `
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                html += `
+                    <div class="script-footer">
+                        <p>Blood on the Clocktower - ${meta?.name || '剧本'} | ${meta?.author ? '设计: ' + meta.author : ''}</p>
+                    </div>
+                `;
+                
+                scriptDisplay.innerHTML = html;
+                scriptDisplay.style.display = 'block';
+                
+                updateUI();
+                updateLayout();
+                
+                scriptDisplay.scrollIntoView({ behavior: 'smooth' });
+            }
+            
+            function createRoleSection(title, sectionClass, roles) {
+                if (!roles.length) return '';
+                
+                let html = `
+                    <div class="role-section ${sectionClass}">
+                        <div class="role-section-title"><i class="fas fa-users"></i> ${title} (${roles.length})</div>
+                        <div class="roles-container">
+                `;
+                
+                roles.forEach(role => {
+                    const teamClass = getTeamClass(role.team);
+                    
+                    let roleIconHtml = '';
+                    if (role.image) {
+                        roleIconHtml = `<img src="${role.image}" alt="${role.name}">`;
+                    } else {
+                        roleIconHtml = `<i class="fas fa-user"></i>`;
+                    }
+                    
+                    html += `
+                        <div class="role-card ${teamClass}">
+                            <div class="role-content">
+                                <div class="role-header">
+                                    <div class="role-icon">
+                                        ${roleIconHtml}
+                                    </div>
+                                    <div class="role-name">
+                                        ${role.name}
+                                    </div>
+                                </div>
+                                
+                                ${role.ability ? `<div class="role-ability">${role.ability}</div>` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += `
+                        </div>
+                    </div>
+                `;
+                
+                return html;
+            }
+            
+            function getTeamClass(team) {
+                switch (team) {
+                    case 'townsfolk': return 'townsfolk';
+                    case 'outsider': return 'outsider';
+                    case 'minion': return 'minion';
+                    case 'demon': return 'demon';
+                    case 'fabled': return 'fabled';
+                    case 'a jinxed': return 'jinxed';
+                    case 'traveler': return 'traveler';
+                    default: return '';
+                }
+            }
+        });
+    </script>
+</body>
+</html>

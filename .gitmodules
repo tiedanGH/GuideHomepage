@@ -1,0 +1,6 @@
+[submodule "tiedangh.github.io"]
+	path = tiedan
+	url = git@github.com:tiedanGH/tiedangh.github.io.git
+[submodule "yagame"]
+	path = yagame
+	url = git@github.com:imalydimalyd/yagame.git
