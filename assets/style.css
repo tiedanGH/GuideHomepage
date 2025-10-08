@@ -35,12 +35,15 @@ a:hover {
 }
 
 h1 {
-    color: #333;
     margin-top: 0;
+    color: #333;
+}
+h2 {
+    margin: 0 0 15px;
+    color: #333;
 }
 h3 {
-    margin: 5px 0;
-    text-align:center;
+    margin: 0 0 18px;
     color: #666;
 }
 p {
@@ -215,7 +218,8 @@ p {
         flex-direction: column;
     }
     .section {
-        margin-bottom: 20px;
+        margin-bottom: 0;
+        padding: 10px;
     }
     .feature-buttons {
         flex-direction: column;
