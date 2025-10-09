@@ -246,7 +246,6 @@ p {
         align-items: center;
     }
     .feature-btn {
-        width: 100%;
         max-width: 300px;
     }
 }
