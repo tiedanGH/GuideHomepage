@@ -1,10 +1,28 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+    <script>
+        // 在 GitHub Pages 部署时隐藏警告
+        (function() {
+            const hideDomains = ["tiedan.site", "tiedangh.github.io", "localhost"];
+            const host = window.location.hostname.toLowerCase();
+            const hide = hideDomains.some(domain => host === domain || host.endsWith("." + domain));
+            if (hide) {
+                const style = document.createElement("style");
+                style.setAttribute("data-hide-warning", "1");
+                style.textContent = ".warning { display: none !important; }";
+                if (document.head) {
+                    document.head.insertBefore(style, document.head.firstChild);
+                } else {
+                    document.documentElement.insertBefore(style, document.documentElement.firstChild);
+                }
+            }
+        })();
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>导航主页</title>
-    <link rel="stylesheet" href="assets/style.css" />
+    <link rel="stylesheet" href="assets/style.css"/>
     <link rel="icon" href="favicon.ico">
 </head>
 <body>
@@ -18,7 +36,7 @@
 <div class="container">
     <div class="main-sections">
         <a href="yagame" class="section btn btn-yagame">
-            <img src="assets/icons/yagame.svg" alt="icon" class="btn-icon" /> YaGame
+            <img src="assets/icons/yagame.svg" alt="icon" class="btn-icon"/> YaGame
         </a>
         <a href="tiedan" class="section btn btn-tiedan">
             <img src="assets/icons/tiedan.svg" alt="icon" class="btn-icon" /> 铁蛋的游戏网站
