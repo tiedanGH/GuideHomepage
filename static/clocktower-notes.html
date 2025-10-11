@@ -1083,7 +1083,7 @@
                     </div>
                     <div class="input-group">
                         <label for="totalPlayers">玩家总数:</label>
-                        <input type="number" id="totalPlayers" min="5" max="20" value="12">
+                        <input type="number" id="totalPlayers" min="5" max="15" value="12">
                     </div>
                     <div class="input-group">
                         <label for="alive">存活人数:</label>
@@ -1097,6 +1097,7 @@
                     
                     <div class="role-config-container">
                         <input type="text" id="evilConfig" class="role-config-input" placeholder="邪恶配置">
+                        <div class="info-note" id="evilConfigHint">标准配置：7民2外2爪1恶</div>
                     </div>
                 </div>
                 
@@ -1224,6 +1225,14 @@
             }
         ];
         
+        // 默认角色提醒标记数据
+        const defaultRoleReminders = [
+            { text: "是酒鬼", type: "role", image: "https://oss.gstonegames.com/data_file/clocktower/web/icons/drunk.png" },
+            { text: "是疯子", type: "role", image: "https://oss.gstonegames.com/data_file/clocktower/web/icons/lunatic.png" },
+            { text: "是提线木偶", type: "role", image: "https://oss.gstonegames.com/data_file/clocktower/web/icons/marionette.png" },
+            { text: "是悟道者", type: "role", image: "https://oss.gstonegames.com/data_file/clocktower/web/icons/wudaozhe.png" }
+        ];
+        
         // 玩家提醒标记数据
         let playerReminders = {};
         
@@ -1253,6 +1262,7 @@
             const totalPlayersInput = document.getElementById('totalPlayers');
             const playerStatus = document.getElementById('playerStatus');
             const evilConfigInput = document.getElementById('evilConfig');
+            const evilConfigHint = document.getElementById('evilConfigHint');
             const roleSelectorModal = document.getElementById('roleSelectorModal');
             const closeModal = document.getElementById('closeModal');
             const roleGrid = document.getElementById('roleGrid');
@@ -1292,6 +1302,81 @@
             centerDisplay.appendChild(centerDisplayTitle);
             centerDisplay.appendChild(centerRemindersContainer);
             playerStatus.appendChild(centerDisplay);
+            
+            // 更新邪恶配置提示的函数
+            function updateEvilConfigHint() {
+                const playerCount = parseInt(totalPlayersInput.value);
+                let hint = "";
+                
+                switch(playerCount) {
+                    case 5:
+                        hint = "标准配置：3民0外1爪1恶";
+                        break;
+                    case 6:
+                        hint = "标准配置：3民1外1爪1恶";
+                        break;
+                    case 7:
+                        hint = "标准配置：5民0外1爪1恶";
+                        break;
+                    case 8:
+                        hint = "标准配置：5民1外1爪1恶";
+                        break;
+                    case 9:
+                        hint = "标准配置：5民2外1爪1恶";
+                        break;
+                    case 10:
+                        hint = "标准配置：7民0外2爪1恶";
+                        break;
+                    case 11:
+                        hint = "标准配置：7民1外2爪1恶";
+                        break;
+                    case 12:
+                        hint = "标准配置：7民2外2爪1恶";
+                        break;
+                    case 13:
+                        hint = "标准配置：9民0外3爪1恶";
+                        break;
+                    case 14:
+                        hint = "标准配置：9民1外3爪1恶";
+                        break;
+                    case 15:
+                        hint = "标准配置：9民2外3爪1恶";
+                        break;
+                    default:
+                        hint = "请选择5-15名玩家";
+                }
+                
+                evilConfigHint.textContent = hint;
+            }
+            
+            // 自动为所有玩家笔记添加分号的函数
+            function addSemicolonToAllNotes() {
+                console.log("自动为所有玩家笔记添加分号");
+                
+                // 获取所有笔记行
+                const noteRows = notesContainer.querySelectorAll('.note-row');
+                
+                noteRows.forEach(row => {
+                    const descInput = row.querySelector('.desc-input');
+                    const playerInput = row.querySelector('.player-input');
+                    
+                    if (playerInput && playerInput.value) {
+                        const playerNum = parseInt(playerInput.value);
+                        
+                        // 无论笔记内容是否为空，都添加分号
+                        // 如果末尾已经有分号，不再重复添加
+                        if (!descInput.value.trim().endsWith('；')) {
+                            descInput.value += '；';
+                            
+                            // 更新对应的玩家笔记
+                            addPlayerNote(playerNum, descInput.value);
+                        }
+                    }
+                });
+                
+                // 重新渲染玩家卡片以显示更新后的笔记
+                renderPlayers();
+            }
             
             // 更新中心显示区域的函数
             function updateCenterDisplay(playerNum) {
@@ -1776,7 +1861,7 @@
                 }
             }
             
-            // 日夜切换
+            // 日夜切换 - 从白天切换到夜晚，天数增加
             nightBtn.addEventListener('click', function() {
                 if (!isNight) {
                     // 从白天切换到夜晚，天数增加
@@ -1784,18 +1869,24 @@
                     isNight = true;
                     nightBtn.classList.add('active');
                     dayBtn.classList.remove('active');
+                    
                     selectedPlayers = [];
                     renderPlayers();
                     updateDeathSummary();
                 }
             });
             
+            // 日夜切换 - 从夜晚切换到白天，新的一天开始，自动添加分号
             dayBtn.addEventListener('click', function() {
                 if (isNight) {
                     // 从夜晚切换到白天，天数不变
                     isNight = false;
                     dayBtn.classList.add('active');
                     nightBtn.classList.remove('active');
+                    
+                    // 每个游戏日结束后，新的一天开始时，自动为所有玩家笔记添加分号
+                    addSemicolonToAllNotes();
+                    
                     selectedPlayers = [];
                     renderPlayers();
                     updateDeathSummary();
@@ -1983,7 +2074,7 @@
                 // 更新提醒标记网格
                 reminderTokensGrid.innerHTML = '';
                 
-                // 添加默认提醒标记
+                // 添加默认提醒标记（善良、邪恶、数字等）
                 defaultReminders.forEach(reminder => {
                     const token = document.createElement('div');
                     token.className = 'reminder-token-select default-reminder';
@@ -2016,6 +2107,39 @@
                     reminderTokensGrid.appendChild(token);
                 });
                 
+                // 添加默认角色提醒标记（固定显示，不受角色数据影响）
+                defaultRoleReminders.forEach(reminder => {
+                    const token = document.createElement('div');
+                    token.className = 'reminder-token-select';
+                    token.style.backgroundImage = `url('${reminder.image}')`;
+                    token.textContent = reminder.text;
+                    token.dataset.text = reminder.text;
+                    token.dataset.image = reminder.image;
+                    
+                    token.addEventListener('click', function() {
+                        const playerNum = parseInt(reminderPlayerSelect.value);
+                        if (playerNum) {
+                            if (!playerReminders[playerNum]) {
+                                playerReminders[playerNum] = [];
+                            }
+                            
+                            // 添加提醒标记
+                            playerReminders[playerNum].push({
+                                text: this.dataset.text,
+                                image: this.dataset.image
+                            });
+                            
+                            // 更新玩家卡片
+                            renderPlayers();
+                            
+                            // 关闭提醒标记选择器
+                            reminderSelectorModal.classList.remove('active');
+                        }
+                    });
+                    
+                    reminderTokensGrid.appendChild(token);
+                });
+                
                 // 使用角色数据中的提醒标记
                 const allReminders = [];
                 roleData.forEach(role => {
@@ -2029,7 +2153,7 @@
                     }
                 });
                 
-                // 显示提醒标记
+                // 显示角色数据中的提醒标记
                 allReminders.forEach(reminder => {
                     const token = document.createElement('div');
                     token.className = 'reminder-token-select';
@@ -2182,26 +2306,35 @@
                 alert('笔记已复制到剪贴板！');
             });
             
-            // 清空所有
+            // 清空所有 - 添加了弹窗警告
             clearBtn.addEventListener('click', function() {
-                document.getElementById('day').value = '1';
-                document.getElementById('conditions').value = '';
-                evilConfigInput.value = '';
+                // 显示确认对话框
+                const userConfirmed = confirm('确定要清空所有数据吗？此操作不可撤销！');
                 
-                // 重置日夜状态
-                isNight = false;
-                dayBtn.classList.add('active');
-                nightBtn.classList.remove('active');
-                
-                // 重置玩家状态
-                initPlayers();
-                
-                output.value = '';
+                // 只有在用户确认后才执行清空操作
+                if (userConfirmed) {
+                    document.getElementById('day').value = '1';
+                    document.getElementById('conditions').value = '';
+                    evilConfigInput.value = '';
+                    
+                    // 重置日夜状态
+                    isNight = false;
+                    dayBtn.classList.add('active');
+                    nightBtn.classList.remove('active');
+                    
+                    // 重置玩家状态
+                    initPlayers();
+                    
+                    output.value = '';
+                    
+                    alert('所有数据已清空！');
+                }
             });
             
             // 玩家总数变化时重新初始化
             totalPlayersInput.addEventListener('change', function() {
                 initPlayers();
+                updateEvilConfigHint();
             });
             
             // 初始化角色选择器
@@ -2331,6 +2464,7 @@
             // 初始化玩家和角色选择器
             initPlayers();
             initRoleSelector();
+            updateEvilConfigHint();
         });
     </script>
 </body>
