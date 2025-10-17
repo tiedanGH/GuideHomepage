@@ -12,14 +12,14 @@
             box-sizing: border-box;
             font-family: 'Microsoft YaHei', sans-serif;
         }
-        
+
         body {
             background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
             color: #fff;
             min-height: 100vh;
             padding: 20px;
         }
-        
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -28,7 +28,7 @@
             padding: 20px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
-        
+
         header {
             text-align: center;
             margin-bottom: 30px;
@@ -36,30 +36,30 @@
             background: rgba(0, 0, 0, 0.5);
             border-radius: 15px;
         }
-        
+
         h1 {
             font-size: 2.5rem;
             margin-bottom: 10px;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
         }
-        
+
         .description {
             font-size: 1.2rem;
             opacity: 0.9;
             margin-bottom: 20px;
         }
-        
+
         .main-content {
             display: flex;
             flex-wrap: wrap;
             gap: 20px;
         }
-        
+
         .left-panel, .right-panel {
             flex: 1;
             min-width: 300px;
         }
-        
+
         .section {
             margin-bottom: 25px;
             padding: 15px;
@@ -67,26 +67,26 @@
             border-radius: 8px;
             border-left: 4px solid #ffd700;
         }
-        
+
         .section-title {
             font-weight: bold;
             margin-bottom: 10px;
             color: #ffd700;
             font-size: 1.2rem;
         }
-        
+
         .input-group {
             display: flex;
             align-items: center;
             margin-bottom: 15px;
         }
-        
+
         .input-group label {
             width: 120px;
             margin-right: 10px;
             color: #fff;
         }
-        
+
         input, select, textarea {
             padding: 8px;
             border: 1px solid #444;
@@ -94,45 +94,46 @@
             font-size: 14px;
             background: rgba(255, 255, 255, 0.9);
         }
-        
+
         input[type="text"], select {
             width: 200px;
         }
-        
+
         textarea {
             width: 100%;
             min-height: 100px;
             resize: vertical;
         }
-        
+
         .note-row {
             display: flex;
             margin-bottom: 10px;
             align-items: center;
         }
-        
+
         .note-row input {
             width: 50px;
             margin-right: 10px;
         }
-        
+
         .note-row .player-label {
             margin-right: 10px;
             color: #fff;
         }
-        
+
         .note-row input.desc {
             flex: 1;
             margin-right: 10px;
         }
-        
+
         .buttons {
             display: flex;
             justify-content: center;
             gap: 15px;
             margin: 20px 0;
+            flex-wrap: wrap;
         }
-        
+
         button {
             padding: 10px 20px;
             background: #ffd700;
@@ -144,35 +145,44 @@
             font-weight: bold;
             transition: all 0.3s;
         }
-        
+
         button:hover {
             background: #ffcc00;
             transform: translateY(-3px);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
-        
+
         button.copy {
             background: #4CAF50;
             color: white;
         }
-        
+
         button.copy:hover {
             background: #45a049;
         }
-        
+
         button.clear {
             background: #f44336;
             color: white;
         }
-        
+
         button.clear:hover {
             background: #d32f2f;
         }
-        
+
+        button.rollback {
+            background: #ff9800;
+            color: white;
+        }
+
+        button.rollback:hover {
+            background: #e68900;
+        }
+
         .output-area {
             margin-top: 20px;
         }
-        
+
         .output-area textarea {
             min-height: 300px;
             font-family: monospace;
@@ -180,23 +190,23 @@
             overflow-wrap: normal;
             overflow-x: scroll;
         }
-        
+
         .add-note-btn {
             background: #6c757d;
             color: white;
             margin-bottom: 15px;
         }
-        
+
         .add-note-btn:hover {
             background: #5a6268;
         }
-        
+
         .day-night-controls {
             display: flex;
             gap: 10px;
             margin-bottom: 15px;
         }
-        
+
         .day-night-btn {
             flex: 1;
             padding: 8px;
@@ -207,17 +217,17 @@
             cursor: pointer;
             transition: all 0.3s;
         }
-        
+
         .day-night-btn:hover {
             background: rgba(255, 215, 0, 0.2);
         }
-        
+
         .day-night-btn.active {
             background: #ffd700;
             color: #1a2a6c;
             font-weight: bold;
         }
-        
+
         .player-status-container {
             position: relative;
             height: 500px;
@@ -227,13 +237,13 @@
             border-radius: 8px;
             overflow: hidden;
         }
-        
+
         .player-status {
             position: relative;
             height: 100%;
             width: 100%;
         }
-        
+
         /* 双面卡片容器 */
         .player-card-container {
             width: 100px;
@@ -242,7 +252,7 @@
             position: absolute;
             cursor: pointer;
         }
-        
+
         .player-card {
             width: 100%;
             height: 100%;
@@ -252,11 +262,11 @@
             border-radius: 10px;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
         }
-        
+
         .player-card.flipped {
             transform: rotateY(180deg);
         }
-        
+
         .player-card-front, .player-card-back {
             position: absolute;
             width: 100%;
@@ -270,23 +280,23 @@
             overflow: hidden;
             padding: 5px;
         }
-        
+
         .player-card-front {
             background: rgba(255, 255, 255, 0.9);
             border: 2px solid transparent;
         }
-        
+
         .player-card-front.alive {
             background: rgba(212, 237, 218, 0.9);
             border-color: #28a745;
         }
-        
+
         .player-card-front.dead {
             background: rgba(248, 215, 218, 0.8);
             border-color: #dc3545;
             opacity: 0.8;
         }
-        
+
         .player-card-back {
             background: rgba(255, 255, 255, 0.95);
             transform: rotateY(180deg);
@@ -294,21 +304,21 @@
             padding: 8px;
             text-align: center;
         }
-        
+
         .player-card.selected .player-card-front {
             box-shadow: 0 0 0 3px #ffd700, 0 10px 25px rgba(0, 0, 0, 0.4);
             transform: scale(1.05);
         }
-        
+
         .player-card-container:hover .player-card {
             transform: translateY(-5px) scale(1.02);
             box-shadow: 0 12px 25px rgba(0, 0, 0, 0.4);
         }
-        
+
         .player-card-container:hover .player-card.flipped {
             transform: rotateY(180deg) translateY(-5px) scale(1.02);
         }
-        
+
         .player-number {
             font-size: 24px;
             font-weight: bold;
@@ -316,7 +326,7 @@
             text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
             z-index: 2;
         }
-        
+
         .player-note-desc {
             font-size: 10px;
             margin-top: 3px;
@@ -328,7 +338,7 @@
             white-space: nowrap;
             z-index: 2;
         }
-        
+
         /* 角色图标背景样式 */
         .player-role-background {
             position: absolute;
@@ -346,11 +356,11 @@
             background-color: rgba(255, 255, 255, 0.5);
             border: 2px solid rgba(255, 255, 255, 0.8);
         }
-        
+
         .player-card-front:hover .player-role-background {
             opacity: 0.85;
         }
-        
+
         .player-content {
             position: relative;
             z-index: 2;
@@ -364,168 +374,109 @@
             border-radius: 8px;
             padding: 5px;
         }
-        
-        /* 卡片背面样式 */
-        .reminder-tokens-container {
-            position: absolute;
-            top: 0;
-            left: 0;
+
+        /* 表格样式 */
+        .table-container {
+            margin-top: 20px;
+            overflow-x: auto;
+        }
+
+        .notes-table {
             width: 100%;
-            height: 100%;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: center;
-            gap: 3px;
-            padding: 5px;
-            z-index: 2;
-        }
-        
-        .reminder-token {
-            border-radius: 50%;
-            background-size: cover;
-            background-position: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-            border: 2px solid rgba(255, 255, 255, 0.8);
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
             overflow: hidden;
-            text-align: center;
-            line-height: 1.2;
-            padding: 2px;
-            background-color: #45224B;
-            position: relative;
+            font-size: 14px;
         }
-        
-        .flip-back-btn {
-            position: absolute;
-            bottom: 5px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 3px 8px;
+
+        .notes-table th {
+            background: rgba(255, 215, 0, 0.3);
+            color: #ffd700;
+            padding: 10px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .notes-table td {
+            padding: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+            word-break: break-word;
+        }
+
+        .notes-table tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .notes-table tr:hover {
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        .player-cell {
+            font-weight: bold;
+            color: #ffd700;
+            width: 100px;
+        }
+
+        .death-cell {
+            font-size: 12px;
+            color: #ff6b6b;
+            width: 120px;
+        }
+
+        .day-cell {
+            width: 120px;
+        }
+
+        /* 死亡玩家的特殊样式 */
+        .dead-player {
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+
+        .death-mark {
+            color: #ff6b6b;
+            font-size: 12px;
+        }
+
+        /* 文件上传样式 */
+        .file-upload-container {
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .file-upload-label {
+            display: inline-block;
+            padding: 10px 20px;
             background: #ffd700;
             color: #1a2a6c;
-            border: none;
-            border-radius: 3px;
-            font-size: 9px;
+            border-radius: 4px;
             cursor: pointer;
-            z-index: 3;
-        }
-        
-        /* 中心显示区域样式 */
-        .center-display {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 180px;
-            height: 180px;
-            background: rgba(0, 0, 0, 0.8);
-            border-radius: 15px;
-            border: 3px solid #ffd700;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 5;
-            padding: 10px;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
-            backdrop-filter: blur(5px);
-        }
-        
-        .center-display-title {
-            color: #ffd700;
             font-weight: bold;
-            margin-bottom: 10px;
-            font-size: 14px;
-            text-align: center;
+            transition: all 0.3s;
         }
-        
-        .center-reminders-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 5px;
-            justify-content: center;
-            align-items: center;
-            max-height: 130px;
-            overflow-y: auto;
-            padding: 5px;
+
+        .file-upload-label:hover {
+            background: #ffcc00;
         }
-        
-        .center-reminder-token {
-            border-radius: 50%;
-            background-size: cover;
-            background-position: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            text-shadow: 
-                0 0 3px rgba(0, 0, 0, 0.8),
-                0 0 5px rgba(0, 0, 0, 0.6),
-                0 0 7px rgba(0, 0, 0, 0.4);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-            border: 2px solid rgba(255, 255, 255, 0.8);
-            overflow: hidden;
-            text-align: center;
-            line-height: 1.2;
-            padding: 2px;
-            background-color: #45224B;
-            position: relative;
-            width: 50px;
-            height: 50px;
-            font-size: 14px;
-        }
-        
-        /* 修改善良标记为蓝色，数字标记为绿色 */
-        .center-reminder-token.default-reminder.good {
-            background-color: #2196F3 !important; /* 蓝色 */
-        }
-        
-        .center-reminder-token.default-reminder.evil {
-            background-color: #F44336 !important;
-        }
-        
-        .center-reminder-token.default-reminder.number {
-            background-color: #4CAF50 !important; /* 绿色 */
-        }
-        
-        .center-display.hidden {
+
+        .file-upload-input {
             display: none;
         }
-        
-        /* 中心显示区域的删除按钮 */
-        .center-reminder-delete-btn {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background: #f44336;
-            color: white;
-            border: none;
+
+        /* 邪恶配置提示样式 */
+        .evil-config-tip {
             font-size: 12px;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-            transition: all 0.2s;
-            z-index: 10;
+            color: #ffd700;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            padding: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            border-left: 3px solid #ffd700;
         }
-        
-        .center-reminder-delete-btn:hover {
-            background: #d32f2f;
-            transform: scale(1.1);
-        }
-        
+
         /* 角色选择器模态框 */
         .role-selector-modal {
             position: fixed;
@@ -534,20 +485,19 @@
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.8);
-            display: flex;
+            display: none;
             align-items: center;
             justify-content: center;
             z-index: 1000;
             opacity: 0;
-            visibility: hidden;
             transition: all 0.3s;
         }
-        
+
         .role-selector-modal.active {
             opacity: 1;
-            visibility: visible;
+            display: flex;
         }
-        
+
         .role-selector-content {
             background: rgba(26, 42, 108, 0.95);
             border-radius: 15px;
@@ -558,19 +508,19 @@
             overflow-y: auto;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
-        
+
         .role-selector-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
         }
-        
+
         .role-selector-title {
             font-size: 1.5rem;
             color: #ffd700;
         }
-        
+
         .close-modal {
             background: #f44336;
             color: white;
@@ -584,14 +534,14 @@
             align-items: center;
             justify-content: center;
         }
-        
+
         .role-tabs {
             display: flex;
             gap: 10px;
             margin-bottom: 20px;
             flex-wrap: wrap;
         }
-        
+
         .role-tab {
             padding: 8px 16px;
             background: rgba(255, 255, 255, 0.1);
@@ -600,23 +550,23 @@
             transition: all 0.3s;
             font-size: 14px;
         }
-        
+
         .role-tab.active {
             background: #ffd700;
             color: #1a2a6c;
             font-weight: bold;
         }
-        
+
         .role-tab:hover {
             background: rgba(255, 215, 0, 0.3);
         }
-        
+
         .role-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
             gap: 15px;
         }
-        
+
         .role-item {
             background: rgba(255, 255, 255, 0.9);
             border-radius: 10px;
@@ -629,13 +579,14 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            position: relative;
         }
-        
+
         .role-item:hover {
             transform: translateY(-5px);
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
         }
-        
+
         .role-icon {
             width: 80px;
             height: 80px;
@@ -649,19 +600,19 @@
             border: 3px solid #fff;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
-        
+
         .role-icon img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
-        
+
         .role-name {
             font-size: 14px;
             color: #333;
             font-weight: bold;
         }
-        
+
         .team-badge {
             position: absolute;
             top: 5px;
@@ -676,1796 +627,1205 @@
             color: white;
             font-weight: bold;
         }
-        
+
         .townsfolk {
             background: #4caf50;
         }
-        
+
         .outsider {
             background: #2196f3;
         }
-        
+
         .minion {
             background: #f44336;
         }
-        
+
         .demon {
             background: #9c27b0;
         }
-        
-        .mark-death-container {
-            text-align: center;
-            margin: 15px 0;
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-        }
-        
-        .role-config-container {
-            margin-top: 15px;
-        }
-        
-        .role-config-input {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background: rgba(255, 255, 255, 0.9);
-        }
-        
-        .info-note {
-            font-size: 12px;
-            color: #aaa;
-            margin-top: 5px;
-            font-style: italic;
-        }
-        
-        .file-upload-container {
-            margin-bottom: 15px;
-            text-align: center;
-        }
-        
-        .file-upload-label {
-            display: inline-block;
-            padding: 10px 20px;
-            background: #ffd700;
-            color: #1a2a6c;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
-        
-        .file-upload-label:hover {
-            background: #ffcc00;
-        }
-        
-        .file-upload-input {
-            display: none;
-        }
-        
-        .update-btn {
-            background: #17a2b8;
-            color: white;
-            padding: 5px 10px;
-            font-size: 12px;
-            margin-left: 10px;
-        }
-        
+
         .no-roles-message {
             text-align: center;
             padding: 20px;
             color: #ffd700;
             font-size: 16px;
         }
-        
-        .death-summary-container {
-            margin-top: 20px;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-        }
-        
-        .death-summary-title {
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: #ffd700;
-            font-size: 1.2rem;
-        }
-        
-        .death-summary-content {
-            max-height: 200px;
-            overflow-y: auto;
-            font-family: monospace;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-        
-        .death-summary-line {
-            margin-bottom: 5px;
-        }
-        
-        .peaceful-day {
-            color: #4caf50;
-        }
-        
-        .peaceful-night {
-            color: #2196f3;
-        }
-        
-        .multi-death-night {
-            color: #f44336;
-            font-weight: bold;
-        }
-        
-        .resurrect-btn {
-            background: #9c27b0;
-            color: white;
-        }
-        
-        .resurrect-btn:hover {
-            background: #8e24aa;
-        }
-        
-        .add-reminder-btn {
-            background: #17a2b8;
-            color: white;
-        }
-        
-        .add-reminder-btn:hover {
-            background: #138496;
-        }
-        
-        .reminder-selector-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s;
-        }
-        
-        .reminder-selector-modal.active {
-            opacity: 1;
-            visibility: visible;
-        }
-        
-        .reminder-selector-content {
-            background: rgba(26, 42, 108, 0.95);
-            border-radius: 15px;
-            padding: 20px;
-            width: 90%;
-            max-width: 800px;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-        }
-        
-        .reminder-selector-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        
-        .reminder-selector-title {
-            font-size: 1.5rem;
-            color: #ffd700;
-        }
-        
-        .player-selection {
-            margin-bottom: 20px;
-        }
-        
-        .player-selection label {
-            display: block;
-            margin-bottom: 5px;
-            color: #ffd700;
-        }
-        
-        .player-selection select {
-            width: 100%;
-            padding: 8px;
-            border-radius: 4px;
-            background: rgba(255, 255, 255, 0.9);
-            border: 1px solid #ddd;
-        }
-        
-        .reminder-tokens-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
-            gap: 10px;
-            margin-top: 20px;
-        }
-        
-        .reminder-token-select {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            background-size: cover;
-            background-position: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 14px;
-            font-weight: bold;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-            border: 2px solid rgba(255, 255, 255, 0.8);
-            cursor: pointer;
-            transition: all 0.3s;
-            background-color: #45224B;
-        }
-        
-        .reminder-token-select:hover {
-            transform: scale(1.1);
-            box-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
-        }
-        
-        /* 默认标记的特殊样式 */
-        .default-reminder.good {
-            background-color: #2196F3 !important; /* 蓝色 */
-        }
-        
-        .default-reminder.evil {
-            background-color: #F44336 !important;
-        }
-        
-        .default-reminder.number {
-            background-color: #4CAF50 !important; /* 绿色 */
-        }
-        
+
+        /* 响应式调整 */
         @media (max-width: 768px) {
             .main-content {
                 flex-direction: column;
             }
-            
+
             .player-status-container {
                 height: 400px;
             }
-            
+
             .player-card-container {
                 width: 80px;
                 height: 100px;
             }
-            
+
             .player-number {
                 font-size: 20px;
             }
-            
+
+            .notes-table {
+                font-size: 12px;
+            }
+
+            .notes-table th, .notes-table td {
+                padding: 6px;
+            }
+
+            .player-cell {
+                width: 80px;
+            }
+
+            .death-cell {
+                width: 100px;
+                font-size: 11px;
+            }
+
+            .day-cell {
+                width: 100px;
+            }
+
+            .buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
             .role-grid {
                 grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
             }
-            
+
             .role-item {
                 min-height: 120px;
                 padding: 10px;
             }
-            
+
             .role-icon {
                 width: 60px;
                 height: 60px;
             }
-            
-            .mark-death-container {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            /* 在平板设备上调整提醒标记尺寸 */
-            .reminder-token {
-                font-size: 10px;
-            }
-            
-            .reminder-token-select {
-                width: 60px;
-                height: 60px;
-                font-size: 12px;
-            }
-            
-            .center-display {
-                width: 150px;
-                height: 150px;
-            }
-            
-            .center-reminder-token {
-                width: 40px;
-                height: 40px;
-                font-size: 12px;
-            }
-            
-            .center-reminder-delete-btn {
-                width: 16px;
-                height: 16px;
-                font-size: 10px;
-                top: -6px;
-                right: -6px;
-            }
         }
-        
+
         @media (max-width: 480px) {
             .player-status-container {
                 height: 350px;
             }
-            
+
             .player-card-container {
                 width: 70px;
                 height: 90px;
             }
-            
+
             .player-number {
                 font-size: 18px;
             }
-            
+
             .player-note-desc {
                 font-size: 8px;
             }
-            
+
+            .notes-table {
+                font-size: 11px;
+            }
+
+            .notes-table th, .notes-table td {
+                padding: 4px;
+            }
+
+            .player-cell {
+                width: 60px;
+            }
+
+            .death-cell {
+                width: 80px;
+                font-size: 10px;
+            }
+
+            .day-cell {
+                width: 80px;
+            }
+
             .role-grid {
                 grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
                 gap: 10px;
             }
-            
+
             .role-item {
                 min-height: 100px;
                 padding: 8px;
             }
-            
+
             .role-icon {
                 width: 50px;
                 height: 50px;
             }
-            
+
             .role-name {
                 font-size: 12px;
-            }
-            
-            /* 在手机设备上调整提醒标记尺寸 */
-            .reminder-token {
-                font-size: 9px;
-            }
-            
-            .reminder-token-select {
-                width: 50px;
-                height: 50px;
-                font-size: 11px;
-            }
-            
-            .center-display {
-                width: 130px;
-                height: 130px;
-            }
-            
-            .center-reminder-token {
-                width: 35px;
-                height: 35px;
-                font-size: 11px;
-            }
-            
-            .center-reminder-delete-btn {
-                width: 14px;
-                height: 14px;
-                font-size: 9px;
-                top: -5px;
-                right: -5px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>血染钟楼笔记生成器</h1>
-            <p class="description">单击角色卡片查看提醒标记，双击选择角色，长按角色卡片查看角色卡片背面</p>
-            <p class="description">添加笔记时，使用分号（；）分隔不同天数的笔记，生成时会按天数→玩家序号顺序排列</p>
-        </header>
-        
-        <div class="file-upload-container">
-            <label for="jsonFile" class="file-upload-label">上传角色JSON配置文件</label>
-            <input type="file" id="jsonFile" class="file-upload-input" accept=".json">
-        </div>
-        
-        <div class="main-content">
-            <div class="left-panel">
-                <div class="section">
-                    <div class="section-title">游戏状态</div>
-                    <div class="input-group">
-                        <label for="day">当前天数:</label>
-                        <input type="text" id="day" value="1" readonly>
-                    </div>
-                    <div class="input-group">
-                        <label for="totalPlayers">玩家总数:</label>
-                        <input type="number" id="totalPlayers" min="5" max="15" value="12">
-                    </div>
-                    <div class="input-group">
-                        <label for="alive">存活人数:</label>
-                        <input type="text" id="alive" value="12/12" readonly>
-                    </div>
-                    
-                    <div class="day-night-controls">
-                        <div class="day-night-btn" id="nightBtn">夜晚</div>
-                        <div class="day-night-btn active" id="dayBtn">白天</div>
-                    </div>
-                    
-                    <div class="role-config-container">
-                        <input type="text" id="evilConfig" class="role-config-input" placeholder="邪恶配置">
-                        <div class="info-note" id="evilConfigHint">标准配置：7民2外2爪1恶</div>
-                    </div>
-                </div>
-                
-                <div class="section">
-                    <div class="section-title">笔记记录</div>
-                    <p style="font-size: 12px; color: #ffd700; margin-bottom: 10px;">使用分号（；）分隔不同天数的笔记，即使这天信息为0也要写个无；</p>
-                    <button class="add-note-btn" id="addNoteBtn">添加笔记</button>
-                    <div id="notesContainer">
-                        <!-- 笔记行将通过JS动态生成 -->
-                    </div>
-                </div>
-                
-                <div class="section">
-                    <div class="section-title">博学者信息或其他大段信息</div>
-                    <textarea id="conditions" placeholder="博学者信息或者其他大段信息"></textarea>
-                </div>
-            </div>
-            
-            <div class="right-panel">
-                <div class="section">
-                    <div class="section-title">玩家状态</div>
-                    <div class="mark-death-container">
-                        <button id="markDeathBtn">标记死亡玩家</button>
-                        <button id="resurrectBtn" class="resurrect-btn">复活玩家</button>
-                        <button id="addReminderBtn" class="add-reminder-btn">添加提醒标记</button>
-                    </div>
-                    <div class="player-status-container">
-                        <div class="player-status" id="playerStatus">
-                            <!-- 玩家卡片将通过JS动态生成 -->
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="section death-summary-container">
-                    <div class="death-summary-title">死亡汇总</div>
-                    <div class="death-summary-content" id="deathSummary">
-                        <!-- 死亡汇总信息将通过JS动态生成 -->
-                    </div>
-                </div>
-                
-                <div class="section output-area">
-                    <div class="section-title">生成的笔记</div>
-                    <div class="buttons">
-                        <button id="generateBtn">生成笔记</button>
-                        <button id="copyBtn" class="copy">复制笔记</button>
-                        <button id="clearBtn" class="clear">清空所有</button>
-                    </div>
-                    <textarea id="output" readonly></textarea>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- 角色选择模态框 -->
-    <div class="role-selector-modal" id="roleSelectorModal">
-        <div class="role-selector-content">
-            <div class="role-selector-header">
-                <h2 class="role-selector-title">选择角色</h2>
-                <button class="close-modal" id="closeModal">&times;</button>
-            </div>
-            <div class="role-tabs" id="roleTabs">
-                <div class="role-tab active" data-team="all">全部</div>
-                <div class="role-tab" data-team="townsfolk">镇民</div>
-                <div class="role-tab" data-team="outsider">外来者</div>
-                <div class="role-tab" data-team="minion">爪牙</div>
-                <div class="role-tab" data-team="demon">恶魔</div>
-            </div>
-            <div class="role-grid" id="roleGrid">
-                <!-- 角色项将通过JS动态生成 -->
-            </div>
-        </div>
-    </div>
-    
-    <!-- 提醒标记选择器模态框 -->
-    <div class="reminder-selector-modal" id="reminderSelectorModal">
-        <div class="reminder-selector-content">
-            <div class="reminder-selector-header">
-                <h2 class="reminder-selector-title">添加提醒标记</h2>
-                <button class="close-modal" id="closeReminderModal">&times;</button>
-            </div>
-            
-            <div class="player-selection">
-                <label for="reminderPlayerSelect">选择玩家:</label>
-                <select id="reminderPlayerSelect">
-                    <!-- 玩家选项将通过JS动态生成 -->
-                </select>
-            </div>
-            
-            <div class="reminder-tokens-grid" id="reminderTokensGrid">
-                <!-- 提醒标记将通过JS动态生成 -->
-            </div>
-        </div>
+<div class="container">
+    <header>
+        <h1>血染钟楼笔记生成器 - 表格版</h1>
+        <p class="description">单击角色卡片查看提醒标记，双击选择角色，长按角色卡片查看角色卡片背面</p>
+        <p class="description">添加笔记时，使用分号（；）分隔不同天数的笔记，生成时会按天数→玩家序号顺序排列</p>
+    </header>
+
+    <div class="file-upload-container">
+        <label for="jsonFile" class="file-upload-label">上传角色JSON配置文件</label>
+        <input type="file" id="jsonFile" class="file-upload-input" accept=".json">
     </div>
 
-    <script>
-        // 角色数据初始化为您指定的四个角色
-        let roleData = [
-            { 
-                id: "drunk", 
-                name: "酒鬼", 
-                team: "outsider", 
-                image: "https://oss.gstonegames.com/data_file/clocktower/web/icons/drunk.png",
-                reminders: ["是酒鬼"]
-            },
-            { 
-                id: "lunatic", 
-                name: "疯子", 
-                team: "outsider", 
-                image: "https://oss.gstonegames.com/data_file/clocktower/web/icons/lunatic.png",
-                reminders: ["是疯子"]
-            },
-            { 
-                id: "marionette", 
-                name: "提线木偶", 
-                team: "minion", 
-                image: "https://oss.gstonegames.com/data_file/clocktower/web/icons/marionette.png",
-                reminders: ["是提线木偶"]
-            },
-            { 
-                id: "wudaozhe", 
-                name: "悟道者", 
-                team: "minion", 
-                image: "https://oss.gstonegames.com/data_file/clocktower/web/icons/wudaozhe.png",
-                reminders: ["是悟道者"]
-            }
-        ];
-        
-        // 默认角色提醒标记数据
-        const defaultRoleReminders = [
-            { text: "是酒鬼", type: "role", image: "https://oss.gstonegames.com/data_file/clocktower/web/icons/drunk.png" },
-            { text: "是疯子", type: "role", image: "https://oss.gstonegames.com/data_file/clocktower/web/icons/lunatic.png" },
-            { text: "是提线木偶", type: "role", image: "https://oss.gstonegames.com/data_file/clocktower/web/icons/marionette.png" },
-            { text: "是悟道者", type: "role", image: "https://oss.gstonegames.com/data_file/clocktower/web/icons/wudaozhe.png" }
-        ];
-        
-        // 玩家提醒标记数据
-        let playerReminders = {};
-        
-        // 默认提醒标记数据
-        const defaultReminders = [
-            { text: "善良", type: "good" },
-            { text: "邪恶", type: "evil" },
-            { text: "0", type: "number" },
-            { text: "1", type: "number" },
-            { text: "2", type: "number" }
-        ];
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            const notesContainer = document.getElementById('notesContainer');
-            const addNoteBtn = document.getElementById('addNoteBtn');
-            const generateBtn = document.getElementById('generateBtn');
-            const copyBtn = document.getElementById('copyBtn');
-            const clearBtn = document.getElementById('clearBtn');
-            const markDeathBtn = document.getElementById('markDeathBtn');
-            const resurrectBtn = document.getElementById('resurrectBtn');
-            const addReminderBtn = document.getElementById('addReminderBtn');
-            const output = document.getElementById('output');
-            const nightBtn = document.getElementById('nightBtn');
-            const dayBtn = document.getElementById('dayBtn');
-            const dayInput = document.getElementById('day');
-            const aliveInput = document.getElementById('alive');
-            const totalPlayersInput = document.getElementById('totalPlayers');
-            const playerStatus = document.getElementById('playerStatus');
-            const evilConfigInput = document.getElementById('evilConfig');
-            const evilConfigHint = document.getElementById('evilConfigHint');
-            const roleSelectorModal = document.getElementById('roleSelectorModal');
-            const closeModal = document.getElementById('closeModal');
-            const roleGrid = document.getElementById('roleGrid');
-            const jsonFileInput = document.getElementById('jsonFile');
-            const roleTabs = document.getElementById('roleTabs');
-            const deathSummary = document.getElementById('deathSummary');
-            const reminderSelectorModal = document.getElementById('reminderSelectorModal');
-            const closeReminderModal = document.getElementById('closeReminderModal');
-            const reminderPlayerSelect = document.getElementById('reminderPlayerSelect');
-            const reminderTokensGrid = document.getElementById('reminderTokensGrid');
-            
-            // 默认设置为白天
-            let isNight = false;
-            
-            let players = [];
-            let selectedPlayers = [];
-            let totalPlayers = 12;
-            let playerNotes = {};
-            let playerRoles = {};
-            let currentPlayerForRole = null;
-            let clickTimer = null;
-            let currentCenterPlayer = null; // 当前在中心显示的玩家
-            
-            // 创建中心显示区域
-            const centerDisplay = document.createElement('div');
-            centerDisplay.className = 'center-display hidden';
-            centerDisplay.id = 'centerDisplay';
-            
-            const centerDisplayTitle = document.createElement('div');
-            centerDisplayTitle.className = 'center-display-title';
-            centerDisplayTitle.textContent = '玩家提醒标记';
-            
-            const centerRemindersContainer = document.createElement('div');
-            centerRemindersContainer.className = 'center-reminders-container';
-            centerRemindersContainer.id = 'centerRemindersContainer';
-            
-            centerDisplay.appendChild(centerDisplayTitle);
-            centerDisplay.appendChild(centerRemindersContainer);
-            playerStatus.appendChild(centerDisplay);
-            
-            // 更新邪恶配置提示的函数
-            function updateEvilConfigHint() {
-                const playerCount = parseInt(totalPlayersInput.value);
-                let hint = "";
-                
-                switch(playerCount) {
-                    case 5:
-                        hint = "标准配置：3民0外1爪1恶";
-                        break;
-                    case 6:
-                        hint = "标准配置：3民1外1爪1恶";
-                        break;
-                    case 7:
-                        hint = "标准配置：5民0外1爪1恶";
-                        break;
-                    case 8:
-                        hint = "标准配置：5民1外1爪1恶";
-                        break;
-                    case 9:
-                        hint = "标准配置：5民2外1爪1恶";
-                        break;
-                    case 10:
-                        hint = "标准配置：7民0外2爪1恶";
-                        break;
-                    case 11:
-                        hint = "标准配置：7民1外2爪1恶";
-                        break;
-                    case 12:
-                        hint = "标准配置：7民2外2爪1恶";
-                        break;
-                    case 13:
-                        hint = "标准配置：9民0外3爪1恶";
-                        break;
-                    case 14:
-                        hint = "标准配置：9民1外3爪1恶";
-                        break;
-                    case 15:
-                        hint = "标准配置：9民2外3爪1恶";
-                        break;
-                    default:
-                        hint = "请选择5-15名玩家";
-                }
-                
-                evilConfigHint.textContent = hint;
-            }
-            
-            // 自动为所有玩家笔记添加分号的函数
-            function addSemicolonToAllNotes() {
-                console.log("自动为所有玩家笔记添加分号");
-                
-                // 获取所有笔记行
-                const noteRows = notesContainer.querySelectorAll('.note-row');
-                
-                noteRows.forEach(row => {
-                    const descInput = row.querySelector('.desc-input');
-                    const playerInput = row.querySelector('.player-input');
-                    
-                    if (playerInput && playerInput.value) {
-                        const playerNum = parseInt(playerInput.value);
-                        
-                        // 无论笔记内容是否为空，都添加分号
-                        // 如果末尾已经有分号，不再重复添加
-                        if (!descInput.value.trim().endsWith('；')) {
-                            descInput.value += '；';
-                            
-                            // 更新对应的玩家笔记
-                            addPlayerNote(playerNum, descInput.value);
-                        }
-                    }
+    <div class="main-content">
+        <div class="left-panel">
+            <div class="section">
+                <div class="section-title">游戏状态</div>
+                <div class="input-group">
+                    <label for="day">当前天数:</label>
+                    <input type="text" id="day" value="1" readonly>
+                </div>
+                <div class="input-group">
+                    <label for="totalPlayers">玩家总数:</label>
+                    <input type="number" id="totalPlayers" min="5" max="15" value="12">
+                </div>
+                <div class="input-group">
+                    <label for="alive">存活人数:</label>
+                    <input type="text" id="alive" value="12/12" readonly>
+                </div>
+
+                <div class="day-night-controls">
+                    <div class="day-night-btn" id="nightBtn">夜晚</div>
+                    <div class="day-night-btn active" id="dayBtn">白天</div>
+                </div>
+
+                <div class="role-config-container">
+                    <input type="text" id="evilConfig" class="role-config-input" placeholder="邪恶配置">
+                    <div class="evil-config-tip" id="evilConfigTip">
+                        标准配置：7民2外2爪1恶
+                    </div>
+                </div>
+
+                <div class="buttons">
+                    <button id="rollbackBtn" class="rollback">回退前一天</button>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">笔记记录</div>
+                <p style="font-size: 12px; color: #ffd700; margin-bottom: 10px;">使用分号（；）分隔不同天数的笔记，即使这天信息为0也要写个无；</p>
+                <button class="add-note-btn" id="addNoteBtn">添加笔记</button>
+                <div id="notesContainer">
+                    <!-- 笔记行将通过JS动态生成 -->
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">博学者信息或其他大段信息</div>
+                <textarea id="conditions" placeholder="博学者信息或者其他大段信息"></textarea>
+            </div>
+        </div>
+
+        <div class="right-panel">
+            <div class="section">
+                <div class="section-title">玩家状态</div>
+                <div class="mark-death-container">
+                    <button id="markDeathBtn">标记死亡玩家</button>
+                    <button id="resurrectBtn" class="resurrect-btn">复活玩家</button>
+                </div>
+                <div class="player-status-container">
+                    <div class="player-status" id="playerStatus">
+                        <!-- 玩家卡片将通过JS动态生成 -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="section output-area">
+                <div class="section-title">生成的笔记（表格格式）</div>
+                <div class="buttons">
+                    <button id="generateBtn">生成笔记</button>
+                    <button id="copyBtn" class="copy">复制笔记</button>
+                    <button id="clearBtn" class="clear">清空所有</button>
+                </div>
+                <div class="table-container">
+                    <div id="tableOutput"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 角色选择模态框 -->
+<div class="role-selector-modal" id="roleSelectorModal">
+    <div class="role-selector-content">
+        <div class="role-selector-header">
+            <h2 class="role-selector-title">选择角色</h2>
+            <button class="close-modal" id="closeModal">&times;</button>
+        </div>
+        <div class="role-tabs" id="roleTabs">
+            <div class="role-tab active" data-team="all">全部</div>
+            <div class="role-tab" data-team="townsfolk">镇民</div>
+            <div class="role-tab" data-team="outsider">外来者</div>
+            <div class="role-tab" data-team="minion">爪牙</div>
+            <div class="role-tab" data-team="demon">恶魔</div>
+        </div>
+        <div class="role-grid" id="roleGrid">
+            <!-- 角色项将通过JS动态生成 -->
+        </div>
+    </div>
+</div>
+
+<script>
+    // 角色数据初始化为您指定的四个角色
+    let roleData = [
+        {
+            id: "drunk",
+            name: "酒鬼",
+            team: "outsider",
+            image: "https://oss.gstonegames.com/data_file/clocktower/web/icons/drunk.png",
+            reminders: ["是酒鬼"]
+        },
+        {
+            id: "lunatic",
+            name: "疯子",
+            team: "outsider",
+            image: "https://oss.gstonegames.com/data_file/clocktower/web/icons/lunatic.png",
+            reminders: ["是疯子"]
+        },
+        {
+            id: "marionette",
+            name: "提线木偶",
+            team: "minion",
+            image: "https://oss.gstonegames.com/data_file/clocktower/web/icons/marionette.png",
+            reminders: ["是提线木偶"]
+        },
+        {
+            id: "wudaozhe",
+            name: "悟道者",
+            team: "minion",
+            image: "https://oss.gstonegames.com/data_file/clocktower/web/icons/wudaozhe.png",
+            reminders: ["是悟道者"]
+        }
+    ];
+
+    // 玩家提醒标记数据
+    let playerReminders = {};
+
+    // 默认提醒标记数据
+    const defaultReminders = [
+        { text: "善良", type: "good" },
+        { text: "邪恶", type: "evil" },
+        { text: "0", type: "number" },
+        { text: "1", type: "number" },
+        { text: "2", type: "number" }
+    ];
+
+    // 标准配置映射表
+    const standardConfigs = {
+        5: "3民0外1爪1恶",
+        6: "3民1外1爪1恶",
+        7: "5民0外1爪1恶",
+        8: "5民1外1爪1恶",
+        9: "5民2外1爪1恶",
+        10: "7民0外2爪1恶",
+        11: "7民1外2爪1恶",
+        12: "7民2外2爪1恶",
+        13: "9民0外3爪1恶",
+        14: "9民1外3爪1恶",
+        15: "9民2外3爪1恶"
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const notesContainer = document.getElementById('notesContainer');
+        const addNoteBtn = document.getElementById('addNoteBtn');
+        const generateBtn = document.getElementById('generateBtn');
+        const copyBtn = document.getElementById('copyBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const markDeathBtn = document.getElementById('markDeathBtn');
+        const resurrectBtn = document.getElementById('resurrectBtn');
+        const rollbackBtn = document.getElementById('rollbackBtn');
+        const nightBtn = document.getElementById('nightBtn');
+        const dayBtn = document.getElementById('dayBtn');
+        const dayInput = document.getElementById('day');
+        const aliveInput = document.getElementById('alive');
+        const totalPlayersInput = document.getElementById('totalPlayers');
+        const playerStatus = document.getElementById('playerStatus');
+        const evilConfigInput = document.getElementById('evilConfig');
+        const evilConfigTip = document.getElementById('evilConfigTip');
+        const tableOutput = document.getElementById('tableOutput');
+        const jsonFileInput = document.getElementById('jsonFile');
+        const roleSelectorModal = document.getElementById('roleSelectorModal');
+        const closeModal = document.getElementById('closeModal');
+        const roleGrid = document.getElementById('roleGrid');
+        const roleTabs = document.getElementById('roleTabs');
+
+        // 默认设置为白天
+        let isNight = false;
+
+        let players = [];
+        let selectedPlayers = [];
+        let totalPlayers = 12;
+        let playerNotes = {};
+        let playerRoles = {};
+        let currentPlayerForRole = null;
+
+        // 初始化玩家状态
+        function initPlayers() {
+            totalPlayers = parseInt(totalPlayersInput.value) || 12;
+            players = [];
+            playerNotes = {};
+            playerRoles = {};
+            playerReminders = {};
+            for (let i = 1; i <= totalPlayers; i++) {
+                players.push({
+                    number: i,
+                    alive: true,
+                    deathDay: null,
+                    deathTime: null
                 });
-                
-                // 重新渲染玩家卡片以显示更新后的笔记
-                renderPlayers();
+                playerNotes[i] = [];
+                playerRoles[i] = null;
+                playerReminders[i] = [];
             }
-            
-            // 更新中心显示区域的函数
-            function updateCenterDisplay(playerNum) {
-                const centerDisplay = document.getElementById('centerDisplay');
-                const centerRemindersContainer = document.getElementById('centerRemindersContainer');
-                const centerDisplayTitle = centerDisplay.querySelector('.center-display-title');
-                
-                if (playerNum && playerReminders[playerNum] && playerReminders[playerNum].length > 0) {
-                    // 显示该玩家的提醒标记
-                    centerDisplayTitle.textContent = `${playerNum}号玩家提醒标记`;
-                    centerRemindersContainer.innerHTML = '';
-                    
-                    playerReminders[playerNum].forEach((reminder, index) => {
+
+            // 清空笔记记录区域，并创建与玩家数量相同的笔记行
+            notesContainer.innerHTML = '';
+            for (let i = 1; i <= totalPlayers; i++) {
+                createNoteRow(i);
+            }
+
+            renderPlayers();
+            updateAliveCount();
+
+            // 更新邪恶配置提示
+            updateEvilConfigTip();
+        }
+
+        // 更新邪恶配置提示
+        function updateEvilConfigTip() {
+            const playerCount = parseInt(totalPlayersInput.value);
+            if (standardConfigs[playerCount]) {
+                evilConfigTip.textContent = `标准配置：${standardConfigs[playerCount]}`;
+            } else {
+                evilConfigTip.textContent = "标准配置：未知";
+            }
+        }
+
+        // 创建笔记行
+        function createNoteRow(playerNum) {
+            const newRow = document.createElement('div');
+            newRow.className = 'note-row';
+
+            const playerInput = document.createElement('input');
+            playerInput.type = 'text';
+            playerInput.className = 'player-input';
+            playerInput.value = playerNum;
+
+            const playerLabel = document.createElement('span');
+            playerLabel.className = 'player-label';
+            playerLabel.textContent = '号玩家';
+
+            const descInput = document.createElement('input');
+            descInput.type = 'text';
+            descInput.className = 'desc-input desc';
+            descInput.placeholder = '笔记内容（用；分隔不同天数的笔记，即使这天信息为0也要写个无；）';
+
+            const updateBtn = document.createElement('button');
+            updateBtn.className = 'update-btn';
+            updateBtn.textContent = '更新';
+            updateBtn.addEventListener('click', function() {
+                const playerNum = playerInput.value;
+                const noteText = descInput.value;
+
+                // 修复：当笔记内容为空时，清空对应玩家的笔记显示
+                if (playerNum) {
+                    if (noteText.trim() === '') {
+                        removePlayerNote(parseInt(playerNum));
+                    } else {
+                        addPlayerNote(playerNum, noteText);
+                    }
+                    renderPlayers();
+                }
+            });
+
+            newRow.appendChild(playerInput);
+            newRow.appendChild(playerLabel);
+            newRow.appendChild(descInput);
+            newRow.appendChild(updateBtn);
+
+            notesContainer.appendChild(newRow);
+        }
+
+        // 渲染玩家状态卡片（圆形排列）
+        function renderPlayers() {
+            playerStatus.innerHTML = '';
+
+            const containerWidth = playerStatus.offsetWidth;
+            const containerHeight = playerStatus.offsetHeight;
+            const centerX = containerWidth / 2;
+            const centerY = containerHeight / 2;
+            const radius = Math.min(containerWidth, containerHeight) * 0.4;
+
+            players.forEach((player, index) => {
+                // 计算每个玩家在圆上的位置（1号在顶部）
+                const angle = ((index * (360 / players.length)) - 90) * (Math.PI / 180);
+                const x = centerX + radius * Math.cos(angle);
+                const y = centerY + radius * Math.sin(angle);
+
+                // 创建卡片容器
+                const playerCardContainer = document.createElement('div');
+                playerCardContainer.className = 'player-card-container';
+                playerCardContainer.dataset.player = player.number;
+                playerCardContainer.style.left = `${x - 50}px`;
+                playerCardContainer.style.top = `${y - 60}px`;
+
+                // 创建双面卡片
+                const playerCard = document.createElement('div');
+                playerCard.className = `player-card ${selectedPlayers.includes(player.number) ? 'selected' : ''}`;
+
+                // 创建卡片正面
+                const playerCardFront = document.createElement('div');
+                playerCardFront.className = `player-card-front ${player.alive ? 'alive' : 'dead'}`;
+
+                // 添加角色背景
+                const roleBackground = document.createElement('div');
+                roleBackground.className = 'player-role-background';
+                if (playerRoles[player.number] && playerRoles[player.number].image) {
+                    roleBackground.style.backgroundImage = `url('${playerRoles[player.number].image}')`;
+                }
+                playerCardFront.appendChild(roleBackground);
+
+                const playerContent = document.createElement('div');
+                playerContent.className = 'player-content';
+
+                const playerNumber = document.createElement('div');
+                playerNumber.className = 'player-number';
+                playerNumber.textContent = player.number;
+
+                // 添加笔记描述显示
+                const noteDesc = document.createElement('div');
+                noteDesc.className = 'player-note-desc';
+                noteDesc.id = `note-desc-${player.number}`;
+
+                // 显示玩家的完整笔记（包括所有天数）
+                if (playerNotes[player.number] && playerNotes[player.number].length > 0) {
+                    const note = playerNotes[player.number][0];
+                    if (note && note.length > 0) {
+                        noteDesc.textContent = note;
+                    } else {
+                        noteDesc.textContent = ''; // 确保没有笔记时显示为空
+                    }
+                } else {
+                    noteDesc.textContent = ''; // 确保没有笔记时显示为空
+                }
+
+                playerContent.appendChild(playerNumber);
+                playerContent.appendChild(noteDesc);
+                playerCardFront.appendChild(playerContent);
+
+                // 创建卡片背面
+                const playerCardBack = document.createElement('div');
+                playerCardBack.className = 'player-card-back';
+
+                // 添加角色背景（背面）
+                const roleBackgroundBack = document.createElement('div');
+                roleBackgroundBack.className = 'player-role-background';
+                if (playerRoles[player.number] && playerRoles[player.number].image) {
+                    roleBackgroundBack.style.backgroundImage = `url('${playerRoles[player.number].image}')`;
+                }
+                playerCardBack.appendChild(roleBackgroundBack);
+
+                // 添加提醒标记容器（背面仅显示，无删除功能）
+                const reminderTokensContainer = document.createElement('div');
+                reminderTokensContainer.className = 'reminder-tokens-container';
+
+                // 显示玩家的提醒标记
+                if (playerReminders[player.number] && playerReminders[player.number].length > 0) {
+                    const reminders = playerReminders[player.number];
+                    const reminderCount = reminders.length;
+
+                    // 根据标记数量计算大小
+                    let tokenSize, fontSize;
+                    if (reminderCount <= 2) {
+                        tokenSize = 40;
+                        fontSize = 14;
+                    } else if (reminderCount <= 4) {
+                        tokenSize = 30;
+                        fontSize = 11;
+                    } else if (reminderCount <= 6) {
+                        tokenSize = 25;
+                        fontSize = 9;
+                    } else {
+                        tokenSize = 20;
+                        fontSize = 7;
+                    }
+
+                    reminders.forEach((reminder, index) => {
                         const token = document.createElement('div');
-                        token.className = 'center-reminder-token';
-                        
+                        token.className = 'reminder-token';
+                        token.style.width = `${tokenSize}px`;
+                        token.style.height = `${tokenSize}px`;
+                        token.style.fontSize = `${fontSize}px`;
+
                         // 设置标记样式
                         if (reminder.image) {
                             token.style.backgroundImage = `url('${reminder.image}')`;
                         } else if (reminder.type) {
-                            // 默认标记使用特定颜色
                             token.classList.add('default-reminder', reminder.type);
                         }
-                        
+
                         token.textContent = reminder.text;
-                        
-                        // 添加删除按钮
-                        const deleteBtn = document.createElement('button');
-                        deleteBtn.className = 'center-reminder-delete-btn';
-                        deleteBtn.innerHTML = '×';
-                        deleteBtn.title = '删除标记';
-                        deleteBtn.addEventListener('click', function(e) {
-                            e.stopPropagation();
-                            e.preventDefault();
-                            removeReminderToken(playerNum, index);
-                        });
-                        
-                        token.appendChild(deleteBtn);
-                        centerRemindersContainer.appendChild(token);
+                        reminderTokensContainer.appendChild(token);
                     });
-                    
-                    centerDisplay.classList.remove('hidden');
-                    currentCenterPlayer = playerNum;
-                } else {
-                    // 隐藏中心显示区域
-                    centerDisplay.classList.add('hidden');
-                    currentCenterPlayer = null;
                 }
-            }
-            
-            // 删除提醒标记的函数
-            function removeReminderToken(playerNum, reminderIndex) {
-                console.log("删除提醒标记:", playerNum, reminderIndex);
-                if (playerReminders[playerNum] && playerReminders[playerNum].length > reminderIndex) {
-                    playerReminders[playerNum].splice(reminderIndex, 1);
-                    renderPlayers();
-                    
-                    // 如果当前正在显示该玩家的提醒标记，更新中心显示
-                    if (currentCenterPlayer === playerNum) {
-                        updateCenterDisplay(playerNum);
-                    }
-                }
-            }
-            
-            // 初始化玩家状态
-            function initPlayers() {
-                totalPlayers = parseInt(totalPlayersInput.value) || 12;
-                players = [];
-                playerNotes = {};
-                playerRoles = {};
-                playerReminders = {};
-                for (let i = 1; i <= totalPlayers; i++) {
-                    players.push({
-                        number: i,
-                        alive: true,
-                        deathDay: null,
-                        deathTime: null
-                    });
-                    playerNotes[i] = [];
-                    playerRoles[i] = null;
-                    playerReminders[i] = [];
-                }
-                
-                // 清空笔记记录区域，并创建与玩家数量相同的笔记行
-                notesContainer.innerHTML = '';
-                for (let i = 1; i <= totalPlayers; i++) {
-                    createNoteRow(i);
-                }
-                
-                renderPlayers();
-                updateAliveCount();
-                updateDeathSummary();
-                
-                // 隐藏中心显示区域
-                const centerDisplay = document.getElementById('centerDisplay');
-                centerDisplay.classList.add('hidden');
-                currentCenterPlayer = null;
-            }
-            
-            // 创建笔记行
-            function createNoteRow(playerNum) {
-                const newRow = document.createElement('div');
-                newRow.className = 'note-row';
-                
-                const playerInput = document.createElement('input');
-                playerInput.type = 'text';
-                playerInput.className = 'player-input';
-                playerInput.value = playerNum;
-                
-                const playerLabel = document.createElement('span');
-                playerLabel.className = 'player-label';
-                playerLabel.textContent = '号玩家';
-                
-                const descInput = document.createElement('input');
-                descInput.type = 'text';
-                descInput.className = 'desc-input desc';
-                descInput.placeholder = '笔记内容（用；分隔不同天数的笔记，即使这天信息为0也要写个无；）';
-                
-                const updateBtn = document.createElement('button');
-                updateBtn.className = 'update-btn';
-                updateBtn.textContent = '更新';
-                updateBtn.addEventListener('click', function() {
-                    const playerNum = playerInput.value;
-                    const noteText = descInput.value;
-                    
-                    // 修复：当笔记内容为空时，清空对应玩家的笔记显示
-                    if (playerNum) {
-                        if (noteText.trim() === '') {
-                            removePlayerNote(parseInt(playerNum));
-                        } else {
-                            addPlayerNote(playerNum, noteText);
-                        }
-                        renderPlayers();
-                    }
+
+                playerCardBack.appendChild(reminderTokensContainer);
+
+                // 添加返回按钮
+                const flipBackBtn = document.createElement('button');
+                flipBackBtn.className = 'flip-back-btn';
+                flipBackBtn.textContent = '返回';
+                flipBackBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    playerCard.classList.remove('flipped');
                 });
-                
-                newRow.appendChild(playerInput);
-                newRow.appendChild(playerLabel);
-                newRow.appendChild(descInput);
-                newRow.appendChild(updateBtn);
-                
-                notesContainer.appendChild(newRow);
-            }
-            
-            // 渲染玩家状态卡片（圆形排列）
-            function renderPlayers() {
-                playerStatus.innerHTML = '';
-                
-                // 重新添加中心显示区域
-                const centerDisplay = document.createElement('div');
-                centerDisplay.className = 'center-display hidden';
-                centerDisplay.id = 'centerDisplay';
-                
-                const centerDisplayTitle = document.createElement('div');
-                centerDisplayTitle.className = 'center-display-title';
-                centerDisplayTitle.textContent = '玩家提醒标记';
-                
-                const centerRemindersContainer = document.createElement('div');
-                centerRemindersContainer.className = 'center-reminders-container';
-                centerRemindersContainer.id = 'centerRemindersContainer';
-                
-                centerDisplay.appendChild(centerDisplayTitle);
-                centerDisplay.appendChild(centerRemindersContainer);
-                playerStatus.appendChild(centerDisplay);
-                
-                // 如果之前有显示某个玩家的提醒标记，重新显示
-                if (currentCenterPlayer) {
-                    updateCenterDisplay(currentCenterPlayer);
-                }
-                
-                const containerWidth = playerStatus.offsetWidth;
-                const containerHeight = playerStatus.offsetHeight;
-                const centerX = containerWidth / 2;
-                const centerY = containerHeight / 2;
-                const radius = Math.min(containerWidth, containerHeight) * 0.4;
-                
-                players.forEach((player, index) => {
-                    // 计算每个玩家在圆上的位置（1号在顶部）
-                    const angle = ((index * (360 / players.length)) - 90) * (Math.PI / 180);
-                    const x = centerX + radius * Math.cos(angle);
-                    const y = centerY + radius * Math.sin(angle);
-                    
-                    // 创建卡片容器
-                    const playerCardContainer = document.createElement('div');
-                    playerCardContainer.className = 'player-card-container';
-                    playerCardContainer.dataset.player = player.number;
-                    playerCardContainer.style.left = `${x - 50}px`;
-                    playerCardContainer.style.top = `${y - 60}px`;
-                    
-                    // 创建双面卡片
-                    const playerCard = document.createElement('div');
-                    playerCard.className = `player-card ${selectedPlayers.includes(player.number) ? 'selected' : ''}`;
-                    
-                    // 创建卡片正面
-                    const playerCardFront = document.createElement('div');
-                    playerCardFront.className = `player-card-front ${player.alive ? 'alive' : 'dead'}`;
-                    
-                    // 添加角色背景
-                    const roleBackground = document.createElement('div');
-                    roleBackground.className = 'player-role-background';
-                    if (playerRoles[player.number] && playerRoles[player.number].image) {
-                        roleBackground.style.backgroundImage = `url('${playerRoles[player.number].image}')`;
-                    }
-                    playerCardFront.appendChild(roleBackground);
-                    
-                    const playerContent = document.createElement('div');
-                    playerContent.className = 'player-content';
-                    
-                    const playerNumber = document.createElement('div');
-                    playerNumber.className = 'player-number';
-                    playerNumber.textContent = player.number;
-                    
-                    // 添加笔记描述显示
-                    const noteDesc = document.createElement('div');
-                    noteDesc.className = 'player-note-desc';
-                    noteDesc.id = `note-desc-${player.number}`;
-                    
-                    // 显示玩家的完整笔记（包括所有天数）
-                    if (playerNotes[player.number] && playerNotes[player.number].length > 0) {
-                        const note = playerNotes[player.number][0];
-                        if (note && note.length > 0) {
-                            noteDesc.textContent = note;
-                        } else {
-                            noteDesc.textContent = ''; // 确保没有笔记时显示为空
-                        }
+
+                playerCardBack.appendChild(flipBackBtn);
+
+                // 将正反面添加到卡片
+                playerCard.appendChild(playerCardFront);
+                playerCard.appendChild(playerCardBack);
+
+                // 将卡片添加到容器
+                playerCardContainer.appendChild(playerCard);
+                playerStatus.appendChild(playerCardContainer);
+
+                // 单击事件：选择玩家（标记死亡/复活）
+                playerCardContainer.addEventListener('click', function(e) {
+                    const playerNum = parseInt(this.dataset.player);
+
+                    // 原有的选择功能保持不变
+                    playerCard.classList.toggle('selected');
+                    const index = selectedPlayers.indexOf(playerNum);
+
+                    if (index === -1) {
+                        selectedPlayers.push(playerNum);
                     } else {
-                        noteDesc.textContent = ''; // 确保没有笔记时显示为空
+                        selectedPlayers.splice(index, 1);
                     }
-                    
-                    playerContent.appendChild(playerNumber);
-                    playerContent.appendChild(noteDesc);
-                    playerCardFront.appendChild(playerContent);
-                    
-                    // 创建卡片背面
-                    const playerCardBack = document.createElement('div');
-                    playerCardBack.className = 'player-card-back';
-                    
-                    // 添加角色背景（背面）
-                    const roleBackgroundBack = document.createElement('div');
-                    roleBackgroundBack.className = 'player-role-background';
-                    if (playerRoles[player.number] && playerRoles[player.number].image) {
-                        roleBackgroundBack.style.backgroundImage = `url('${playerRoles[player.number].image}')`;
-                    }
-                    playerCardBack.appendChild(roleBackgroundBack);
-                    
-                    // 添加提醒标记容器（背面仅显示，无删除功能）
-                    const reminderTokensContainer = document.createElement('div');
-                    reminderTokensContainer.className = 'reminder-tokens-container';
-                    
-                    // 显示玩家的提醒标记
-                    if (playerReminders[player.number] && playerReminders[player.number].length > 0) {
-                        const reminders = playerReminders[player.number];
-                        const reminderCount = reminders.length;
-                        
-                        // 根据标记数量计算大小
-                        let tokenSize, fontSize;
-                        if (reminderCount <= 2) {
-                            tokenSize = 40;
-                            fontSize = 14;
-                        } else if (reminderCount <= 4) {
-                            tokenSize = 30;
-                            fontSize = 11;
-                        } else if (reminderCount <= 6) {
-                            tokenSize = 25;
-                            fontSize = 9;
-                        } else {
-                            tokenSize = 20;
-                            fontSize = 7;
-                        }
-                        
-                        reminders.forEach((reminder, index) => {
-                            const token = document.createElement('div');
-                            token.className = 'reminder-token';
-                            token.style.width = `${tokenSize}px`;
-                            token.style.height = `${tokenSize}px`;
-                            token.style.fontSize = `${fontSize}px`;
-                            
-                            // 设置标记样式
-                            if (reminder.image) {
-                                token.style.backgroundImage = `url('${reminder.image}')`;
-                            } else if (reminder.type) {
-                                token.classList.add('default-reminder', reminder.type);
-                            }
-                            
-                            token.textContent = reminder.text;
-                            reminderTokensContainer.appendChild(token);
-                        });
-                    }
-                    
-                    playerCardBack.appendChild(reminderTokensContainer);
-                    
-                    // 添加返回按钮
-                    const flipBackBtn = document.createElement('button');
-                    flipBackBtn.className = 'flip-back-btn';
-                    flipBackBtn.textContent = '返回';
-                    flipBackBtn.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        playerCard.classList.remove('flipped');
-                    });
-                    
-                    playerCardBack.appendChild(flipBackBtn);
-                    
-                    // 将正反面添加到卡片
-                    playerCard.appendChild(playerCardFront);
-                    playerCard.appendChild(playerCardBack);
-                    
-                    // 将卡片添加到容器
-                    playerCardContainer.appendChild(playerCard);
-                    playerStatus.appendChild(playerCardContainer);
-                    
-                    // 单击事件：选择玩家（标记死亡/复活）和显示提醒标记
-                    playerCardContainer.addEventListener('click', function(e) {
-                        // 防止事件冒泡到卡片翻转逻辑
-                        if (e.target.closest('.player-card-back')) return;
-                        
-                        if (clickTimer) {
-                            clearTimeout(clickTimer);
-                            clickTimer = null;
-                            return;
-                        }
-                        
-                        clickTimer = setTimeout(() => {
-                            const playerNum = parseInt(this.dataset.player);
-                            
-                            // 更新中心显示区域
-                            if (currentCenterPlayer === playerNum) {
-                                // 如果点击的是当前显示的玩家，则隐藏中心显示
-                                updateCenterDisplay(null);
-                            } else {
-                                // 否则显示该玩家的提醒标记
-                                updateCenterDisplay(playerNum);
-                            }
-                            
-                            // 原有的选择功能保持不变
-                            playerCard.classList.toggle('selected');
-                            const index = selectedPlayers.indexOf(playerNum);
-                            
-                            if (index === -1) {
-                                selectedPlayers.push(playerNum);
-                            } else {
-                                selectedPlayers.splice(index, 1);
-                            }
-                            clickTimer = null;
-                        }, 300);
-                    });
-                    
-                    // 双击事件：翻转卡片查看角色详情
-                    playerCardContainer.addEventListener('dblclick', function(e) {
-                        clearTimeout(clickTimer);
-                        clickTimer = null;
-                        
-                        // 双击打开角色选择器
-                        currentPlayerForRole = player.number;
-                        openRoleSelector();
-                    });
-                    
-                    // 长按事件：翻转卡片查看角色详情
-                    let pressTimer;
-                    playerCardContainer.addEventListener('mousedown', function() {
-                        pressTimer = setTimeout(() => {
-                            playerCard.classList.toggle('flipped');
-                        }, 500);
-                    });
-                    
-                    playerCardContainer.addEventListener('mouseup', function() {
-                        clearTimeout(pressTimer);
-                    });
-                    
-                    playerCardContainer.addEventListener('mouseleave', function() {
-                        clearTimeout(pressTimer);
-                    });
-                    
-                    playerCardContainer.addEventListener('touchstart', function() {
-                        pressTimer = setTimeout(() => {
-                            playerCard.classList.toggle('flipped');
-                        }, 500);
-                    });
-                    
-                    playerCardContainer.addEventListener('touchend', function() {
-                        clearTimeout(pressTimer);
-                    });
                 });
+
+                // 双击事件：打开角色选择器
+                playerCardContainer.addEventListener('dblclick', function(e) {
+                    currentPlayerForRole = player.number;
+                    openRoleSelector();
+                });
+
+                // 长按事件：翻转卡片查看角色详情
+                let pressTimer;
+                playerCardContainer.addEventListener('mousedown', function() {
+                    pressTimer = setTimeout(() => {
+                        playerCard.classList.toggle('flipped');
+                    }, 500);
+                });
+
+                playerCardContainer.addEventListener('mouseup', function() {
+                    clearTimeout(pressTimer);
+                });
+
+                playerCardContainer.addEventListener('mouseleave', function() {
+                    clearTimeout(pressTimer);
+                });
+
+                playerCardContainer.addEventListener('touchstart', function() {
+                    pressTimer = setTimeout(() => {
+                        playerCard.classList.toggle('flipped');
+                    }, 500);
+                });
+
+                playerCardContainer.addEventListener('touchend', function() {
+                    clearTimeout(pressTimer);
+                });
+            });
+        }
+
+        // 更新存活人数显示
+        function updateAliveCount() {
+            const aliveCount = players.filter(p => p.alive).length;
+            aliveInput.value = `${aliveCount}/${players.length}`;
+        }
+
+        // 添加玩家笔记
+        function addPlayerNote(playerNum, noteText) {
+            if (!playerNotes[playerNum]) {
+                playerNotes[playerNum] = [];
             }
-            
-            // 更新存活人数显示
-            function updateAliveCount() {
-                const aliveCount = players.filter(p => p.alive).length;
-                aliveInput.value = `${aliveCount}/${players.length}`;
+            // 替换而不是添加，确保只显示最新的笔记
+            playerNotes[playerNum] = [noteText];
+
+            // 更新笔记描述显示
+            const noteDesc = document.getElementById(`note-desc-${playerNum}`);
+            if (noteDesc) {
+                // 显示完整的笔记（包括所有天数）
+                noteDesc.textContent = noteText;
             }
-            
-            // 添加玩家笔记
-            function addPlayerNote(playerNum, noteText) {
-                if (!playerNotes[playerNum]) {
-                    playerNotes[playerNum] = [];
-                }
-                // 替换而不是添加，确保只显示最新的笔记
-                playerNotes[playerNum] = [noteText];
-                
+        }
+
+        // 移除玩家笔记
+        function removePlayerNote(playerNum) {
+            if (playerNotes[playerNum]) {
+                playerNotes[playerNum] = [];
+
                 // 更新笔记描述显示
                 const noteDesc = document.getElementById(`note-desc-${playerNum}`);
                 if (noteDesc) {
-                    // 显示完整的笔记（包括所有天数）
-                    noteDesc.textContent = noteText;
+                    noteDesc.textContent = '';
                 }
             }
-            
-            // 移除玩家笔记
-            function removePlayerNote(playerNum) {
-                if (playerNotes[playerNum]) {
-                    playerNotes[playerNum] = [];
-                    
-                    // 更新笔记描述显示
-                    const noteDesc = document.getElementById(`note-desc-${playerNum}`);
-                    if (noteDesc) {
-                        noteDesc.textContent = '';
-                    }
-                }
-            }
-            
-            // 更新死亡汇总
-            function updateDeathSummary() {
-                // 清空死亡汇总容器
-                deathSummary.innerHTML = '';
-                
-                // 收集所有死亡事件
-                const deathEvents = {};
-                
-                players.forEach(player => {
-                    if (!player.alive && player.deathDay) {
-                        const day = player.deathDay;
-                        const isNightDeath = player.deathTime && player.deathTime.includes('夜');
-                        
-                        if (!deathEvents[day]) {
-                            deathEvents[day] = { day: day, deaths: [], nightDeaths: [] };
-                        }
-                        
-                        if (isNightDeath) {
-                            deathEvents[day].nightDeaths.push(player.number);
-                        } else {
-                            deathEvents[day].deaths.push(player.number);
-                        }
-                    }
-                });
-                
-                // 获取当前天数
-                const currentDay = parseInt(dayInput.value);
-                // 最大天数为当前天数和死亡事件中的最大天数的较大值
-                const maxDay = Math.max(currentDay, ...Object.keys(deathEvents).map(Number));
-                
-                for (let day = 1; day <= maxDay; day++) {
-                    const line = document.createElement('div');
-                    line.className = 'death-summary-line';
-                    
-                    if (deathEvents[day]) {
-                        const event = deathEvents[day];
-                        
-                        // 夜晚死亡情况
-                        let nightText = '';
-                        if (event.nightDeaths.length > 0) {
-                            const nightClass = event.nightDeaths.length > 1 ? 'multi-death-night' : '';
-                            nightText = `<span class="${nightClass}">第${day}夜死亡: ${event.nightDeaths.join(', ')}号玩家</span>`;
-                        } else {
-                            nightText = `<span class="peaceful-night">第${day}夜平安夜</span>`;
-                        }
-                        
-                        // 白天死亡情况
-                        let dayText = '';
-                        if (event.deaths.length > 0) {
-                            dayText = `第${day}天死亡: ${event.deaths.join(', ')}号玩家`;
-                        } else {
-                            dayText = `<span class="peaceful-day">第${day}天平安日</span>`;
-                        }
-                        
-                        // 将夜晚和白天显示在同一行
-                        line.innerHTML = `${nightText} | ${dayText}`;
-                    } else {
-                        // 这一天没有任何死亡事件
-                        line.innerHTML = `<span class="peaceful-night">第${day}夜平安夜</span> | <span class="peaceful-day">第${day}天平安日</span>`;
-                    }
-                    
-                    deathSummary.appendChild(line);
-                }
-            }
-            
-            // 日夜切换 - 从白天切换到夜晚，天数增加
-            nightBtn.addEventListener('click', function() {
-                if (!isNight) {
-                    // 从白天切换到夜晚，天数增加
-                    dayInput.value = parseInt(dayInput.value) + 1;
-                    isNight = true;
-                    nightBtn.classList.add('active');
-                    dayBtn.classList.remove('active');
-                    
-                    selectedPlayers = [];
-                    renderPlayers();
-                    updateDeathSummary();
-                }
-            });
-            
-            // 日夜切换 - 从夜晚切换到白天，新的一天开始，自动添加分号
-            dayBtn.addEventListener('click', function() {
-                if (isNight) {
-                    // 从夜晚切换到白天，天数不变
-                    isNight = false;
-                    dayBtn.classList.add('active');
-                    nightBtn.classList.remove('active');
-                    
-                    // 每个游戏日结束后，新的一天开始时，自动为所有玩家笔记添加分号
-                    addSemicolonToAllNotes();
-                    
-                    selectedPlayers = [];
-                    renderPlayers();
-                    updateDeathSummary();
-                }
-            });
-            
-            // 标记死亡玩家
-            markDeathBtn.addEventListener('click', function() {
-                console.log("标记死亡按钮被点击");
-                
-                // 检查是否有选中的玩家
-                const selectedCards = document.querySelectorAll('.player-card.selected');
-                console.log("选中的玩家卡片数量:", selectedCards.length);
-                
-                if (selectedCards.length === 0) {
-                    alert('请先选择要标记死亡的玩家');
-                    return;
-                }
-                
-                const currentDay = dayInput.value;
-                const timeString = isNight ? `第${currentDay}夜死亡` : `第${currentDay}天死亡`;
-                
-                // 从选中的卡片中获取玩家编号
-                const selectedPlayerNumbers = Array.from(selectedCards).map(card => 
-                    parseInt(card.closest('.player-card-container').dataset.player)
-                );
-                
-                console.log("要标记死亡的玩家:", selectedPlayerNumbers);
-                
-                selectedPlayerNumbers.forEach(playerNum => {
-                    // 标记玩家死亡
-                    const player = players.find(p => p.number === playerNum);
-                    if (player && player.alive) {
-                        player.alive = false;
-                        player.deathDay = currentDay;
-                        player.deathTime = timeString;
-                        
-                        // 添加死亡笔记
-                        addPlayerNote(playerNum, timeString);
-                        
-                        // 查找该玩家是否已有笔记行
-                        let found = false;
-                        const noteRows = notesContainer.querySelectorAll('.note-row');
-                        noteRows.forEach(row => {
-                            const rowPlayerInput = row.querySelector('.player-input');
-                            if (rowPlayerInput && parseInt(rowPlayerInput.value) === playerNum) {
-                                const descInput = row.querySelector('.desc-input');
-                                if (descInput.value) {
-                                    descInput.value += ` (${timeString})`;
-                                } else {
-                                    descInput.value = timeString;
-                                }
-                                found = true;
-                            }
-                        });
-                        
-                        // 如果没有找到该玩家的笔记行，则添加新行
-                        if (!found) {
-                            createNoteRow(playerNum);
-                            const newRow = notesContainer.lastChild;
-                            const descInput = newRow.querySelector('.desc-input');
-                            descInput.value = timeString;
-                        }
-                    }
-                });
-                
-                updateAliveCount();
+        }
+
+        // 日夜切换
+        nightBtn.addEventListener('click', function() {
+            if (!isNight) {
+                // 从白天切换到夜晚，天数增加
+                dayInput.value = parseInt(dayInput.value) + 1;
+                isNight = true;
+                nightBtn.classList.add('active');
+                dayBtn.classList.remove('active');
                 selectedPlayers = [];
                 renderPlayers();
-                updateDeathSummary();
-            });
-            
-            // 复活玩家
-            resurrectBtn.addEventListener('click', function() {
-                console.log("复活按钮被点击");
-                
-                // 检查是否有选中的玩家
-                const selectedCards = document.querySelectorAll('.player-card.selected');
-                console.log("选中的玩家卡片数量:", selectedCards.length);
-                
-                if (selectedCards.length === 0) {
-                    alert('请先选择要复活的玩家');
-                    return;
-                }
-                
-                // 从选中的卡片中获取玩家编号
-                const selectedPlayerNumbers = Array.from(selectedCards).map(card => 
-                    parseInt(card.closest('.player-card-container').dataset.player)
-                );
-                
-                console.log("要复活的玩家:", selectedPlayerNumbers);
-                
-                selectedPlayerNumbers.forEach(playerNum => {
-                    // 复活玩家
-                    const player = players.find(p => p.number === playerNum);
-                    if (player && !player.alive) {
-                        player.alive = true;
-                        player.deathDay = null;
-                        player.deathTime = null;
-                        
-                        // 移除死亡笔记
-                        removePlayerNote(playerNum);
-                        
-                        // 查找该玩家是否已有笔记行，并移除死亡标记
-                        const noteRows = notesContainer.querySelectorAll('.note-row');
-                        noteRows.forEach(row => {
-                            const rowPlayerInput = row.querySelector('.player-input');
-                            if (rowPlayerInput && parseInt(rowPlayerInput.value) === playerNum) {
-                                const descInput = row.querySelector('.desc-input');
-                                // 移除死亡标记
-                                descInput.value = descInput.value.replace(/（第\d+[夜天]死亡）/, '');
-                                descInput.value = descInput.value.replace(/第\d+[夜天]死亡/, '');
-                            }
-                        });
-                    }
-                });
-                
-                updateAliveCount();
+            }
+        });
+
+        dayBtn.addEventListener('click', function() {
+            if (isNight) {
+                // 从夜晚切换到白天，天数不变
+                isNight = false;
+                dayBtn.classList.add('active');
+                nightBtn.classList.remove('active');
                 selectedPlayers = [];
                 renderPlayers();
-                updateDeathSummary();
-            });
-            
-            // 添加笔记行
-            addNoteBtn.addEventListener('click', function() {
-                const newRow = document.createElement('div');
-                newRow.className = 'note-row';
-                
-                const playerInput = document.createElement('input');
-                playerInput.type = 'text';
-                playerInput.className = 'player-input';
-                playerInput.value = notesContainer.children.length + 1;
-                
-                const playerLabel = document.createElement('span');
-                playerLabel.className = 'player-label';
-                playerLabel.textContent = '号玩家';
-                
-                const descInput = document.createElement('input');
-                descInput.type = 'text';
-                descInput.className = 'desc-input desc';
-                descInput.placeholder = '笔记内容（用；分隔不同天数的笔记，即使这天信息为0也要写个无；）';
-                
-                const updateBtn = document.createElement('button');
-                updateBtn.className = 'update-btn';
-                updateBtn.textContent = '更新';
-                updateBtn.addEventListener('click', function() {
-                    const playerNum = playerInput.value;
-                    const noteText = descInput.value;
-                    
-                    // 修复：当笔记内容为空时，清空对应玩家的笔记显示
-                    if (playerNum) {
-                        if (noteText.trim() === '') {
-                            removePlayerNote(parseInt(playerNum));
-                        } else {
-                            addPlayerNote(playerNum, noteText);
-                        }
-                        renderPlayers();
-                    }
-                });
-                
-                newRow.appendChild(playerInput);
-                newRow.appendChild(playerLabel);
-                newRow.appendChild(descInput);
-                newRow.appendChild(updateBtn);
-                
-                notesContainer.appendChild(newRow);
-            });
-            
-            // 添加提醒标记
-            addReminderBtn.addEventListener('click', function() {
-                openReminderSelector();
-            });
-            
-            // 打开提醒标记选择器
-            function openReminderSelector() {
-                // 更新玩家选择下拉框
-                reminderPlayerSelect.innerHTML = '';
-                players.forEach(player => {
-                    const option = document.createElement('option');
-                    option.value = player.number;
-                    option.textContent = `${player.number}号玩家`;
-                    reminderPlayerSelect.appendChild(option);
-                });
-                
-                // 更新提醒标记网格
-                reminderTokensGrid.innerHTML = '';
-                
-                // 添加默认提醒标记（善良、邪恶、数字等）
-                defaultReminders.forEach(reminder => {
-                    const token = document.createElement('div');
-                    token.className = 'reminder-token-select default-reminder';
-                    token.classList.add(reminder.type);
-                    token.textContent = reminder.text;
-                    token.dataset.text = reminder.text;
-                    token.dataset.type = reminder.type;
-                    
-                    token.addEventListener('click', function() {
-                        const playerNum = parseInt(reminderPlayerSelect.value);
-                        if (playerNum) {
-                            if (!playerReminders[playerNum]) {
-                                playerReminders[playerNum] = [];
-                            }
-                            
-                            // 添加提醒标记
-                            playerReminders[playerNum].push({
-                                text: this.dataset.text,
-                                type: this.dataset.type
-                            });
-                            
-                            // 更新玩家卡片
-                            renderPlayers();
-                            
-                            // 关闭提醒标记选择器
-                            reminderSelectorModal.classList.remove('active');
-                        }
-                    });
-                    
-                    reminderTokensGrid.appendChild(token);
-                });
-                
-                // 添加默认角色提醒标记（固定显示，不受角色数据影响）
-                defaultRoleReminders.forEach(reminder => {
-                    const token = document.createElement('div');
-                    token.className = 'reminder-token-select';
-                    token.style.backgroundImage = `url('${reminder.image}')`;
-                    token.textContent = reminder.text;
-                    token.dataset.text = reminder.text;
-                    token.dataset.image = reminder.image;
-                    
-                    token.addEventListener('click', function() {
-                        const playerNum = parseInt(reminderPlayerSelect.value);
-                        if (playerNum) {
-                            if (!playerReminders[playerNum]) {
-                                playerReminders[playerNum] = [];
-                            }
-                            
-                            // 添加提醒标记
-                            playerReminders[playerNum].push({
-                                text: this.dataset.text,
-                                image: this.dataset.image
-                            });
-                            
-                            // 更新玩家卡片
-                            renderPlayers();
-                            
-                            // 关闭提醒标记选择器
-                            reminderSelectorModal.classList.remove('active');
-                        }
-                    });
-                    
-                    reminderTokensGrid.appendChild(token);
-                });
-                
-                // 使用角色数据中的提醒标记
-                const allReminders = [];
-                roleData.forEach(role => {
-                    if (role.reminders && role.reminders.length > 0) {
-                        role.reminders.forEach(reminderText => {
-                            allReminders.push({
-                                text: reminderText,
-                                image: role.image
-                            });
-                        });
-                    }
-                });
-                
-                // 显示角色数据中的提醒标记
-                allReminders.forEach(reminder => {
-                    const token = document.createElement('div');
-                    token.className = 'reminder-token-select';
-                    token.style.backgroundImage = `url('${reminder.image}')`;
-                    token.textContent = reminder.text;
-                    token.dataset.text = reminder.text;
-                    token.dataset.image = reminder.image;
-                    
-                    token.addEventListener('click', function() {
-                        const playerNum = parseInt(reminderPlayerSelect.value);
-                        if (playerNum) {
-                            if (!playerReminders[playerNum]) {
-                                playerReminders[playerNum] = [];
-                            }
-                            
-                            // 添加提醒标记
-                            playerReminders[playerNum].push({
-                                text: this.dataset.text,
-                                image: this.dataset.image
-                            });
-                            
-                            // 更新玩家卡片
-                            renderPlayers();
-                            
-                            // 关闭提醒标记选择器
-                            reminderSelectorModal.classList.remove('active');
-                        }
-                    });
-                    
-                    reminderTokensGrid.appendChild(token);
-                });
-                
-                reminderSelectorModal.classList.add('active');
             }
-            
-            // 关闭提醒标记选择器
-            function closeReminderSelector() {
-                reminderSelectorModal.classList.remove('active');
+        });
+
+        // 标记死亡玩家
+        markDeathBtn.addEventListener('click', function() {
+            console.log("标记死亡按钮被点击");
+
+            // 检查是否有选中的玩家
+            const selectedCards = document.querySelectorAll('.player-card.selected');
+            console.log("选中的玩家卡片数量:", selectedCards.length);
+
+            if (selectedCards.length === 0) {
+                alert('请先选择要标记死亡的玩家');
+                return;
             }
-            
-            // 关闭提醒标记选择器按钮
-            closeReminderModal.addEventListener('click', closeReminderSelector);
-            
-            // 点击模态框背景关闭
-            reminderSelectorModal.addEventListener('click', function(e) {
-                if (e.target === reminderSelectorModal) {
-                    closeReminderSelector();
-                }
-            });
-            
-            // 生成笔记 - 修改后的函数
-            generateBtn.addEventListener('click', function() {
-                const day = dayInput.value;
-                const alive = aliveInput.value;
-                const conditions = document.getElementById('conditions').value;
-                const evilConfig = evilConfigInput.value;
-                
-                // 获取当前天数
-                const currentDay = parseInt(day);
-                
-                // 创建一个对象来存储按天分组的笔记
-                const dayNotes = {};
-                
-                // 初始化每一天的笔记数组
-                for (let i = 1; i <= currentDay; i++) {
-                    dayNotes[i] = [];
-                }
-                
-                // 遍历所有玩家，按天拆分笔记
-                for (let playerNum = 1; playerNum <= totalPlayers; playerNum++) {
-                    if (playerNotes[playerNum] && playerNotes[playerNum].length > 0) {
-                        const noteText = playerNotes[playerNum][0]; // 获取笔记文本
-                        
-                        // 按分号拆分笔记
-                        const noteParts = noteText.split('；');
-                        
-                        // 将每个部分添加到对应的天数
-                        for (let dayIndex = 1; dayIndex <= currentDay; dayIndex++) {
-                            let part = '';
-                            if (dayIndex <= noteParts.length) {
-                                part = noteParts[dayIndex-1].trim();
-                            }
-                            
-                            // 如果该部分为空，则显示为"无"
-                            if (part === '') {
-                                part = '无';
-                            }
-                            
-                            // 查找该玩家是否已经死亡
-                            const playerObj = players.find(p => p.number === playerNum);
-                            if (playerObj && !playerObj.alive && playerObj.deathTime) {
-                                // 玩家已死亡，将死亡时间放在前面
-                                dayNotes[dayIndex].push(`（${playerObj.deathTime}）[${playerNum}号玩家] ${part}`);
+
+            const currentDay = dayInput.value;
+            const timeString = isNight ? `第${currentDay}夜死亡` : `第${currentDay}天死亡`;
+
+            // 从选中的卡片中获取玩家编号
+            const selectedPlayerNumbers = Array.from(selectedCards).map(card =>
+                parseInt(card.closest('.player-card-container').dataset.player)
+            );
+
+            console.log("要标记死亡的玩家:", selectedPlayerNumbers);
+
+            selectedPlayerNumbers.forEach(playerNum => {
+                // 标记玩家死亡
+                const player = players.find(p => p.number === playerNum);
+                if (player && player.alive) {
+                    player.alive = false;
+                    player.deathDay = currentDay;
+                    player.deathTime = timeString;
+
+                    // 添加死亡笔记
+                    addPlayerNote(playerNum, timeString);
+
+                    // 查找该玩家是否已有笔记行
+                    let found = false;
+                    const noteRows = notesContainer.querySelectorAll('.note-row');
+                    noteRows.forEach(row => {
+                        const rowPlayerInput = row.querySelector('.player-input');
+                        if (rowPlayerInput && parseInt(rowPlayerInput.value) === playerNum) {
+                            const descInput = row.querySelector('.desc-input');
+                            if (descInput.value) {
+                                descInput.value += ` (${timeString})`;
                             } else {
-                                dayNotes[dayIndex].push(`[${playerNum}号玩家] ${part}`);
+                                descInput.value = timeString;
                             }
+                            found = true;
                         }
+                    });
+
+                    // 如果没有找到该玩家的笔记行，则添加新行
+                    if (!found) {
+                        createNoteRow(playerNum);
+                        const newRow = notesContainer.lastChild;
+                        const descInput = newRow.querySelector('.desc-input');
+                        descInput.value = timeString;
+                    }
+                }
+            });
+
+            updateAliveCount();
+            selectedPlayers = [];
+            renderPlayers();
+        });
+
+        // 复活玩家
+        resurrectBtn.addEventListener('click', function() {
+            console.log("复活按钮被点击");
+
+            // 检查是否有选中的玩家
+            const selectedCards = document.querySelectorAll('.player-card.selected');
+            console.log("选中的玩家卡片数量:", selectedCards.length);
+
+            if (selectedCards.length === 0) {
+                alert('请先选择要复活的玩家');
+                return;
+            }
+
+            // 从选中的卡片中获取玩家编号
+            const selectedPlayerNumbers = Array.from(selectedCards).map(card =>
+                parseInt(card.closest('.player-card-container').dataset.player)
+            );
+
+            console.log("要复活的玩家:", selectedPlayerNumbers);
+
+            selectedPlayerNumbers.forEach(playerNum => {
+                // 复活玩家
+                const player = players.find(p => p.number === playerNum);
+                if (player && !player.alive) {
+                    player.alive = true;
+                    player.deathDay = null;
+                    player.deathTime = null;
+
+                    // 移除死亡笔记
+                    removePlayerNote(playerNum);
+
+                    // 查找该玩家是否已有笔记行，并移除死亡标记
+                    const noteRows = notesContainer.querySelectorAll('.note-row');
+                    noteRows.forEach(row => {
+                        const rowPlayerInput = row.querySelector('.player-input');
+                        if (rowPlayerInput && parseInt(rowPlayerInput.value) === playerNum) {
+                            const descInput = row.querySelector('.desc-input');
+                            // 移除死亡标记
+                            descInput.value = descInput.value.replace(/（第\d+[夜天]死亡）/, '');
+                            descInput.value = descInput.value.replace(/第\d+[夜天]死亡/, '');
+                        }
+                    });
+                }
+            });
+
+            updateAliveCount();
+            selectedPlayers = [];
+            renderPlayers();
+        });
+
+        // 回退前一天功能
+        rollbackBtn.addEventListener('click', function() {
+            const currentDay = parseInt(dayInput.value);
+
+            // 如果已经是第一天，无法回退
+            if (currentDay <= 1) {
+                alert('已经是第一天，无法回退！');
+                return;
+            }
+
+            // 确认回退操作
+            if (!confirm(`确定要回退到第 ${currentDay - 1} 天吗？这将清除第 ${currentDay} 天的所有死亡记录。`)) {
+                return;
+            }
+
+            // 回退天数
+            dayInput.value = currentDay - 1;
+
+            // 强制设置为白天状态
+            isNight = false;
+            dayBtn.classList.add('active');
+            nightBtn.classList.remove('active');
+
+            // 清除回退的那一天的所有死亡记录
+            const rollbackDay = currentDay; // 回退的是当前这一天
+            players.forEach(player => {
+                if (player.deathDay == rollbackDay) {
+                    player.alive = true;
+                    player.deathDay = null;
+                    player.deathTime = null;
+
+                    // 移除死亡笔记
+                    removePlayerNote(player.number);
+
+                    // 查找该玩家是否已有笔记行，并移除死亡标记
+                    const noteRows = notesContainer.querySelectorAll('.note-row');
+                    noteRows.forEach(row => {
+                        const rowPlayerInput = row.querySelector('.player-input');
+                        if (rowPlayerInput && parseInt(rowPlayerInput.value) === player.number) {
+                            const descInput = row.querySelector('.desc-input');
+                            // 移除死亡标记
+                            descInput.value = descInput.value.replace(/（第\d+[夜天]死亡）/, '');
+                            descInput.value = descInput.value.replace(/第\d+[夜天]死亡/, '');
+                        }
+                    });
+                }
+            });
+
+            updateAliveCount();
+            selectedPlayers = [];
+            renderPlayers();
+
+            alert(`已成功回退到第 ${currentDay - 1} 天！`);
+        });
+
+        // 添加笔记行
+        addNoteBtn.addEventListener('click', function() {
+            const newRow = document.createElement('div');
+            newRow.className = 'note-row';
+
+            const playerInput = document.createElement('input');
+            playerInput.type = 'text';
+            playerInput.className = 'player-input';
+            playerInput.value = notesContainer.children.length + 1;
+
+            const playerLabel = document.createElement('span');
+            playerLabel.className = 'player-label';
+            playerLabel.textContent = '号玩家';
+
+            const descInput = document.createElement('input');
+            descInput.type = 'text';
+            descInput.className = 'desc-input desc';
+            descInput.placeholder = '笔记内容（用；分隔不同天数的笔记，即使这天信息为0也要写个无；）';
+
+            const updateBtn = document.createElement('button');
+            updateBtn.className = 'update-btn';
+            updateBtn.textContent = '更新';
+            updateBtn.addEventListener('click', function() {
+                const playerNum = playerInput.value;
+                const noteText = descInput.value;
+
+                // 修复：当笔记内容为空时，清空对应玩家的笔记显示
+                if (playerNum) {
+                    if (noteText.trim() === '') {
+                        removePlayerNote(parseInt(playerNum));
                     } else {
-                        // 如果玩家没有笔记，为每一天添加"无"
-                        for (let dayIndex = 1; dayIndex <= currentDay; dayIndex++) {
-                            const playerObj = players.find(p => p.number === playerNum);
-                            if (playerObj && !playerObj.alive && playerObj.deathTime) {
-                                dayNotes[dayIndex].push(`（${playerObj.deathTime}）[${playerNum}号玩家] 无`);
-                            } else {
-                                dayNotes[dayIndex].push(`[${playerNum}号玩家] 无`);
-                            }
-                        }
+                        addPlayerNote(playerNum, noteText);
                     }
+                    renderPlayers();
                 }
-                
-                // 构建笔记文本
-                let note = `【当前第 ${day} 天 ☀】\n` +
-                           `【存活人数：${alive}】\n`;
-                
-                if (evilConfig) {
-                    note += `【邪恶配置：${evilConfig}】\n\n`;
+            });
+
+            newRow.appendChild(playerInput);
+            newRow.appendChild(playerLabel);
+            newRow.appendChild(descInput);
+            newRow.appendChild(updateBtn);
+
+            notesContainer.appendChild(newRow);
+        });
+
+        // 生成表格笔记
+        function generateTableNotes() {
+            const day = dayInput.value;
+            const alive = aliveInput.value;
+            const conditions = document.getElementById('conditions').value;
+            const evilConfig = evilConfigInput.value;
+
+            // 获取当前天数
+            const currentDay = parseInt(day);
+
+            // 创建表格HTML
+            let tableHTML = `
+                    <div style="margin-bottom: 20px;">
+                        <div style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">【当前第 ${day} 天 ☀】</div>
+                        <div style="margin-bottom: 10px;">【存活人数：${alive}】</div>
+                        ${evilConfig ? `<div style="margin-bottom: 10px;">【邪恶配置：${evilConfig}】</div>` : ''}
+                    </div>
+                    <table class="notes-table">
+                        <thead>
+                            <tr>
+                                <th class="player-cell">玩家</th>
+                                <th class="death-cell">死亡情况</th>`;
+
+            // 添加天数表头
+            for (let i = 1; i <= currentDay; i++) {
+                tableHTML += `<th class="day-cell">第${i}天</th>`;
+            }
+
+            tableHTML += `</tr></thead><tbody>`;
+
+            // 添加玩家行
+            for (let playerNum = 1; playerNum <= totalPlayers; playerNum++) {
+                tableHTML += `<tr>`;
+
+                // 玩家编号单元格
+                const playerObj = players.find(p => p.number === playerNum);
+                if (playerObj && !playerObj.alive) {
+                    tableHTML += `<td class="player-cell dead-player">${playerNum}号</td>`;
                 } else {
-                    note += '\n';
+                    tableHTML += `<td class="player-cell">${playerNum}号</td>`;
                 }
-                
-                // 按天数添加笔记
-                for (let i = 1; i <= currentDay; i++) {
-                    if (dayNotes[i].length > 0) {
-                        note += `第${i}天：\n`;
-                        // 按玩家编号排序
-                        dayNotes[i].sort((a, b) => {
-                            const aPlayer = parseInt(a.match(/\[(\d+)号玩家\]/)[1]);
-                            const bPlayer = parseInt(b.match(/\[(\d+)号玩家\]/)[1]);
-                            return aPlayer - bPlayer;
-                        });
-                        
-                        dayNotes[i].forEach(noteLine => {
-                            note += noteLine + '\n';
-                        });
-                        note += '\n';
-                    }
+
+                // 死亡情况单元格
+                if (playerObj && !playerObj.alive && playerObj.deathTime) {
+                    tableHTML += `<td class="death-cell">${playerObj.deathTime}</td>`;
+                } else {
+                    tableHTML += `<td class="death-cell">-</td>`;
                 }
-                
-                if (conditions) {
-                    note += conditions + '\n';
-                }
-                
-                output.value = note;
-            });
-            
-            // 复制笔记
-            copyBtn.addEventListener('click', function() {
-                output.select();
-                document.execCommand('copy');
-                alert('笔记已复制到剪贴板！');
-            });
-            
-            // 清空所有 - 添加了弹窗警告
-            clearBtn.addEventListener('click', function() {
-                // 显示确认对话框
-                const userConfirmed = confirm('确定要清空所有数据吗？此操作不可撤销！');
-                
-                // 只有在用户确认后才执行清空操作
-                if (userConfirmed) {
-                    document.getElementById('day').value = '1';
-                    document.getElementById('conditions').value = '';
-                    evilConfigInput.value = '';
-                    
-                    // 重置日夜状态
-                    isNight = false;
-                    dayBtn.classList.add('active');
-                    nightBtn.classList.remove('active');
-                    
-                    // 重置玩家状态
-                    initPlayers();
-                    
-                    output.value = '';
-                    
-                    alert('所有数据已清空！');
-                }
-            });
-            
-            // 玩家总数变化时重新初始化
-            totalPlayersInput.addEventListener('change', function() {
-                initPlayers();
-                updateEvilConfigHint();
-            });
-            
-            // 初始化角色选择器
-            function initRoleSelector() {
-                roleGrid.innerHTML = '';
-                
-                const activeTab = document.querySelector('.role-tab.active');
-                const selectedTeam = activeTab ? activeTab.dataset.team : 'all';
-                
-                const filteredRoles = selectedTeam === 'all' 
-                    ? roleData 
-                    : roleData.filter(role => role.team === selectedTeam);
-                
-                // 如果筛选后没有角色，显示提示信息
-                if (filteredRoles.length === 0) {
-                    const message = document.createElement('div');
-                    message.className = 'no-roles-message';
-                    message.textContent = '该分类下没有角色';
-                    roleGrid.appendChild(message);
-                    return;
-                }
-                
-                filteredRoles.forEach(role => {
-                    const roleItem = document.createElement('div');
-                    roleItem.className = 'role-item';
-                    roleItem.dataset.id = role.id;
-                    
-                    const roleIcon = document.createElement('div');
-                    roleIcon.className = 'role-icon';
-                    
-                    if (role.image) {
-                        const img = document.createElement('img');
-                        img.src = role.image;
-                        img.alt = role.name;
-                        roleIcon.appendChild(img);
-                    } else {
-                        roleIcon.textContent = role.name.substring(0, 2);
-                    }
-                    
-                    const roleName = document.createElement('div');
-                    roleName.className = 'role-name';
-                    roleName.textContent = role.name;
-                    
-                    // 添加阵营标识
-                    if (role.team) {
-                        const teamBadge = document.createElement('div');
-                        teamBadge.className = 'team-badge ' + role.team;
-                        
-                        switch(role.team) {
-                            case 'townsfolk': teamBadge.textContent = '镇'; break;
-                            case 'outsider': teamBadge.textContent = '外'; break;
-                            case 'minion': teamBadge.textContent = '爪'; break;
-                            case 'demon': teamBadge.textContent = '恶'; break;
-                            default: teamBadge.textContent = '?';
+
+                // 添加每一天的笔记
+                for (let dayIndex = 1; dayIndex <= currentDay; dayIndex++) {
+                    // 获取该玩家在这一天的笔记内容
+                    let noteContent = '';
+                    if (playerNotes[playerNum] && playerNotes[playerNum].length > 0) {
+                        const noteText = playerNotes[playerNum][0];
+                        const noteParts = noteText.split('；');
+                        if (dayIndex <= noteParts.length) {
+                            noteContent = noteParts[dayIndex-1].trim();
                         }
-                        
-                        roleItem.appendChild(teamBadge);
                     }
-                    
-                    roleItem.appendChild(roleIcon);
-                    roleItem.appendChild(roleName);
-                    
-                    roleItem.addEventListener('click', function() {
-                        if (currentPlayerForRole) {
-                            playerRoles[currentPlayerForRole] = role;
-                            renderPlayers();
-                            closeRoleSelector();
-                        }
-                    });
-                    
-                    roleGrid.appendChild(roleItem);
-                });
+
+                    if (noteContent === '') {
+                        noteContent = '无';
+                    }
+
+                    tableHTML += `<td>${noteContent}</td>`;
+                }
+
+                tableHTML += `</tr>`;
             }
-            
-            // 角色分类选项卡点击事件
-            roleTabs.addEventListener('click', function(e) {
-                if (e.target.classList.contains('role-tab')) {
-                    document.querySelectorAll('.role-tab').forEach(tab => {
-                        tab.classList.remove('active');
-                    });
-                    e.target.classList.add('active');
-                    initRoleSelector();
-                }
+
+            tableHTML += `</tbody></table>`;
+
+            // 添加博学者信息
+            if (conditions) {
+                tableHTML += `<div style="margin-top: 20px; padding: 10px; background: rgba(255, 255, 255, 0.1); border-radius: 8px;">
+                        <div style="font-weight: bold; margin-bottom: 5px; color: #ffd700;">博学者信息或其他大段信息：</div>
+                        <div>${conditions}</div>
+                    </div>`;
+            }
+
+            return tableHTML;
+        }
+
+        // 生成笔记按钮事件
+        generateBtn.addEventListener('click', function() {
+            tableOutput.innerHTML = generateTableNotes();
+        });
+
+        // 复制笔记
+        copyBtn.addEventListener('click', function() {
+            // 获取表格元素
+            const table = document.querySelector('.notes-table');
+            if (!table) {
+                alert('请先生成笔记表格！');
+                return;
+            }
+
+            // 获取表头
+            const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent);
+
+            // 获取所有行数据
+            const rows = Array.from(table.querySelectorAll('tbody tr')).map(row => {
+                return Array.from(row.querySelectorAll('td')).map(cell => cell.textContent);
             });
-            
-            // 打开角色选择器
-            function openRoleSelector() {
-                roleSelectorModal.classList.add('active');
+
+            // 构建文本表格
+            let textTable = '';
+
+            // 添加表头
+            textTable += headers.join('\t') + '\n';
+
+            // 添加数据行
+            rows.forEach(row => {
+                textTable += row.join('\t') + '\n';
+            });
+
+            // 添加游戏信息
+            const day = dayInput.value;
+            const alive = aliveInput.value;
+            const evilConfig = evilConfigInput.value;
+            const conditions = document.getElementById('conditions').value;
+
+            let infoText = `【当前第 ${day} 天 ☀】\n【存活人数：${alive}】\n`;
+            if (evilConfig) {
+                infoText += `【邪恶配置：${evilConfig}】\n`;
+            }
+
+            if (conditions) {
+                infoText += `\n${conditions}\n`;
+            }
+
+            textTable = infoText + '\n' + textTable;
+
+            // 复制到剪贴板
+            const textArea = document.createElement('textarea');
+            textArea.value = textTable;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+
+            alert('笔记已复制到剪贴板！');
+        });
+
+        // 初始化角色选择器
+        function initRoleSelector() {
+            roleGrid.innerHTML = '';
+
+            const activeTab = document.querySelector('.role-tab.active');
+            const selectedTeam = activeTab ? activeTab.dataset.team : 'all';
+
+            const filteredRoles = selectedTeam === 'all'
+                ? roleData
+                : roleData.filter(role => role.team === selectedTeam);
+
+            // 如果筛选后没有角色，显示提示信息
+            if (filteredRoles.length === 0) {
+                const message = document.createElement('div');
+                message.className = 'no-roles-message';
+                message.textContent = '该分类下没有角色';
+                roleGrid.appendChild(message);
+                return;
+            }
+
+            filteredRoles.forEach(role => {
+                const roleItem = document.createElement('div');
+                roleItem.className = 'role-item';
+                roleItem.dataset.id = role.id;
+
+                const roleIcon = document.createElement('div');
+                roleIcon.className = 'role-icon';
+
+                if (role.image) {
+                    const img = document.createElement('img');
+                    img.src = role.image;
+                    img.alt = role.name;
+                    roleIcon.appendChild(img);
+                } else {
+                    roleIcon.textContent = role.name.substring(0, 2);
+                }
+
+                const roleName = document.createElement('div');
+                roleName.className = 'role-name';
+                roleName.textContent = role.name;
+
+                // 添加阵营标识
+                if (role.team) {
+                    const teamBadge = document.createElement('div');
+                    teamBadge.className = 'team-badge ' + role.team;
+
+                    switch(role.team) {
+                        case 'townsfolk': teamBadge.textContent = '镇'; break;
+                        case 'outsider': teamBadge.textContent = '外'; break;
+                        case 'minion': teamBadge.textContent = '爪'; break;
+                        case 'demon': teamBadge.textContent = '恶'; break;
+                        default: teamBadge.textContent = '?';
+                    }
+
+                    roleItem.appendChild(teamBadge);
+                }
+
+                roleItem.appendChild(roleIcon);
+                roleItem.appendChild(roleName);
+
+                roleItem.addEventListener('click', function() {
+                    if (currentPlayerForRole) {
+                        playerRoles[currentPlayerForRole] = role;
+                        renderPlayers();
+                        closeRoleSelector();
+                    }
+                });
+
+                roleGrid.appendChild(roleItem);
+            });
+        }
+
+        // 角色分类选项卡点击事件
+        roleTabs.addEventListener('click', function(e) {
+            if (e.target.classList.contains('role-tab')) {
+                document.querySelectorAll('.role-tab').forEach(tab => {
+                    tab.classList.remove('active');
+                });
+                e.target.classList.add('active');
                 initRoleSelector();
             }
-            
-            // 关闭角色选择器
-            function closeRoleSelector() {
-                roleSelectorModal.classList.remove('active');
-                currentPlayerForRole = null;
-            }
-            
-            // 关闭模态框
-            closeModal.addEventListener('click', closeRoleSelector);
-            
-            // 点击模态框背景关闭
-            roleSelectorModal.addEventListener('click', function(e) {
-                if (e.target === roleSelectorModal) {
-                    closeRoleSelector();
-                }
-            });
-            
-            // 处理JSON文件上传
-            jsonFileInput.addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        try {
-                            const uploadedData = JSON.parse(e.target.result);
-                            roleData = uploadedData;
-                            alert('角色数据加载成功！');
-                            initRoleSelector();
-                        } catch (error) {
-                            alert('解析JSON文件时出错：' + error.message);
-                        }
-                    };
-                    reader.readAsText(file);
-                }
-            });
-            
-            // 初始化玩家和角色选择器
-            initPlayers();
-            initRoleSelector();
-            updateEvilConfigHint();
         });
-    </script>
+
+        // 打开角色选择器
+        function openRoleSelector() {
+            roleSelectorModal.classList.add('active');
+            initRoleSelector();
+        }
+
+        // 关闭角色选择器
+        function closeRoleSelector() {
+            roleSelectorModal.classList.remove('active');
+            currentPlayerForRole = null;
+        }
+
+        // 关闭模态框
+        closeModal.addEventListener('click', closeRoleSelector);
+
+        // 点击模态框背景关闭
+        roleSelectorModal.addEventListener('click', function(e) {
+            if (e.target === roleSelectorModal) {
+                closeRoleSelector();
+            }
+        });
+
+        // 处理JSON文件上传
+        jsonFileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const uploadedData = JSON.parse(e.target.result);
+                        roleData = uploadedData;
+                        alert('角色数据加载成功！');
+                        initRoleSelector();
+                    } catch (error) {
+                        alert('解析JSON文件时出错：' + error.message);
+                    }
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        // 玩家总数变化时重新初始化
+        totalPlayersInput.addEventListener('change', function() {
+            initPlayers();
+            updateEvilConfigTip();
+        });
+
+        // 清空所有
+        clearBtn.addEventListener('click', function() {
+            document.getElementById('day').value = '1';
+            document.getElementById('conditions').value = '';
+            evilConfigInput.value = '';
+
+            // 重置日夜状态
+            isNight = false;
+            dayBtn.classList.add('active');
+            nightBtn.classList.remove('active');
+
+            // 重置玩家状态
+            initPlayers();
+
+            tableOutput.innerHTML = '';
+        });
+
+        // 初始化玩家和角色选择器
+        initPlayers();
+        initRoleSelector();
+    });
+</script>
 </body>
 </html>
