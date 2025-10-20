@@ -510,6 +510,10 @@
             background-color: #4CAF50 !important; /* 绿色 */
         }
 
+        .center-reminder-token.role-reminder {
+            background-color: #9C27B0 !important; /* 紫色，用于角色标记 */
+        }
+
         .center-display.hidden {
             display: none;
         }
@@ -1001,6 +1005,10 @@
             background-color: #4CAF50 !important; /* 绿色 */
         }
 
+        .role-reminder {
+            background-color: #9C27B0 !important; /* 紫色，用于角色标记 */
+        }
+
         /* 输出区域样式调整 */
         .table-output-container {
             margin-top: 20px;
@@ -1229,7 +1237,7 @@
                     <input type="text" id="evilConfig" class="role-config-input" placeholder="邪恶配置">
                     <!-- 重新添加邪恶配置提示文本 -->
                     <div class="evil-config-tip" id="evilConfigTip">
-                        标准配置：7民2外2爪1恶 顺时针=左侧=号码大的方向
+                        标准配置：7民2外2爪1恶
                     </div>
                 </div>
             </div>
@@ -1370,22 +1378,35 @@
         { text: "邪恶", type: "evil" },
         { text: "0", type: "number" },
         { text: "1", type: "number" },
-        { text: "2", type: "number" }
+        { text: "2", type: "number" },
+        { text: "3", type: "number" },
+        { text: "4", type: "number" },
+        { text: "5", type: "number" },
+        { text: "6", type: "number" },
+        { text: "7", type: "number" },
+        { text: "8", type: "number" },
+        { text: "9", type: "number" },
+        { text: "死亡", type: "death" },
+        { text: "中毒", type: "poison" },
+        { text: "醉酒", type: "drunk" },
+        { text: "提名", type: "nomination" },
+        { text: "投票", type: "vote" },
+        { text: "保护", type: "protection" }
     ];
 
     // 标准配置映射表
     const standardConfigs = {
-        5: "3民0外1爪1恶 顺时针=左侧=号码大的方向",
-        6: "3民1外1爪1恶 顺时针=左侧=号码大的方向",
-        7: "5民0外1爪1恶 顺时针=左侧=号码大的方向",
-        8: "5民1外1爪1恶 顺时针=左侧=号码大的方向",
-        9: "5民2外1爪1恶 顺时针=左侧=号码大的方向",
-        10: "7民0外2爪1恶 顺时针=左侧=号码大的方向",
-        11: "7民1外2爪1恶 顺时针=左侧=号码大的方向",
-        12: "7民2外2爪1恶 顺时针=左侧=号码大的方向",
-        13: "9民0外3爪1恶 顺时针=左侧=号码大的方向",
-        14: "9民1外3爪1恶 顺时针=左侧=号码大的方向",
-        15: "9民2外3爪1恶 顺时针=左侧=号码大的方向"
+        5: "3民0外1爪1恶",
+        6: "3民1外1爪1恶",
+        7: "5民0外1爪1恶",
+        8: "5民1外1爪1恶",
+        9: "5民2外1爪1恶",
+        10: "7民0外2爪1恶",
+        11: "7民1外2爪1恶",
+        12: "7民2外2爪1恶",
+        13: "9民0外3爪1恶",
+        14: "9民1外3爪1恶",
+        15: "9民2外3爪1恶"
     };
 
     document.addEventListener('DOMContentLoaded', function() {
@@ -1479,6 +1500,9 @@
                     } else if (reminder.type) {
                         // 默认标记使用特定颜色
                         token.classList.add('default-reminder', reminder.type);
+                    } else if (reminder.roleType) {
+                        // 角色标记使用紫色
+                        token.classList.add('role-reminder');
                     }
 
                     token.textContent = reminder.text;
@@ -1740,6 +1764,9 @@
                             token.style.backgroundImage = `url('${reminder.image}')`;
                         } else if (reminder.type) {
                             token.classList.add('default-reminder', reminder.type);
+                        } else if (reminder.roleType) {
+                            // 角色标记使用紫色
+                            token.classList.add('role-reminder');
                         }
 
                         token.textContent = reminder.text;
@@ -2225,6 +2252,45 @@
                         playerReminders[playerNum].push({
                             text: this.dataset.text,
                             type: this.dataset.type
+                        });
+
+                        // 更新玩家卡片
+                        renderPlayers();
+
+                        // 关闭提醒标记选择器
+                        reminderSelectorModal.classList.remove('active');
+                    }
+                });
+
+                reminderTokensGrid.appendChild(token);
+            });
+
+            // 添加四个默认角色提醒标记
+            const defaultRoleReminders = [
+                { text: "是酒鬼", roleType: "drunk" },
+                { text: "是疯子", roleType: "lunatic" },
+                { text: "是提线木偶", roleType: "marionette" },
+                { text: "是悟道者", roleType: "wudaozhe" }
+            ];
+
+            defaultRoleReminders.forEach(reminder => {
+                const token = document.createElement('div');
+                token.className = 'reminder-token-select role-reminder';
+                token.textContent = reminder.text;
+                token.dataset.text = reminder.text;
+                token.dataset.roleType = reminder.roleType;
+
+                token.addEventListener('click', function() {
+                    const playerNum = parseInt(reminderPlayerSelect.value);
+                    if (playerNum) {
+                        if (!playerReminders[playerNum]) {
+                            playerReminders[playerNum] = [];
+                        }
+
+                        // 添加提醒标记
+                        playerReminders[playerNum].push({
+                            text: this.dataset.text,
+                            roleType: this.dataset.roleType
                         });
 
                         // 更新玩家卡片
