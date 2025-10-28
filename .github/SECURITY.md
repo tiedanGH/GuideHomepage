@@ -10,6 +10,6 @@ please report it **privately**. Do **not** submit it as a public GitHub Issue.
 
 ### Related Resources
 - [Security Policy (HTML)](https://tiedan.site/security-policy.html)
-- [Security.txt](https://tiedan.site/.well-known/security.txt)
+- [Security.txt](/.well-known/security.txt)
 
 Please do **not** publicly disclose vulnerabilities before they have been reviewed and fixed.  
