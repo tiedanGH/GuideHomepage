@@ -2,12 +2,11 @@
 <html lang="zh-CN">
 <head>
     <script>
-        // 在 GitHub Pages 部署时隐藏警告
+        // 非IP直连时隐藏警告
         (function() {
-            const hideDomains = ["tiedan.site", "tiedangh.github.io", "localhost"];
-            const host = window.location.hostname.toLowerCase();
-            const hide = hideDomains.some(domain => host === domain || host.endsWith("." + domain));
-            if (hide) {
+            const host = window.location.hostname.trim().toLowerCase();
+            const isIP = /^(\d{1,3}\.){3}\d{1,3}$/.test(host) || /^\[?[a-f0-9:]+]?$/i.test(host);
+            if (!isIP) {
                 const style = document.createElement("style");
                 style.setAttribute("data-hide-warning", "1");
                 style.textContent = ".warning { display: none !important; }";
