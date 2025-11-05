@@ -4,4 +4,4 @@
 Contact: https://github.com/tiedanGH/GuideHomepage/security/advisories
 Expires: 2026-12-31T23:59:59Z
 Preferred-Languages: zh, en
-Policy: https://tiedan.site/security-policy.html
+Policy: https://github.tiedan.site/security-policy.html
