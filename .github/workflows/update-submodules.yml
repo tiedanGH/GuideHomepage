@@ -1,0 +1,55 @@
+name: Update Git Submodules
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * 1"
+
+permissions:
+  contents: write
+
+jobs:
+  update-submodules:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          submodules: recursive
+          fetch-depth: 0
+
+      - name: Git Setup
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Update Submodules
+        run: |
+          git submodule foreach --recursive '
+            branch=$(git config -f $toplevel/.gitmodules submodule.$name.branch || echo main);
+            echo "Updating $name on branch $branch";
+            git fetch origin $branch;
+            git checkout $branch;
+            git pull origin $branch;
+          '
+
+      - name: Detect Changes
+        run: |
+          git add .
+          if [[ -n "$(git status --porcelain)" ]]; then
+          echo "changes=true" >> $GITHUB_ENV
+          echo "Changes detected. Ready to commit."
+          git status
+          else
+          echo "changes=false" >> $GITHUB_ENV
+          echo "No changes detected."
+          fi
+
+      - name: Commit & Push
+        if: env.changes == 'true'
+        run: |
+          git commit -m "sync(auto): update submodules to latest commits"
+          git push origin HEAD:main

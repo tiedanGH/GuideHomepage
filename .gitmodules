@@ -1,6 +1,8 @@
 [submodule "tiedangh.github.io"]
 	path = tiedan
-	url = git@github.com:tiedanGH/tiedangh.github.io.git
+	url = https://github.com/tiedanGH/tiedangh.github.io.git
+	branch = main
 [submodule "yagame"]
 	path = yagame
-	url = git@github.com:imalydimalyd/yagame.git
+	url = https://github.com/imalydimalyd/yagame.git
+	branch = main
