@@ -300,6 +300,13 @@ p {
 
 /* 响应式设计 */
 @media (max-width: 768px) {
+    .header-title .qq-chat {
+        right: 3px;
+        bottom: 3px;
+        font-size: 0.7em;
+        padding: 2px 4px;
+        border-radius: 4px;
+    }
     .main-sections {
         flex-direction: column;
     }
