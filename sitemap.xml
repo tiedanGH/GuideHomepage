@@ -4,20 +4,20 @@
     <url>
         <loc>https://tiedan.site/</loc>
         <changefreq>monthly</changefreq>
-        <priority>0.5</priority>
+        <priority>0.8</priority>
     </url>
 
-    <sitemap>
-        <loc>https://yagame.tiedan.site/sitemap.xml</loc>
+    <url>
+        <loc>https://yagame.tiedan.site/</loc>
         <changefreq>monthly</changefreq>
         <priority>1.0</priority>
-    </sitemap>
+    </url>
 
-    <sitemap>
-        <loc>https://tdgame.tiedan.site/sitemap.xml</loc>
+    <url>
+        <loc>https://tdgame.tiedan.site/</loc>
         <changefreq>monthly</changefreq>
-        <priority>0.8</priority>
-    </sitemap>
+        <priority>0.6</priority>
+    </url>
 
     <url>
         <loc>https://tiedan.site/privacy.html</loc>
@@ -27,7 +27,7 @@
 
     <url>
         <loc>https://tiedan.site/security-policy.html</loc>
-        <changefreq>yearly</changefreq>
+        <changefreq>never</changefreq>
         <priority>0.1</priority>
     </url>
 
