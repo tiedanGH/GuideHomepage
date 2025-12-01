@@ -217,6 +217,7 @@ p {
     flex-wrap: wrap;
 }
 .feature-btn {
+    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -240,6 +241,14 @@ p {
     margin-top: 30px;
     display: flex;
     justify-content: center;
+}
+.by-author {
+    position: absolute;
+    right: 6px;         /* 右下角位置，可微调 */
+    bottom: 2px;
+    font-size: 9px;     /* 很小的字 */
+    opacity: 0.7;       /* 淡化显示（可选） */
+    pointer-events: none; /* 不阻挡点击 */
 }
 
 /* 按钮图标 */
