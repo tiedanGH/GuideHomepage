@@ -22,13 +22,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#667eea"/>
     <meta name="description" content="一个汇集多个项目的导航网站，包含 YaGame、铁蛋网站、实用工具以及相关站点链接"/>
-    <meta property="og:image" content="https://tiedan.site/assets/icons/icon.png">
+    <meta property="og:image" content="https://tiedan.site/assets/icons/favicon.png">
 
     <title>导航主页</title>
     <link rel="icon" href="/favicon.ico">
-    <link rel="apple-touch-icon" href="/assets/icons/icon.png"/>
+    <link rel="apple-touch-icon" href="/assets/icons/favicon.png"/>
 
-    <link rel="stylesheet" href="assets/style.css"/>
+    <link rel="stylesheet" href="assets/css/main.css"/>
+    <link rel="stylesheet" href="assets/css/button.css"/>
+    <script src="assets/js/main.js" defer></script>
 </head>
 <body>
 
@@ -43,10 +45,10 @@
 
 <div class="container">
     <div class="main-sections">
-        <a href="yagame" class="section btn btn-yagame">
+        <a href="yagame" class="section main-btn yagame">
             <img src="assets/icons/yagame.svg" alt="icon" class="btn-icon"/> YaGame
         </a>
-        <a href="tiedan" class="section btn btn-tiedan">
+        <a href="tiedan" class="section main-btn tiedan">
             <img src="assets/icons/tiedan.svg" alt="icon" class="btn-icon" /> 铁蛋的游戏网站
         </a>
     </div>
@@ -54,34 +56,53 @@
     <div class="other-features">
         <h2>相关网站</h2>
         <div class="feature-buttons">
-            <a href="http://47.105.179.94:41080/jzj/" target="_blank" class="feature-btn jzj">
+            <a href="http://47.105.179.94:41080/jzj/" target="_blank" class="button jzj">
                 <img src="assets/icons/jzj.ico" class="btn-icon" alt=""/>
                 计中计
             </a>
-            <a href="http://8.213.137.106:48089" target="_blank" class="feature-btn killing">
+            <a href="http://8.213.137.106:48089" target="_blank" class="button killing">
                 <img src="assets/icons/vite.svg" class="btn-icon" alt=""/>
                 大杀四方
             </a>
+            <div class="menu-group">
+                <div class="button menu">
+<!--                    <img src="assets/icons/fish.png" class="btn-icon" alt="">-->
+                    saiwei 摸鱼小游戏 ▼
+                </div>
+                <div class="menu-panel">
+                    <a href="https://www.lingguang.com/share/FLASH_APP-705aab1d-f26d-4695-b280-d33e3e33312a26" target="_blank" class="button child">
+                        草帽海贼团
+                    </a>
+                    <a href="https://www.lingguang.com/share/FLASH_APP-2d1434f0-0358-4ecf-a657-8f1ff1f4543126" target="_blank" class="button child">
+                        极限跳伞
+                    </a>
+                </div>
+            </div>
         </div>
 
         <h2>更多功能</h2>
         <div class="feature-buttons">
-            <a href="static/clocktower-notes.html" class="feature-btn blood">
-                <img src="assets/icons/blood_white.svg" class="btn-icon" alt=""/>
-                血染钟楼笔记生成器
-            </a>
-            <a href="static/clocktower-generator.html" class="feature-btn blood">
-                <img src="assets/icons/blood_white.svg" class="btn-icon" alt=""/>
-                血染钟楼剧本加载器
-            </a>
-            <a href="static/JsonToolVer.1.6.6.html" class="feature-btn blood">
-                <img src="assets/icons/blood_white.svg" class="btn-icon" alt=""/>
-                JSON文件生成工具<small class="by-author">by 黑心恰克</small>
-            </a>
+            <div class="menu-group">
+                <div class="button menu blood">
+                    <img src="assets/icons/blood_white.svg" class="btn-icon" alt="">
+                    血染钟楼工具 ▼
+                </div>
+                <div class="menu-panel">
+                    <a href="static/clocktower-notes.html" class="button child blood">
+                        血染钟楼笔记生成器
+                    </a>
+                    <a href="static/clocktower-generator.html" class="button child blood">
+                        血染钟楼剧本加载器
+                    </a>
+                    <a href="static/JsonToolVer.1.6.6.html" class="button child blood">
+                        JSON文件生成工具 <small class="by-author">by 黑心恰克</small>
+                    </a>
+                </div>
+            </div>
         </div>
 
         <div class="github-section">
-            <a href="https://github.com/tiedanGH/Guide-Homepage" target="_blank" class="feature-btn github">
+            <a href="https://github.com/tiedanGH/Guide-Homepage" target="_blank" class="button github">
                 <img src="assets/icons/github.svg" class="btn-icon" alt="" />
                 查看仓库源码
             </a>
