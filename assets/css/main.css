@@ -273,6 +273,9 @@ p {
         padding: 2px 4px;
         border-radius: 4px;
     }
+    .container {
+        padding: 10px 20px;
+    }
     .main-sections {
         flex-direction: column;
     }
