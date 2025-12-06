@@ -1,23 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <script>
-        // 非IP直连时隐藏警告
-        (function() {
-            const host = window.location.hostname.trim().toLowerCase();
-            const isIP = /^(\d{1,3}\.){3}\d{1,3}$/.test(host) || /^\[?[a-f0-9:]+]?$/i.test(host);
-            if (!isIP) {
-                const style = document.createElement("style");
-                style.setAttribute("data-hide-warning", "1");
-                style.textContent = ".warning { display: none !important; }";
-                if (document.head) {
-                    document.head.insertBefore(style, document.head.firstChild);
-                } else {
-                    document.documentElement.insertBefore(style, document.documentElement.firstChild);
-                }
-            }
-        })();
-    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#667eea"/>
@@ -30,6 +13,7 @@
 
     <link rel="stylesheet" href="assets/css/main.css"/>
     <link rel="stylesheet" href="assets/css/button.css"/>
+
     <script src="assets/js/main.js" defer></script>
 </head>
 <body>
