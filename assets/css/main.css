@@ -255,12 +255,49 @@ p {
     pointer-events: auto;
     transform: translateY(0);
 }
+/* 二级菜单容器 */
+.submenu-group {
+    position: relative;
+}
+/* 二级菜单浮层 */
+.submenu-panel {
+    position: absolute;
+    top: 100%;
+    left: 15%;
+    margin-bottom: 6px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    background: white;
+    padding: 10px;
+    border-radius: 10px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.18);
+
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(6px) scale(0.95);
+    transition: all 0.2s ease;
+    z-index: 10000;
+}
+/* 二级菜单展开 */
+.submenu-panel.open {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
+}
 /* 悬停展开 */
 @media (hover:hover) {
     .menu-group:hover .menu-panel {
         opacity: 1;
         pointer-events: auto;
         transform: translateY(0);
+    }
+    .submenu-group:hover .submenu-panel {
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateY(0) scale(1);
     }
 }
 

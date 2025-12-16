@@ -16,9 +16,16 @@
     box-shadow: 0 4px 15px rgba(37, 117, 252, 0.3);
 }
 .button.menu {}
+.button.submenu {}
 .button.child {
-    width: 216px;
+    width: 215px;
     height: 45px;
+    min-height: 35px;
+}
+.button.child.small {
+    background: linear-gradient(135deg, #6caeff 0%, #478dff 100%);
+    width: 200px;
+    height: 40px;
 }
 .button.child:hover {
     transform: translateY(-3px);
