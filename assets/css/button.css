@@ -24,7 +24,7 @@
 }
 .button.child.small {
     background: linear-gradient(135deg, #6caeff 0%, #478dff 100%);
-    width: 200px;
+    width: 180px;
     height: 40px;
 }
 .button.child:hover {
