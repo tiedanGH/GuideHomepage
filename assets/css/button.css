@@ -55,9 +55,9 @@
     box-shadow: 0 4px 15px rgba(255, 0, 0, 0.3);
 }
 .button.child.blood:hover {
-    transform: translateY(-3px);
     box-shadow: 0 6px 20px rgba(255, 0, 0, 0.4);
     filter: brightness(1.05);
+    transform: translateY(-3px);
 }
 
 /* 计中计按钮 */
@@ -66,10 +66,10 @@
     box-shadow: inset 0 0 0 2px #333, 0 4px 15px rgba(0, 0, 0, 0.5);
 }
 .button.jzj:hover {
+    background: linear-gradient(145deg, #1a1a1a, #3a3a3a);
     box-shadow: inset 0 0 0 2px #c4322f, 0 6px 20px rgba(196, 50, 47, 0.6);
     color: #ff4945;
     transform: translateY(-2px) scale(1.03);
-    background: linear-gradient(145deg, #1a1a1a, #3a3a3a);
 }
 
 /* 大杀四方按钮 */
@@ -79,10 +79,21 @@
 }
 .button.killing:hover {
     background: linear-gradient(90deg, #ae6eff, #f35b8a);
-    transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(227, 65, 115, 0.4);
+    transform: translateY(-2px);
+
 }
 
+/* 灵光按钮 */
+.button.lingguang {
+    background: linear-gradient(145deg, rgba(30, 60, 114, 0.9), rgba(20, 30, 48, 0.9));
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+.button.lingguang:hover {
+    background: linear-gradient(145deg, rgba(40, 80, 150, 0.95), rgba(30, 50, 80, 0.95));
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
+}
 
 /* Github按钮 */
 .button.github {

@@ -1,0 +1,116 @@
+body {
+    padding: 20px;
+}
+a {
+    text-decoration: none;
+}
+
+/* 返回主页按钮 */
+.back-home {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    padding: 10px 18px;
+    background: linear-gradient(135deg, #1e3c72, #2a5298);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+#homeButton:hover {
+    background: linear-gradient(135deg, #2a5298, #3a6bc5);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* 标题样式 */
+h1 {
+    text-align: center;
+    margin: 30px 0 30px;
+    font-size: 2.2rem;
+    background: linear-gradient(90deg, #4dabf7, #228be6);
+    background-clip: text;
+    color: transparent;
+}
+
+/* 按钮网格样式 */
+.button-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+    max-width: 1200px;
+    margin: 0 auto 40px;
+    padding: 0 15px;
+}
+.button-grid a {
+    position: relative;
+    display: block;
+    padding: 15px 10px;
+    background: linear-gradient(145deg, rgba(30, 60, 114, 0.9), rgba(20, 30, 48, 0.9));
+    color: white;
+    border-radius: 8px;
+    font-weight: 600;
+    text-align: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(100, 150, 255, 0.1);
+    max-width: 100%;
+    font-size: 1.1rem;
+}
+.button-grid a:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    background: linear-gradient(145deg, rgba(40, 80, 150, 0.95), rgba(30, 50, 80, 0.95));
+    border-color: rgba(100, 150, 255, 0.3);
+}
+.by-author {
+    position: absolute;
+    right: 6px;
+    bottom: 2px;
+    font-size: 11px;
+    opacity: 0.8;
+    pointer-events: none;
+}
+
+/* 免责声明样式 */
+.disclaimer {
+    font-size: 0.9em;
+    color: #555;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    body {
+        padding: 5px;
+    }
+
+    #homeButton {
+        top: 10px;
+        left: 10px;
+        padding: 8px 14px;
+        font-size: 13px;
+    }
+
+    h1 {
+        font-size: 1.8rem;
+        margin-top: 15px;
+    }
+
+    .button-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media screen and (max-width: 480px) {
+    .button-grid {
+        grid-template-columns: 1fr;
+        max-width: 250px;
+    }
+}
