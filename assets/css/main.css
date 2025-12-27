@@ -38,6 +38,10 @@ p {
     color: red;
     font-weight: bold;
 }
+.warning a {
+    color: blue;
+    text-decoration: none;
+}
 
 /* 网站标题 */
 .header-title {
