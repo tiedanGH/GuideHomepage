@@ -39,31 +39,19 @@
 }
 
 .search-clear {
+    background: url("../img/clear.png") no-repeat center / contain;
     position: absolute;
-    right: 30px;
-    top: 12px;
-    width: 24px;
-    height: 24px;
-    background-color: #ddd;
-    border-radius: 50%;
+    right: 28px;
+    top: 50%;
+    width: 30px;
+    height: 30px;
     cursor: pointer;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    transition: all 0.2s ease;
+    transform: translateY(-50%);
+    transition: opacity 0.2s ease, filter 0.2s ease;
     z-index: 2;
     visibility: hidden;
     opacity: 0;
     pointer-events: none;
-}
-.search-clear::before {
-    content: "×";
-    font-size: 18px;
-    font-weight: bold;
-    color: #666;
-    transform: translate(0.5px, -1px);
 }
 .search-clear.visible {
     visibility: visible;
@@ -71,7 +59,7 @@
     pointer-events: auto;
 }
 .search-clear:hover {
-    background-color: #ccc;
+    filter: brightness(0.85);
 }
 
 /* 搜索结果容器 */
@@ -106,17 +94,10 @@
 
     .search-icon {
         left: 25px;
-        top: 13px;
-        font-size: 16px;
     }
 
     .search-clear {
-        right: 25px;
-        top: 13px;
-        width: 22px;
-        height: 22px;
-        line-height: 20px;
-        font-size: 16px;
+        right: 20px;
     }
 
     .search-results-container {
@@ -137,16 +118,9 @@
 
     .search-icon {
         left: 20px;
-        top: 12px;
-        font-size: 15px;
     }
 
     .search-clear {
-        right: 20px;
-        top: 12px;
-        width: 20px;
-        height: 20px;
-        line-height: 18px;
-        font-size: 15px;
+        right: 18px;
     }
 }
