@@ -32,7 +32,7 @@
     box-shadow: 0 6px 20px rgba(37, 117, 252, 0.4);
     filter: brightness(1.05);
 }
-.by-author {
+.author {
     position: absolute;
     right: 6px;
     bottom: 2px;
