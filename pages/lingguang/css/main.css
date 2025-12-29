@@ -70,6 +70,10 @@ h1 {
     color: #2ecc71;
     border-color: #2ecc71;
 }
+.category-title.luck {
+    color: #f1c40f;
+    border-color: #f1c40f;
+}
 .category-title.arcade {
     color: #ff7a18;
     border-color: #ff7a18;
@@ -77,10 +81,6 @@ h1 {
 .category-title.battle {
     color: #9b59b6;
     border-color: #9b59b6;
-}
-.category-title.unused1 {
- color: #f5a623;
- border-color: #f5a623;
 }
 .category-title.uncategorized {
     color: #7f8c8d;
