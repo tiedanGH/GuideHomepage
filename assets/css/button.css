@@ -15,6 +15,11 @@
     transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(37, 117, 252, 0.3);
 }
+.button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(37, 117, 252, 0.4);
+    filter: brightness(1.05);
+}
 .button.menu {}
 .button.submenu {}
 .button.child {
@@ -28,7 +33,6 @@
     height: 40px;
 }
 .button.child:hover {
-    transform: translateY(-3px);
     box-shadow: 0 6px 20px rgba(37, 117, 252, 0.4);
     filter: brightness(1.05);
 }
@@ -57,7 +61,6 @@
 .button.child.blood:hover {
     box-shadow: 0 6px 20px rgba(255, 0, 0, 0.4);
     filter: brightness(1.05);
-    transform: translateY(-3px);
 }
 
 /* 计中计按钮 */
@@ -80,8 +83,6 @@
 .button.killing:hover {
     background: linear-gradient(90deg, #ae6eff, #f35b8a);
     box-shadow: 0 6px 20px rgba(227, 65, 115, 0.4);
-    transform: translateY(-2px);
-
 }
 
 /* 灵光按钮 */
@@ -92,7 +93,6 @@
 .button.lingguang:hover {
     background: linear-gradient(145deg, rgba(40, 80, 150, 0.95), rgba(30, 50, 80, 0.95));
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-    transform: translateY(-2px);
 }
 
 /* Github按钮 */
