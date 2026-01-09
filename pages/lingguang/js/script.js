@@ -1,46 +1,82 @@
+
+let starFilterActive = false;
+
 document.addEventListener("DOMContentLoaded", () => {
-    // 未分类为空自动隐藏
-    const uncategorized = document.querySelector('.category .category-title.uncategorized')?.parentElement;
-    if (uncategorized) {
-        const grid = uncategorized.querySelector('.button-grid');
-        if (!grid || grid.querySelectorAll('a').length === 0) {
-            uncategorized.style.display = 'none';
-        }
-    }
-
-    // 对按钮进行自动排序
-    const grids = document.querySelectorAll('.button-grid');
-    grids.forEach(grid => {
-        const buttons = Array.from(grid.querySelectorAll('a'));
-
-        buttons.sort((a, b) => {
-            const getTitle = el => {
-                const clone = el.cloneNode(true);
-                const small = clone.querySelector('small');
-                if (small) small.remove();
-                return clone.innerText.trim();
-            };
-            return getTitle(a).localeCompare(getTitle(b), 'zh-CN');
-        });
-
-        grid.innerHTML = '';
-        buttons.forEach(btn => grid.appendChild(btn));
-    });
-
-
-    // 设置所有按钮链接在新标签页打开
-    document.querySelectorAll('.button-grid a').forEach(link => {
-        link.setAttribute('target', '_blank');
-        link.setAttribute('rel', 'noopener noreferrer');
-    });
-
-
-    // 搜索功能
     const searchInput = document.getElementById('searchInput');
     const searchClear = document.getElementById('searchClear');
     const allCategories = document.querySelectorAll('.category');
     const allButtons = document.querySelectorAll('.button-grid a');
 
+    // 应用筛选函数
+    function applyStarFilter() {
+        allCategories.forEach(category => {
+            const buttons = category.querySelectorAll('.button-grid a');
+            let hasVisibleButtons = false;
+
+            buttons.forEach(button => {
+                const hasStar = button.querySelector('.star') !== null;
+                const visible = !starFilterActive || hasStar;
+
+                button.style.display = visible ? 'block' : 'none';
+                if (visible) hasVisibleButtons = true;
+            });
+
+            category.style.display = hasVisibleButtons ? '' : 'none';
+        });
+    }
+
+    // 初始化：分类为空自动隐藏
+    applyStarFilter();
+
+    // 按钮排序函数
+    function sortButtons(buttons) {
+        return buttons.sort((a, b) => {
+            const aHasStar = a.querySelector('.star') !== null;
+            const bHasStar = b.querySelector('.star') !== null;
+            if (aHasStar && !bHasStar) return -1;
+            if (!aHasStar && bHasStar) return 1;
+
+            const getTitle = el => {
+                const clone = el.cloneNode(true);
+                const small = clone.querySelector('small');
+                if (small) small.remove();
+                const star = clone.querySelector('.star');
+                if (star) star.remove();
+                return clone.innerText.trim();
+            };
+            return getTitle(a).localeCompare(getTitle(b), 'zh-CN');
+        });
+    }
+
+    // 初始化：对按钮进行自动排序
+    const grids = document.querySelectorAll('.button-grid');
+    grids.forEach(grid => {
+        const buttons = Array.from(grid.querySelectorAll('a'));
+        const sortedButtons = sortButtons(buttons);
+        grid.innerHTML = '';
+        sortedButtons.forEach(btn => grid.appendChild(btn));
+    });
+
+    // 初始化：设置所有按钮链接在新标签页打开
+    document.querySelectorAll('.button-grid a').forEach(link => {
+        link.setAttribute('target', '_blank');
+        link.setAttribute('rel', 'noopener noreferrer');
+    });
+
+    // 星星筛选功能
+    const starFilter = document.getElementById('starFilter');
+    function toggleStarFilter() {
+        starFilterActive = !starFilterActive;
+        starFilter.classList.toggle('active', starFilterActive);
+
+        applyStarFilter();
+        if (searchInput.value.trim()) {
+            performSearch();
+        }
+    }
+    starFilter.addEventListener('click', toggleStarFilter);
+
+    // 搜索功能
     const searchResultsContainer = document.createElement('div');
     searchResultsContainer.className = 'search-results-container';
     const resultCount = document.createElement('div');
@@ -62,25 +98,17 @@ document.addEventListener("DOMContentLoaded", () => {
         if (searchTerm.length === 0) {
             searchResultsContainer.style.display = 'none';
             resultsGrid.innerHTML = '';
-            allCategories.forEach(category => category.style.display = '');
             searchClear.classList.remove('visible');
-            if (uncategorized) {
-                const grid = uncategorized.querySelector('.button-grid');
-                if (!grid || grid.querySelectorAll('a').length === 0) {
-                    uncategorized.style.display = 'none';
-                }
-            }
+            applyStarFilter();
             return;
         }
 
         searchClear.classList.add('visible');
-
         allCategories.forEach(category => category.style.display = 'none');
         searchResultsContainer.style.display = 'block';
-
         resultsGrid.innerHTML = '';
 
-        let matchCount = 0;
+        const matchedButtons = [];
 
         // 查找并添加匹配的按钮到结果网格
         allButtons.forEach(button => {
@@ -89,18 +117,37 @@ document.addEventListener("DOMContentLoaded", () => {
                 button.textContent.replace(button.querySelector('small').textContent, '') :
                 button.textContent;
 
-            if (buttonText.includes(searchTerm) || buttonTitle.toLowerCase().includes(searchTerm)) {
-                const clonedButton = button.cloneNode(true);
-
-                clonedButton.setAttribute('target', '_blank');
-                clonedButton.setAttribute('rel', 'noopener noreferrer');
-
-                resultsGrid.appendChild(clonedButton);
-                matchCount++;
+            const matchesSearch = buttonText.includes(searchTerm) || buttonTitle.toLowerCase().includes(searchTerm);
+            if (starFilterActive) {
+                const hasStar = button.querySelector('.star') !== null;
+                if (matchesSearch && hasStar) {
+                    matchedButtons.push(button);
+                }
+            } else {
+                if (matchesSearch) {
+                    matchedButtons.push(button);
+                }
             }
         });
+        // 对匹配的按钮进行排序
+        const sortedMatchedButtons = sortButtons(matchedButtons);
 
-        resultCount.textContent = matchCount > 0 ? `找到 ${matchCount} 个匹配的应用` : '未找到匹配的应用';
+        resultsGrid.innerHTML = '';
+        sortedMatchedButtons.forEach(button => {
+            const clonedButton = button.cloneNode(true);
+            resultsGrid.appendChild(clonedButton);
+        });
+
+        // 搜索结果计数
+        let countText;
+        if (starFilterActive) {
+            countText = matchedButtons.length > 0 ?
+                `找到 ${matchedButtons.length} 个匹配的精选应用` : '未找到匹配的精选应用';
+        } else {
+            countText = matchedButtons.length > 0 ?
+                `找到 ${matchedButtons.length} 个匹配的应用` : '未找到匹配的应用';
+        }
+        resultCount.textContent = countText;
     }
 
     // 输入事件监听

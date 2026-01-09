@@ -1,11 +1,19 @@
 /* 搜索框样式 */
 .search-container {
     position: relative;
-    max-width: 600px;
+    max-width: 700px;
     margin: 20px auto;
     padding: 0 15px;
     height: 50px;
     box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.search-wrapper {
+    flex: 1;
+    position: relative;
 }
 
 #searchInput {
@@ -29,7 +37,7 @@
 .search-icon {
     background: url("../img/search.png") no-repeat center / contain;
     position: absolute;
-    left: 30px;
+    left: 15px;
     top: 50%;
     width: 22px;
     height: 22px;
@@ -41,7 +49,7 @@
 .search-clear {
     background: url("../img/clear.png") no-repeat center / contain;
     position: absolute;
-    right: 28px;
+    right: 15px;
     top: 50%;
     width: 30px;
     height: 30px;
@@ -60,6 +68,37 @@
 }
 .search-clear:hover {
     filter: brightness(0.85);
+}
+
+/* 星星过滤按钮 */
+#starFilter {
+    background: url("../img/star.png") no-repeat center / contain;
+    min-width: 42px;
+    min-height: 42px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    opacity: 0.6;
+    border: 2px solid #f7d046;
+    border-radius: 8px;
+    padding: 5px;
+    box-sizing: border-box;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+#starFilter:hover {
+    opacity: 0.8;
+    transform: scale(1.05);
+}
+#starFilter.active {
+    opacity: 1;
+    background-color: rgba(247, 208, 70, 0.2);
+    border-color: #ffc107;
+    box-shadow: 0 0 8px rgba(247, 208, 70, 0.4);
+    animation: pulse 1.5s infinite;
+}
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(247, 208, 70, 0.4); }
+    70% { box-shadow: 0 0 0 6px rgba(247, 208, 70, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(247, 208, 70, 0); }
 }
 
 /* 搜索结果容器 */
@@ -84,6 +123,7 @@
         margin: 15px auto;
         padding: 0 10px;
         height: 45px;
+        gap: 8px;
     }
 
     #searchInput {
@@ -93,11 +133,16 @@
     }
 
     .search-icon {
-        left: 25px;
+        left: 12px;
     }
 
     .search-clear {
-        right: 20px;
+        right: 12px;
+    }
+
+    #starFilter {
+        min-width: 36px;
+        min-height: 36px;
     }
 
     .search-results-container {
@@ -107,7 +152,9 @@
 
 @media (max-width: 480px) {
     .search-container {
+        padding: 0 5px;
         height: 42px;
+        gap: 6px;
     }
 
     #searchInput {
@@ -117,10 +164,17 @@
     }
 
     .search-icon {
-        left: 20px;
+        left: 10px;
     }
 
     .search-clear {
-        right: 18px;
+        right: 10px;
+    }
+
+    #starFilter {
+        min-width: 34px;
+        min-height: 34px;
+        border-radius: 6px;
+        padding: 4px;
     }
 }

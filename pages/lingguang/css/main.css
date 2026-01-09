@@ -57,10 +57,6 @@ h1 {
     box-sizing: border-box;
 }
 
-.category-title.premium {
-    color: #c9a227;
-    border-color: #c9a227;
-}
 .category-title.puzzle {
     color: #4a90e2;
     border-color: #4a90e2;
@@ -69,6 +65,10 @@ h1 {
     color: #e84393;
     border-color: #e84393;
 }
+.category-title.text-adventure {
+    color: #16a085;
+    border-color: #16a085;
+}
 .category-title.relax {
     color: #2ecc71;
     border-color: #2ecc71;
@@ -76,6 +76,10 @@ h1 {
 .category-title.luck {
     color: #f7d046;
     border-color: #f7d046;
+}
+.category-title.workshop {
+    color: #a66dd4;
+    border-color: #a66dd4;
 }
 .category-title.level {
     color: #ff6b6b;
@@ -123,6 +127,15 @@ h1 {
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
     background: linear-gradient(145deg, rgba(40, 80, 150, 0.95), rgba(30, 50, 80, 0.95));
     border-color: rgba(100, 150, 255, 0.3);
+}
+.button-grid a .star {
+    position: absolute;
+    left: 6px;
+    top: 6px;
+    width: 18px;
+    height: 18px;
+    background: url('../img/star.png') no-repeat center / contain;
+    z-index: 1;
 }
 .author {
     position: absolute;
@@ -180,6 +193,21 @@ h1 {
     .button-grid a {
         padding: 12px;
         font-size: 1rem;
+    }
+    .button-grid a .star {
+        width: 16px;
+        height: 16px;
+        left: 5px;
+        top: 5px;
+    }
+
+    .author {
+        font-size: 10px;
+        right: 4px;
+    }
+    .note {
+        font-size: 11px;
+        right: 2px;
     }
 }
 @media (max-width: 480px) {
