@@ -396,104 +396,109 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>血染钟楼角色转换工具</h1>
-            <p class="subtitle">实现角色信息在集石字段和完整字段之间的互换转换</p>
-        </header>
-        
-        <div class="instructions">
-            <h3>使用说明：</h3>
-            <ol>
-                <li>使用"导入JSON文件"功能，将角色数据JSON文件直接拖放或选择到上传区域</li>
-                <li>选择转换方向：从集石字段转换为完整字段，或从完整字段转换为集石字段</li>
-                <li>点击"开始转换"按钮执行转换</li>
-                <li>转换结果将显示在右侧输出框中，可以点击"下载JSON文件"保存结果</li>
-                <li>使用"重置"按钮清除所有数据重新开始</li>
-            </ol>
-        </div>
-        
-        <div class="main-content">
-            <div class="panel">
-                <h2>📂 导入JSON文件</h2>
-                <p class="panel-description">导入角色数据JSON文件，支持集石字段(id)和完整字段两种格式</p>
-                
-                <div class="json-upload-section" id="jsonUploadArea">
-                    <h3>导入JSON文件</h3>
-                    <p>将JSON文件拖放到此区域，或点击下方按钮选择文件</p>
-                    
-                    <div class="file-input-wrapper">
-                        <input type="file" id="jsonFileInput" accept=".json" multiple>
-                        <div class="file-input-label">
-                            <span class="icon">📂</span>
-                            选择JSON文件
-                        </div>
-                    </div>
-                    
-                    <p style="margin-top: 15px; color: #666; font-size: 0.9rem;">支持格式：包含角色对象的JSON数组，如 <code>[{"id":"mayor"}, {"id":"artist"}]</code> 或完整角色信息</p>
-                    
-                    <div class="status-info" id="uploadStatus"></div>
-                </div>
-                
-                <div class="conversion-options">
-                    <h4>选择转换方向：</h4>
-                    <div class="radio-group">
-                        <div class="radio-option">
-                            <input type="radio" id="toFull" name="conversionType" value="toFull" checked>
-                            <label for="toFull">集石字段 → 完整字段</label>
-                        </div>
-                        <div class="radio-option">
-                            <input type="radio" id="toSimple" name="conversionType" value="toSimple">
-                            <label for="toSimple">完整字段 → 集石字段</label>
-                        </div>
-                    </div>
-                    <p class="example-text">集石字段: <code>{"id": "lleech"}</code> ↔ 完整字段: <code>{"id": "lleech", "name": "痢蛭", "ability": "...", ...}</code></p>
-                </div>
-                
-                <div class="controls">
-                    <button class="btn-success" id="convertBtn">
-                        <span class="icon">⚡</span>
-                        开始转换
-                    </button>
-                    <button class="btn-danger" id="resetBtn">
-                        <span class="icon">🗑️</span>
-                        重置所有
-                    </button>
-                </div>
-            </div>
-            
-            <div class="panel">
-                <h2>📤 输出结果</h2>
-                <p class="panel-description">转换后的角色信息（JSON格式）</p>
-                
-                <div class="loading" id="loadingIndicator">
-                    <div class="spinner"></div>
-                    <p>正在转换中，请稍候...</p>
-                </div>
-                
-                <textarea id="outputResult" placeholder="转换结果将显示在这里..." readonly></textarea>
-                
-                <div class="output-info">
-                    <div>转换角色数量：<span class="role-count" id="roleCount">0</span> 个</div>
-                    <div>未知角色：<span class="unknown-count" id="unknownCount">0</span> 个</div>
-                </div>
-                
-                <div id="statusMessage"></div>
-                
-                <div class="controls">
-                    <button class="btn-purple" id="downloadBtn">
-                        <span class="icon">💾</span>
-                        下载JSON文件
-                    </button>
-                </div>
-            </div>
-        </div>
-        
-        <footer>
-            <p>血染钟楼角色转换工具 | 版本 1.2 | 完全在浏览器中运行，无需服务器</p>
-            <p>注：所有数据仅保存在您的浏览器中，不会上传到任何服务器</p>
-        </footer>
+<div class="container">
+    <header>
+        <h1>血染钟楼角色转换工具</h1>
+        <p class="subtitle">实现角色信息在集石字段和完整字段之间的互换转换</p>
+    </header>
+
+    <div class="instructions">
+        <h3>使用说明：</h3>
+        <ol>
+            <li>使用"导入JSON文件"功能，将角色数据JSON文件直接拖放或选择到上传区域</li>
+            <li>选择转换方向：从集石字段转换为完整字段，或从完整字段转换为集石字段</li>
+            <li>点击"开始转换"按钮执行转换</li>
+            <li>转换结果将显示在右侧输出框中，可以点击"下载JSON文件"保存结果</li>
+            <li>使用"清理_gstone后缀"按钮去除角色ID中的_gstone后缀</li>
+            <li>使用"重置"按钮清除所有数据重新开始</li>
+        </ol>
     </div>
+
+    <div class="main-content">
+        <div class="panel">
+            <h2>📂 导入JSON文件</h2>
+            <p class="panel-description">导入角色数据JSON文件，支持集石字段(id)和完整字段两种格式</p>
+
+            <div class="json-upload-section" id="jsonUploadArea">
+                <h3>导入JSON文件</h3>
+                <p>将JSON文件拖放到此区域，或点击下方按钮选择文件</p>
+
+                <div class="file-input-wrapper">
+                    <input type="file" id="jsonFileInput" accept=".json" multiple>
+                    <div class="file-input-label">
+                        <span class="icon">📂</span>
+                        选择JSON文件
+                    </div>
+                </div>
+
+                <p style="margin-top: 15px; color: #666; font-size: 0.9rem;">支持格式：包含角色对象的JSON数组，如 <code>[{"id":"mayor"}, {"id":"artist"}]</code> 或完整角色信息</p>
+
+                <div class="status-info" id="uploadStatus"></div>
+            </div>
+
+            <div class="conversion-options">
+                <h4>选择转换方向：</h4>
+                <div class="radio-group">
+                    <div class="radio-option">
+                        <input type="radio" id="toFull" name="conversionType" value="toFull" checked>
+                        <label for="toFull">集石字段 → 完整字段</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="toSimple" name="conversionType" value="toSimple">
+                        <label for="toSimple">完整字段 → 集石字段</label>
+                    </div>
+                </div>
+                <p class="example-text">集石字段: <code>{"id": "lleech"}</code> ↔ 完整字段: <code>{"id": "lleech", "name": "痢蛭", "ability": "...", ...}</code></p>
+            </div>
+
+            <div class="controls">
+                <button class="btn-success" id="convertBtn">
+                    <span class="icon">⚡</span>
+                    开始转换
+                </button>
+                <button class="btn-danger" id="resetBtn">
+                    <span class="icon">🗑️</span>
+                    重置所有
+                </button>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2>📤 输出结果</h2>
+            <p class="panel-description">转换后的角色信息（JSON格式）</p>
+
+            <div class="loading" id="loadingIndicator">
+                <div class="spinner"></div>
+                <p>正在转换中，请稍候...</p>
+            </div>
+
+            <textarea id="outputResult" placeholder="转换结果将显示在这里..." readonly></textarea>
+
+            <div class="output-info">
+                <div>转换角色数量：<span class="role-count" id="roleCount">0</span> 个</div>
+                <div>未知角色：<span class="unknown-count" id="unknownCount">0</span> 个</div>
+            </div>
+
+            <div id="statusMessage"></div>
+
+            <div class="controls">
+                <button class="btn-purple" id="downloadBtn">
+                    <span class="icon">💾</span>
+                    下载JSON文件
+                </button>
+                <button class="btn-warning" id="cleanSuffixBtn">
+                    <span class="icon">🧹</span>
+                    清理_gstone后缀
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>血染钟楼角色转换工具 | 版本 1.3 | 完全在浏览器中运行，无需服务器</p>
+        <p>注：所有数据仅保存在您的浏览器中，不会上传到任何服务器</p>
+    </footer>
+</div>
 
     <script>
         // 完整的角色数据库（示例数据）
@@ -3923,383 +3928,429 @@
     
  ];
 
-        // DOM元素
-        const outputResult = document.getElementById('outputResult');
-        const convertBtn = document.getElementById('convertBtn');
-        const resetBtn = document.getElementById('resetBtn');
-        const downloadBtn = document.getElementById('downloadBtn');
-        const jsonFileInput = document.getElementById('jsonFileInput');
-        const jsonUploadArea = document.getElementById('jsonUploadArea');
-        const uploadStatus = document.getElementById('uploadStatus');
-        const loadingIndicator = document.getElementById('loadingIndicator');
-        const roleCountElement = document.getElementById('roleCount');
-        const unknownCountElement = document.getElementById('unknownCount');
-        const statusMessageElement = document.getElementById('statusMessage');
+    // DOM元素
+    const outputResult = document.getElementById('outputResult');
+    const convertBtn = document.getElementById('convertBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const cleanSuffixBtn = document.getElementById('cleanSuffixBtn'); // 新增
+    const jsonFileInput = document.getElementById('jsonFileInput');
+    const jsonUploadArea = document.getElementById('jsonUploadArea');
+    const uploadStatus = document.getElementById('uploadStatus');
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    const roleCountElement = document.getElementById('roleCount');
+    const unknownCountElement = document.getElementById('unknownCount');
+    const statusMessageElement = document.getElementById('statusMessage');
 
-        // 存储上传的数据和文件名
-        let uploadedData = null;
-        let uploadedFileName = null;
-        let currentConversionType = null;
-        let unknownRoleCount = 0;
+    // 存储上传的数据和文件名
+    let uploadedData = null;
+    let uploadedFileName = null;
+    let currentConversionType = null;
+    let unknownRoleCount = 0;
 
-        // 显示状态消息
-        function showStatus(message, type = 'success') {
-            statusMessageElement.textContent = message;
-            statusMessageElement.className = '';
-            
-            if (type === 'success') {
-                statusMessageElement.style.color = '#27ae60';
-            } else if (type === 'error') {
-                statusMessageElement.style.color = '#e74c3c';
-            } else if (type === 'info') {
-                statusMessageElement.style.color = '#3498db';
-            }
-            
-            // 3秒后清除状态消息
-            setTimeout(() => {
-                statusMessageElement.textContent = '';
-            }, 3000);
+    // 显示状态消息
+    function showStatus(message, type = 'success') {
+        statusMessageElement.textContent = message;
+        statusMessageElement.className = '';
+
+        if (type === 'success') {
+            statusMessageElement.style.color = '#27ae60';
+        } else if (type === 'error') {
+            statusMessageElement.style.color = '#e74c3c';
+        } else if (type === 'info') {
+            statusMessageElement.style.color = '#3498db';
         }
 
-        // 显示上传状态
-        function showUploadStatus(message, type = 'info') {
-            uploadStatus.textContent = message;
-            uploadStatus.className = 'status-info';
-            
-            if (type === 'success') {
-                uploadStatus.classList.add('status-success');
-            } else if (type === 'error') {
-                uploadStatus.classList.add('status-error');
-            } else if (type === 'loading') {
-                uploadStatus.classList.add('status-loading');
-            }
-        }
-
-        // 显示加载指示器
-        function showLoading() {
-            loadingIndicator.style.display = 'block';
-            outputResult.style.opacity = '0.5';
-        }
-
-        // 隐藏加载指示器
-        function hideLoading() {
-            loadingIndicator.style.display = 'none';
-            outputResult.style.opacity = '1';
-        }
-
-      // 集石字段转换为完整字段
-function convertToFull(simpleList) {
-    try {
-        let unknownCount = 0;
-        const result = simpleList.map(item => {
-            // 特殊处理 _meta 对象
-            if (item.id === "_meta") {
-                // 直接返回完整的 _meta 对象
-                return item;
-            }
-            
-            // 在完整角色数据库中查找对应的角色
-            const fullRole = fullRoleDatabase.find(role => role.id === item.id);
-            
-            if (!fullRole) {
-                unknownCount++;
-                console.warn(`未找到角色ID: ${item.id}`);
-                // 直接返回原始对象，不做任何转换
-                return item;
-            }
-            
-            // 返回完整角色信息
-            return { ...fullRole };
-        });
-        
-        return { result, unknownCount };
-    } catch (error) {
-        console.error('转换过程中发生错误:', error);
-        return null;
+        // 3秒后清除状态消息
+        setTimeout(() => {
+            statusMessageElement.textContent = '';
+        }, 3000);
     }
-}
 
-// 完整字段转换为集石字段
-function convertToSimple(fullList) {
-    try {
-        let unknownCount = 0;
-        const result = fullList.map(item => {
-            // 特殊处理 _meta 对象
-            if (item.id === "_meta") {
-                // 直接返回完整的 _meta 对象，不提取 id
-                return item;
-            }
-            
-            // 只保留id字段
-            return { id: item.id };
-        });
-        
-        return { result, unknownCount };
-    } catch (error) {
-        console.error('转换过程中发生错误:', error);
-        return null;
+    // 显示上传状态
+    function showUploadStatus(message, type = 'info') {
+        uploadStatus.textContent = message;
+        uploadStatus.className = 'status-info';
+
+        if (type === 'success') {
+            uploadStatus.classList.add('status-success');
+        } else if (type === 'error') {
+            uploadStatus.classList.add('status-error');
+        } else if (type === 'loading') {
+            uploadStatus.classList.add('status-loading');
+        }
     }
-}
 
-        // 检测数据格式
-        function detectDataFormat(data) {
-            if (!Array.isArray(data) || data.length === 0) {
-                return 'unknown';
-            }
-            
-            // 检查第一个元素是否包含完整字段
-            const firstItem = data[0];
-            const hasFullFields = firstItem.name !== undefined && 
-                                 firstItem.ability !== undefined && 
-                                 firstItem.team !== undefined;
-            
-            return hasFullFields ? 'full' : 'simple';
-        }
+    // 显示加载指示器
+    function showLoading() {
+        loadingIndicator.style.display = 'block';
+        outputResult.style.opacity = '0.5';
+    }
 
-        // 处理JSON文件导入
-        function handleJsonFileUpload(file) {
-            if (!file) return;
-            
-            showUploadStatus('正在读取文件...', 'loading');
-            
-            // 保存文件名（去掉扩展名）
-            uploadedFileName = file.name.replace(/\.json$/, '');
-            
-            const reader = new FileReader();
-            
-            reader.onload = function(e) {
-                try {
-                    const jsonData = JSON.parse(e.target.result);
-                    
-                    // 检查数据格式
-                    if (!Array.isArray(jsonData)) {
-                        showUploadStatus('错误: JSON数据必须是数组格式', 'error');
-                        return;
-                    }
-                    
-                    // 存储上传的数据
-                    uploadedData = jsonData;
-                    
-                    // 自动检测数据格式
-                    const detectedFormat = detectDataFormat(jsonData);
-                    
-                    // 根据检测结果设置默认的转换方向
-                    if (detectedFormat === 'full') {
-                        document.getElementById('toSimple').checked = true;
-                        showUploadStatus(`✅ JSON文件导入成功！检测到完整格式数据 (${jsonData.length} 个角色)`, 'success');
-                    } else if (detectedFormat === 'simple') {
-                        document.getElementById('toFull').checked = true;
-                        showUploadStatus(`✅ JSON文件导入成功！检测到集石格式数据 (${jsonData.length} 个角色)`, 'success');
-                    } else {
-                        showUploadStatus(`✅ JSON文件导入成功！ (${jsonData.length} 个角色)`, 'success');
-                    }
-                    
-                    showStatus(`成功导入 ${jsonData.length} 个角色`, 'success');
-                    
-                    // 更新角色计数
-                    roleCountElement.textContent = '0';
-                    unknownCountElement.textContent = '0';
-                    
-                } catch (error) {
-                    showUploadStatus(`错误: ${error.message}`, 'error');
-                    console.error('JSON解析错误:', error);
+    // 隐藏加载指示器
+    function hideLoading() {
+        loadingIndicator.style.display = 'none';
+        outputResult.style.opacity = '1';
+    }
+
+    // 集石字段转换为完整字段
+    function convertToFull(simpleList) {
+        try {
+            let unknownCount = 0;
+            const result = simpleList.map(item => {
+                // 特殊处理 _meta 对象
+                if (item.id === "_meta") {
+                    // 直接返回完整的 _meta 对象
+                    return item;
                 }
-            };
-            
-            reader.onerror = function() {
-                showUploadStatus('错误: 读取文件失败', 'error');
-            };
-            
-            reader.readAsText(file);
-        }
 
-        // 拖放功能
-        function setupDragAndDrop() {
-            // 防止默认拖放行为
-            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-                jsonUploadArea.addEventListener(eventName, preventDefaults, false);
-                document.body.addEventListener(eventName, preventDefaults, false);
+                // 在完整角色数据库中查找对应的角色
+                const fullRole = fullRoleDatabase.find(role => role.id === item.id);
+
+                if (!fullRole) {
+                    unknownCount++;
+                    console.warn(`未找到角色ID: ${item.id}`);
+                    // 直接返回原始对象，不做任何转换
+                    return item;
+                }
+
+                // 返回完整角色信息
+                return { ...fullRole };
             });
-            
-            // 高亮拖放区域
-            ['dragenter', 'dragover'].forEach(eventName => {
-                jsonUploadArea.addEventListener(eventName, highlight, false);
-            });
-            
-            ['dragleave', 'drop'].forEach(eventName => {
-                jsonUploadArea.addEventListener(eventName, unhighlight, false);
-            });
-            
-            // 处理文件拖放
-            jsonUploadArea.addEventListener('drop', handleDrop, false);
-            
-            function preventDefaults(e) {
-                e.preventDefault();
-                e.stopPropagation();
-            }
-            
-            function highlight() {
-                jsonUploadArea.classList.add('highlight');
-            }
-            
-            function unhighlight() {
-                jsonUploadArea.classList.remove('highlight');
-            }
-            
-            function handleDrop(e) {
-                const dt = e.dataTransfer;
-                const files = dt.files;
-                
-                if (files.length > 0) {
-                    const file = files[0];
-                    if (file.type === 'application/json' || file.name.endsWith('.json')) {
-                        handleJsonFileUpload(file);
-                    } else {
-                        showUploadStatus('错误: 请上传JSON文件', 'error');
-                    }
-                }
-            }
+
+            return { result, unknownCount };
+        } catch (error) {
+            console.error('转换过程中发生错误:', error);
+            return null;
         }
+    }
 
-        // 文件选择处理
-        jsonFileInput.addEventListener('change', function(e) {
-            if (this.files.length > 0) {
-                handleJsonFileUpload(this.files[0]);
-                // 重置文件输入，以便可以再次选择同一个文件
-                this.value = '';
-            }
-        });
+    // 完整字段转换为集石字段
+    function convertToSimple(fullList) {
+        try {
+            let unknownCount = 0;
+            const result = fullList.map(item => {
+                // 特殊处理 _meta 对象
+                if (item.id === "_meta") {
+                    // 直接返回完整的 _meta 对象，不提取 id
+                    return item;
+                }
 
-        // 转换按钮点击事件
-        convertBtn.addEventListener('click', function() {
-            try {
-                if (!uploadedData) {
-                    showStatus('请先导入JSON文件', 'error');
-                    return;
-                }
-                
-                showLoading();
-                
-                // 获取转换方向
-                currentConversionType = document.querySelector('input[name="conversionType"]:checked').value;
-                
-                let conversionResult;
-                let conversionText;
-                
-                // 根据转换方向执行转换
-                if (currentConversionType === 'toFull') {
-                    conversionResult = convertToFull(uploadedData);
-                    conversionText = '集石字段 → 完整字段';
-                } else {
-                    conversionResult = convertToSimple(uploadedData);
-                    conversionText = '完整字段 → 集石字段';
-                }
-                
-                if (!conversionResult || !conversionResult.result) {
-                    showStatus('转换失败，请检查上传的数据', 'error');
-                    hideLoading();
-                    return;
-                }
-                
-                const result = conversionResult.result;
-                unknownRoleCount = conversionResult.unknownCount || 0;
-                
-                if (result.length === 0) {
-                    showStatus('错误: 没有可转换的数据', 'error');
-                    hideLoading();
-                    return;
-                }
-                
-                // 显示结果
-                outputResult.value = JSON.stringify(result, null, 2);
-                roleCountElement.textContent = result.length;
-                unknownCountElement.textContent = unknownRoleCount;
-                
-                // 显示转换状态信息
-                if (currentConversionType === 'toFull' && unknownRoleCount > 0) {
-                    showStatus(`✅ ${conversionText} 转换成功 (${result.length} 个角色，其中 ${unknownRoleCount} 个未知角色)`, 'warning');
-                } else {
-                    showStatus(`✅ ${conversionText} 转换成功 (${result.length} 个角色)`, 'success');
-                }
-                
-                hideLoading();
-                
-            } catch (error) {
-                console.error('转换错误:', error);
-                showStatus('错误: ' + error.message, 'error');
-                hideLoading();
-            }
-        });
+                // 只保留id字段
+                return { id: item.id };
+            });
 
-        // 重置按钮点击事件
-        resetBtn.addEventListener('click', function() {
-            if (confirm('确定要重置所有数据吗？')) {
-                uploadedData = null;
-                uploadedFileName = null;
-                currentConversionType = null;
-                unknownRoleCount = 0;
-                outputResult.value = '';
-                roleCountElement.textContent = '0';
-                unknownCountElement.textContent = '0';
-                statusMessageElement.textContent = '';
-                uploadStatus.textContent = '';
-                uploadStatus.className = 'status-info';
-                showStatus('已重置所有数据', 'info');
-            }
-        });
+            return { result, unknownCount };
+        } catch (error) {
+            console.error('转换过程中发生错误:', error);
+            return null;
+        }
+    }
 
-        // 下载JSON文件
-        downloadBtn.addEventListener('click', function() {
-            if (!outputResult.value.trim()) {
-                showStatus('没有内容可下载', 'error');
+    // 清理 _gstone 后缀的函数
+    function cleanGstoneSuffix() {
+        try {
+            if (!uploadedData) {
+                showStatus('请先导入JSON文件', 'error');
                 return;
             }
-            
-            try {
-                const jsonData = outputResult.value;
-                const blob = new Blob([jsonData], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                
-                // 根据转换类型和导入的文件名确定下载文件名
-                let fileName;
-                if (uploadedFileName) {
-                    // 使用导入的文件名加上转换类型后缀
-                    if (currentConversionType === 'toFull') {
-                        fileName = `${uploadedFileName}_完整数据库版本.json`;
-                    } else {
-                        fileName = `${uploadedFileName}_集石版本.json`;
-                    }
-                } else {
-                    // 如果没有导入文件名，使用默认名称
-                    if (currentConversionType === 'toFull') {
-                        fileName = '血染钟楼完整角色数据.json';
-                    } else {
-                        fileName = '血染钟楼集石角色数据.json';
-                    }
+
+            // 清理上传的数据
+            const cleanedData = uploadedData.map(item => {
+                // 特殊处理 _meta 对象和 _meta 结尾的对象
+                if (item.id === "_meta" || item.id.endsWith("_meta")) {
+                    return item;
                 }
-                
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = fileName;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                
-                showStatus('✅ 文件下载成功', 'success');
+
+                // 如果 id 以 _gstone 结尾，去掉它
+                if (item.id && item.id.endsWith('_gstone')) {
+                    const cleanedItem = { ...item };
+                    cleanedItem.id = cleanedItem.id.replace('_gstone', '');
+                    return cleanedItem;
+                }
+
+                return item;
+            });
+
+            // 更新上传的数据
+            uploadedData = cleanedData;
+
+            // 显示状态信息
+            const cleanedCount = cleanedData.filter(item =>
+                item.id && item.id.endsWith && !item.id.endsWith('_gstone')
+            ).length;
+
+            showStatus(`✅ 已清理 ${cleanedCount} 个角色ID中的_gstone后缀`, 'success');
+            showUploadStatus(`✅ 已清理_gstone后缀 (${cleanedData.length} 个角色)`, 'success');
+
+        } catch (error) {
+            console.error('清理后缀错误:', error);
+            showStatus('清理后缀失败: ' + error.message, 'error');
+        }
+    }
+
+    // 检测数据格式
+    function detectDataFormat(data) {
+        if (!Array.isArray(data) || data.length === 0) {
+            return 'unknown';
+        }
+
+        // 检查第一个元素是否包含完整字段
+        const firstItem = data[0];
+        const hasFullFields = firstItem.name !== undefined &&
+            firstItem.ability !== undefined &&
+            firstItem.team !== undefined;
+
+        return hasFullFields ? 'full' : 'simple';
+    }
+
+    // 处理JSON文件导入
+    function handleJsonFileUpload(file) {
+        if (!file) return;
+
+        showUploadStatus('正在读取文件...', 'loading');
+
+        // 保存文件名（去掉扩展名）
+        uploadedFileName = file.name.replace(/\.json$/, '');
+
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            try {
+                const jsonData = JSON.parse(e.target.result);
+
+                // 检查数据格式
+                if (!Array.isArray(jsonData)) {
+                    showUploadStatus('错误: JSON数据必须是数组格式', 'error');
+                    return;
+                }
+
+                // 存储上传的数据
+                uploadedData = jsonData;
+
+                // 自动检测数据格式
+                const detectedFormat = detectDataFormat(jsonData);
+
+                // 根据检测结果设置默认的转换方向
+                if (detectedFormat === 'full') {
+                    document.getElementById('toSimple').checked = true;
+                    showUploadStatus(`✅ JSON文件导入成功！检测到完整格式数据 (${jsonData.length} 个角色)`, 'success');
+                } else if (detectedFormat === 'simple') {
+                    document.getElementById('toFull').checked = true;
+                    showUploadStatus(`✅ JSON文件导入成功！检测到集石格式数据 (${jsonData.length} 个角色)`, 'success');
+                } else {
+                    showUploadStatus(`✅ JSON文件导入成功！ (${jsonData.length} 个角色)`, 'success');
+                }
+
+                showStatus(`成功导入 ${jsonData.length} 个角色`, 'success');
+
+                // 更新角色计数
+                roleCountElement.textContent = '0';
+                unknownCountElement.textContent = '0';
+
             } catch (error) {
-                console.error('下载错误:', error);
-                showStatus('下载失败: ' + error.message, 'error');
+                showUploadStatus(`错误: ${error.message}`, 'error');
+                console.error('JSON解析错误:', error);
             }
+        };
+
+        reader.onerror = function() {
+            showUploadStatus('错误: 读取文件失败', 'error');
+        };
+
+        reader.readAsText(file);
+    }
+
+    // 拖放功能
+    function setupDragAndDrop() {
+        // 防止默认拖放行为
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            jsonUploadArea.addEventListener(eventName, preventDefaults, false);
+            document.body.addEventListener(eventName, preventDefaults, false);
         });
 
-        // 页面加载完成后初始化
-        window.addEventListener('DOMContentLoaded', function() {
-            // 设置拖放功能
-            setupDragAndDrop();
-            
-            console.log('血染钟楼角色转换工具已初始化');
+        // 高亮拖放区域
+        ['dragenter', 'dragover'].forEach(eventName => {
+            jsonUploadArea.addEventListener(eventName, highlight, false);
         });
-    </script>
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            jsonUploadArea.addEventListener(eventName, unhighlight, false);
+        });
+
+        // 处理文件拖放
+        jsonUploadArea.addEventListener('drop', handleDrop, false);
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        function highlight() {
+            jsonUploadArea.classList.add('highlight');
+        }
+
+        function unhighlight() {
+            jsonUploadArea.classList.remove('highlight');
+        }
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+
+            if (files.length > 0) {
+                const file = files[0];
+                if (file.type === 'application/json' || file.name.endsWith('.json')) {
+                    handleJsonFileUpload(file);
+                } else {
+                    showUploadStatus('错误: 请上传JSON文件', 'error');
+                }
+            }
+        }
+    }
+
+    // 文件选择处理
+    jsonFileInput.addEventListener('change', function(e) {
+        if (this.files.length > 0) {
+            handleJsonFileUpload(this.files[0]);
+            // 重置文件输入，以便可以再次选择同一个文件
+            this.value = '';
+        }
+    });
+
+    // 转换按钮点击事件
+    convertBtn.addEventListener('click', function() {
+        try {
+            if (!uploadedData) {
+                showStatus('请先导入JSON文件', 'error');
+                return;
+            }
+
+            showLoading();
+
+            // 获取转换方向
+            currentConversionType = document.querySelector('input[name="conversionType"]:checked').value;
+
+            let conversionResult;
+            let conversionText;
+
+            // 根据转换方向执行转换
+            if (currentConversionType === 'toFull') {
+                conversionResult = convertToFull(uploadedData);
+                conversionText = '集石字段 → 完整字段';
+            } else {
+                conversionResult = convertToSimple(uploadedData);
+                conversionText = '完整字段 → 集石字段';
+            }
+
+            if (!conversionResult || !conversionResult.result) {
+                showStatus('转换失败，请检查上传的数据', 'error');
+                hideLoading();
+                return;
+            }
+
+            const result = conversionResult.result;
+            unknownRoleCount = conversionResult.unknownCount || 0;
+
+            if (result.length === 0) {
+                showStatus('错误: 没有可转换的数据', 'error');
+                hideLoading();
+                return;
+            }
+
+            // 显示结果
+            outputResult.value = JSON.stringify(result, null, 2);
+            roleCountElement.textContent = result.length;
+            unknownCountElement.textContent = unknownRoleCount;
+
+            // 显示转换状态信息
+            if (currentConversionType === 'toFull' && unknownRoleCount > 0) {
+                showStatus(`✅ ${conversionText} 转换成功 (${result.length} 个角色，其中 ${unknownRoleCount} 个未知角色)`, 'warning');
+            } else {
+                showStatus(`✅ ${conversionText} 转换成功 (${result.length} 个角色)`, 'success');
+            }
+
+            hideLoading();
+
+        } catch (error) {
+            console.error('转换错误:', error);
+            showStatus('错误: ' + error.message, 'error');
+            hideLoading();
+        }
+    });
+
+    // 重置按钮点击事件
+    resetBtn.addEventListener('click', function() {
+        if (confirm('确定要重置所有数据吗？')) {
+            uploadedData = null;
+            uploadedFileName = null;
+            currentConversionType = null;
+            unknownRoleCount = 0;
+            outputResult.value = '';
+            roleCountElement.textContent = '0';
+            unknownCountElement.textContent = '0';
+            statusMessageElement.textContent = '';
+            uploadStatus.textContent = '';
+            uploadStatus.className = 'status-info';
+            showStatus('已重置所有数据', 'info');
+        }
+    });
+
+    // 清理后缀按钮点击事件
+    cleanSuffixBtn.addEventListener('click', cleanGstoneSuffix);
+
+    // 下载JSON文件
+    downloadBtn.addEventListener('click', function() {
+        if (!outputResult.value.trim()) {
+            showStatus('没有内容可下载', 'error');
+            return;
+        }
+
+        try {
+            const jsonData = outputResult.value;
+            const blob = new Blob([jsonData], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+
+            // 根据转换类型和导入的文件名确定下载文件名
+            let fileName;
+            if (uploadedFileName) {
+                // 使用导入的文件名加上转换类型后缀
+                if (currentConversionType === 'toFull') {
+                    fileName = `${uploadedFileName}_完整数据库版本.json`;
+                } else {
+                    fileName = `${uploadedFileName}_集石版本.json`;
+                }
+            } else {
+                // 如果没有导入文件名，使用默认名称
+                if (currentConversionType === 'toFull') {
+                    fileName = '血染钟楼完整角色数据.json';
+                } else {
+                    fileName = '血染钟楼集石角色数据.json';
+                }
+            }
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            showStatus('✅ 文件下载成功', 'success');
+        } catch (error) {
+            console.error('下载错误:', error);
+            showStatus('下载失败: ' + error.message, 'error');
+        }
+    });
+
+    // 页面加载完成后初始化
+    window.addEventListener('DOMContentLoaded', function() {
+        // 设置拖放功能
+        setupDragAndDrop();
+
+        console.log('血染钟楼角色转换工具已初始化');
+    });
+</script>
 </body>
 </html>
