@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+    <base href="/pages/clocktower-json-tool/">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>剧本JSON工具by黑心恰克</title>
@@ -1053,19 +1054,19 @@
 
         // 页面加载完成后检查访问协议
         window.addEventListener('DOMContentLoaded', function() {
-            // if (isLocalFile()) {
-            //     // 本地文件模式下隐藏"生成剧本图"按钮
-            //     const generateImageButton = document.querySelector('button[onclick="generateScriptImage()"]');
-            //     if (generateImageButton) {
-            //         generateImageButton.style.display = 'none';
-            //     }
-            //
-            //     // 不显示本地文件模式警告信息
-            //     const warning = document.getElementById('local-mode-warning');
-            //     if (warning) {
-            //         warning.style.display = 'none';
-            //     }
-            // }
+            if (isLocalFile()) {
+                // 本地文件模式下隐藏"生成剧本图"按钮
+                const generateImageButton = document.querySelector('button[onclick="generateScriptImage()"]');
+                if (generateImageButton) {
+                    generateImageButton.style.display = 'none';
+                }
+
+                // 不显示本地文件模式警告信息
+                const warning = document.getElementById('local-mode-warning');
+                if (warning) {
+                    warning.style.display = 'none';
+                }
+            }
         });
 
         // 辅助函数：检测是否为本地文件协议
