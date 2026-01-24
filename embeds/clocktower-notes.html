@@ -1056,6 +1056,37 @@
             background: #f57c00;
         }
 
+        /* 快速输入按钮样式 */
+        .quick-input-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+            justify-content: center;
+        }
+
+        .quick-input-btn {
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid #ffd700;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            min-width: 36px;
+            text-align: center;
+        }
+
+        .quick-input-btn:hover {
+            background: rgba(255, 215, 0, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .quick-input-btn.yes-no {
+            min-width: 50px;
+        }
+
         @media (max-width: 768px) {
             .main-content {
                 flex-direction: column;
@@ -1121,6 +1152,17 @@
                 font-size: 10px;
                 top: -6px;
                 right: -6px;
+            }
+
+            /* 快速输入按钮在平板设备上的调整 */
+            .quick-input-btn {
+                padding: 6px 10px;
+                font-size: 12px;
+                min-width: 32px;
+            }
+
+            .quick-input-btn.yes-no {
+                min-width: 45px;
             }
         }
 
@@ -1190,6 +1232,17 @@
                 top: -5px;
                 right: -5px;
             }
+
+            /* 快速输入按钮在手机设备上的调整 */
+            .quick-input-btn {
+                padding: 5px 8px;
+                font-size: 11px;
+                min-width: 28px;
+            }
+
+            .quick-input-btn.yes-no {
+                min-width: 40px;
+            }
         }
     </style>
 </head>
@@ -1244,6 +1297,34 @@
             <div class="section">
                 <div class="section-title">笔记记录</div>
                 <p style="font-size: 12px; color: #ffd700; margin-bottom: 10px;">使用分号（；）分隔不同天数的笔记，即使这天信息为0也要写个无；</p>
+
+                <!-- 快速输入按钮区域 -->
+                <div class="quick-input-container" id="quickInputContainer">
+                    <!-- 数字按钮0-9 -->
+                    <button class="quick-input-btn" data-value="0">0</button>
+                    <button class="quick-input-btn" data-value="1">1</button>
+                    <button class="quick-input-btn" data-value="2">2</button>
+                    <button class="quick-input-btn" data-value="3">3</button>
+                    <button class="quick-input-btn" data-value="4">4</button>
+                    <button class="quick-input-btn" data-value="5">5</button>
+                    <button class="quick-input-btn" data-value="6">6</button>
+                    <button class="quick-input-btn" data-value="7">7</button>
+                    <button class="quick-input-btn" data-value="8">8</button>
+                    <button class="quick-input-btn" data-value="9">9</button>
+                    <button class="quick-input-btn" data-value="=">=</button>
+
+                    <!-- 是否按钮 -->
+                    <button class="quick-input-btn yes-no" data-value="是">是</button>
+                    <button class="quick-input-btn yes-no" data-value="否">否</button>
+                    <!-- 特殊符号按钮 -->
+                    <button class="quick-input-btn" data-value="；">分号</button>
+                    <button class="quick-input-btn" data-value=" ">空格</button>
+
+                    <button class="quick-input-btn" data-value="无">无</button>
+                    <button class="quick-input-btn" data-value="完美">完美</button>
+
+                </div>
+
                 <button class="add-note-btn" id="addNoteBtn">添加笔记</button>
                 <div id="notesContainer">
                     <!-- 笔记行将通过JS动态生成 -->
@@ -1438,6 +1519,7 @@
         const reminderPlayerSelect = document.getElementById('reminderPlayerSelect');
         const reminderTokensGrid = document.getElementById('reminderTokensGrid');
         const tableOutput = document.getElementById('tableOutput');
+        const quickInputContainer = document.getElementById('quickInputContainer');
 
         // 默认设置为白天
         let isNight = false;
@@ -1450,6 +1532,7 @@
         let currentPlayerForRole = null;
         let clickTimer = null;
         let currentCenterPlayer = null; // 当前在中心显示的玩家
+        let currentFocusedInput = null; // 当前聚焦的输入框
 
         // 创建中心显示区域
         const centerDisplay = document.createElement('div');
@@ -1598,6 +1681,11 @@
             descInput.type = 'text';
             descInput.className = 'desc-input desc';
             descInput.placeholder = '笔记内容（用；分隔不同天数的笔记，即使这天信息为0也要写个无；）';
+
+            // 添加聚焦事件，用于快速输入
+            descInput.addEventListener('focus', function() {
+                currentFocusedInput = this;
+            });
 
             const updateBtn = document.createElement('button');
             updateBtn.className = 'update-btn';
@@ -2186,6 +2274,11 @@
             descInput.className = 'desc-input desc';
             descInput.placeholder = '笔记内容（用；分隔不同天数的笔记，即使这天信息为0也要写个无；）';
 
+            // 添加聚焦事件，用于快速输入
+            descInput.addEventListener('focus', function() {
+                currentFocusedInput = this;
+            });
+
             const updateBtn = document.createElement('button');
             updateBtn.className = 'update-btn';
             updateBtn.textContent = '更新';
@@ -2215,6 +2308,33 @@
         // 添加提醒标记
         addReminderBtn.addEventListener('click', function() {
             openReminderSelector();
+        });
+
+        // 快速输入按钮功能
+        quickInputContainer.addEventListener('click', function(e) {
+            if (e.target.classList.contains('quick-input-btn')) {
+                const value = e.target.getAttribute('data-value');
+
+                if (currentFocusedInput) {
+                    // 在当前光标位置插入文本
+                    const start = currentFocusedInput.selectionStart;
+                    const end = currentFocusedInput.selectionEnd;
+                    const text = currentFocusedInput.value;
+
+                    currentFocusedInput.value = text.substring(0, start) + value + text.substring(end);
+
+                    // 移动光标到插入位置之后
+                    const newPosition = start + value.length;
+                    currentFocusedInput.selectionStart = newPosition;
+                    currentFocusedInput.selectionEnd = newPosition;
+
+                    // 聚焦输入框
+                    currentFocusedInput.focus();
+                } else {
+                    // 如果没有聚焦的输入框，提示用户
+                    alert('请先点击一个笔记输入框，然后再使用快速输入按钮。');
+                }
+            }
         });
 
         // 打开提醒标记选择器
