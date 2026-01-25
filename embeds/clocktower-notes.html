@@ -1087,6 +1087,122 @@
             min-width: 50px;
         }
 
+        /* 快捷按钮悬浮框样式 */
+        .quick-float-container {
+            position: fixed;
+            left: 10px;  /* 改为左侧 */
+            top: 50%;    /* 垂直居中 */
+            transform: translateY(-50%); /* 垂直居中 */
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start; /* 改为从左侧开始对齐 */
+            gap: 10px;
+        }
+
+        .quick-float-toggle {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #ffd700;
+            color: #1a2a6c;
+            border: none;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .quick-float-toggle:hover {
+            transform: scale(1.1);
+            background: #ffcc00;
+        }
+
+        .quick-float-panel {
+            background: rgba(26, 42, 108, 0.95);
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 2px solid #ffd700;
+            max-width: 300px;
+            max-height: 70vh;
+            overflow-y: auto;
+            display: none;
+            margin-right: 10px;
+            padding-left: 20px; /* 添加左侧内边距，让内容离边框更远一些 */
+        }
+
+        .quick-float-panel.active {
+            display: block;
+        }
+
+        .quick-float-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            color: #ffd700;
+            font-weight: bold;
+        }
+
+        .close-float-btn {
+            background: #f44336;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .quick-float-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .quick-float-btn {
+            padding: 10px 5px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid #ffd700;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            text-align: center;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            word-break: break-word;
+        }
+
+        .quick-float-btn:hover {
+            background: rgba(255, 215, 0, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .quick-float-special {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .quick-float-special .quick-float-btn {
+            background: rgba(255, 215, 0, 0.3);
+        }
+
         @media (max-width: 768px) {
             .main-content {
                 flex-direction: column;
@@ -1163,6 +1279,18 @@
 
             .quick-input-btn.yes-no {
                 min-width: 45px;
+            }
+
+            /* 在移动设备上隐藏原始快速输入容器 */
+            #quickInputContainer {
+                display: none;
+            }
+        }
+
+        @media (min-width: 769px) {
+            /* 在电脑上隐藏悬浮框 */
+            .quick-float-container {
+                display: none;
             }
         }
 
@@ -1242,6 +1370,23 @@
 
             .quick-input-btn.yes-no {
                 min-width: 40px;
+            }
+
+            /* 移动设备上悬浮框的优化 */
+            .quick-float-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 6px;
+            }
+
+            .quick-float-btn {
+                font-size: 12px;
+                padding: 8px 3px;
+                min-height: 35px;
+            }
+
+            .quick-float-special {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 6px;
             }
         }
     </style>
@@ -1416,6 +1561,25 @@
     </div>
 </div>
 
+<!-- 快捷按钮悬浮框 -->
+<div class="quick-float-container" id="quickFloatContainer">
+    <div class="quick-float-panel" id="quickFloatPanel">
+        <div class="quick-float-header">
+            <span>快速输入</span>
+            <button class="close-float-btn" id="closeFloatBtn">&times;</button>
+        </div>
+        <div class="quick-float-grid" id="quickFloatGrid">
+            <!-- 数字按钮0-9将通过JS动态生成 -->
+        </div>
+        <div class="quick-float-special" id="quickFloatSpecial">
+            <!-- 特殊按钮将通过JS动态生成 -->
+        </div>
+    </div>
+    <button class="quick-float-toggle" id="quickFloatToggle">
+        <span id="toggleIcon">⌨️</span>
+    </button>
+</div>
+
 <script>
     // 角色数据初始化为您指定的四个角色
     let roleData = [
@@ -1520,6 +1684,15 @@
         const reminderTokensGrid = document.getElementById('reminderTokensGrid');
         const tableOutput = document.getElementById('tableOutput');
         const quickInputContainer = document.getElementById('quickInputContainer');
+
+        // 悬浮框相关元素
+        const quickFloatContainer = document.getElementById('quickFloatContainer');
+        const quickFloatPanel = document.getElementById('quickFloatPanel');
+        const quickFloatToggle = document.getElementById('quickFloatToggle');
+        const closeFloatBtn = document.getElementById('closeFloatBtn');
+        const quickFloatGrid = document.getElementById('quickFloatGrid');
+        const quickFloatSpecial = document.getElementById('quickFloatSpecial');
+        const toggleIcon = document.getElementById('toggleIcon');
 
         // 默认设置为白天
         let isNight = false;
@@ -1879,6 +2052,7 @@
                 playerCard.appendChild(playerCardBack);
 
                 // 将卡片添加到容器
+                playerCardContainer.appendChild(playerCard);
                 playerCardContainer.appendChild(playerCard);
                 playerStatus.appendChild(playerCardContainer);
 
@@ -2310,30 +2484,126 @@
             openReminderSelector();
         });
 
+        // 插入快速输入文本的函数
+        function insertQuickInput(value) {
+            if (currentFocusedInput) {
+                // 在当前光标位置插入文本
+                const start = currentFocusedInput.selectionStart;
+                const end = currentFocusedInput.selectionEnd;
+                const text = currentFocusedInput.value;
+
+                currentFocusedInput.value = text.substring(0, start) + value + text.substring(end);
+
+                // 移动光标到插入位置之后
+                const newPosition = start + value.length;
+                currentFocusedInput.selectionStart = newPosition;
+                currentFocusedInput.selectionEnd = newPosition;
+
+                // 聚焦输入框
+                currentFocusedInput.focus();
+
+                // 在移动设备上，输入后自动关闭悬浮框
+                if (window.innerWidth <= 768) {
+                    quickFloatPanel.classList.remove('active');
+                    toggleIcon.textContent = '⌨️';
+                }
+            } else {
+                // 如果没有聚焦的输入框，提示用户
+                alert('请先点击一个笔记输入框，然后再使用快速输入按钮。');
+            }
+        }
+
         // 快速输入按钮功能
         quickInputContainer.addEventListener('click', function(e) {
             if (e.target.classList.contains('quick-input-btn')) {
                 const value = e.target.getAttribute('data-value');
+                insertQuickInput(value);
+            }
+        });
 
-                if (currentFocusedInput) {
-                    // 在当前光标位置插入文本
-                    const start = currentFocusedInput.selectionStart;
-                    const end = currentFocusedInput.selectionEnd;
-                    const text = currentFocusedInput.value;
+        // 初始化悬浮框按钮
+        function initFloatButtons() {
+            // 清空现有按钮
+            quickFloatGrid.innerHTML = '';
+            quickFloatSpecial.innerHTML = '';
 
-                    currentFocusedInput.value = text.substring(0, start) + value + text.substring(end);
+            // 数字按钮0-9
+            for (let i = 0; i <= 9; i++) {
+                const btn = document.createElement('button');
+                btn.className = 'quick-float-btn';
+                btn.textContent = i;
+                btn.dataset.value = i.toString();
 
-                    // 移动光标到插入位置之后
-                    const newPosition = start + value.length;
-                    currentFocusedInput.selectionStart = newPosition;
-                    currentFocusedInput.selectionEnd = newPosition;
+                btn.addEventListener('click', function() {
+                    insertQuickInput(this.dataset.value);
+                });
 
-                    // 聚焦输入框
-                    currentFocusedInput.focus();
-                } else {
-                    // 如果没有聚焦的输入框，提示用户
-                    alert('请先点击一个笔记输入框，然后再使用快速输入按钮。');
-                }
+                quickFloatGrid.appendChild(btn);
+            }
+
+            // 添加等号按钮
+            const equalBtn = document.createElement('button');
+            equalBtn.className = 'quick-float-btn';
+            equalBtn.textContent = '=';
+            equalBtn.dataset.value = '=';
+            equalBtn.addEventListener('click', function() {
+                insertQuickInput(this.dataset.value);
+            });
+            quickFloatGrid.appendChild(equalBtn);
+
+            // 特殊按钮
+            const specialButtons = [
+                { text: '是', value: '是' },
+                { text: '否', value: '否' },
+                { text: '分号', value: '；' },
+                { text: '空格', value: ' ' },
+                { text: '无', value: '无' },
+                { text: '完美', value: '完美' }
+            ];
+
+            specialButtons.forEach(btnData => {
+                const btn = document.createElement('button');
+                btn.className = 'quick-float-btn';
+                btn.textContent = btnData.text;
+                btn.dataset.value = btnData.value;
+
+                btn.addEventListener('click', function() {
+                    insertQuickInput(this.dataset.value);
+                });
+
+                quickFloatSpecial.appendChild(btn);
+            });
+        }
+
+        // 切换悬浮框显示/隐藏
+        quickFloatToggle.addEventListener('click', function() {
+            quickFloatPanel.classList.toggle('active');
+
+            // 切换图标
+            if (quickFloatPanel.classList.contains('active')) {
+                toggleIcon.textContent = '✕';
+            } else {
+                toggleIcon.textContent = '⌨️';
+            }
+        });
+
+        // 关闭悬浮框
+        closeFloatBtn.addEventListener('click', function() {
+            quickFloatPanel.classList.remove('active');
+            toggleIcon.textContent = '⌨️';
+        });
+
+        // 修改点击外部关闭的逻辑
+        document.addEventListener('click', function(event) {
+            // 检查点击的是否是悬浮框内部元素
+            const isClickInsideFloat = quickFloatContainer.contains(event.target);
+            // 检查点击的是否是原始快速输入容器
+            const isClickInsideQuickInput = event.target.closest('#quickInputContainer');
+
+            // 如果点击的不是悬浮框内部，也不是原始快速输入容器，则关闭悬浮框
+            if (!isClickInsideFloat && !isClickInsideQuickInput) {
+                quickFloatPanel.classList.remove('active');
+                toggleIcon.textContent = '⌨️';
             }
         });
 
@@ -2840,6 +3110,7 @@
         // 初始化玩家和角色选择器
         initPlayers();
         initRoleSelector();
+        initFloatButtons();
     });
 </script>
 </body>
