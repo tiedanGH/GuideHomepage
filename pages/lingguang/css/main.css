@@ -61,6 +61,10 @@ h1 {
     color: #4a90e2;
     border-color: #4a90e2;
 }
+.category-title.level {
+    color: #ff6b6b;
+    border-color: #ff6b6b;
+}
 .category-title.card {
     color: #e84393;
     border-color: #e84393;
@@ -68,6 +72,10 @@ h1 {
 .category-title.text-adventure {
     color: #16a085;
     border-color: #16a085;
+}
+.category-title.parkour {
+    color: #ff9f43;
+    border-color: #ff9f43;
 }
 .category-title.relax {
     color: #2ecc71;
@@ -80,10 +88,6 @@ h1 {
 .category-title.workshop {
     color: #a66dd4;
     border-color: #a66dd4;
-}
-.category-title.level {
-    color: #ff6b6b;
-    border-color: #ff6b6b;
 }
 .category-title.arcade {
     color: #ff7a18;
