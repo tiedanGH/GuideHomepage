@@ -77,6 +77,10 @@ h1 {
     color: #ff9f43;
     border-color: #ff9f43;
 }
+.category-title.roguelite {
+    color: #e74c3c;
+    border-color: #c0392b;
+}
 .category-title.relax {
     color: #2ecc71;
     border-color: #2ecc71;
