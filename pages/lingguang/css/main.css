@@ -189,6 +189,7 @@ h1 {
     }
 
     .category {
+        padding: 0 10px;
         margin-bottom: 10px;
     }
     .category-title {
@@ -219,13 +220,12 @@ h1 {
     }
 }
 @media (max-width: 480px) {
-    .category-title {
-        max-width: 240px;
+    .category {
+        padding: 0 5px;
     }
     .button-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
         gap: 8px;
-        max-width: 240px;
     }
     .button-grid a {
         font-size: 0.95rem;

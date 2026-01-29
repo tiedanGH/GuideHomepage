@@ -177,4 +177,8 @@
         border-radius: 6px;
         padding: 4px;
     }
+
+    .search-results-container {
+        padding: 0 5px;
+    }
 }
