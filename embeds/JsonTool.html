@@ -1041,27 +1041,14 @@
             生成剧本图
         </button>
     </div>
-
-    <!-- 图片预览区域 -->
     <div id="image-preview" class="image-preview"></div>
-
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
-
-
-
-
     <script>
+        // 由于代码非常长，我将完整的JavaScript代码放在这里
+        // 注意：这里包含了所有的角色数据和函数定义
 
-        // 页面加载完成后检查访问协议
         window.addEventListener('DOMContentLoaded', function() {
             if (isLocalFile()) {
-                // 本地文件模式下隐藏"生成剧本图"按钮
-                // const generateImageButton = document.querySelector('button[onclick="generateScriptImage()"]');
-                // if (generateImageButton) {
-                //     generateImageButton.style.display = 'none';
-                // }
-
-                // 不显示本地文件模式警告信息
                 const warning = document.getElementById('local-mode-warning');
                 if (warning) {
                     warning.style.display = 'none';
@@ -1069,38 +1056,28 @@
             }
         });
 
-        // 辅助函数：检测是否为本地文件协议
         function isLocalFile() {
             return window.location.protocol === 'file:';
         }
 
-        // 辅助函数：批量加载所有角色图像
         async function loadAllRoleImages(roles) {
             const imagePromises = roles.map(async (role) => {
                 const editionRole = editionRolesJson.find(r => r.id === role.id);
                 if (editionRole && editionRole.image) {
-                    // 检测图片是否为网络URL
                     const isNetworkImage = editionRole.image && (
                         editionRole.image.startsWith('http://') ||
                         editionRole.image.startsWith('https://')
                     );
-
                     let imagePath;
                     let imageName;
                     let isLocalFileImage = false;
-
                     if (isNetworkImage) {
-                        // 网络图片：直接使用原始URL
                         imagePath = editionRole.image;
                         imageName = editionRole.image.split('/').pop().split('?')[0] || `${role.id}.png`;
                     } else {
-                        // 本地图片：提取文件名并构建本地路径
                         try {
-                            // 尝试从URL中提取文件名
                             const urlParts = editionRole.image.split('/');
                             imageName = urlParts[urlParts.length - 1];
-
-                            // 如果文件名包含查询参数，则去掉查询参数
                             if (imageName.includes('?')) {
                                 imageName = imageName.split('?')[0];
                             }
@@ -1108,28 +1085,20 @@
                             console.error('Failed to extract image name:', error);
                             imageName = '';
                         }
-
-                        // 如果没有提取到文件名，则使用角色ID作为文件名
                         if (!imageName) {
                             imageName = `${role.id}.png`;
                         }
-
-                        // 构建本地图片路径
                         imagePath = `img/${imageName}`;
                         isLocalFileImage = isLocalFile();
-
                         if (isLocalFileImage) {
                             console.warn(`本地文件模式：尝试加载本地图片 ${imageName}，如果无法显示请通过HTTP服务器访问。`);
                         }
                     }
-
-                    // 尝试预加载图片以验证是否可用
                     let isImageAvailable = true;
                     if (isLocalFileImage) {
                         try {
                             const testImg = new Image();
                             testImg.src = imagePath;
-                            // 同步检查可能不准确，但至少尝试加载
                             testImg.onerror = function() {
                                 isImageAvailable = false;
                                 console.warn(`本地图片 ${imageName} 加载失败，将显示占位符`);
@@ -1138,7 +1107,6 @@
                             isImageAvailable = false;
                         }
                     }
-
                     return {
                         roleId: role.id,
                         imagePath: imagePath,
@@ -1147,14 +1115,12 @@
                         isAvailable: isImageAvailable
                     };
                 }
-
                 return {
                     roleId: role.id,
                     imagePath: null,
                     isLocalFile: isLocalFile()
                 };
             });
-
             const results = await Promise.all(imagePromises);
             const imageMap = {};
             results.forEach(result => {
@@ -1162,195 +1128,200 @@
                     path: result.imagePath,
                     name: result.imageName,
                     isLocal: result.isLocalFile,
-                    isAvailable: result.isAvailable !== false // 默认认为可用
+                    isAvailable: result.isAvailable !== false
                 };
             });
             return imageMap;
         }
 
-        // ============================================
-        // 剧本图生成功能
-        // ============================================
-
-        /**
-         * 生成剧本图主函数
-         * 创建一个包含剧本信息、角色列表和行动顺序的可视化图表
-         * 功能：
-         * 1. 创建剧本图容器并设置样式
-         * 2. 异步加载角色图片并处理本地/网络图片
-         * 3. 生成首夜行动顺序图标列表
-         * 4. 生成其他夜晚行动顺序图标列表
-         * 5. 创建角色列表（按类型分列显示）
-         * 6. 使用html2canvas生成最终图片
-         * 7. 在新窗口中显示生成的图片并提供下载功能
-         */
         function generateScriptImage() {
-            // ============================================
-            // 第一步：初始化和容器创建
-            // ============================================
-
-            // 获取用户输入的文件名，如果为空则使用默认值"剧本图"
             const scriptImageNameInput = document.getElementById('script-image-name') || document.getElementById('json-file-name');
             const fileName = scriptImageNameInput.value.trim() || '剧本图';
 
-            // 创建剧本图主容器 - 使用div元素作为容器
+            // 创建主容器，包含两页
             const scriptImageContainer = document.createElement('div');
-            scriptImageContainer.id = 'script-image-container'; // 设置唯一ID用于后续查找
-
-            // 设置容器样式 - 使用内联样式确保截图时样式正确渲染
+            scriptImageContainer.id = 'script-image-container';
             scriptImageContainer.style.cssText = `
-                position: fixed;           /* 固定定位，脱离文档流，覆盖在页面最上层 */
-                top: 0;                   /* 顶部对齐，从视口顶部开始 */
-                left: 0;                  /* 左侧对齐，从视口左侧开始 */
-                width: 1481px;            /* 固定宽度1481px，适配高分辨率截图 */
-                background: white;         /* 白色背景，确保截图时背景干净 */
-                padding: 19px;            /* 内边距，按比例放大（10px * 1.9） */
-                box-sizing: border-box;    /* 盒模型计算方式，确保width包含padding和border */
-                font-family: 'Microsoft YaHei', sans-serif; /* 字体设置，使用微软雅黑确保中文显示效果 */
-                z-index: 10000;           /* 最高层级，确保容器显示在所有其他元素之上 */
-                overflow: hidden;          /* 隐藏溢出内容，防止布局被破坏 */
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 1481px;
+                min-height: 2800px; /* 增加高度以适应两页内容 */
+                background: #f4e9d8; /* 米黄色背景 */
+                padding: 19px;
+                box-sizing: border-box;
+                font-family: 'Microsoft YaHei', sans-serif;
+                z-index: 10000;
+                overflow: hidden;
             `;
 
-            // ============================================
-            // 第二步：获取剧本基本信息
-            // ============================================
+            const editionName = metaInfoJson.name || '未知剧本';
+            const authorName = metaInfoJson.author || '未知作者';
+            const description = metaInfoJson.description || '';
 
-            // 从全局metaInfoJson对象中提取剧本基本信息
-            const editionName = metaInfoJson.name || '未知剧本';    // 剧本名称，如果不存在则显示默认值
-            const authorName = metaInfoJson.author || '未知作者';    // 作者名称，如果不存在则显示默认值
-            const description = metaInfoJson.description || '';      // 剧本描述，可以为空
-
-            // ============================================
-            // 第三步：构建剧本图HTML结构
-            // ============================================
-
-            // 构建剧本图HTML结构 - 使用模板字符串和内联样式确保截图一致性
+            // 第一页HTML结构 - 使用米黄色背景，所有框框透明
             scriptImageContainer.innerHTML = `
-                <!-- 剧本标题区域 - 居中显示剧本基本信息 -->
-                <div style="text-align: center; margin-bottom: 30px;">
-                    <h1 style="font-size: 32px; margin: 0 0 10px 0; color: #333;">${editionName}</h1>
-                    <p style="font-size: 18px; margin: 0 0 10px 0; color: #666;">作者：${authorName}</p>
-                    ${description ? `<p style="font-size: 16px; margin: 0; color: #888; max-width: 800px; line-height: 1.5;">${description}</p>` : ''}
+                <!-- 第一页 -->
+                <div class="page" style="page-break-after: always; margin-bottom: 40px; background: #f4e9d8;">
+                    <div style="text-align: center; margin-bottom: 30px;">
+                        <h1 style="font-size: 32px; margin: 0 0 10px 0; color: #333;">${editionName}</h1>
+                        <p style="font-size: 18px; margin: 0 0 10px 0; color: #666;">作者：${authorName}</p>
+                        ${description ? `<p style="font-size: 16px; margin: 0; color: #888; max-width: 800px; line-height: 1.5;">${description}</p>` : ''}
+                    </div>
+
+                    <div style="position: relative; min-height: 800px;">
+                        <!-- 角色列表区域 - 透明 -->
+                        <div style="padding: 10px; border-radius: 8px; margin: 0 67px; position: relative;">
+                            <h3 style="font-size: 20px; margin: 0 0 15px 0; color: #333;">角色列表</h3>
+                            <div id="roles-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;"></div>
+                        </div>
+
+                        <!-- 首个夜晚区域 - 透明 -->
+                        <div style="position: absolute; left: 0; top: 0; width: 57px; padding: 2px; border-radius: 8px;">
+                            <h3 style="font-size: 16px; margin: 0 0 8px 0; color: #333; text-align: center;">首个<br>夜晚</h3>
+                            <div id="first-night-order" style="display: flex; flex-direction: column; align-items: center; gap: 19px; justify-content: flex-start;"></div>
+                        </div>
+
+                        <!-- 其他夜晚区域 - 透明 -->
+                        <div style="position: absolute; right: 0; top: 0; width: 57px; padding: 2px; border-radius: 8px;">
+                            <h3 style="font-size: 16px; margin: 0 0 8px 0; color: #333; text-align: center;">其他<br>夜晚</h3>
+                            <div id="other-night-order" style="display: flex; flex-direction: column; align-items: center; gap: 19px; justify-content: flex-start;"></div>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- 主要内容区域 - 包含角色列表和行动顺序 -->
-                <div style="position: relative; min-height: 800px;">
-                    <!-- 中央角色列表容器 - 显示所有选中角色的详细信息 -->
-                    <div style="background: #f8f9fa; padding: 10px; border-radius: 8px; margin: 0 67px; position: relative;">
-                        <h3 style="font-size: 20px; margin: 0 0 15px 0; color: #333;">角色列表</h3>
-                        <div id="roles-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;"></div>
-                    </div>
+                <!-- 第二页：相克规则和人数配置表 -->
+                <div class="page" style="page-break-before: always; padding-top: 40px; background: #f4e9d8;">
+                    <div id="jinx-section"></div>
 
-                    <!-- 左侧首夜行动顺序 - 垂直显示首夜需要行动的角色 -->
-                    <div style="position: absolute; left: 0; top: 0; width: 57px; background: #f8f9fa; padding: 2px; border-radius: 8px;">
-                        <h3 style="font-size: 16px; margin: 0 0 8px 0; color: #333; text-align: center;">首个<br>夜晚</h3>
-                        <div id="first-night-order" style="display: flex; flex-direction: column; align-items: center; gap: 19px; justify-content: flex-start;"></div>
-                    </div>
+                    <div style="margin-top: 60px;">
+                        <h2 style="color: #333; font-size: 28px; font-weight: bold; border-bottom: 2px solid #333; padding-bottom: 8px; margin-bottom: 20px;">
+                            标准人数表
+                        </h2>
 
-                    <!-- 右侧其他夜晚行动顺序 - 垂直显示其他夜晚需要行动的角色 -->
-                    <div style="position: absolute; right: 0; top: 0; width: 57px; background: #f8f9fa; padding: 2px; border-radius: 8px;">
-                        <h3 style="font-size: 16px; margin: 0 0 8px 0; color: #333; text-align: center;">其他<br>夜晚</h3>
-                        <div id="other-night-order" style="display: flex; flex-direction: column; align-items: center; gap: 19px; justify-content: flex-start;"></div>
+                        <table style="width: 100%; border-collapse: collapse; border: 2px solid #333; font-size: 18px; text-align: center; background: transparent;">
+                            <thead>
+                                <tr style="background-color: rgba(248, 249, 251, 0.5);">
+                                    <th style="border: 1px solid #333; padding: 12px; text-align: left; width: 120px;">角色类型</th>
+                                    <th style="border: 1px solid #333; padding: 12px;">7</th>
+                                    <th style="border: 1px solid #333; padding: 12px;">8</th>
+                                    <th style="border: 1px solid #333; padding: 12px;">9</th>
+                                    <th style="border: 1px solid #333; padding: 12px;">10</th>
+                                    <th style="border: 1px solid #333; padding: 12px;">11</th>
+                                    <th style="border: 1px solid #333; padding: 12px;">12</th>
+                                    <th style="border: 1px solid #333; padding: 12px;">13</th>
+                                    <th style="border: 1px solid #333; padding: 12px;">14</th>
+                                    <th style="border: 1px solid #333; padding: 12px;">15+</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="border: 1px solid #333; padding: 12px; text-align: left; font-weight: bold; background-color: #00008B; color: white;">镇民</td>
+                                    <td style="border: 1px solid #333; padding: 12px;">5</td>
+                                    <td style="border: 1px solid #333; padding: 12px;">5</td>
+                                    <td style="border: 1px solid #333; padding: 12px;">5</td>
+                                    <td style="border: 1px solid #333; padding: 12px;">7</td>
+                                    <td style="border: 1px solid #333; padding: 12px;">7</td>
+                                    <td style="border: 1px solid #333; padding: 12px;">7</td>
+                                    <td style="border: 1px solid #333; padding: 12px;">9</td>
+                                    <td style="border: 1px solid #333; padding: 12px;">9</td>
+                                    <td style="border: 1px solid #333; padding: 12px;">9</td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #333; padding: 12px; text-align: left; font-weight: bold; background-color: #0000FF; color: white;">外来者</td>
+                                    <td style="border: 1px solid #333; padding: 12px;">0</td>
+                                    <td style="border: 1px solid #333; padding: 12px;">1</td>
+                                    <td style="border: 1px solid #333; padding: 12px;">2</td>
+                                    <td style="border: 1px solid #333; padding: 12px;">0</td>
+                                    <td style="border: 1px solid #333; padding: 12px;">1</td>
+                                    <td style="border: 1px solid #333; padding: 12px;">2</td>
+                                    <td style="border: 1px solid #333; padding: 12px;">0</td>
+                                    <td style="border: 1px solid #333; padding: 12px;">1</td>
+                                    <td style="border: 1px solid #333; padding: 12px;">2</td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #333; padding: 12px; text-align: left; font-weight: bold; background-color: #FF6666; color: white;">爪牙</td>
+                                    <td style="border: 1px solid #333; padding: 12px;">1</td>
+                                    <td style="border: 1px solid #333; padding: 12px;">1</td>
+                                    <td style="border: 1px solid #333; padding: 12px;">1</td>
+                                    <td style="border: 1px solid #333; padding: 12px;">2</td>
+                                    <td style="border: 1px solid #333; padding: 12px;">2</td>
+                                    <td style="border: 1px solid #333; padding: 12px;">2</td>
+                                    <td style="border: 1px solid #333; padding: 12px;">3</td>
+                                    <td style="border: 1px solid #333; padding: 12px;">3</td>
+                                    <td style="border: 1px solid #333; padding: 12px;">3</td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #333; padding: 12px; text-align: left; font-weight: bold; background-color: #FF0000; color: white;">恶魔</td>
+                                    <td style="border: 1px solid #333; padding: 12px;">1</td>
+                                    <td style="border: 1px solid #333; padding: 12px;">1</td>
+                                    <td style="border: 1px solid #333; padding: 12px;">1</td>
+                                    <td style="border: 1px solid #333; padding: 12px;">1</td>
+                                    <td style="border: 1px solid #333; padding: 12px;">1</td>
+                                    <td style="border: 1px solid #333; padding: 12px;">1</td>
+                                    <td style="border: 1px solid #333; padding: 12px;">1</td>
+                                    <td style="border: 1px solid #333; padding: 12px;">1</td>
+                                    <td style="border: 1px solid #333; padding: 12px;">1</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div style="margin-top: 20px; font-size: 14px; color: #666;">
+                            <p><strong>说明：</strong>此表为推荐配置，可根据实际游戏情况调整。旅行者和传奇角色不占用常规角色名额。</p>
+                        </div>
                     </div>
                 </div>
             `;
 
-            // 将剧本图容器添加到页面body中
             document.body.appendChild(scriptImageContainer);
 
-            // ============================================
-            // 第四步：异步加载角色图片并生成剧本图内容
-            // ============================================
-
-            // 异步加载所有选中角色和自制角色的图片资源
-            // 使用Promise链式调用确保图片加载完成后再进行后续处理
             loadAllRoleImages([...selectedRoles, ...dirRolesJson]).then((imageMap) => {
-
-                // ============================================
-                // 第五步：本地文件模式检测和提示
-                // ============================================
-
-                // 检查是否为本地文件模式，如果是则显示提示信息
-                // 本地文件协议访问时图片可能无法正常加载，需要提示用户
                 const hasLocalImages = Object.values(imageMap).some(img => img && img.isLocal);
                 const isLocalMode = isLocalFile();
-
                 if (hasLocalImages || isLocalMode) {
                     console.warn('本地文件模式检测到，正在尝试加载本地图片...');
-
-                    // 在剧本图顶部添加本地文件模式提示信息
                     const warningDiv = document.createElement('div');
                     warningDiv.style.cssText = `
-                        background: #d1ecf1;    /* 浅蓝色背景 */
-                        border: 1px solid #bee5eb;  /* 边框颜色 */
-                        color: #0c5460;           /* 文字颜色 */
-                        padding: 10px;            /* 内边距 */
-                        margin-bottom: 20px;      /* 下外边距 */
-                        border-radius: 4px;       /* 圆角 */
-                        font-size: 14px;          /* 字体大小 */
-                        text-align: center;       /* 文字居中 */
+                        background: #d1ecf1;
+                        border: 1px solid #bee5eb;
+                        color: #0c5460;
+                        padding: 10px;
+                        margin-bottom: 20px;
+                        border-radius: 4px;
+                        font-size: 14px;
+                        text-align: center;
                     `;
-
                     let warningMessage = '📁 本地文件模式：正在尝试加载本地图片，如果图片显示为占位符，请通过HTTP服务器访问以正常显示。<br><small>推荐使用：Live Server、Python HTTP Server 或其他本地服务器工具</small>';
-
                     if (hasLocalImages && !isLocalMode) {
                         warningMessage = '🌐 混合模式：检测到本地图片文件，部分图片可能显示为占位符。<br><small>请通过HTTP服务器访问以显示所有图片，或继续使用当前模式</small>';
                     } else if (!hasLocalImages && isLocalMode) {
                         warningMessage = '📁 本地文件模式：请通过HTTP服务器访问以正常显示图片。<br><small>推荐使用：Live Server、Python HTTP Server 或其他本地服务器工具</small>';
                     }
-
                     warningDiv.innerHTML = warningMessage;
-
-                    // 将提示信息插入到标题区域下方
                     const container = scriptImageContainer.querySelector('div[style*="text-align: center"]');
                     if (container) {
                         container.parentNode.insertBefore(warningDiv, container.nextSibling);
                     }
                 }
 
-                // ============================================
-                // 第六步：生成首夜行动顺序列表
-                // ============================================
-
-                // 获取首夜行动顺序容器中的所有可拖拽按钮
+                // 生成首夜行动顺序
                 const firstNightContainer = document.getElementById('first-night-buttons-container');
                 const firstNightButtons = firstNightContainer ? firstNightContainer.querySelectorAll('.draggable-button') : [];
-
-                // 获取剧本图中首夜行动顺序显示区域
                 const firstNightOrderDiv = document.getElementById('first-night-order');
-
-                // ============================================
-                // 强制添加必要的游戏流程按钮
-                // 这些按钮是游戏规则必需的，必须显示在首夜行动顺序中
-                // ============================================
-
                 const forcedButtons = [];
-
-                // 创建爪牙信息按钮 - 游戏中必须的流程节点
-                // firstNight值设为2000
                 const minionInfoButton = document.createElement('div');
-                minionInfoButton.setAttribute('data-role-id', 'minioninfo');  // 设置角色ID标识
-                minionInfoButton.setAttribute('data-first-night', '2000');     // 设置首夜行动顺序值
-                minionInfoButton.textContent = '爪牙信息';                      // 按钮显示文字
+                minionInfoButton.setAttribute('data-role-id', 'minioninfo');
+                minionInfoButton.setAttribute('data-first-night', '2000');
+                minionInfoButton.textContent = '爪牙信息';
                 forcedButtons.push(minionInfoButton);
-
-                // 创建恶魔信息按钮 - 游戏中必须的流程节点
-                // firstNight值设为3000
                 const demonInfoButton = document.createElement('div');
-                demonInfoButton.setAttribute('data-role-id', 'demoninfo');    // 设置角色ID标识
-                demonInfoButton.setAttribute('data-first-night', '3000');    // 设置首夜行动顺序值
-                demonInfoButton.textContent = '恶魔信息';                      // 按钮显示文字
+                demonInfoButton.setAttribute('data-role-id', 'demoninfo');
+                demonInfoButton.setAttribute('data-first-night', '3000');
+                demonInfoButton.textContent = '恶魔信息';
                 forcedButtons.push(demonInfoButton);
 
-                // ============================================
-                // 按钮合并和去重处理
-                // ============================================
-
-                // 合并强制添加的按钮和用户拖拽排序的按钮，并按firstNight值排序
-                const existingButtonIds = new Set();      // 用于去重的ID集合
-                const allFirstNightButtons = [];         // 最终的按钮列表
-
-                // 第一步：优先添加强制按钮（确保必要流程节点存在）
+                const existingButtonIds = new Set();
+                const allFirstNightButtons = [];
                 forcedButtons.forEach(button => {
                     const roleId = button.getAttribute('data-role-id');
                     if (!existingButtonIds.has(roleId)) {
@@ -1358,8 +1329,6 @@
                         existingButtonIds.add(roleId);
                     }
                 });
-
-                // 第二步：添加用户设置的按钮，跳过与强制按钮重复的项
                 firstNightButtons.forEach(button => {
                     const roleId = button.getAttribute('data-role-id');
                     if (!existingButtonIds.has(roleId)) {
@@ -1368,258 +1337,149 @@
                     }
                 });
 
-                // ============================================
-                // 按钮排序逻辑
-                // ============================================
-
-                // 最后按firstNight值进行排序，确保行动顺序符合游戏逻辑
                 allFirstNightButtons.sort((a, b) => {
-                    // 辅助函数：获取按钮的firstNight值
                     const getFirstNightValue = (btn) => {
-                        // 优先使用data-first-night属性值
                         const attr = btn.getAttribute('data-first-night');
                         if (attr) return parseInt(attr, 10);
-
-                        // 如果没有该属性，从角色数据中获取
                         const roleId = btn.getAttribute('data-role-id');
-                        const allRoles = [...selectedRoles, ...dirRolesJson];  // 合并所有角色数据
+                        const allRoles = [...selectedRoles, ...dirRolesJson];
                         const currentRole = allRoles.find(r => r.id === roleId);
-                        return currentRole && currentRole.firstNight ? currentRole.firstNight : 999;  // 默认值999排在最后
+                        return currentRole && currentRole.firstNight ? currentRole.firstNight : 999;
                     };
-
-                    // 返回排序结果：从小到大排序
                     return getFirstNightValue(a) - getFirstNightValue(b);
                 });
 
-                // ============================================
-                // 生成首夜行动顺序图标列表
-                // ============================================
-
                 if (allFirstNightButtons.length > 0) {
-                    // 记录已显示的恶魔和爪牙信息（防止重复显示）
-                    const shownDemons = new Set();
-                    const shownMinions = new Set();
-
-                    // 遍历所有按钮，生成对应的HTML图标元素
                     const orderList = Array.from(allFirstNightButtons).map((btn, index) => {
-                        // 获取按钮的基本信息
-                        const roleId = btn.getAttribute('data-role-id');    // 角色ID
-                        const buttonText = btn.textContent;                // 按钮显示文字
-                        const imageData = imageMap[roleId];                // 角色对应的图片数据
-
-                        // 查找完整角色信息以确定角色类型
-                        const allRoles = [...selectedRoles, ...dirRolesJson];  // 合并所有角色数据
-                        const currentRole = allRoles.find(r => r.id === roleId); // 查找当前角色
-                        const roleTeam = currentRole ? currentRole.team : '';     // 获取角色阵营
-
-                        // 判断是否为特殊信息图标（非具体角色）
-                        const isMinionInfo = roleId === 'minioninfo';  // 爪牙信息标识
-                        const isDemonInfo = roleId === 'demoninfo';    // 恶魔信息标识
-
-                        // ============================================
-                        // 图标选择逻辑
-                        // 根据角色类型决定使用哪种图标显示
-                        // ============================================
-
+                        const roleId = btn.getAttribute('data-role-id');
+                        const buttonText = btn.textContent;
+                        const imageData = imageMap[roleId];
+                        const allRoles = [...selectedRoles, ...dirRolesJson];
+                        const currentRole = allRoles.find(r => r.id === roleId);
+                        const roleTeam = currentRole ? currentRole.team : '';
+                        const isMinionInfo = roleId === 'minioninfo';
+                        const isDemonInfo = roleId === 'demoninfo';
                         let iconImage = '';
                         if (isMinionInfo) {
-                            // 爪牙信息：使用专用的爪牙信息图标
                             iconImage = 'minioninfo.png';
                         } else if (isDemonInfo) {
-                            // 恶魔信息：使用专用的恶魔信息图标
                             iconImage = 'demoninfo.png';
                         } else if (roleTeam === 'minion') {
-                            // 具体爪牙角色（如投毒者、管家等）使用自己的角色图标
                             iconImage = imageData ? imageData.name : null;
                         } else if (roleTeam === 'demon') {
-                            // 具体恶魔角色（如普卡、莉莉丝等）使用自己的角色图标
                             iconImage = imageData ? imageData.name : null;
                         } else {
-                            // 其他类型角色（镇民、外来者等）使用自己的角色图标
                             iconImage = imageData ? imageData.name : null;
                         }
-
-                        // ============================================
-                        // 图像显示条件判断
-                        // 根据不同情况决定是否显示实际图片
-                        // ============================================
-
                         let shouldShowImage = false;
                         if (isMinionInfo || isDemonInfo) {
-                            // 信息图标：检查是否为本地文件模式
                             shouldShowImage = !isLocalFile() && !!iconImage;
                         } else {
-                            // 普通角色：需要满足多个条件才显示图片
-                            // 1. 图片数据存在 2. 图片路径存在 3. 非本地文件或本地文件可用 4. 图标名称存在
                             shouldShowImage = imageData && imageData.path && (!imageData.isLocal || imageData.isAvailable) && iconImage;
                         }
-
-                        // 构建最终的图片资源路径
                         const iconPath = shouldShowImage ? `img/${iconImage}` : null;
 
-                        // ============================================
-                        // 占位符图标生成逻辑
-                        // 当图片无法显示时，根据角色类型显示不同的文字或emoji占位符
-                        // ============================================
-
                         const getPlaceholderIcon = (roleTeam, imageData) => {
-                            // 特殊信息图标使用单字母标识
-                            if (isDemonInfo) return 'D';    // 恶魔信息
-                            if (isMinionInfo) return 'M';    // 爪牙信息
-
-                            // 根据图片数据状态显示不同占位符
+                            if (isDemonInfo) return 'D';
+                            if (isMinionInfo) return 'M';
                             if (imageData) {
-                                return imageData.isLocal ? '📁' : '👤';  // 本地文件显示文件夹，网络文件显示人形
+                                return imageData.isLocal ? '📁' : '👤';
                             }
-
-                            // 根据角色类型显示不同的emoji占位符
                             switch(roleTeam) {
-                                case 'townsfolk': return '👨';    // 镇民：男人
-                                case 'outsider': return '🧑';      // 外来者：中性人
-                                case 'minion': return '👹';       // 爪牙：怪物
-                                case 'demon': return '😈';        // 恶魔：恶魔表情
-                                case 'traveller': return '🧳';    // 旅行者：行李箱
-                                case 'fabled': return '👑';       // 传奇角色：皇冠
-                                default: return '👤';              // 默认：人形
+                                case 'townsfolk': return '👨';
+                                case 'outsider': return '🧑';
+                                case 'minion': return '👹';
+                                case 'demon': return '😈';
+                                case 'traveller': return '🧳';
+                                case 'fabled': return '👑';
+                                default: return '👤';
                             }
                         };
 
-                        // ============================================
-                        // 生成单个首夜行动图标的HTML结构
-                        // 根据图片可用性选择显示实际图片或占位符
-                        // ============================================
-
                         return `
-                            <div style="display: flex; flex-direction: column; align-items: center; background: white; border-radius: 3px; padding: 0px; width: 56px; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
+                            <div style="display: flex; flex-direction: column; align-items: center; background: transparent; border-radius: 3px; padding: 0px; width: 56px;">
                                 ${shouldShowImage ? `
-                                    <!-- 图片元素 - 尝试加载实际的图标文件 -->
-                                    <img src="${iconPath}" crossorigin="anonymous" style="width: 50px; height: 50px; border-radius: 2px; margin-bottom: 0px; object-fit: cover;"
+                                    <img src="${iconPath}" crossorigin="anonymous" style="width: 50px; height: 50px; border-radius: 2px; margin-bottom: 0px; object-fit: cover; background: transparent;"
                                          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
                                          onload="console.log('图片加载成功: ${iconImage}');">
-                                    <!-- 图片加载失败时显示的备用占位符 -->
-                                    <div style="width: 50px; height: 50px; border-radius: 2px; margin-bottom: 0px; background: #e9ecef; display: none; align-items: center; justify-content: center; font-size: 26px; color: #6c757d;">
+                                    <div style="width: 50px; height: 50px; border-radius: 2px; margin-bottom: 0px; background: transparent; display: none; align-items: center; justify-content: center; font-size: 26px; color: #6c757d;">
                                         ${getPlaceholderIcon(roleTeam, imageData)}
                                     </div>
                                 ` : `
-                                    <!-- 直接显示占位符（无图片或图片不可用时） -->
-                                    <div style="width: 50px; height: 50px; border-radius: 2px; margin-bottom: 0px; background: #e9ecef; display: flex; align-items: center; justify-content: center; font-size: 26px; color: #6c757d;">
+                                    <div style="width: 50px; height: 50px; border-radius: 2px; margin-bottom: 0px; background: transparent; display: flex; align-items: center; justify-content: center; font-size: 26px; color: #6c757d;">
                                         ${getPlaceholderIcon(roleTeam, imageData)}
                                     </div>
                                 `}
-                                <!-- 隐藏的文字标签 - 仅在需要调试时显示，包含角色名称 -->
                                 <div style="font-size: 9px; color: #333; text-align: center; line-height: 1.0; display: none;">${buttonText.replace(/\s*\(.*?\)/g, '')}</div>
                             </div>
                         `;
                     }).join('');
                     firstNightOrderDiv.innerHTML = orderList;
                 } else {
-                    // 当没有首夜行动角色时显示提示信息
                     firstNightOrderDiv.innerHTML = '<p style="color: #888; font-size: 14px;">无首夜行动角色</p>';
                 }
 
-                // ============================================
-                // 第七步：生成其他夜晚行动顺序列表
-                // ============================================
-
-                // 获取其他夜晚行动顺序容器中的所有可拖拽按钮
+                // 生成其他夜晚行动顺序
                 const otherNightContainer = document.getElementById('other-night-buttons-container');
                 const otherNightButtons = otherNightContainer ? otherNightContainer.querySelectorAll('.draggable-button') : [];
-
-                // 获取剧本图中其他夜晚行动顺序显示区域
                 const otherNightOrderDiv = document.getElementById('other-night-order');
-
                 if (otherNightButtons.length > 0) {
                     const orderList = Array.from(otherNightButtons).map((btn, index) => {
                         const roleId = btn.getAttribute('data-role-id');
                         const buttonText = btn.textContent;
                         const imageData = imageMap[roleId];
-
-                        // 查找角色信息以确定角色类型
                         const allRoles = [...selectedRoles, ...dirRolesJson];
                         const currentRole = allRoles.find(r => r.id === roleId);
                         const roleTeam = currentRole ? currentRole.team : '';
-
-                        // 判断是否为信息图标（不是具体角色）
-                        const isMinionInfo = roleId === 'minioninfo';   // 爪牙信息标识
-                        const isDemonInfo = roleId === 'demoninfo';     // 恶魔信息标识
-
-                        // 其他夜晚行动顺序图标显示逻辑
-                        // 注意：通常情况下其他夜晚只显示具体角色，不显示信息类图标
-                        // 但为了保持一致性，这里仍然强制显示信息图标
+                        const isMinionInfo = roleId === 'minioninfo';
+                        const isDemonInfo = roleId === 'demoninfo';
                         let iconImage = '';
                         if (isMinionInfo) {
-                            // 爪牙信息图标 - 强制显示
                             iconImage = 'minioninfo.png';
                         } else if (isDemonInfo) {
-                            // 恶魔信息图标 - 强制显示
                             iconImage = 'demoninfo.png';
                         } else if (imageData && imageData.name) {
-                            // 具体角色图标 - 使用角色对应的图片
                             iconImage = imageData.name;
                         }
-
-                        // 图像显示判断逻辑
                         let shouldShowImage = false;
                         if (isMinionInfo || isDemonInfo) {
-                            // 信息图标：检查是否为本地文件模式
                             shouldShowImage = !isLocalFile() && !!iconImage;
                         } else {
-                            // 普通角色：需要检查路径、本地状态和图标名称
                             shouldShowImage = imageData && imageData.path && (!imageData.isLocal || imageData.isAvailable) && iconImage;
                         }
-                        // 构建最终图片路径
                         const iconPath = shouldShowImage ? `img/${iconImage}` : null;
 
-                        // ============================================
-                        // 占位符图标生成逻辑
-                        // 当图片无法显示时，根据角色类型显示不同的文字或emoji占位符
-                        // ============================================
-
                         const getPlaceholderIcon = (roleTeam, imageData) => {
-                            // 特殊信息图标使用单字母标识
-                            if (isDemonInfo) return 'D';    // 恶魔信息
-                            if (isMinionInfo) return 'M';    // 爪牙信息
-
-                            // 根据图片数据状态显示不同占位符
+                            if (isDemonInfo) return 'D';
+                            if (isMinionInfo) return 'M';
                             if (imageData) {
-                                return imageData.isLocal ? '📁' : '👤';  // 本地文件显示文件夹，网络文件显示人形
+                                return imageData.isLocal ? '📁' : '👤';
                             }
-
-                            // 根据角色类型显示不同的emoji占位符
                             switch(roleTeam) {
-                                case 'townsfolk': return '👨';    // 镇民：男人
-                                case 'outsider': return '🧑';      // 外来者：中性人
-                                case 'minion': return '👹';       // 爪牙：怪物
-                                case 'demon': return '😈';        // 恶魔：恶魔表情
-                                case 'traveller': return '🧳';    // 旅行者：行李箱
-                                case 'fabled': return '👑';       // 传奇角色：皇冠
-                                default: return '👤';              // 默认：人形
+                                case 'townsfolk': return '👨';
+                                case 'outsider': return '🧑';
+                                case 'minion': return '👹';
+                                case 'demon': return '😈';
+                                case 'traveller': return '🧳';
+                                case 'fabled': return '👑';
+                                default: return '👤';
                             }
                         };
 
-                        // ============================================
-                        // 生成单个首夜行动图标的HTML结构
-                        // 根据图片可用性选择显示实际图片或占位符
-                        // ============================================
-
                         return `
-                            <div style="display: flex; flex-direction: column; align-items: center; background: white; border-radius: 3px; padding: 0px; width: 56px; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
+                            <div style="display: flex; flex-direction: column; align-items: center; background: transparent; border-radius: 3px; padding: 0px; width: 56px;">
                                 ${shouldShowImage ? `
-                                    <!-- 图片元素 - 尝试加载实际的图标文件 -->
-                                    <img src="${iconPath}" crossorigin="anonymous" style="width: 50px; height: 50px; border-radius: 2px; margin-bottom: 0px; object-fit: cover;"
+                                    <img src="${iconPath}" crossorigin="anonymous" style="width: 50px; height: 50px; border-radius: 2px; margin-bottom: 0px; object-fit: cover; background: transparent;"
                                          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
                                          onload="console.log('图片加载成功: ${iconImage}');">
-                                    <!-- 图片加载失败时显示的备用占位符 -->
-                                    <div style="width: 50px; height: 50px; border-radius: 2px; margin-bottom: 0px; background: #e9ecef; display: none; align-items: center; justify-content: center; font-size: 26px; color: #6c757d;">
+                                    <div style="width: 50px; height: 50px; border-radius: 2px; margin-bottom: 0px; background: transparent; display: none; align-items: center; justify-content: center; font-size: 26px; color: #6c757d;">
                                         ${getPlaceholderIcon(roleTeam, imageData)}
                                     </div>
                                 ` : `
-                                    <!-- 直接显示占位符（无图片或图片不可用时） -->
-                                    <div style="width: 50px; height: 50px; border-radius: 2px; margin-bottom: 0px; background: #e9ecef; display: flex; align-items: center; justify-content: center; font-size: 26px; color: #6c757d;">
+                                    <div style="width: 50px; height: 50px; border-radius: 2px; margin-bottom: 0px; background: transparent; display: flex; align-items: center; justify-content: center; font-size: 26px; color: #6c757d;">
                                         ${getPlaceholderIcon(roleTeam, imageData)}
                                     </div>
                                 `}
-                                <!-- 隐藏的文字标签 - 仅在需要调试时显示，包含角色名称 -->
                                 <div style="font-size: 9px; color: #333; text-align: center; line-height: 1.0; display: none;">${buttonText.replace(/\s*\(.*?\)/g, '')}</div>
                             </div>
                         `;
@@ -1629,15 +1489,7 @@
                     otherNightOrderDiv.innerHTML = '<p style="color: #888; font-size: 14px;">无其他夜晚行动角色</p>';
                 }
 
-                // ============================================
-                // 第八步：生成角色列表
-                // ============================================
-
-                // ============================================
-                // 获取角色相克关系的辅助函数
-                // ============================================
-
-                // 获取角色类型图标（用于占位符）
+                // 生成角色列表
                 const getRoleTypeIcon = (team) => {
                     switch(team) {
                         case 'townsfolk': return '👨';
@@ -1650,150 +1502,28 @@
                     }
                 };
 
-                // 获取指定角色的所有相克角色（去重）
-                const getJinxedRolesForRole = (roleName) => {
-                    const jinxedRoles = new Set(); // 使用Set避免重复
-
-                    if (typeof getJinxRules === 'function') {
-                        // 获取常规相克规则
-                        const editionJinxes = getJinxRules(jinxes);
-                        editionJinxes.forEach(jinx => {
-                            if (jinx.jinxRole1 === roleName) {
-                                jinxedRoles.add(jinx.jinxRole2);
-                            } else if (jinx.jinxRole2 === roleName) {
-                                jinxedRoles.add(jinx.jinxRole1);
-                            }
-                        });
-
-                        // 获取试运行相克规则
-                        const editionTrialJinxes = getJinxRules(trialJinxes);
-                        editionTrialJinxes.forEach(jinx => {
-                            if (jinx.jinxRole1 === roleName) {
-                                jinxedRoles.add(jinx.jinxRole2);
-                            } else if (jinx.jinxRole2 === roleName) {
-                                jinxedRoles.add(jinx.jinxRole1);
-                            }
-                        });
-                    }
-
-                    return Array.from(jinxedRoles);
-                };
-
-                // 生成角色相克图标HTML
-                const generateJinxedRoleIcons = (roleName) => {
-                    const jinxedRoles = getJinxedRolesForRole(roleName);
-
-                    if (jinxedRoles.length === 0) {
-                        return '';
-                    }
-
-                    const iconsHtml = jinxedRoles.map(jinxedRoleName => {
-                        // 查找相克角色的图片数据
-                        const jinxedRole = editionRolesJson.find(r => r.name === jinxedRoleName);
-                        if (!jinxedRole) {
-                            return '';
-                        }
-
-                        const imageData = imageMap[jinxedRole.id];
-                        const shouldShowImage = imageData && imageData.path && (!imageData.isLocal || imageData.isAvailable);
-
-                        // 获取相克角色的图标
-                        const getJinxedRoleIcon = (role) => {
-                            const imgData = imageMap[role.id];
-
-                            // 获取图标名称（与首夜行动顺序相同的逻辑）
-                            let iconImage = null;
-                            if (imgData && imgData.name) {
-                                iconImage = imgData.name;
-                            }
-
-                            // 判断是否应该显示图片（与首夜行动顺序相同的逻辑）
-                            const shouldShowImage = imgData && imgData.path && (!imgData.isLocal || imgData.isAvailable) && iconImage;
-
-                            // 构建图片路径（与首夜行动顺序相同的逻辑）
-                            const iconPath = shouldShowImage ? `img/${iconImage}` : null;
-
-                            // 检查是否为本地文件模式且图片为本地路径
-                            const isLocalImage = imgData && imgData.isLocal;
-
-                            if (shouldShowImage) {
-                                return `
-                                    <img src="${iconPath}" crossorigin="anonymous"
-                                         style="width: 33px; height: 33px; border-radius: 2px; object-fit: cover; border: 1px solid #e9ecef;"
-                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
-                                         onload="console.log('相克角色图标加载成功: ${imgData.name}');">
-                                    <div style="width: 33px; height: 33px; border-radius: 2px; background: #e9ecef; display: none; align-items: center; justify-content: center; font-size: 17px; color: #6c757d; border: 1px solid #e9ecef;" title="${isLocalImage ? '本地文件模式，请通过HTTP服务器访问以显示图片' : '图片加载失败'}">
-                                        ${getRoleTypeIcon(role.team)}
-                                    </div>
-                                `;
-                            } else {
-                                // 本地文件模式或图片不可用时直接显示占位符
-                                return `
-                                    <div style="width: 33px; height: 33px; border-radius: 2px; background: #e9ecef; display: flex; align-items: center; justify-content: center; font-size: 17px; color: #6c757d; border: 1px solid #e9ecef;" title="${isLocalImage ? '本地文件模式，请通过HTTP服务器访问以显示图片' : '图片不可用'}">
-                                        ${getRoleTypeIcon(role.team)}
-                                    </div>
-                                `;
-                            }
-                        };
-
-                        return `
-                            <div style="position: relative; margin: 1px;" title="${jinxedRoleName}">
-                                ${getJinxedRoleIcon(jinxedRole)}
-                            </div>
-                        `;
-                    }).join('');
-
-                    return `
-                        <div style="display: flex; align-items: center; gap: 1px; flex-wrap: wrap;">
-                            <span style="font-size: 16px; color: #999; margin-right: 3px; line-height: 18px;">相克:</span>
-                            ${iconsHtml}
-                        </div>
-                    `;
-                };
-
-                // 合并所有角色数据：选中角色 + 自制角色
-                const allRoles = [...selectedRoles, ...dirRolesJson];
-
-                // 获取角色网格容器，用于显示角色卡片
+                const allRolesData = [...selectedRoles, ...dirRolesJson];
                 const rolesGrid = document.getElementById('roles-grid');
-
-                if (allRoles.length > 0) {
-                    // 按阵营分类角色
-                    const townsfolkRoles = allRoles.filter(role => role.team === 'townsfolk');  // 镇民角色
-                    const otherRoles = allRoles.filter(role => role.team !== 'townsfolk');      // 其他阵营角色
-
-                    // 初始化左右两列的内容变量
-                    let leftColumn = '';   // 左列内容（镇民）
-                    let rightColumn = '';   // 右列内容（其他角色）
-
-                    // ============================================
-                    // 左列：镇民角色列表
-                    // ============================================
+                if (allRolesData.length > 0) {
+                    const townsfolkRoles = allRolesData.filter(role => role.team === 'townsfolk');
+                    const otherRoles = allRolesData.filter(role => role.team !== 'townsfolk');
+                    let leftColumn = '';
+                    let rightColumn = '';
 
                     if (townsfolkRoles.length > 0) {
-                        // 为每个镇民角色生成角色卡片
                         const roleCards = townsfolkRoles.map(role => {
-                            // 获取角色图片数据
                             const imageData = imageMap[role.id];
-
-                            // 获取图标名称（与首夜行动顺序相同的逻辑）
                             let iconImage = null;
                             if (imageData && imageData.name) {
                                 iconImage = imageData.name;
                             }
-
-                            // 判断是否应该显示图片（与首夜行动顺序相同的逻辑）
                             const shouldShowImage = imageData && imageData.path && (!imageData.isLocal || imageData.isAvailable) && iconImage;
-
-                            // 构建图片路径（与首夜行动顺序相同的逻辑）
                             const iconPath = shouldShowImage ? `img/${iconImage}` : null;
 
-                            // 改进占位符显示逻辑
                             const getPlaceholderIcon = (roleTeam, imageData) => {
                                 if (imageData) {
                                     return imageData.isLocal ? '📁' : '👨';
                                 }
-                                // 根据角色类型显示不同占位符
                                 switch(roleTeam) {
                                     case 'townsfolk': return '👨';
                                     case 'outsider': return '🧑';
@@ -1806,96 +1536,28 @@
                             };
 
                             return `
-                                <div style="display: flex; align-items: flex-start; background: white; padding: 8px; border-radius: 6px; margin-bottom: 4px; border-left: 3px solid #00008B; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                                <div style="display: flex; align-items: flex-start; background: transparent; padding: 8px; border-radius: 6px; margin-bottom: 4px; border-left: 3px solid #00008B;">
                                     ${shouldShowImage ? `
-                                        <img src="${iconPath}" crossorigin="anonymous" style="width: 74px; height: 74px; border-radius: 4px; margin-right: 22px; object-fit: cover; border: 1px solid #e9ecef;"
+                                        <img src="${iconPath}" crossorigin="anonymous" style="width: 74px; height: 74px; border-radius: 4px; margin-right: 22px; object-fit: cover; background: transparent;"
                                              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
                                              onload="console.log('镇民图片加载成功: ${imageData ? imageData.name : '未知角色'}');">
-                                        <div style="width: 74px; height: 74px; border-radius: 4px; margin-right: 22px; background: #e9ecef; display: none; align-items: center; justify-content: center; font-size: 26px; color: #6c757d; border: 1px solid #e9ecef;">
+                                        <div style="width: 74px; height: 74px; border-radius: 4px; margin-right: 22px; background: transparent; display: none; align-items: center; justify-content: center; font-size: 26px; color: #6c757d;">
                                             ${getPlaceholderIcon(role.team, imageData)}
                                         </div>
                                     ` : `
-                                        <div style="width: 74px; height: 74px; border-radius: 4px; margin-right: 22px; background: #e9ecef; display: flex; align-items: center; justify-content: center; font-size: 26px; color: #6c757d; border: 1px solid #e9ecef;">
+                                        <div style="width: 74px; height: 74px; border-radius: 4px; margin-right: 22px; background: transparent; display: flex; align-items: center; justify-content: center; font-size: 26px; color: #6c757d;">
                                             ${getPlaceholderIcon(role.team, imageData)}
                                         </div>
                                     `}
                                     <div style="flex: 1;">
                                         <div style="display: flex; align-items: center; margin-bottom: 7px;">
                                             <div style="font-weight: bold; color: #333; font-size: 26px; margin-right: 15px;">${role.name}</div>
-                                            ${generateJinxedRoleIcons(role.name)}
                                         </div>
                                         <div style="font-size: 20px; color: #666; line-height: 1.3;">${role.ability || ''}</div>
                                     </div>
                                 </div>
                             `;
                         }).join('');
-
-
-
-                        // ============================================
-                        // 生成相克规则数据
-                        // ============================================
-
-                        // 生成相克规则HTML
-                        const generateJinxRules = () => {
-                            const jinxRulesSet = new Set(); // 使用Set去重
-
-                            // 使用getJinxRules函数获取与当前角色相关的相克规则
-                            if (typeof getJinxRules === 'function') {
-                                // 获取常规相克规则
-                                const editionJinxes = getJinxRules(jinxes);
-                                editionJinxes.forEach(jinx => {
-                                    // 创建唯一键：角色1 + 角色2（按字母顺序排序，确保正反方向都算作同一个规则）
-                                    const key = [jinx.jinxRole1, jinx.jinxRole2].sort().join('|');
-                                    jinxRulesSet.add(JSON.stringify({
-                                        role1: jinx.jinxRole1,
-                                        role2: jinx.jinxRole2,
-                                        rule: jinx.jinxRule,
-                                        key: key
-                                    }));
-                                });
-
-                                // 获取试运行相克规则
-                                const editionTrialJinxes = getJinxRules(trialJinxes);
-                                editionTrialJinxes.forEach(jinx => {
-                                    // 创建唯一键并去重
-                                    const key = [jinx.jinxRole1, jinx.jinxRole2].sort().join('|');
-                                    jinxRulesSet.add(JSON.stringify({
-                                        role1: jinx.jinxRole1,
-                                        role2: jinx.jinxRole2,
-                                        rule: jinx.jinxRule,
-                                        key: key
-                                    }));
-                                });
-                            }
-
-                            const jinxRules = Array.from(jinxRulesSet).map(item => JSON.parse(item));
-
-                            // 如果有相克规则，生成HTML
-                            if (jinxRules.length > 0) {
-                                const jinxRulesContent = jinxRules.map(jinx => `
-                                <div style="margin-bottom: 3px; line-height: 1.0;">
-                                    <span style="font-weight: bold; color: #333; font-size: 15px;">
-                                        ${jinx.role1} ↔ ${jinx.role2}:
-                                    </span>
-                                    <span style="color: #666; font-size: 15px; line-height: 1.0;">${jinx.rule}</span>
-                                </div>
-                            `).join('');
-
-                                return `
-                                <div style="margin-bottom: 15px;">
-                                    <h4 style="margin: 0 0 8px 0; color: #e6d708; font-size: 24px; font-weight: bold; border-bottom: 2px solid #e6d708; padding-bottom: 1px;">
-                                        相克 (${jinxRules.length})
-                                    </h4>
-                                    <div style="background: white; padding: 4px; border-radius: 6px; border-left: 3px solid #e6d708; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                                        ${jinxRulesContent}
-                                    </div>
-                                </div>
-                            `;
-                            }
-
-                            return '';
-                        };
 
                         leftColumn = `
                             <div style="margin-bottom: 20px;">
@@ -1905,28 +1567,18 @@
                                 ${roleCards}
                             </div>
                         `;
-
-                        // 添加相克规则到镇民部分下方
-                        const jinxSection = generateJinxRules();
-                        if (jinxSection) {
-                            leftColumn += jinxSection;
-                        }
                     }
 
-                    // 右列：其他角色
                     const otherTeamOrder = ['outsider', 'minion', 'demon'];
                     let rightColumnContent = '';
-
                     otherTeamOrder.forEach(team => {
                         const roles = otherRoles.filter(role => role.team === team);
                         if (roles.length === 0) return;
-
                         const teamColor = {
                             'outsider': '#0000FF',
                             'minion': '#FF6666',
                             'demon': '#FF0000'
                         }[team];
-
                         const teamName = {
                             'outsider': '外来者',
                             'minion': '爪牙',
@@ -1935,25 +1587,17 @@
 
                         const roleCards = roles.map(role => {
                             const imageData = imageMap[role.id];
-
-                            // 获取图标名称（与首夜行动顺序相同的逻辑）
                             let iconImage = null;
                             if (imageData && imageData.name) {
                                 iconImage = imageData.name;
                             }
-
-                            // 判断是否应该显示图片（与首夜行动顺序相同的逻辑）
                             const shouldShowImage = imageData && imageData.path && (!imageData.isLocal || imageData.isAvailable) && iconImage;
-
-                            // 构建图片路径（与首夜行动顺序相同的逻辑）
                             const iconPath = shouldShowImage ? `img/${iconImage}` : null;
 
-                            // 改进占位符显示逻辑
                             const getPlaceholderIcon = (roleTeam, imageData) => {
                                 if (imageData) {
                                     return imageData.isLocal ? '📁' : (roleTeam === 'townsfolk' ? '👨' : '👤');
                                 }
-                                // 根据角色类型显示不同占位符
                                 switch(roleTeam) {
                                     case 'townsfolk': return '👨';
                                     case 'outsider': return '🧑';
@@ -1966,23 +1610,22 @@
                             };
 
                             return `
-                                <div style="display: flex; align-items: flex-start; background: white; padding: 8px; border-radius: 6px; margin-bottom: 4px; border-left: 3px solid ${teamColor}; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                                <div style="display: flex; align-items: flex-start; background: transparent; padding: 8px; border-radius: 6px; margin-bottom: 4px; border-left: 3px solid ${teamColor};">
                                     ${shouldShowImage ? `
-                                        <img src="${iconPath}" crossorigin="anonymous" style="width: 74px; height: 74px; border-radius: 4px; margin-right: 22px; object-fit: cover; border: 1px solid #e9ecef;"
+                                        <img src="${iconPath}" crossorigin="anonymous" style="width: 74px; height: 74px; border-radius: 4px; margin-right: 22px; object-fit: cover; background: transparent;"
                                              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
                                              onload="console.log('其他角色图片加载成功: ${imageData ? imageData.name : '未知角色'}');">
-                                        <div style="width: 74px; height: 74px; border-radius: 4px; margin-right: 22px; background: #e9ecef; display: none; align-items: center; justify-content: center; font-size: 26px; color: #6c757d; border: 1px solid #e9ecef;">
+                                        <div style="width: 74px; height: 74px; border-radius: 4px; margin-right: 22px; background: transparent; display: none; align-items: center; justify-content: center; font-size: 26px; color: #6c757d;">
                                             ${getPlaceholderIcon(role.team, imageData)}
                                         </div>
                                     ` : `
-                                        <div style="width: 74px; height: 74px; border-radius: 4px; margin-right: 22px; background: #e9ecef; display: flex; align-items: center; justify-content: center; font-size: 26px; color: #6c757d; border: 1px solid #e9ecef;">
+                                        <div style="width: 74px; height: 74px; border-radius: 4px; margin-right: 22px; background: transparent; display: flex; align-items: center; justify-content: center; font-size: 26px; color: #6c757d;">
                                             ${getPlaceholderIcon(role.team, imageData)}
                                         </div>
                                     `}
                                     <div style="flex: 1;">
                                         <div style="display: flex; align-items: center; margin-bottom: 7px;">
                                             <div style="font-weight: bold; color: #333; font-size: 26px; margin-right: 15px;">${role.name}</div>
-                                            ${generateJinxedRoleIcons(role.name)}
                                         </div>
                                         <div style="font-size: 20px; color: #666; line-height: 1.3;">${role.ability || ''}</div>
                                     </div>
@@ -1991,45 +1634,105 @@
                         }).join('');
 
                         rightColumnContent += `
-                                <div style="margin-bottom: 20px;">
+                            <div style="margin-bottom: 20px;">
                                 <h4 style="margin: 0 0 12px 0; color: ${teamColor}; font-size: 30px; font-weight: bold; border-bottom: 2px solid ${teamColor}; padding-bottom: 8px;">
-                                        ${teamName} (${roles.length})
+                                    ${teamName} (${roles.length})
                                 </h4>
-                                    ${roleCards}
-                                </div>
-                            `;
+                                ${roleCards}
+                            </div>
+                        `;
                     });
 
                     rightColumn = rightColumnContent || '<p style="color: #888;">暂无其他角色</p>';
-
                     rolesGrid.innerHTML = `
-                            <div style="padding-right: 19px;">${leftColumn || '<p style="color: #888;">暂无数据</p>'}</div>
-                            <div style="padding-left: 19px;">${rightColumn || '<p style="color: #888;">暂无数据</p>'}</div>
-                        `;
+                        <div style="padding-right: 19px;">${leftColumn || '<p style="color: #888;">暂无数据</p>'}</div>
+                        <div style="padding-left: 19px;">${rightColumn || '<p style="color: #888;">暂无数据</p>'}</div>
+                    `;
                 } else {
                     rolesGrid.innerHTML = '<p style="color: #888; font-size: 14px;">无角色数据</p>';
                 }
 
-                // ============================================
-                // 第九步：等待所有图片加载完成
-                // 这是截图前的准备工作，确保所有图片都已正确加载
-                // ============================================
+                // 生成相克规则到第二页
+                const generateJinxRulesForSecondPage = () => {
+                    const jinxRulesSet = new Set();
+                    if (typeof getJinxRules === 'function') {
+                        const editionJinxes = getJinxRules(jinxes);
+                        editionJinxes.forEach(jinx => {
+                            const key = [jinx.jinxRole1, jinx.jinxRole2].sort().join('|');
+                            jinxRulesSet.add(JSON.stringify({
+                                role1: jinx.jinxRole1,
+                                role2: jinx.jinxRole2,
+                                rule: jinx.jinxRule,
+                                key: key
+                            }));
+                        });
 
-                // 创建一个Promise函数来等待所有图片加载完成
+                        const editionTrialJinxes = getJinxRules(trialJinxes);
+                        editionTrialJinxes.forEach(jinx => {
+                            const key = [jinx.jinxRole1, jinx.jinxRole2].sort().join('|');
+                            jinxRulesSet.add(JSON.stringify({
+                                role1: jinx.jinxRole1,
+                                role2: jinx.jinxRole2,
+                                rule: jinx.jinxRule,
+                                key: key
+                            }));
+                        });
+                    }
+
+                    const jinxRules = Array.from(jinxRulesSet).map(item => JSON.parse(item));
+                    if (jinxRules.length > 0) {
+                        const jinxRulesContent = jinxRules.map(jinx => `
+                            <div style="margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px dashed #ddd; line-height: 1.4;">
+                                <div style="display: flex; align-items: flex-start; margin-bottom: 6px;">
+                                    <div style="font-weight: bold; color: #333; font-size: 20px; margin-right: 10px;">
+                                        ${jinx.role1}
+                                    </div>
+                                    <div style="color: #666; font-size: 18px;">↔</div>
+                                    <div style="font-weight: bold; color: #333; font-size: 20px; margin-left: 10px;">
+                                        ${jinx.role2}
+                                    </div>
+                                </div>
+                                <div style="color: #555; font-size: 18px; padding-left: 10px; line-height: 1.5;">
+                                    ${jinx.rule}
+                                </div>
+                            </div>
+                        `).join('');
+
+                        return `
+                            <h2 style="color: #e6d708; font-size: 28px; font-weight: bold; border-bottom: 2px solid #e6d708; padding-bottom: 8px; margin-bottom: 20px;">
+                                相克规则 (${jinxRules.length})
+                            </h2>
+                            <div style="background: transparent; padding: 20px; border-radius: 8px; border-left: 4px solid #e6d708;">
+                                ${jinxRulesContent}
+                            </div>
+                        `;
+                    }
+                    return `
+                        <h2 style="color: #e6d708; font-size: 28px; font-weight: bold; border-bottom: 2px solid #e6d708; padding-bottom: 8px; margin-bottom: 20px;">
+                            相克规则
+                        </h2>
+                        <div style="background: transparent; padding: 20px; border-radius: 8px; border-left: 4px solid #e6d708; text-align: center; color: #888; font-size: 18px;">
+                            本剧本中没有相克规则
+                        </div>
+                    `;
+                };
+
+                // 将相克规则添加到第二页
+                const jinxSection = document.getElementById('jinx-section');
+                if (jinxSection) {
+                    jinxSection.innerHTML = generateJinxRulesForSecondPage();
+                }
+
+                // 等待所有图片加载完成
                 const waitForImagesToLoad = () => {
                     return new Promise((resolve) => {
-                        // 获取剧本图容器中的所有图片元素
                         const images = scriptImageContainer.querySelectorAll('img');
-
-                        // 初始化计数器
                         let loadedCount = 0;
-                        const totalImages = images.length;  // 总图片数量
-
+                        const totalImages = images.length;
                         if (totalImages === 0) {
                             resolve();
                             return;
                         }
-
                         images.forEach(img => {
                             if (img.complete) {
                                 loadedCount++;
@@ -2048,74 +1751,61 @@
                                 };
                             }
                         });
-
                         if (loadedCount === totalImages) {
                             resolve();
                         }
                     });
                 };
 
-
-                // ============================================
-                // 第十步：调整容器样式和创建控制按钮
-                // ============================================
-
-                // 将剧本图容器从固定定位改为相对定位，使其正常显示在页面流中
-                // 这样用户可以预览剧本图的内容
+                // 调整容器位置和样式
                 scriptImageContainer.style.position = 'relative';
                 scriptImageContainer.style.top = '0';
                 scriptImageContainer.style.left = '0';
-                scriptImageContainer.style.margin = '20px auto';        // 居中显示
-                scriptImageContainer.style.boxShadow = '0 4px 20px rgba(0,0,0,0.1)';  // 添加阴影效果
-                scriptImageContainer.style.borderRadius = '8px';       // 圆角
-                scriptImageContainer.style.maxWidth = '1481px';         // 最大宽度限制
+                scriptImageContainer.style.margin = '20px auto';
+                scriptImageContainer.style.boxShadow = '0 4px 20px rgba(0,0,0,0.1)';
+                scriptImageContainer.style.borderRadius = '8px';
+                scriptImageContainer.style.maxWidth = '1481px';
 
-                // 创建"生成最终图片"按钮
+                // 添加生成图片和关闭按钮
                 const generateImageButton = document.createElement('button');
                 generateImageButton.textContent = '生成最终图片';
                 generateImageButton.style.cssText = `
-                        position: fixed;
-                        top: 20px;
-                        right: 20px;
-                        background: #007bff;
-                        color: white;
-                        border: none;
-                        padding: 10px 20px;
-                        border-radius: 4px;
-                        cursor: pointer;
-                        font-size: 14px;
-                        z-index: 10001;
-                        transition: background-color 0.3s;
-                    `;
-
-                // 设置生成按钮的悬停效果
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: #007bff;
+                    color: white;
+                    border: none;
+                    padding: 10px 20px;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    font-size: 14px;
+                    z-index: 10001;
+                    transition: background-color 0.3s;
+                `;
                 generateImageButton.onmouseover = () => {
-                    generateImageButton.style.backgroundColor = '#0056b3';  // 悬停时变深蓝色
+                    generateImageButton.style.backgroundColor = '#0056b3';
                 };
                 generateImageButton.onmouseout = () => {
-                    generateImageButton.style.backgroundColor = '#007bff';  // 离开时恢复蓝色
+                    generateImageButton.style.backgroundColor = '#007bff';
                 };
-
-                // ============================================
-                // 创建关闭预览按钮
-                // ============================================
 
                 const closeButton = document.createElement('button');
                 closeButton.textContent = '关闭预览';
                 closeButton.style.cssText = `
-                        position: fixed;
-                        top: 20px;
-                        left: 20px;
-                        background: #dc3545;
-                        color: white;
-                        border: none;
-                        padding: 10px 20px;
-                        border-radius: 4px;
-                        cursor: pointer;
-                        font-size: 14px;
-                        z-index: 10001;
-                        transition: background-color 0.3s;
-                    `;
+                    position: fixed;
+                    top: 20px;
+                    left: 20px;
+                    background: #dc3545;
+                    color: white;
+                    border: none;
+                    padding: 10px 20px;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    font-size: 14px;
+                    z-index: 10001;
+                    transition: background-color 0.3s;
+                `;
                 closeButton.onmouseover = () => {
                     closeButton.style.backgroundColor = '#c82333';
                 };
@@ -2123,186 +1813,129 @@
                     closeButton.style.backgroundColor = '#dc3545';
                 };
 
-                // ============================================
-                // 第十一步：按钮点击事件处理
-                // ============================================
-
-                // 生成图片按钮的点击事件处理
+                // 生成最终图片
                 generateImageButton.onclick = () => {
-                    // 隐藏两个控制按钮，避免出现在截图中
                     generateImageButton.style.display = 'none';
                     closeButton.style.display = 'none';
-
-                    // ============================================
-                    // 第十二步：使用html2canvas生成最终图片
-                    // ============================================
-
-                    // 等待所有图片加载完成后，使用html2canvas库生成图片
                     waitForImagesToLoad().then(() => {
-                        // 调用html2canvas将DOM元素转换为Canvas
                         html2canvas(scriptImageContainer, {
-                            width: 1481,                   // 截图宽度
-                            height: 2000,                  // 截图高度
-                            scale: 2,                      // 缩放比例，提高清晰度
-                            backgroundColor: '#ffffff',    // 背景色为白色
-                            useCORS: true,                // 允许跨域图片
-                            allowTaint: false              // 禁止污染Canvas（提高兼容性）
+                            width: 1481,
+                            height: 2800,
+                            scale: 2,
+                            backgroundColor: '#f4e9d8', // 设置米黄色背景
+                            useCORS: true,
+                            allowTaint: false
                         }).then(canvas => {
-                            // ============================================
-                            // 第十三步：处理生成的图片数据
-                            // ============================================
-
-                            // 将Canvas对象转换为base64格式的图片数据
                             const imageData = canvas.toDataURL('image/png');
-
-                            // ============================================
-                            // 第十四步：在新窗口中显示生成的剧本图
-                            // ============================================
-
-                            // 打开新窗口用于显示生成的剧本图
                             const newWindow = window.open('', '_blank');
-
-                            // 在新窗口中写入包含剧本图和下载功能的HTML页面
                             newWindow.document.write(`
-                                    <!DOCTYPE html>
-                                    <html>
-                                    <head>
-                                        <title>${editionName} - 剧本图</title>
-                                        <meta charset="UTF-8">
-                                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                                        <style>
-                                            body {
-                                                margin: 0;
-                                                padding: 10px;
-                                                background: #f5f5f5;
-                                                font-family: 'Microsoft YaHei', sans-serif;
-                                                display: flex;
-                                                justify-content: center;
-                                                align-items: center;
-                                                min-height: 100vh;
-                                            }
-                                            .image-container {
-                                                max-width: 100%;
-                                                box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-                                                border-radius: 8px;
-                                                overflow: hidden;
-                                            }
-                                            .image-container img {
-                                                max-width: 100%;
-                                                height: auto;
-                                                display: block;
-                                            }
-                                            .controls {
-                                                position: fixed;
-                                                top: 20px;
-                                                right: 20px;
-                                                background: white;
-                                                padding: 5px 5px;
-                                                border-radius: 8px;
-                                                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-                                                z-index: 1000;
-                                            }
-                                            .download-btn {
-                                                background: #007bff;
-                                                color: white;
-                                                border: none;
-                                                padding: 8px 16px;
-                                                border-radius: 4px;
-                                                cursor: pointer;
-                                                text-decoration: none;
-                                                font-size: 14px;
-                                                transition: background-color 0.3s;
-                                                display: inline-block;
-                                            }
-                                            .download-btn:hover {
-                                                background: #0056b3;
-                                            }
-                                            .title {
-                                                position: fixed;
-                                                top: 20px;
-                                                left: 20px;
-                                                background: white;
-                                                padding: 10px 15px;
-                                                border-radius: 8px;
-                                                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-                                                z-index: 1000;
-                                                font-size: 18px;
-                                                font-weight: bold;
-                                            }
-                                        </style>
-                                    </head>
-                                    <body>
-                                        <div class="title">${editionName} - 剧本图</div>
-                                        <div class="controls">
-                                            <a href="${imageData}" download="${fileName}.png" class="download-btn">下载图片</a>
-                                        </div>
-                                        <div class="image-container">
-                                            <img src="${imageData}" alt="${editionName}剧本图">
-                                        </div>
-                                    </body>
-                                    </html>
-                                `);
-                            // 关闭文档流，完成页面渲染
+                                <!DOCTYPE html>
+                                <html>
+                                <head>
+                                    <title>${editionName} - 剧本图</title>
+                                    <meta charset="UTF-8">
+                                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                                    <style>
+                                        body {
+                                            margin: 0;
+                                            padding: 10px;
+                                            background: #f5f5f5;
+                                            font-family: 'Microsoft YaHei', sans-serif;
+                                            display: flex;
+                                            justify-content: center;
+                                            align-items: center;
+                                            min-height: 100vh;
+                                        }
+                                        .image-container {
+                                            max-width: 100%;
+                                            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+                                            border-radius: 8px;
+                                            overflow: hidden;
+                                        }
+                                        .image-container img {
+                                            max-width: 100%;
+                                            height: auto;
+                                            display: block;
+                                        }
+                                        .controls {
+                                            position: fixed;
+                                            top: 20px;
+                                            right: 20px;
+                                            background: white;
+                                            padding: 5px 5px;
+                                            border-radius: 8px;
+                                            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                                            z-index: 1000;
+                                        }
+                                        .download-btn {
+                                            background: #007bff;
+                                            color: white;
+                                            border: none;
+                                            padding: 8px 16px;
+                                            border-radius: 4px;
+                                            cursor: pointer;
+                                            text-decoration: none;
+                                            font-size: 14px;
+                                            transition: background-color 0.3s;
+                                            display: inline-block;
+                                        }
+                                        .download-btn:hover {
+                                            background: #0056b3;
+                                        }
+                                        .title {
+                                            position: fixed;
+                                            top: 20px;
+                                            left: 20px;
+                                            background: white;
+                                            padding: 10px 15px;
+                                            border-radius: 8px;
+                                            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                                            z-index: 1000;
+                                            font-size: 18px;
+                                            font-weight: bold;
+                                        }
+                                    </style>
+                                </head>
+                                <body>
+                                    <div class="title">${editionName} - 剧本图</div>
+                                    <div class="controls">
+                                        <a href="${imageData}" download="${fileName}.png" class="download-btn">下载图片</a>
+                                    </div>
+                                    <div class="image-container">
+                                        <img src="${imageData}" alt="${editionName}剧本图">
+                                    </div>
+                                </body>
+                                </html>
+                            `);
                             newWindow.document.close();
-
-                            // ============================================
-                            // 清理工作
-                            // ============================================
-
-                            // 移除页面上的临时剧本图容器
                             document.body.removeChild(scriptImageContainer);
-
-                            // 输出成功信息到控制台
                             console.log('剧本图生成完成，已在新窗口中显示');
                         }).catch(error => {
-                            // ============================================
-                            // 错误处理
-                            // ============================================
-
-                            // 捕获并记录生成过程中的错误
                             console.error('生成剧本图失败:', error);
-
-                            // 向用户显示错误提示
                             alert('生成剧本图失败，请检查浏览器控制台');
-
-                            // 重新显示按钮，允许用户重试
                             generateImageButton.style.display = 'block';
                             closeButton.style.display = 'block';
                         });
                     });
                 };
 
-                // ============================================
-                // 关闭按钮事件处理
-                // ============================================
-
+                // 关闭预览
                 closeButton.onclick = () => {
-                    // 移除剧本图容器和所有按钮
                     document.body.removeChild(scriptImageContainer);
                     document.body.removeChild(generateImageButton);
                     document.body.removeChild(closeButton);
                 };
 
-                // ============================================
-                // 第十五步：添加元素到页面并显示
-                // ============================================
-
-                // 将控制按钮添加到页面
                 document.body.appendChild(generateImageButton);
                 document.body.appendChild(closeButton);
-
-                // 将剧本图容器添加到页面（显示预览效果）
                 document.body.appendChild(scriptImageContainer);
 
             }).catch(error => {
-                // ============================================
-                // 图片加载失败的错误处理
-                // ============================================
-
                 console.error('Failed to load images:', error);
                 alert('图像加载失败，请检查网络连接或稍后重试');
             });
         }
+
 
         // ============================================
         // 全局变量定义
