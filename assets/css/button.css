@@ -72,7 +72,6 @@
     background: linear-gradient(145deg, #1a1a1a, #3a3a3a);
     box-shadow: inset 0 0 0 2px #c4322f, 0 6px 20px rgba(196, 50, 47, 0.6);
     color: #ff4945;
-    transform: translateY(-2px) scale(1.03);
 }
 
 /* 大杀四方按钮 */
@@ -93,6 +92,15 @@
 .button.lingguang:hover {
     background: linear-gradient(145deg, rgba(40, 80, 150, 0.95), rgba(30, 50, 80, 0.95));
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* 比赛按钮 */
+.button.match {
+    background: linear-gradient(135deg, #1a1a40, #3a0ca3);
+    box-shadow: 0 4px 20px rgba(58, 12, 163, 0.5);
+}
+.button.match:hover {
+    box-shadow: 0 8px 30px rgba(90, 120, 255, 0.6);
 }
 
 /* Github按钮 */

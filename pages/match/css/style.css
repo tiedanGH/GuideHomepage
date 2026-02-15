@@ -1,0 +1,175 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+html {
+    scroll-behavior: smooth;
+}
+body {
+    background-color: #f4f6f9;
+    line-height: 1.6;
+    padding: 1rem 1rem;
+    min-height: 100vh;
+}
+a {
+    color: #0d6efd;
+    text-decoration: none;
+}
+
+/* 页面容器 */
+.container {
+    max-width: 1500px;
+    margin: 0 auto;
+}
+
+/* 深色页眉 */
+.hero {
+    background: linear-gradient(135deg, #1a1a40, #3a0ca3);
+    color: #fff;
+    text-align: center;
+    padding: 20px 0 15px 0;
+    border-radius: 12px;
+    margin-bottom: 16px;
+    box-shadow: 0 6px 12px rgba(58, 12, 163, 0.5);
+}
+
+.hero h1 {
+    font-size: 35px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+.hero .organizer {
+    font-size: 20px;
+    font-weight: 400;
+    color: #ced4da;
+}
+
+/* 卡片区域 */
+.rule-section {
+    background-color: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+    padding: 20px 30px;
+    margin-bottom: 16px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 1px solid rgba(255,255,255,0.5);
+}
+.rule-section:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 20px rgba(13,110,253,0.08);
+}
+
+.rule-section h2 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #0b2b4a;
+    margin-bottom: 14px;
+    padding-left: 20px;
+    border-left: 6px solid #0d6efd;
+    line-height: 1.3;
+}
+.rule-section p {
+    margin-bottom: 3px;
+    color: #2d3e53;
+    font-size: 1rem;
+}
+
+/* 子区块标题 */
+.sub-title {
+    font-weight: 650;
+    font-size: 18px;
+    color: #0a4b7a;
+    margin-top: 14px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid #e6ecf0;
+}
+/* 缩进块 */
+.sub-block {
+    margin-left: 3px;
+    padding-left: 16px;
+    border-left: 3px solid #dee2e6;
+    margin-bottom: 14px;
+}
+
+/* 列表项 */
+.list-item {
+    padding-left: 24px;
+    margin-bottom: 4px;
+    color: #2c3e50;
+}
+
+/* 文档链接块 */
+.doc-link {
+    background-color: #f1f6fd;
+    padding: 14px 24px;
+    border-radius: 14px;
+    border-left: 6px solid #0d6efd;
+    margin-top: 12px;
+    margin-bottom: 8px;
+}
+.doc-link a {
+    color: #0a58ca;
+    text-decoration: none;
+    font-weight: 500;
+    border-bottom: 1px solid rgba(13,110,253,0.3);
+    transition: border-color 0.15s;
+}
+.doc-link a:hover {
+    border-bottom-color: #0d6efd;
+}
+iframe {
+    width: 100%;
+    height: 100vh;
+    margin-top: 5px;
+    border: none;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.highlight {
+    background: #e9ecef;
+    padding: 3px 8px;
+    border-radius: 8px;
+    font-weight: 550;
+    color: #0d3e6b;
+}
+
+/* 强标签 */
+.strong-label {
+    font-weight: 700;
+    color: #0b5e8a;
+    background: #e8f1fe;
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .wrapper {
+        padding: 8px;
+    }
+
+    .hero h1 {
+        font-size: 26px;
+    }
+    .hero .organizer {
+        font-size: 16px;
+    }
+
+    .rule-section {
+        padding: 16px 20px;
+    }
+    .rule-section h2 {
+        font-size: 20px;
+    }
+
+    .doc-link {
+        padding: 12px 10px;
+        border-left: 4px solid #0d6efd;
+    }
+}
