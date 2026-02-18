@@ -97,6 +97,10 @@ h1 {
     color: #ff7a18;
     border-color: #ff7a18;
 }
+.category-title.battle-duo {
+    color: #e74c3c;
+    border-color: #e74c3c;
+}
 .category-title.battle {
     color: #9b59b6;
     border-color: #9b59b6;
