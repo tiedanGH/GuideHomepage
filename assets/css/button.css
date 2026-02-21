@@ -27,15 +27,16 @@
     height: 45px;
     min-height: 35px;
 }
+.button.child:hover {
+    box-shadow: 0 6px 20px rgba(37, 117, 252, 0.4);
+    filter: brightness(1.05);
+}
 .button.child.small {
     background: linear-gradient(135deg, #6caeff 0%, #478dff 100%);
     width: 180px;
     height: 40px;
 }
-.button.child:hover {
-    box-shadow: 0 6px 20px rgba(37, 117, 252, 0.4);
-    filter: brightness(1.05);
-}
+
 .author {
     position: absolute;
     right: 6px;
@@ -61,6 +62,10 @@
 .button.child.blood:hover {
     box-shadow: 0 6px 20px rgba(255, 0, 0, 0.4);
     filter: brightness(1.05);
+}
+.button.child.blood.small {
+    background: linear-gradient(135deg, #d94a4a 0%, #f06a6a 100%);
+    box-shadow: 0 3px 8px rgba(217, 74, 74, 0.25);
 }
 
 /* 计中计按钮 */
