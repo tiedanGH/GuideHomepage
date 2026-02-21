@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <base href="/pages/clocktower/json/">
+    <base href="/pages/clocktower-json-tool/">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>剧本JSON工具by黑心恰克</title>
@@ -1003,6 +1003,37 @@
         </div>
     </div>
 
+    <!-- 随机选择工具 -->
+    <div class="random-selection-tool" style="background: var(--card-bg-color); padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px;">
+        <h2 style="color: #4667ae; margin-bottom: 15px;">随机选择工具</h2>
+        <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center; margin-bottom: 15px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <label style="font-weight: bold; color: #00008B;">镇民：</label>
+                <input type="number" id="random-townsfolk" min="0" value="13" placeholder="数量" style="width: 80px; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px;">
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <label style="font-weight: bold; color: #0000FF;">外来者：</label>
+                <input type="number" id="random-outsiders" min="0" value="4" placeholder="数量" style="width: 80px; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px;">
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <label style="font-weight: bold; color: #FF6666;">爪牙：</label>
+                <input type="number" id="random-minions" min="0" value="4" placeholder="数量" style="width: 80px; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px;">
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <label style="font-weight: bold; color: #FF0000;">恶魔：</label>
+                <input type="number" id="random-demons" min="0" value="4" placeholder="数量" style="width: 80px; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px;">
+            </div>
+        </div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <button onclick="randomSelectRoles()" style="background-color: #ffc107; color: #333; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">
+                按所选人数随机勾选
+            </button>
+            <button onclick="clearAllSelections()" style="background-color: #dc3545; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">
+                清空选择
+            </button>
+        </div>
+    </div>
+
     <!-- 显示选择数量的区域 -->
     <div class="selection-info" id="selection-info">
         已选择：镇民 0 个，外来者 0 个，爪牙 0 个，恶魔 0 个，传奇角色 0 个，旅行者 0 个。
@@ -1037,6 +1068,9 @@
         <input type="text" id="json-file-name" placeholder="文件名（可选）"
                style="padding: 12px; box-sizing: border-box; font-size: 16px; border: 1px solid var(--border-color); border-radius: 4px; flex: 0.8;">
         <button class="violet-button" onclick="generateJson()" style="flex: 1;">保存JSON文件</button>
+        <button class="violet-button" onclick="copyJson()" style="flex: 1; background-color: #17a2b8;">
+            复制JSON
+        </button>
         <button class="violet-button" onclick="generateScriptImage()" style="flex: 1; background-color: #28a745;">
             生成剧本图
         </button>
@@ -1055,12 +1089,6 @@
         // 页面加载完成后检查访问协议
         window.addEventListener('DOMContentLoaded', function() {
             if (isLocalFile()) {
-                // 本地文件模式下隐藏"生成剧本图"按钮
-                // const generateImageButton = document.querySelector('button[onclick="generateScriptImage()"]');
-                // if (generateImageButton) {
-                //     generateImageButton.style.display = 'none';
-                // }
-
                 // 不显示本地文件模式警告信息
                 const warning = document.getElementById('local-mode-warning');
                 if (warning) {
@@ -8854,6 +8882,114 @@
 
             //alert("JSON文件已生成！");
 
+        }
+
+        function copyJson() {
+            // 在生成JSON前保存所有拖拽后的值
+            saveNightValuesFromButtons();
+
+            selectedRoles = getSelectedRoles();
+            if (selectedRoles.length === 0 && dirRolesJson.length === 0)  {
+                alert("请至少选择一个角色！");
+                return;
+            }
+
+            // 处理选中的角色
+            editionRolesJson = [...selectedRoles, ...dirRolesJson];
+            const jsonData = [];
+
+            jsonData.push(metaInfoJson);
+
+            // 添加相克规则
+            const editionJinxes = getJinxRules(jinxes);
+            addJinxInRoleJson(editionJinxes);
+            const editionTrialJinxes = getJinxRules(trialJinxes);
+            addJinxInRoleJson(editionTrialJinxes);
+
+            // 添加角色数据
+            jsonData.push(...editionRolesJson);
+
+            addAJinxInJson(jsonData);
+
+            // 转换为 JSON 字符串
+            const jsonString = JSON.stringify(jsonData, null, 4);
+
+            // 复制到剪贴板
+            navigator.clipboard.writeText(jsonString).then(function() {
+                alert("JSON已复制到剪贴板！");
+            }).catch(function(err) {
+                console.error('复制失败:', err);
+                alert("复制失败，请手动复制！");
+            });
+        }
+
+        function randomSelectRoles() {
+            const counts = {
+                townsfolk: parseInt(document.getElementById('random-townsfolk').value) || 0,
+                outsiders: parseInt(document.getElementById('random-outsiders').value) || 0,
+                minions: parseInt(document.getElementById('random-minions').value) || 0,
+                demons: parseInt(document.getElementById('random-demons').value) || 0
+            };
+
+            const teamIds = {
+                townsfolk: 'townsfolk',
+                outsiders: 'outsider',
+                minions: 'minion',
+                demons: 'demon'
+            };
+
+            const listIds = {
+                townsfolk: 'townsfolk-columns',
+                outsiders: 'outsiders-columns',
+                minions: 'minions-columns',
+                demons: 'demons-columns'
+            };
+
+            for (const [team, count] of Object.entries(counts)) {
+                if (count <= 0) continue;
+
+                const listContainer = document.getElementById(listIds[team]);
+                if (!listContainer) continue;
+
+                const checkboxes = listContainer.querySelectorAll('input[type="checkbox"]:not(:disabled)');
+                const availableCheckboxes = Array.from(checkboxes);
+
+                if (availableCheckboxes.length === 0) {
+                    alert(`没有可用的${team === 'townsfolk' ? '镇民' : team === 'outsiders' ? '外来者' : team === 'minions' ? '爪牙' : '恶魔'}角色！`);
+                    continue;
+                }
+
+                if (count > availableCheckboxes.length) {
+                    alert(`${team === 'townsfolk' ? '镇民' : team === 'outsiders' ? '外来者' : team === 'minions' ? '爪牙' : '恶魔'}只有 ${availableCheckboxes.length} 个可用角色，无法选择 ${count} 个！`);
+                    continue;
+                }
+
+                availableCheckboxes.forEach(cb => cb.checked = false);
+
+                const shuffled = [...availableCheckboxes].sort(() => Math.random() - 0.5);
+                const selected = shuffled.slice(0, count);
+                selected.forEach(cb => cb.checked = true);
+            }
+
+            updateSelectionInfo();
+            updateFirstNightButtons();
+            updateOtherNightButtons();
+        }
+
+        function clearAllSelections() {
+            const allCheckboxes = document.querySelectorAll('.role-list input[type="checkbox"]');
+            allCheckboxes.forEach(cb => {
+                cb.checked = false;
+            });
+
+            document.getElementById('random-townsfolk').value = '13';
+            document.getElementById('random-outsiders').value = '4';
+            document.getElementById('random-minions').value = '4';
+            document.getElementById('random-demons').value = '4';
+
+            updateSelectionInfo();
+            updateFirstNightButtons();
+            updateOtherNightButtons();
         }
 
         function addAJinxInJson(jsonData){
