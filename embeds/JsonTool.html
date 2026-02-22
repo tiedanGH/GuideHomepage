@@ -398,6 +398,34 @@
             background-color: #f0f0f0;                        /* 悬停背景色 */
         }
 
+        /* 相克规则编辑器搜索结果容器样式 */
+        .search-results-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+
+        /* 相克规则编辑器搜索结果项样式 */
+        .search-results-dropdown div {
+            padding: 8px 12px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        /* 相克规则编辑器搜索结果项悬停样式 */
+        .search-results-dropdown div:hover {
+            background-color: #f0f0f0;
+        }
+
         /* 角色列表标题基础样式 */
         .role-list h2 {
             font-size: 1.5em;                                 /* 字体大小 */
@@ -1003,6 +1031,53 @@
         </div>
     </div>
 
+    <!-- 相克规则编辑器 -->
+    <div class="jinx-editor" style="background: var(--card-bg-color); padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px;">
+        <h2 style="color: #e6d708; margin-bottom: 15px;">相克规则编辑器（非必要）</h2>
+
+        <!-- 展开/收起按钮 -->
+        <div style="display: flex; justify-content: center; margin-bottom: 15px;">
+            <button id="toggle-jinx-editor" class="meta-info-button" onclick="toggleJinxEditor()">
+                添加相克规则
+            </button>
+        </div>
+
+        <!-- 相克规则编辑器内容（默认隐藏） -->
+        <div id="jinx-editor-content" style="display: none;">
+            <!-- 添加新相克规则的表单 -->
+            <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 4px;">
+                <h3 style="margin-top: 0; margin-bottom: 15px; color: #333;">添加新相克规则</h3>
+                <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-start; margin-bottom: 10px;">
+                    <div style="flex: 1; min-width: 200px; position: relative;">
+                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">角色1：</label>
+                        <input type="text" id="new-jinx-role1" placeholder="中文名、拼音首字母搜角色..." style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; box-sizing: border-box;">
+                        <div id="jinx-role1-search-results" class="search-results-dropdown"></div>
+                    </div>
+                    <div style="flex: 1; min-width: 200px; position: relative;">
+                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">角色2：</label>
+                        <input type="text" id="new-jinx-role2" placeholder="中文名、拼音首字母搜角色..." style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; box-sizing: border-box;">
+                        <div id="jinx-role2-search-results" class="search-results-dropdown"></div>
+                    </div>
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">相克规则：</label>
+                    <textarea id="new-jinx-rule" placeholder="输入相克规则描述" style="width: 100%; min-height: 60px; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; box-sizing: border-box;"></textarea>
+                </div>
+                <button onclick="addJinxRule()" class="meta-info-button">
+                    添加相克规则
+                </button>
+            </div>
+
+            <!-- 现有相克规则列表 -->
+            <div>
+                <h3 style="margin-top: 0; margin-bottom: 15px; color: #333;">现有相克规则（共 <span id="jinx-count">0</span> 条）</h3>
+                <div id="jinx-list" style="max-height: 400px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 4px; padding: 10px;">
+                    <!-- 相克规则列表将动态生成 -->
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- 随机选择工具 -->
     <div class="random-selection-tool" style="background: var(--card-bg-color); padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px;">
         <h2 style="color: #4667ae; margin-bottom: 15px;">随机选择工具</h2>
@@ -1073,6 +1148,9 @@
         </button>
         <button class="violet-button" onclick="generateScriptImage()" style="flex: 1; background-color: #28a745;">
             生成剧本图
+        </button>
+        <button class="violet-button" onclick="generateJinxAndConfigImage()" style="flex: 1; background-color: #6f42c1;">
+            生成相克规则和配置图
         </button>
     </div>
 
@@ -1201,6 +1279,304 @@
         // ============================================
 
         /**
+         * 生成相克规则和配置图函数
+         * 创建一个包含相克规则和角色配置表的可视化图表
+         */
+        function generateJinxAndConfigImage() {
+            // ============================================
+            // 第一步：初始化和容器创建
+            // ============================================
+
+            // 获取用户输入的文件名，如果为空则使用默认值"相克规则和配置图"
+            const scriptImageNameInput = document.getElementById('script-image-name') || document.getElementById('json-file-name');
+            const fileName = scriptImageNameInput.value.trim() || '相克规则和配置图';
+
+            // 创建相克规则和配置图容器
+            const jinxConfigContainer = document.createElement('div');
+            jinxConfigContainer.id = 'jinx-config-container';
+
+            // 设置容器样式
+            jinxConfigContainer.style.cssText = `
+                position: relative;
+                display: flex;
+                flex-direction: row;
+                align-items: flex-start;
+                gap: 20px;
+                background: #f5f5dc;
+                padding: 19px;
+                box-sizing: border-box;
+                font-family: 'Microsoft YaHei', sans-serif;
+                overflow: visible;
+            `;
+
+            // ============================================
+            // 第二步：获取剧本基本信息
+            // ============================================
+
+            const editionName = metaInfoJson.name || '未知剧本';
+            const authorName = metaInfoJson.author || '未知作者';
+
+            // ============================================
+            // 第三步：获取相克规则
+            // ============================================
+
+            // 合并所有角色数据
+            const allRoles = [...selectedRoles, ...dirRolesJson];
+            const roleNames = allRoles.map(role => role.name);
+
+            // 获取相克规则
+            const getJinxRules = () => {
+                const jinxRules = [];
+
+                // 检查是否存在相克规则库
+                if (typeof jinxes !== 'undefined') {
+                    jinxes.forEach(rule => {
+                        if (roleNames.includes(rule.jinxRole1) && roleNames.includes(rule.jinxRole2)) {
+                            jinxRules.push(rule);
+                        }
+                    });
+                }
+
+                // 检查是否存在用户添加的相克规则
+                if (typeof userAddedJinxRules !== 'undefined') {
+                    userAddedJinxRules.forEach(rule => {
+                        if (roleNames.includes(rule.jinxRole1) && roleNames.includes(rule.jinxRole2)) {
+                            jinxRules.push(rule);
+                        }
+                    });
+                }
+
+                // 检查是否存在全局相克规则
+                if (typeof window.jinxes !== 'undefined') {
+                    window.jinxes.forEach(rule => {
+                        if (roleNames.includes(rule.jinxRole1) && roleNames.includes(rule.jinxRole2)) {
+                            jinxRules.push(rule);
+                        }
+                    });
+                }
+
+                // 检查是否存在全局试运行相克规则
+                if (typeof window.trialJinxes !== 'undefined') {
+                    window.trialJinxes.forEach(rule => {
+                        if (roleNames.includes(rule.jinxRole1) && roleNames.includes(rule.jinxRole2)) {
+                            jinxRules.push(rule);
+                        }
+                    });
+                }
+
+                // 检查是否存在文件中定义的试运行相克规则
+                if (typeof trialJinxes !== 'undefined') {
+                    trialJinxes.forEach(rule => {
+                        if (roleNames.includes(rule.jinxRole1) && roleNames.includes(rule.jinxRole2)) {
+                            jinxRules.push(rule);
+                        }
+                    });
+                }
+
+                return jinxRules;
+            };
+
+            const jinxRules = getJinxRules();
+
+            // ============================================
+            // 第四步：构建相克规则和配置图HTML结构
+            // ============================================
+
+            // 构建相克规则和配置图HTML
+            jinxConfigContainer.innerHTML = `
+                <div style="width: 1481px; min-height: 2093px; background: #f5f5dc; padding: 19px; box-sizing: border-box; display: flex; flex-direction: column;">
+                    <!-- 剧本标题区域 -->
+                    <div style="text-align: center; margin-bottom: 30px;">
+                        <h1 style="font-size: 32px; margin: 0 0 10px 0; color: #333;">${editionName}</h1>
+                        <p style="font-size: 18px; margin: 0 0 10px 0; color: #666;">作者：${authorName}</p>
+                        <h2 style="font-size: 24px; margin: 20px 0 10px 0; color: #333;">相克规则</h2>
+                    </div>
+
+                    <!-- 相克规则区域 -->
+                    <div style="margin-bottom: 40px;">
+                        ${jinxRules.length > 0 ? `
+                            <div style="padding: 20px;">
+                                ${jinxRules.map((rule, index) => `
+                                    <div style="margin-bottom: 25px; padding: 20px; background: white; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                                        <div style="font-weight: bold; font-size: 20px; margin-bottom: 10px; color: #6f42c1;">${rule.jinxRole1} & ${rule.jinxRole2}</div>
+                                        <div style="font-size: 16px; color: #5a5a5a; line-height: 1.6;">${rule.jinxRule}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : `
+                            <div style="text-align: center; color: #888; font-size: 18px; padding: 40px; background: white; border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">无相克规则</div>
+                        `}
+                    </div>
+
+                    <!-- 空白区域，将角色配置表推到底端 -->
+                    <div style="flex-grow: 1;"></div>
+
+                    <!-- 角色配置表标题 -->
+                    <h2 style="font-size: 24px; margin: 40px 0 20px 0; color: #333; text-align: center;">角色配置表</h2>
+
+                    <!-- 角色配置表 -->
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden;">
+                            <thead>
+                                <tr style="background: #6f42c1; color: white;">
+                                    <th style="padding: 15px; text-align: center; border: 1px solid #ddd;">角色类型</th>
+                                    <th style="padding: 15px; text-align: center; border: 1px solid #ddd;">7</th>
+                                    <th style="padding: 15px; text-align: center; border: 1px solid #ddd;">8</th>
+                                    <th style="padding: 15px; text-align: center; border: 1px solid #ddd;">9</th>
+                                    <th style="padding: 15px; text-align: center; border: 1px solid #ddd;">10</th>
+                                    <th style="padding: 15px; text-align: center; border: 1px solid #ddd;">11</th>
+                                    <th style="padding: 15px; text-align: center; border: 1px solid #ddd;">12</th>
+                                    <th style="padding: 15px; text-align: center; border: 1px solid #ddd;">13</th>
+                                    <th style="padding: 15px; text-align: center; border: 1px solid #ddd;">14</th>
+                                    <th style="padding: 15px; text-align: center; border: 1px solid #ddd;">15+</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="background: #f8f9fa;">
+                                    <td style="padding: 15px; text-align: center; border: 1px solid #ddd; font-weight: bold;">镇民</td>
+                                    <td style="padding: 15px; text-align: center; border: 1px solid #ddd;">5</td>
+                                    <td style="padding: 15px; text-align: center; border: 1px solid #ddd;">5</td>
+                                    <td style="padding: 15px; text-align: center; border: 1px solid #ddd;">5</td>
+                                    <td style="padding: 15px; text-align: center; border: 1px solid #ddd;">7</td>
+                                    <td style="padding: 15px; text-align: center; border: 1px solid #ddd;">7</td>
+                                    <td style="padding: 15px; text-align: center; border: 1px solid #ddd;">7</td>
+                                    <td style="padding: 15px; text-align: center; border: 1px solid #ddd;">9</td>
+                                    <td style="padding: 15px; text-align: center; border: 1px solid #ddd;">9</td>
+                                    <td style="padding: 15px; text-align: center; border: 1px solid #ddd;">9</td>
+                                </tr>
+                                <tr style="background: white;">
+                                    <td style="padding: 15px; text-align: center; border: 1px solid #ddd; font-weight: bold;">外来者</td>
+                                    <td style="padding: 15px; text-align: center; border: 1px solid #ddd;">0</td>
+                                    <td style="padding: 15px; text-align: center; border: 1px solid #ddd;">1</td>
+                                    <td style="padding: 15px; text-align: center; border: 1px solid #ddd;">2</td>
+                                    <td style="padding: 15px; text-align: center; border: 1px solid #ddd;">0</td>
+                                    <td style="padding: 15px; text-align: center; border: 1px solid #ddd;">1</td>
+                                    <td style="padding: 15px; text-align: center; border: 1px solid #ddd;">2</td>
+                                    <td style="padding: 15px; text-align: center; border: 1px solid #ddd;">0</td>
+                                    <td style="padding: 15px; text-align: center; border: 1px solid #ddd;">1</td>
+                                    <td style="padding: 15px; text-align: center; border: 1px solid #ddd;">2</td>
+                                </tr>
+                                <tr style="background: #f8f9fa;">
+                                    <td style="padding: 15px; text-align: center; border: 1px solid #ddd; font-weight: bold;">爪牙</td>
+                                    <td style="padding: 15px; text-align: center; border: 1px solid #ddd;">1</td>
+                                    <td style="padding: 15px; text-align: center; border: 1px solid #ddd;">1</td>
+                                    <td style="padding: 15px; text-align: center; border: 1px solid #ddd;">1</td>
+                                    <td style="padding: 15px; text-align: center; border: 1px solid #ddd;">2</td>
+                                    <td style="padding: 15px; text-align: center; border: 1px solid #ddd;">2</td>
+                                    <td style="padding: 15px; text-align: center; border: 1px solid #ddd;">2</td>
+                                    <td style="padding: 15px; text-align: center; border: 1px solid #ddd;">3</td>
+                                    <td style="padding: 15px; text-align: center; border: 1px solid #ddd;">3</td>
+                                    <td style="padding: 15px; text-align: center; border: 1px solid #ddd;">3</td>
+                                </tr>
+                                <tr style="background: white;">
+                                    <td style="padding: 15px; text-align: center; border: 1px solid #ddd; font-weight: bold;">恶魔</td>
+                                    <td style="padding: 15px; text-align: center; border: 1px solid #ddd;">1</td>
+                                    <td style="padding: 15px; text-align: center; border: 1px solid #ddd;">1</td>
+                                    <td style="padding: 15px; text-align: center; border: 1px solid #ddd;">1</td>
+                                    <td style="padding: 15px; text-align: center; border: 1px solid #ddd;">1</td>
+                                    <td style="padding: 15px; text-align: center; border: 1px solid #ddd;">1</td>
+                                    <td style="padding: 15px; text-align: center; border: 1px solid #ddd;">1</td>
+                                    <td style="padding: 15px; text-align: center; border: 1px solid #ddd;">1</td>
+                                    <td style="padding: 15px; text-align: center; border: 1px solid #ddd;">1</td>
+                                    <td style="padding: 15px; text-align: center; border: 1px solid #ddd;">1</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+
+            // ============================================
+            // 第四步：添加到页面并生成图片
+            // ============================================
+
+            // 创建预览容器
+            const previewContainer = document.createElement('div');
+            previewContainer.id = 'jinx-config-preview';
+            previewContainer.style.cssText = `
+                position: fixed;
+                top: 10px;
+                left: 10px;
+                right: 10px;
+                bottom: 10px;
+                background: rgba(0, 0, 0, 0.8);
+                z-index: 9999;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                padding: 20px;
+                box-sizing: border-box;
+                overflow: auto;
+            `;
+
+            // 添加容器到预览区域
+            previewContainer.appendChild(jinxConfigContainer);
+
+            // 创建关闭按钮
+            const closeButton = document.createElement('button');
+            closeButton.textContent = '关闭';
+            closeButton.style.cssText = `
+                position: absolute;
+                top: 20px;
+                right: 20px;
+                padding: 10px 20px;
+                background: #dc3545;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 16px;
+                z-index: 10000;
+            `;
+            closeButton.onclick = function() {
+                document.body.removeChild(previewContainer);
+            };
+            previewContainer.appendChild(closeButton);
+
+            // 创建下载按钮
+            const downloadButton = document.createElement('button');
+            downloadButton.textContent = '下载图片';
+            downloadButton.style.cssText = `
+                position: absolute;
+                top: 20px;
+                left: 20px;
+                padding: 10px 20px;
+                background: #28a745;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 16px;
+                z-index: 10000;
+            `;
+            downloadButton.onclick = function() {
+                // 等待DOM更新完成
+                setTimeout(function() {
+                    // 使用html2canvas生成图片
+                    html2canvas(jinxConfigContainer, {
+                        scale: 2, // 提高清晰度
+                        useCORS: true, // 允许跨域图片
+                        logging: false, // 禁用日志
+                        backgroundColor: '#f5f5dc' // 设置背景色
+                    }).then(function(canvas) {
+                        // 创建下载链接
+                        const link = document.createElement('a');
+                        link.download = fileName + '.png';
+                        link.href = canvas.toDataURL('image/png');
+                        link.click();
+                    }).catch(function(error) {
+                        console.error('生成图片失败:', error);
+                        alert('生成图片失败，请检查控制台错误信息。');
+                    });
+                }, 100);
+            };
+            previewContainer.appendChild(downloadButton);
+
+            // 添加预览容器到页面
+            document.body.appendChild(previewContainer);
+        }
+
+        /**
          * 生成剧本图主函数
          * 创建一个包含剧本信息、角色列表和行动顺序的可视化图表
          * 功能：
@@ -1227,16 +1603,16 @@
 
             // 设置容器样式 - 使用内联样式确保截图时样式正确渲染
             scriptImageContainer.style.cssText = `
-                position: fixed;           /* 固定定位，脱离文档流，覆盖在页面最上层 */
-                top: 0;                   /* 顶部对齐，从视口顶部开始 */
-                left: 0;                  /* 左侧对齐，从视口左侧开始 */
-                width: 1481px;            /* 固定宽度1481px，适配高分辨率截图 */
-                background: white;         /* 白色背景，确保截图时背景干净 */
+                position: relative;           /* 相对定位，在预览容器中正常显示 */
+                display: flex;               /* 使用flex布局 */
+                flex-direction: row;         /* 水平排列页面 */
+                align-items: flex-start;     /* 顶部对齐 */
+                gap: 20px;                   /* 页面间距 */
+                background: #f5f5dc;      /* 米黄色背景 */
                 padding: 19px;            /* 内边距，按比例放大（10px * 1.9） */
                 box-sizing: border-box;    /* 盒模型计算方式，确保width包含padding和border */
                 font-family: 'Microsoft YaHei', sans-serif; /* 字体设置，使用微软雅黑确保中文显示效果 */
-                z-index: 10000;           /* 最高层级，确保容器显示在所有其他元素之上 */
-                overflow: hidden;          /* 隐藏溢出内容，防止布局被破坏 */
+                overflow: visible;          /* 显示溢出内容，允许页面水平排列 */
             `;
 
             // ============================================
@@ -1254,6 +1630,7 @@
 
             // 构建剧本图HTML结构 - 使用模板字符串和内联样式确保截图一致性
             scriptImageContainer.innerHTML = `
+                <div style="width: 1481px; min-height: 1000px; background: #f5f5dc; padding: 19px; box-sizing: border-box;">
                 <!-- 剧本标题区域 - 居中显示剧本基本信息 -->
                 <div style="text-align: center; margin-bottom: 30px;">
                     <h1 style="font-size: 32px; margin: 0 0 10px 0; color: #333;">${editionName}</h1>
@@ -1264,27 +1641,89 @@
                 <!-- 主要内容区域 - 包含角色列表和行动顺序 -->
                 <div style="position: relative; min-height: 800px;">
                     <!-- 中央角色列表容器 - 显示所有选中角色的详细信息 -->
-                    <div style="background: #f8f9fa; padding: 10px; border-radius: 8px; margin: 0 67px; position: relative;">
+                    <div style="background: #f5f5dc; padding: 10px; border-radius: 8px; margin: 0 67px; position: relative;">
                         <h3 style="font-size: 20px; margin: 0 0 15px 0; color: #333;">角色列表</h3>
                         <div id="roles-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;"></div>
                     </div>
 
                     <!-- 左侧首夜行动顺序 - 垂直显示首夜需要行动的角色 -->
-                    <div style="position: absolute; left: 0; top: 0; width: 57px; background: #f8f9fa; padding: 2px; border-radius: 8px;">
+                    <div style="position: absolute; left: 0; top: 0; width: 57px; background: #f5f5dc; padding: 2px; border-radius: 8px;">
                         <h3 style="font-size: 16px; margin: 0 0 8px 0; color: #333; text-align: center;">首个<br>夜晚</h3>
                         <div id="first-night-order" style="display: flex; flex-direction: column; align-items: center; gap: 19px; justify-content: flex-start;"></div>
                     </div>
 
                     <!-- 右侧其他夜晚行动顺序 - 垂直显示其他夜晚需要行动的角色 -->
-                    <div style="position: absolute; right: 0; top: 0; width: 57px; background: #f8f9fa; padding: 2px; border-radius: 8px;">
+                    <div style="position: absolute; right: 0; top: 0; width: 57px; background: #f5f5dc; padding: 2px; border-radius: 8px;">
                         <h3 style="font-size: 16px; margin: 0 0 8px 0; color: #333; text-align: center;">其他<br>夜晚</h3>
                         <div id="other-night-order" style="display: flex; flex-direction: column; align-items: center; gap: 19px; justify-content: flex-start;"></div>
                     </div>
                 </div>
+                </div>
             `;
 
-            // 将剧本图容器添加到页面body中
-            document.body.appendChild(scriptImageContainer);
+            // 创建预览容器，让用户能够滚动查看整个图片
+            const previewContainer = document.createElement('div');
+            previewContainer.id = 'script-image-preview';
+            previewContainer.style.cssText = `
+              position: relative;
+              margin: 20px auto;
+              max-width: 90vw;
+              max-height: 80vh;
+              overflow: auto;
+              border: 1px solid #ddd;
+              border-radius: 8px;
+              box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+              padding: 20px;
+              background: white;
+              display: flex;
+              flex-direction: row;
+              align-items: flex-start;
+              gap: 20px;
+          `;
+
+            // 将剧本图容器放入预览容器中
+            previewContainer.appendChild(scriptImageContainer);
+
+            // 添加下载按钮
+            const downloadButton = document.createElement('button');
+            downloadButton.textContent = '下载图片';
+            downloadButton.style.cssText = `
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                background-color: #4CAF50;
+                color: white;
+                padding: 10px 20px;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 16px;
+                z-index: 1000;
+            `;
+            downloadButton.onclick = function() {
+                // 使用html2canvas将预览容器转换为图片
+                html2canvas(scriptImageContainer, {
+                    scale: 2, // 提高图片质量
+                    useCORS: true, // 允许跨域图片
+                    logging: false,
+                    backgroundColor: '#f5f5dc' // 设置背景色为米黄色，与容器背景一致
+                }).then(canvas => {
+                    // 将canvas转换为图片URL
+                    const imageURL = canvas.toDataURL('image/png');
+
+                    // 创建一个a标签用于下载
+                    const link = document.createElement('a');
+                    link.href = imageURL;
+                    link.download = '剧本图片.png';
+
+                    // 触发下载
+                    link.click();
+                });
+            };
+            previewContainer.appendChild(downloadButton);
+
+            // 将预览容器添加到页面body中
+            document.body.appendChild(previewContainer);
 
             // ============================================
             // 第四步：异步加载角色图片并生成剧本图内容
@@ -1518,7 +1957,7 @@
                         // ============================================
 
                         return `
-                            <div style="display: flex; flex-direction: column; align-items: center; background: white; border-radius: 3px; padding: 0px; width: 56px; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
+                            <div style="display: flex; flex-direction: column; align-items: center; background: #f5f5dc; border-radius: 3px; padding: 0px; width: 56px; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
                                 ${shouldShowImage ? `
                                     <!-- 图片元素 - 尝试加载实际的图标文件 -->
                                     <img src="${iconPath}" crossorigin="anonymous" style="width: 50px; height: 50px; border-radius: 2px; margin-bottom: 0px; object-fit: cover;"
@@ -1631,7 +2070,7 @@
                         // ============================================
 
                         return `
-                            <div style="display: flex; flex-direction: column; align-items: center; background: white; border-radius: 3px; padding: 0px; width: 56px; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
+                            <div style="display: flex; flex-direction: column; align-items: center; background: #f5f5dc; border-radius: 3px; padding: 0px; width: 56px; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
                                 ${shouldShowImage ? `
                                     <!-- 图片元素 - 尝试加载实际的图标文件 -->
                                     <img src="${iconPath}" crossorigin="anonymous" style="width: 50px; height: 50px; border-radius: 2px; margin-bottom: 0px; object-fit: cover;"
@@ -1684,7 +2123,8 @@
 
                     if (typeof getJinxRules === 'function') {
                         // 获取常规相克规则
-                        const editionJinxes = getJinxRules(jinxes);
+                        const globalJinxes = window.jinxes || [];
+                        const editionJinxes = getJinxRules(globalJinxes);
                         editionJinxes.forEach(jinx => {
                             if (jinx.jinxRole1 === roleName) {
                                 jinxedRoles.add(jinx.jinxRole2);
@@ -1694,7 +2134,8 @@
                         });
 
                         // 获取试运行相克规则
-                        const editionTrialJinxes = getJinxRules(trialJinxes);
+                        const globalTrialJinxes = window.trialJinxes || [];
+                        const editionTrialJinxes = getJinxRules(globalTrialJinxes);
                         editionTrialJinxes.forEach(jinx => {
                             if (jinx.jinxRole1 === roleName) {
                                 jinxedRoles.add(jinx.jinxRole2);
@@ -1834,7 +2275,7 @@
                             };
 
                             return `
-                                <div style="display: flex; align-items: flex-start; background: white; padding: 8px; border-radius: 6px; margin-bottom: 4px; border-left: 3px solid #00008B; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                                <div style="display: flex; align-items: flex-start; padding: 8px; margin-bottom: 4px;">
                                     ${shouldShowImage ? `
                                         <img src="${iconPath}" crossorigin="anonymous" style="width: 74px; height: 74px; border-radius: 4px; margin-right: 22px; object-fit: cover; border: 1px solid #e9ecef;"
                                              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
@@ -1868,10 +2309,30 @@
                         const generateJinxRules = () => {
                             const jinxRulesSet = new Set(); // 使用Set去重
 
+                            // 检查jinxRulesLibrary是否存在
+                            console.log('jinxRulesLibrary exists:', typeof jinxRulesLibrary !== 'undefined');
+                            console.log('jinxRulesLibrary length:', typeof jinxRulesLibrary !== 'undefined' ? jinxRulesLibrary.length : 0);
+
+                            // 检查userAddedJinxRules是否存在
+                            console.log('userAddedJinxRules exists:', typeof userAddedJinxRules !== 'undefined');
+                            console.log('userAddedJinxRules length:', typeof userAddedJinxRules !== 'undefined' ? userAddedJinxRules.length : 0);
+
+                            // 检查window.jinxes是否存在
+                            console.log('window.jinxes exists:', typeof window.jinxes !== 'undefined');
+                            console.log('window.jinxes length:', typeof window.jinxes !== 'undefined' ? window.jinxes.length : 0);
+
+                            // 检查window.trialJinxes是否存在
+                            console.log('window.trialJinxes exists:', typeof window.trialJinxes !== 'undefined');
+                            console.log('window.trialJinxes length:', typeof window.trialJinxes !== 'undefined' ? window.trialJinxes.length : 0);
+
                             // 使用getJinxRules函数获取与当前角色相关的相克规则
                             if (typeof getJinxRules === 'function') {
                                 // 获取常规相克规则
-                                const editionJinxes = getJinxRules(jinxes);
+                                const globalJinxes = window.jinxes || [];
+                                console.log('globalJinxes length:', globalJinxes.length);
+                                // 使用所有相克规则，包括原始规则和新增规则
+                                const editionJinxes = getJinxRules(globalJinxes);
+                                console.log('editionJinxes length:', editionJinxes.length);
                                 editionJinxes.forEach(jinx => {
                                     // 创建唯一键：角色1 + 角色2（按字母顺序排序，确保正反方向都算作同一个规则）
                                     const key = [jinx.jinxRole1, jinx.jinxRole2].sort().join('|');
@@ -1884,7 +2345,11 @@
                                 });
 
                                 // 获取试运行相克规则
-                                const editionTrialJinxes = getJinxRules(trialJinxes);
+                                const globalTrialJinxes = window.trialJinxes || [];
+                                console.log('globalTrialJinxes length:', globalTrialJinxes.length);
+                                // 使用所有试运行相克规则，包括原始规则和新增规则
+                                const editionTrialJinxes = getJinxRules(globalTrialJinxes);
+                                console.log('editionTrialJinxes length:', editionTrialJinxes.length);
                                 editionTrialJinxes.forEach(jinx => {
                                     // 创建唯一键并去重
                                     const key = [jinx.jinxRole1, jinx.jinxRole2].sort().join('|');
@@ -1898,6 +2363,9 @@
                             }
 
                             const jinxRules = Array.from(jinxRulesSet).map(item => JSON.parse(item));
+
+                            // 检查最终的相克规则数量
+                            console.log('Final jinxRules length:', jinxRules.length);
 
                             // 如果有相克规则，生成HTML
                             if (jinxRules.length > 0) {
@@ -1915,7 +2383,7 @@
                                     <h4 style="margin: 0 0 8px 0; color: #e6d708; font-size: 24px; font-weight: bold; border-bottom: 2px solid #e6d708; padding-bottom: 1px;">
                                         相克 (${jinxRules.length})
                                     </h4>
-                                    <div style="background: white; padding: 4px; border-radius: 6px; border-left: 3px solid #e6d708; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                                    <div style="padding: 4px;">
                                         ${jinxRulesContent}
                                     </div>
                                 </div>
@@ -1934,11 +2402,8 @@
                             </div>
                         `;
 
-                        // 添加相克规则到镇民部分下方
+                        // 相克规则将显示在新的一页上
                         const jinxSection = generateJinxRules();
-                        if (jinxSection) {
-                            leftColumn += jinxSection;
-                        }
                     }
 
                     // 右列：其他角色
@@ -1994,7 +2459,7 @@
                             };
 
                             return `
-                                <div style="display: flex; align-items: flex-start; background: white; padding: 8px; border-radius: 6px; margin-bottom: 4px; border-left: 3px solid ${teamColor}; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                                <div style="display: flex; align-items: flex-start; padding: 8px; margin-bottom: 4px;">
                                     ${shouldShowImage ? `
                                         <img src="${iconPath}" crossorigin="anonymous" style="width: 74px; height: 74px; border-radius: 4px; margin-right: 22px; object-fit: cover; border: 1px solid #e9ecef;"
                                              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
@@ -2034,6 +2499,94 @@
                             <div style="padding-right: 19px;">${leftColumn || '<p style="color: #888;">暂无数据</p>'}</div>
                             <div style="padding-left: 19px;">${rightColumn || '<p style="color: #888;">暂无数据</p>'}</div>
                         `;
+
+                    // 动态创建相克规则页面
+                    if (jinxSection) {
+                        const jinxPage = document.createElement('div');
+                        jinxPage.style.cssText = `width: 1481px; min-height: 1000px; padding-top: 30px; background: #f5f5dc; padding: 19px; box-sizing: border-box;`;
+                        jinxPage.innerHTML = `
+                            <div style="text-align: center; margin-bottom: 30px;">
+                                <h2 style="font-size: 32px; margin: 0 0 10px 0; color: #333;">相克规则</h2>
+                            </div>
+                            <div style="padding: 20px; margin: 0 67px;">
+                                ${jinxSection}
+                            </div>
+
+                            <!-- 角色配置表格 -->
+                            <div style="margin-top: 50px; padding: 20px; margin: 0 67px;">
+                                <h3 style="font-size: 24px; margin: 0 0 20px 0; color: #333; text-align: center;">角色配置</h3>
+                                <div style="overflow-x: auto;">
+                                    <table style="width: 100%; border-collapse: collapse; font-size: 16px;">
+                                        <thead>
+                                            <tr style="background-color: #f0f0f0;">
+                                                <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">角色类型</th>
+                                                <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">7</th>
+                                                <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">8</th>
+                                                <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">9</th>
+                                                <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">10</th>
+                                                <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">11</th>
+                                                <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">12</th>
+                                                <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">13</th>
+                                                <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">14</th>
+                                                <th style="border: 1px solid #ddd; padding: 10px; text-align: center;">15+</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center; font-weight: bold;">镇民</td>
+                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">5</td>
+                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">5</td>
+                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">5</td>
+                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">7</td>
+                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">7</td>
+                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">7</td>
+                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">9</td>
+                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">9</td>
+                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">9</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center; font-weight: bold;">外来者</td>
+                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">0</td>
+                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">1</td>
+                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">2</td>
+                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">0</td>
+                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">1</td>
+                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">2</td>
+                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">0</td>
+                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">1</td>
+                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">2</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center; font-weight: bold;">爪牙</td>
+                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">1</td>
+                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">1</td>
+                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">1</td>
+                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">2</td>
+                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">2</td>
+                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">2</td>
+                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">3</td>
+                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">3</td>
+                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">3</td>
+                                            </tr>
+                                            <tr>
+                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center; font-weight: bold;">恶魔</td>
+                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">1</td>
+                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">1</td>
+                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">1</td>
+                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">1</td>
+                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">1</td>
+                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">1</td>
+                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">1</td>
+                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">1</td>
+                                                <td style="border: 1px solid #ddd; padding: 10px; text-align: center;">1</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        `;
+                        scriptImageContainer.appendChild(jinxPage);
+                    }
                 } else {
                     rolesGrid.innerHTML = '<p style="color: #888; font-size: 14px;">无角色数据</p>';
                 }
@@ -2305,8 +2858,13 @@
                 // ============================================
 
                 closeButton.onclick = () => {
-                    // 移除剧本图容器和所有按钮
-                    document.body.removeChild(scriptImageContainer);
+                    // 移除预览容器、剧本图容器和所有按钮
+                    const previewContainer = document.getElementById('script-image-preview');
+                    if (previewContainer) {
+                        document.body.removeChild(previewContainer);
+                    } else {
+                        document.body.removeChild(scriptImageContainer);
+                    }
                     document.body.removeChild(generateImageButton);
                     document.body.removeChild(closeButton);
                 };
@@ -2319,8 +2877,8 @@
                 document.body.appendChild(generateImageButton);
                 document.body.appendChild(closeButton);
 
-                // 将剧本图容器添加到页面（显示预览效果）
-                document.body.appendChild(scriptImageContainer);
+
+
 
             }).catch(error => {
                 // ============================================
@@ -7753,7 +8311,7 @@
             }
         ]
 
-        const jinxes = [
+        let jinxes = [
             {"jinxRole1":"侍女","jinxRole2":"数学家","jinxRule":"侍女会得知数学家是否醒来，即使她是在数学家之前醒来。"},
             {"jinxRole1":"哲学家","jinxRole2":"赏金猎人","jinxRule":"如果哲学家获得了赏金猎人的能力，可能会有一名镇民玩家转变为邪恶。"},
             {"jinxRole1":"食人族","jinxRole2":"罂粟种植者","jinxRule":"如果食人族获得了罂粟种植者的能力，当他获得下一个能力时，爪牙和恶魔也会互相认识。"},
@@ -7926,6 +8484,7 @@
             {"jinxRole1":"痢蛭","jinxRole2":"使节","jinxRule":"痢蛭的宿主及其中毒效果无法被转移。"},
             {"jinxRole1":"痢蛭","jinxRole2":"掮客","jinxRule":"痢蛭的宿主及其中毒效果无法被转移。"}
         ];
+        const originalJinxesCount = jinxes.length;
 
         const trialJinxes =[
             {"jinxRole1":"卡扎力","jinxRole2":"唱诗男孩","jinxRule":"（试运行相克规则）相克暂时移除。（注：卡扎力相关相克移除后，其运作更改为：卡扎力能够将他想要的任意玩家变成爪牙，无论该名玩家的角色能力如何，例如：士兵，莽夫，落难少女，国王等。）"},
@@ -8110,7 +8669,6 @@
                         const checkbox = document.querySelector(`.role-item input[value="${role.id}"]`);
                         if (checkbox) {
                             checkbox.checked = true;
-                            updateSelectionCount();
                         }
                         searchResults.style.display = 'none';
                         searchInput.value = '';
@@ -8127,6 +8685,60 @@
             if (event.target !== searchInput) {
                 searchResults.style.display = 'none';
             }
+        });
+
+        // 相克规则编辑器搜索功能
+        function setupJinxRoleSearch(inputId, resultsId) {
+            const input = document.getElementById(inputId);
+            const results = document.getElementById(resultsId);
+
+            if (!input || !results) return;
+
+            input.addEventListener('input', function() {
+                const query = this.value.trim().toLowerCase();
+                if (query === '') {
+                    results.style.display = 'none';
+                    return;
+                }
+
+                const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demonsRoles,...fabledRoles,...travellersRoles];
+                const matchingRoles = allRoles.filter(role => {
+                    const name = role.name.toLowerCase();
+                    const pinyinsuoxie = role.pinyinsuoxie.toLowerCase();
+
+                    return name.includes(query) ||
+                        pinyinsuoxie.includes(query);
+                });
+
+                results.innerHTML = '';
+                if (matchingRoles.length > 0) {
+                    results.style.display = 'block';
+                    matchingRoles.forEach(role => {
+                        const resultItem = document.createElement('div');
+                        resultItem.textContent = role.name;
+                        resultItem.addEventListener('click', function() {
+                            input.value = role.name;
+                            results.style.display = 'none';
+                        });
+                        results.appendChild(resultItem);
+                    });
+                } else {
+                    results.style.display = 'none';
+                }
+            });
+
+            // 当点击页面其他地方时隐藏搜索结果
+            document.addEventListener('click', function(event) {
+                if (event.target !== input) {
+                    results.style.display = 'none';
+                }
+            });
+        }
+
+        // 初始化相克规则编辑器的搜索功能
+        window.addEventListener('DOMContentLoaded', function() {
+            setupJinxRoleSearch('new-jinx-role1', 'jinx-role1-search-results');
+            setupJinxRoleSearch('new-jinx-role2', 'jinx-role2-search-results');
         });
 
         // 动态加载角色复选框
@@ -8364,12 +8976,26 @@
         //
         function toggleDirInput() {
             const dirInputGroup = document.getElementById('dir-input-group');
-            dirInputGroup.style.display = dirInputGroup.style.display === 'none' ? 'block' : 'none';
+            const button = document.querySelector('.dir-button');
+            if (dirInputGroup.style.display === 'none') {
+                dirInputGroup.style.display = 'block';
+                button.textContent = '收起自制角色';
+            } else {
+                dirInputGroup.style.display = 'none';
+                button.textContent = '添加自制角色';
+            }
         }
 
         function toggleMetaInfoInput() {
             const metaInfoGroup = document.getElementById('meta-info-group');
-            metaInfoGroup.style.display = metaInfoGroup.style.display === 'none' ? 'block' : 'none';
+            const button = document.querySelector('.meta-info-button');
+            if (metaInfoGroup.style.display === 'none') {
+                metaInfoGroup.style.display = 'block';
+                button.textContent = '收起剧本信息';
+            } else {
+                metaInfoGroup.style.display = 'none';
+                button.textContent = '添加剧本信息';
+            }
 
             // editionRolesJson=[...dirRolesJson,...selectedRoles];
 
@@ -8657,9 +9283,22 @@
 
             let editionJinxes = [];
 
-            // 遍历jinxes,如果jinxRole1和jinxRole2都在selectedRoles或dirRoleJson中，则添加到editionJinxes中
+            // 合并所有相克规则来源
+            let allJinxes = jinxes || [];
 
-            jinxes.forEach(jinx => {
+            // 添加系统内置的相克规则库
+            if (typeof jinxRulesLibrary !== 'undefined') {
+                allJinxes = [...allJinxes, ...jinxRulesLibrary];
+            }
+
+            // 添加用户添加的相克规则
+            if (typeof userAddedJinxRules !== 'undefined') {
+                allJinxes = [...allJinxes, ...userAddedJinxRules];
+            }
+
+            // 遍历allJinxes,如果jinxRole1和jinxRole2都在selectedRoles或dirRoleJson中，则添加到editionJinxes中
+
+            allJinxes.forEach(jinx => {
 
                 const jinxRole1 = jinx.jinxRole1;
                 const jinxRole2 = jinx.jinxRole2;
@@ -8991,6 +9630,164 @@
             updateFirstNightButtons();
             updateOtherNightButtons();
         }
+
+        function renderJinxList() {
+            const jinxList = document.getElementById('jinx-list');
+            const jinxCount = document.getElementById('jinx-count');
+
+            if (!jinxList || !jinxCount) return;
+
+            jinxCount.textContent = jinxes.length;
+
+            if (jinxes.length === 0) {
+                jinxList.innerHTML = '<div style="text-align: center; color: #999; padding: 20px;">暂无相克规则</div>';
+                return;
+            }
+
+            // 分离原始规则和新增规则
+            const originalRules = [];
+            const newRules = [];
+
+            jinxes.forEach((jinx, index) => {
+                if (index < originalJinxesCount) {
+                    originalRules.push({ jinx, index });
+                } else {
+                    newRules.push({ jinx, index });
+                }
+            });
+
+            // 先渲染新增规则，再渲染原始规则
+            let html = '';
+
+            // 渲染新增规则
+            newRules.forEach(({ jinx, index }) => {
+                html += `
+                <div style="padding: 12px; border-bottom: 1px solid #eee; background: ${index % 2 === 0 ? '#fff' : '#f9f9f9'};">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                        <div style="flex: 1;">
+                            <div style="font-weight: bold; color: #333; margin-bottom: 5px;">
+                                <span style="color: #e6d708;">${jinx.jinxRole1}</span> ↔ <span style="color: #e6d708;">${jinx.jinxRole2}</span>
+                            </div>
+                            <div style="color: #666; font-size: 14px; line-height: 1.5;">
+                                ${jinx.jinxRule}
+                            </div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 5px;">
+                            <button onclick="editJinxRule(${index})" style="background-color: #ffc107; color: #333; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">
+                                编辑
+                            </button>
+                            <button onclick="deleteJinxRule(${index})" style="background-color: #dc3545; color: white; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">
+                                删除
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                `;
+            });
+
+            // 渲染原始规则
+            originalRules.forEach(({ jinx, index }) => {
+                html += `
+                <div style="padding: 12px; border-bottom: 1px solid #eee; background: ${index % 2 === 0 ? '#fff' : '#f9f9f9'};">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                        <div style="flex: 1;">
+                            <div style="font-weight: bold; color: #333; margin-bottom: 5px;">
+                                <span style="color: #e6d708;">${jinx.jinxRole1}</span> ↔ <span style="color: #e6d708;">${jinx.jinxRole2}</span>
+                                <span style="font-size: 12px; color: #666; margin-left: 10px;">(原始规则)</span>
+                            </div>
+                            <div style="color: #666; font-size: 14px; line-height: 1.5;">
+                                ${jinx.jinxRule}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                `;
+            });
+
+            jinxList.innerHTML = html;
+        }
+
+        function toggleJinxEditor() {
+            const content = document.getElementById('jinx-editor-content');
+            const button = document.getElementById('toggle-jinx-editor');
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                button.textContent = '收起相克规则';
+            } else {
+                content.style.display = 'none';
+                button.textContent = '添加相克规则';
+            }
+        }
+
+        function addJinxRule() {
+            const role1 = document.getElementById('new-jinx-role1').value.trim();
+            const role2 = document.getElementById('new-jinx-role2').value.trim();
+            const rule = document.getElementById('new-jinx-rule').value.trim();
+
+            if (!role1 || !role2 || !rule) {
+                alert('请填写完整的信息！');
+                return;
+            }
+
+            jinxes.push({
+                jinxRole1: role1,
+                jinxRole2: role2,
+                jinxRule: rule
+            });
+
+            document.getElementById('new-jinx-role1').value = '';
+            document.getElementById('new-jinx-role2').value = '';
+            document.getElementById('new-jinx-rule').value = '';
+
+            renderJinxList();
+            alert('相克规则添加成功！');
+        }
+
+        function deleteJinxRule(index) {
+            if (index < originalJinxesCount) {
+                alert('原始规则不允许删除！');
+                return;
+            }
+            if (confirm('确定要删除这条相克规则吗？')) {
+                jinxes.splice(index, 1);
+                renderJinxList();
+            }
+        }
+
+        function editJinxRule(index) {
+            if (index < originalJinxesCount) {
+                alert('原始规则不允许编辑！');
+                return;
+            }
+            const jinx = jinxes[index];
+            const newRole1 = prompt('角色1：', jinx.jinxRole1);
+            if (newRole1 === null) return;
+
+            const newRole2 = prompt('角色2：', jinx.jinxRole2);
+            if (newRole2 === null) return;
+
+            const newRule = prompt('相克规则：', jinx.jinxRule);
+            if (newRule === null) return;
+
+            if (!newRole1.trim() || !newRole2.trim() || !newRule.trim()) {
+                alert('请填写完整的信息！');
+                return;
+            }
+
+            jinxes[index] = {
+                jinxRole1: newRole1.trim(),
+                jinxRole2: newRole2.trim(),
+                jinxRule: newRule.trim()
+            };
+
+            renderJinxList();
+        }
+
+        window.addEventListener('DOMContentLoaded', function() {
+            if (typeof renderJinxList === 'function') {
+                renderJinxList();
+            }
+        });
 
         function addAJinxInJson(jsonData){
             const editionJinxes = getJinxRules(jinxes);
@@ -9967,7 +10764,16 @@
                     console.log(`检测到简写角色ID: ${item.id}`);
                 }
 
-                if (item.id === "_meta") return;
+                if (item.id === "_meta") {
+                    // 检查_meta中是否包含相克规则
+                    if (item.jinxes) {
+                        window.jinxes = item.jinxes;
+                    }
+                    if (item.trialJinxes) {
+                        window.trialJinxes = item.trialJinxes;
+                    }
+                    return;
+                }
                 //判断item的id是否在townsfolkRoles、outsidersRoles、minionsRoles、demonsRoles、fabledRoles、travellersRoles中
 
                 // 处理标准角色,如果角色id与官方角色id相同，则选中该角色，保存id
@@ -10006,6 +10812,13 @@
                 }
             });
 
+            // 如果JSON数据中没有包含相克规则，则初始化为空数组
+            if (typeof window.jinxes === 'undefined') {
+                window.jinxes = [];
+            }
+            if (typeof window.trialJinxes === 'undefined') {
+                window.trialJinxes = [];
+            }
 
             updateSelectionCount();
         }
