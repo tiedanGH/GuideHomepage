@@ -9555,7 +9555,10 @@
 
             // 复制到剪贴板
             navigator.clipboard.writeText(jsonString).then(function() {
-                alert("JSON已复制到剪贴板！");
+                const confirmResult = confirm("JSON已复制到剪贴板！是否跳转至魔典？");
+                if (confirmResult) {
+                    window.open("https://botcgrimoire.top/", "_blank");
+                }
             }).catch(function(err) {
                 console.error('复制失败:', err);
                 alert("复制失败，请手动复制！");
@@ -9610,7 +9613,8 @@
                 selected.forEach(cb => cb.checked = true);
             }
 
-            updateSelectionInfo();
+            getSelectedRoles();
+            updateSelectionCount();
             updateFirstNightButtons();
             updateOtherNightButtons();
         }
@@ -9626,7 +9630,8 @@
             document.getElementById('random-minions').value = '4';
             document.getElementById('random-demons').value = '4';
 
-            updateSelectionInfo();
+            getSelectedRoles();
+            updateSelectionCount();
             updateFirstNightButtons();
             updateOtherNightButtons();
         }
