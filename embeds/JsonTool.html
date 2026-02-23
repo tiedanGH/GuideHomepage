@@ -1302,7 +1302,7 @@
                 flex-direction: row;
                 align-items: flex-start;
                 gap: 20px;
-                background: #f5f5dc;
+                background: rgb(247, 244, 233);
                 padding: 19px;
                 box-sizing: border-box;
                 font-family: 'Microsoft YaHei', sans-serif;
@@ -1384,7 +1384,7 @@
 
             // 构建相克规则和配置图HTML
             jinxConfigContainer.innerHTML = `
-                <div style="width: 1481px; min-height: 2093px; background: #f5f5dc; padding: 19px; box-sizing: border-box; display: flex; flex-direction: column;">
+                <div style="width: 1481px; min-height: 2093px; background: rgb(247, 244, 233); padding: 19px; box-sizing: border-box; display: flex; flex-direction: column;">
                     <!-- 剧本标题区域 -->
                     <div style="text-align: center; margin-bottom: 30px;">
                         <h1 style="font-size: 32px; margin: 0 0 10px 0; color: #333;">${editionName}</h1>
@@ -1557,7 +1557,7 @@
                         scale: 2, // 提高清晰度
                         useCORS: true, // 允许跨域图片
                         logging: false, // 禁用日志
-                        backgroundColor: '#f5f5dc' // 设置背景色
+                        backgroundColor: 'rgb(247, 244, 233)' // 设置背景色
                     }).then(function(canvas) {
                         // 创建下载链接
                         const link = document.createElement('a');
@@ -1608,7 +1608,7 @@
                 flex-direction: row;         /* 水平排列页面 */
                 align-items: flex-start;     /* 顶部对齐 */
                 gap: 20px;                   /* 页面间距 */
-                background: #f5f5dc;      /* 米黄色背景 */
+                background: rgb(247, 244, 233);      /* 米黄色背景 */
                 padding: 19px;            /* 内边距，按比例放大（10px * 1.9） */
                 box-sizing: border-box;    /* 盒模型计算方式，确保width包含padding和border */
                 font-family: 'Microsoft YaHei', sans-serif; /* 字体设置，使用微软雅黑确保中文显示效果 */
@@ -1630,7 +1630,7 @@
 
             // 构建剧本图HTML结构 - 使用模板字符串和内联样式确保截图一致性
             scriptImageContainer.innerHTML = `
-                <div style="width: 1481px; min-height: 1000px; background: #f5f5dc; padding: 19px; box-sizing: border-box;">
+                <div style="width: 1481px; min-height: 1000px; background: rgb(247, 244, 233); padding: 19px; box-sizing: border-box;">
                 <!-- 剧本标题区域 - 居中显示剧本基本信息 -->
                 <div style="text-align: center; margin-bottom: 30px;">
                     <h1 style="font-size: 32px; margin: 0 0 10px 0; color: #333;">${editionName}</h1>
@@ -1641,19 +1641,19 @@
                 <!-- 主要内容区域 - 包含角色列表和行动顺序 -->
                 <div style="position: relative; min-height: 800px;">
                     <!-- 中央角色列表容器 - 显示所有选中角色的详细信息 -->
-                    <div style="background: #f5f5dc; padding: 10px; border-radius: 8px; margin: 0 67px; position: relative;">
+                    <div style="background: rgb(247, 244, 233); padding: 10px; border-radius: 8px; margin: 0 67px; position: relative;">
                         <h3 style="font-size: 20px; margin: 0 0 15px 0; color: #333;">角色列表</h3>
                         <div id="roles-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;"></div>
                     </div>
 
                     <!-- 左侧首夜行动顺序 - 垂直显示首夜需要行动的角色 -->
-                    <div style="position: absolute; left: 0; top: 0; width: 57px; background: #f5f5dc; padding: 2px; border-radius: 8px;">
+                    <div style="position: absolute; left: 0; top: 0; width: 57px; background: rgb(247, 244, 233); padding: 2px; border-radius: 8px;">
                         <h3 style="font-size: 16px; margin: 0 0 8px 0; color: #333; text-align: center;">首个<br>夜晚</h3>
                         <div id="first-night-order" style="display: flex; flex-direction: column; align-items: center; gap: 19px; justify-content: flex-start;"></div>
                     </div>
 
                     <!-- 右侧其他夜晚行动顺序 - 垂直显示其他夜晚需要行动的角色 -->
-                    <div style="position: absolute; right: 0; top: 0; width: 57px; background: #f5f5dc; padding: 2px; border-radius: 8px;">
+                    <div style="position: absolute; right: 0; top: 0; width: 57px; background: rgb(247, 244, 233); padding: 2px; border-radius: 8px;">
                         <h3 style="font-size: 16px; margin: 0 0 8px 0; color: #333; text-align: center;">其他<br>夜晚</h3>
                         <div id="other-night-order" style="display: flex; flex-direction: column; align-items: center; gap: 19px; justify-content: flex-start;"></div>
                     </div>
@@ -1706,7 +1706,7 @@
                     scale: 2, // 提高图片质量
                     useCORS: true, // 允许跨域图片
                     logging: false,
-                    backgroundColor: '#f5f5dc' // 设置背景色为米黄色，与容器背景一致
+                    backgroundColor: 'rgb(247, 244, 233)' // 设置背景色为米黄色，与容器背景一致
                 }).then(canvas => {
                     // 将canvas转换为图片URL
                     const imageURL = canvas.toDataURL('image/png');
@@ -1957,7 +1957,7 @@
                         // ============================================
 
                         return `
-                            <div style="display: flex; flex-direction: column; align-items: center; background: #f5f5dc; border-radius: 3px; padding: 0px; width: 56px; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
+                            <div style="display: flex; flex-direction: column; align-items: center; background: rgb(247, 244, 233); border-radius: 3px; padding: 0px; width: 56px; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
                                 ${shouldShowImage ? `
                                     <!-- 图片元素 - 尝试加载实际的图标文件 -->
                                     <img src="${iconPath}" crossorigin="anonymous" style="width: 50px; height: 50px; border-radius: 2px; margin-bottom: 0px; object-fit: cover;"
@@ -2070,7 +2070,7 @@
                         // ============================================
 
                         return `
-                            <div style="display: flex; flex-direction: column; align-items: center; background: #f5f5dc; border-radius: 3px; padding: 0px; width: 56px; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
+                            <div style="display: flex; flex-direction: column; align-items: center; background: rgb(247, 244, 233); border-radius: 3px; padding: 0px; width: 56px; box-shadow: 0 1px 2px rgba(0,0,0,0.1);">
                                 ${shouldShowImage ? `
                                     <!-- 图片元素 - 尝试加载实际的图标文件 -->
                                     <img src="${iconPath}" crossorigin="anonymous" style="width: 50px; height: 50px; border-radius: 2px; margin-bottom: 0px; object-fit: cover;"
@@ -2503,7 +2503,7 @@
                     // 动态创建相克规则页面
                     if (jinxSection) {
                         const jinxPage = document.createElement('div');
-                        jinxPage.style.cssText = `width: 1481px; min-height: 1000px; padding-top: 30px; background: #f5f5dc; padding: 19px; box-sizing: border-box;`;
+                        jinxPage.style.cssText = `width: 1481px; min-height: 1000px; padding-top: 30px; background: rgb(247, 244, 233); padding: 19px; box-sizing: border-box;`;
                         jinxPage.innerHTML = `
                             <div style="text-align: center; margin-bottom: 30px;">
                                 <h2 style="font-size: 32px; margin: 0 0 10px 0; color: #333;">相克规则</h2>
