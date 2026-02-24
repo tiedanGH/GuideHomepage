@@ -257,6 +257,187 @@
             transform: translateY(-2px);                       /* 悬停时向上移动 */
         }
 
+        /* ============================================ 响应式设计 ============================================ */
+        /* 手机屏幕适配 */
+        @media (max-width: 768px) {
+            /* 容器样式调整 */
+            .container {
+                padding: 10px;
+                max-width: 100%;
+            }
+
+            /* 页头样式调整 */
+            .header {
+                padding: 15px;
+            }
+
+            .header h1 {
+                font-size: 1.5em;
+            }
+
+            .header h4 {
+                font-size: 1em;
+            }
+
+            /* 剧本选择区域调整 */
+            .script-selection {
+                padding: 15px;
+                gap: 10px;
+            }
+
+            .script-selection label {
+                margin-right: 10px;
+                font-size: 14px;
+            }
+
+            /* 搜索框调整 */
+            #search-role-input {
+                padding: 10px;
+                font-size: 14px;
+            }
+
+            /* 搜索结果下拉框调整 */
+            #search-results {
+                width: calc(100% - 20px);
+                left: 10px;
+            }
+
+            /* 角色列表调整 */
+            .role-list {
+                padding: 15px;
+                max-height: 300px;
+            }
+
+            /* 角色列调整 - 手机端只显示一列 */
+            .role-columns {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .role-column {
+                min-width: 100%;
+            }
+
+            /* 角色项调整 */
+            .role-item {
+                padding: 6px;
+                gap: 8px;
+            }
+
+            .role-item-img {
+                max-width: 40px;
+                max-height: 40px;
+            }
+
+            /* 按钮调整 */
+            button {
+                padding: 10px 20px;
+                font-size: 14px;
+                margin-top: 15px;
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            /* 选择信息调整 */
+            .selection-info {
+                padding: 12px;
+                font-size: 14px;
+            }
+
+            /* 角色卡片调整 */
+            .role-card {
+                padding: 15px;
+                margin: 5px;
+                max-width: 100%;
+                box-sizing: border-box;
+            }
+
+            /* 其他按钮调整 */
+            .load-json-button,
+            .dir-button,
+            .save-dir-button,
+            .cancel-dir-button,
+            .meta-info-button,
+            .cancel-meta-info-button,
+            .save-meta-info-button,
+            .add-state-btn,
+            .violet-button {
+                padding: 10px 16px;
+                font-size: 14px;
+                margin-top: 10px;
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            /* 随机选择工具调整 */
+            .random-select-panel {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+
+            .random-select-panel label {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .random-select-panel input {
+                width: 60px;
+                padding: 6px;
+            }
+
+            /* 原创剧本窗口调整 */
+            #originalScriptsWindow {
+                width: 100%;
+                height: 100%;
+            }
+
+            #originalScriptsWindow > div {
+                width: 95%;
+                height: 95%;
+                max-width: none;
+                max-height: none;
+            }
+
+            /* 剧本卡片网格调整 */
+            #domesticScriptsGrid,
+            #overseasScriptsGrid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+                gap: 15px;
+            }
+
+            /* 剧本卡片调整 */
+            #domesticScriptsGrid > div,
+            #overseasScriptsGrid > div {
+                padding: 10px;
+            }
+
+            #domesticScriptsGrid h4,
+            #overseasScriptsGrid h4 {
+                font-size: 14px;
+            }
+
+            #domesticScriptsGrid p,
+            #overseasScriptsGrid p {
+                font-size: 12px;
+            }
+        }
+
+        /* 平板屏幕适配 */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            /* 角色列调整 - 平板端显示两列 */
+            .role-columns {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            /* 剧本卡片网格调整 */
+            #domesticScriptsGrid,
+            #overseasScriptsGrid {
+                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            }
+        }
+
         /* ============================================
        图片预览和卡片样式
        ============================================ */
@@ -1336,11 +1517,22 @@
             });
 
             // 卡片内容
-            const logo = script.logo || 'https://via.placeholder.com/200x100?text=No+Logo';
+            let logoHtml = '';
+            if (script.logo) {
+                logoHtml = `
+                    <div style="height: 100px; background: #f5f5f5; display: flex; align-items: center; justify-content: center;">
+                        <img src="${script.logo}" alt="${script.name}" style="max-height: 80px; max-width: 180px; object-fit: contain;">
+                    </div>
+                `;
+            } else {
+                logoHtml = `
+                    <div style="height: 100px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center;">
+                        <h4 style="margin: 0; font-size: 16px; font-weight: bold; color: white; text-align: center; padding: 0 10px;">${script.name}</h4>
+                    </div>
+                `;
+            }
             card.innerHTML = `
-                <div style="height: 100px; background: #f5f5f5; display: flex; align-items: center; justify-content: center;">
-                    <img src="${logo}" alt="${script.name}" style="max-height: 80px; max-width: 180px; object-fit: contain;">
-                </div>
+                ${logoHtml}
                 <div style="padding: 15px;">
                     <h4 style="margin: 0 0 8px 0; font-size: 16px; font-weight: bold; color: #333;">${script.name}</h4>
                     <p style="margin: 0 0 12px 0; font-size: 14px; color: #666;">作者：${script.author}</p>
@@ -9941,29 +10133,26 @@
 
             if (!jinxList || !jinxCount) return;
 
-            jinxCount.textContent = jinxes.length;
-
-            if (jinxes.length === 0) {
-                jinxList.innerHTML = '<div style="text-align: center; color: #999; padding: 20px;">暂无相克规则</div>';
-                return;
-            }
-
             // 分离原始规则和新增规则
-            const originalRules = [];
             const newRules = [];
 
             jinxes.forEach((jinx, index) => {
-                if (index < originalJinxesCount) {
-                    originalRules.push({ jinx, index });
-                } else {
+                if (index >= originalJinxesCount) {
                     newRules.push({ jinx, index });
                 }
             });
 
-            // 先渲染新增规则，再渲染原始规则
+            // 只显示新增规则的数量
+            jinxCount.textContent = newRules.length;
+
+            if (newRules.length === 0) {
+                jinxList.innerHTML = '<div style="text-align: center; color: #999; padding: 20px;">暂无新增相克规则</div>';
+                return;
+            }
+
+            // 只渲染新增规则
             let html = '';
 
-            // 渲染新增规则
             newRules.forEach(({ jinx, index }) => {
                 html += `
                 <div style="padding: 12px; border-bottom: 1px solid #eee; background: ${index % 2 === 0 ? '#fff' : '#f9f9f9'};">
@@ -9983,25 +10172,6 @@
                             <button onclick="deleteJinxRule(${index})" style="background-color: #dc3545; color: white; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">
                                 删除
                             </button>
-                        </div>
-                    </div>
-                </div>
-                `;
-            });
-
-            // 渲染原始规则
-            originalRules.forEach(({ jinx, index }) => {
-                html += `
-                <div style="padding: 12px; border-bottom: 1px solid #eee; background: ${index % 2 === 0 ? '#fff' : '#f9f9f9'};">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
-                        <div style="flex: 1;">
-                            <div style="font-weight: bold; color: #333; margin-bottom: 5px;">
-                                <span style="color: #e6d708;">${jinx.jinxRole1}</span> ↔ <span style="color: #e6d708;">${jinx.jinxRole2}</span>
-                                <span style="font-size: 12px; color: #666; margin-left: 10px;">(原始规则)</span>
-                            </div>
-                            <div style="color: #666; font-size: 14px; line-height: 1.5;">
-                                ${jinx.jinxRule}
-                            </div>
                         </div>
                     </div>
                 </div>
