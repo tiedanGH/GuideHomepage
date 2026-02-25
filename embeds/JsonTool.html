@@ -1617,10 +1617,12 @@
             </button>
         </div>
         <!-- JSON 文件上传区域（默认隐藏） -->
-        <div id="json-upload-area" style="display: none; margin-top: 10px; background-color: #b1b1da;">
-            <div style="display: flex; gap: 10px;">
+        <div id="json-upload-area" style="display: none; margin-top: 10px; background-color: #b1b1da; padding: 15px; border-radius: 8px;">
+            <div style="margin-bottom: 10px;">
                 <input type="file" id="json-file-upload" accept=".json"
-                       style="padding: 12px; box-sizing: border-box; font-size: 16px; border: 1px solid var(--border-color); border-radius: 4px; flex: 1.2;">
+                       style="padding: 12px; box-sizing: border-box; font-size: 16px; border: 1px solid var(--border-color); border-radius: 4px; width: 100%;">
+            </div>
+            <div style="display: flex; gap: 10px;">
                 <button class="load-json-button" onclick="loadJsonFile()" style="flex: 1;">导入JSON文件</button>
                 <button class="load-json-button" onclick="pasteJson()" style="flex: 1; background-color: #17a2b8;">粘贴JSON</button>
             </div>
@@ -1629,18 +1631,23 @@
     </div>
 
 
-    <div style="display: flex; justify-content: center; align-items: flex-end; gap: 10px; margin: 20px 0;">
+    <!-- 文件名输入框 -->
+    <div style="display: flex; justify-content: center; margin: 20px 0 10px 0;">
         <input type="text" id="json-file-name" placeholder="文件名（可选）"
-               style="padding: 12px; box-sizing: border-box; font-size: 16px; border: 1px solid var(--border-color); border-radius: 4px; flex: 0.8;">
-        <button class="violet-button" onclick="generateJson()" style="flex: 1;">保存JSON文件</button>
-        <button class="violet-button" onclick="copyJson()" style="flex: 1; background-color: #17a2b8;">
+               style="padding: 12px; box-sizing: border-box; font-size: 16px; border: 1px solid var(--border-color); border-radius: 4px; width: 80%; max-width: 600px;">
+    </div>
+
+    <!-- 操作按钮 -->
+    <div style="display: flex; justify-content: center; gap: 10px; margin: 0 0 20px 0;">
+        <button class="violet-button" onclick="generateJson()" style="flex: 1; padding: 12px;">保存JSON文件</button>
+        <button class="violet-button" onclick="copyJson()" style="flex: 1; padding: 12px; background-color: #17a2b8;">
             复制JSON
         </button>
-        <button class="violet-button" onclick="generateScriptImage()" style="flex: 1; background-color: #28a745;">
+        <button class="violet-button" onclick="generateScriptImage()" style="flex: 1; padding: 12px; background-color: #28a745;">
             生成剧本图
         </button>
-        <button class="violet-button" onclick="generateJinxAndConfigImage()" style="flex: 1; background-color: #6f42c1;">
-            生成相克规则和配置图
+        <button class="violet-button" onclick="generateJinxAndConfigImage()" style="flex: 1; padding: 12px; background-color: #6f42c1;">
+            生成细节图
         </button>
     </div>
 
@@ -2132,7 +2139,10 @@
                 <div style="position: relative; min-height: 800px;">
                     <!-- 中央角色列表容器 - 显示所有选中角色的详细信息 -->
                     <div style="background: rgb(247, 244, 233); padding: 10px; border-radius: 8px; margin: 0 67px; position: relative; text-align: center;">
-                        <h3 style="font-size: 24px; margin: 0 0 20px 0; color: #333;">角色列表</h3>
+                        <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                            <h3 style="font-size: 24px; margin: 0 20px 0 0; color: #333;">角色列表</h3>
+                            <div id="fabled-roles-display" style="display: flex; gap: 10px; align-items: center;"></div>
+                        </div>
                         <div style="border-bottom: 2px solid #6f42c1; margin-bottom: 20px;"></div>
                         <div id="roles-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; justify-items: center;"></div>
                     </div>
@@ -2716,11 +2726,17 @@
 
                 // 获取角色网格容器，用于显示角色卡片
                 const rolesGrid = document.getElementById('roles-grid');
+                const fabledRolesDisplay = document.getElementById('fabled-roles-display');
+
+                // 获取用户填写的剧本自制规则
+                const bootleggerInput = document.getElementById('bootlegger');
+                const customRules = bootleggerInput ? bootleggerInput.value.trim() : '';
 
                 if (allRoles.length > 0) {
                     // 按阵营分类角色
                     const townsfolkRoles = allRoles.filter(role => role.team === 'townsfolk');  // 镇民角色
-                    const otherRoles = allRoles.filter(role => role.team !== 'townsfolk');      // 其他阵营角色
+                    const otherRoles = allRoles.filter(role => role.team !== 'townsfolk' && role.team !== 'fabled');      // 其他阵营角色
+                    const fabledRoles = allRoles.filter(role => role.team === 'fabled');  // 传奇角色
 
                     // 初始化左右两列的内容变量
                     let leftColumn = '';   // 左列内容（镇民）
@@ -2884,17 +2900,95 @@
                             return '';
                         };
 
+                        // 如果有自制规则，添加到镇民列表下面
+                        let customRulesHtml = '';
+                        if (customRules) {
+                            customRulesHtml = `
+                                <div style="margin-top: 15px; background: #6f42c1; color: white; padding: 15px; border-radius: 8px;">
+                                    <h5 style="margin: 0 0 10px 0; font-size: 20px; font-weight: bold;">剧本自制规则</h5>
+                                    <p style="margin: 0; font-size: 16px; line-height: 1.4;">${customRules}</p>
+                                </div>
+                            `;
+                        }
+
                         leftColumn = `
                             <div style="margin-bottom: 20px;">
-                                <h4 style="margin: 0 0 12px 0; color: #6f42c1; font-size: 30px; font-weight: bold; border-bottom: 2px solid #6f42c1; padding-bottom: 8px;">
+                                <h4 style="margin: 0 0 12px 0; background: #6f42c1; color: white; font-size: 30px; font-weight: bold; padding: 15px; border-radius: 8px; text-align: center;">
                                     镇民 (${townsfolkRoles.length})
                                 </h4>
                                 ${roleCards}
+                                ${customRulesHtml}
                             </div>
                         `;
 
                         // 相克规则将显示在新的一页上
                         const jinxSection = generateJinxRules();
+                    }
+
+                    // 在角色列表标题右边显示传奇角色图片
+                    if (fabledRoles.length > 0) {
+                        // 为每个传奇角色生成小图标
+                        const fabledIcons = fabledRoles.map(role => {
+                            // 获取角色图片数据
+                            const imageData = imageMap[role.id];
+
+                            // 获取图标名称（与首夜行动顺序相同的逻辑）
+                            let iconImage = null;
+                            if (imageData && imageData.name) {
+                                iconImage = imageData.name;
+                            }
+
+                            // 判断是否应该显示图片（与首夜行动顺序相同的逻辑）
+                            const shouldShowImage = imageData && imageData.path && (!imageData.isLocal || imageData.isAvailable) && iconImage;
+
+                            // 构建图片路径（与首夜行动顺序相同的逻辑）
+                            const iconPath = shouldShowImage ? `img/${iconImage}` : null;
+
+                            // 改进占位符显示逻辑
+                            const getPlaceholderIcon = (roleTeam, imageData) => {
+                                if (imageData) {
+                                    return imageData.isLocal ? '📁' : '👑';
+                                }
+                                // 根据角色类型显示不同占位符
+                                switch(roleTeam) {
+                                    case 'townsfolk': return '👨';
+                                    case 'outsider': return '🧑';
+                                    case 'minion': return '👹';
+                                    case 'demon': return '😈';
+                                    case 'traveller': return '🧳';
+                                    case 'fabled': return '👑';
+                                    default: return '👤';
+                                }
+                            };
+
+                            return `
+                                <div style="position: relative; margin: 1px;" title="${role.name}">
+                                    ${shouldShowImage ? `
+                                        <img src="${iconPath}" crossorigin="anonymous"
+                                             style="width: 40px; height: 40px; border-radius: 4px; object-fit: cover; border: 1px solid #e9ecef;"
+                                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                                             onload="console.log('传奇角色图标加载成功: ${imageData ? imageData.name : '未知角色'}');">
+                                        <div style="width: 40px; height: 40px; border-radius: 4px; background: #e9ecef; display: none; align-items: center; justify-content: center; font-size: 18px; color: #6c757d; border: 1px solid #e9ecef;">
+                                            ${getPlaceholderIcon(role.team, imageData)}
+                                        </div>
+                                    ` : `
+                                        <div style="width: 40px; height: 40px; border-radius: 4px; background: #e9ecef; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #6c757d; border: 1px solid #e9ecef;">
+                                            ${getPlaceholderIcon(role.team, imageData)}
+                                        </div>
+                                    `}
+                                </div>
+                            `;
+                        }).join('');
+
+                        // 添加传奇角色标题和图标
+                        fabledRolesDisplay.innerHTML = `
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="font-size: 18px; font-weight: bold; color: #e6d708;">传奇角色:</span>
+                                <div style="display: flex; gap: 5px;">
+                                    ${fabledIcons}
+                                </div>
+                            </div>
+                        `;
                     }
 
                     // 右列：其他角色
@@ -2976,7 +3070,7 @@
 
                         rightColumnContent += `
                                 <div style="margin-bottom: 20px;">
-                                <h4 style="margin: 0 0 12px 0; color: ${teamColor}; font-size: 30px; font-weight: bold; border-bottom: 2px solid ${teamColor}; padding-bottom: 8px;">
+                                <h4 style="margin: 0 0 12px 0; background: ${teamColor}; color: white; font-size: 30px; font-weight: bold; padding: 15px; border-radius: 8px; text-align: center;">
                                         ${teamName} (${roles.length})
                                 </h4>
                                     ${roleCards}
@@ -2990,6 +3084,12 @@
                             <div style="padding-right: 19px;">${leftColumn || '<p style="color: #888;">暂无数据</p>'}</div>
                             <div style="padding-left: 19px;">${rightColumn || '<p style="color: #888;">暂无数据</p>'}</div>
                         `;
+
+                    // 恢复角色网格的布局为两列
+                    rolesGrid.style.display = 'grid';
+                    rolesGrid.style.gridTemplateColumns = 'repeat(2, 1fr)';
+                    rolesGrid.style.gap = '10px';
+                    rolesGrid.style.justifyItems = 'center';
 
                     // 动态创建相克规则页面
                     if (jinxSection) {
