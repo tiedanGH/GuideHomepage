@@ -10307,7 +10307,44 @@
             const container = document.getElementById(containerId);
             container.innerHTML = '';
 
-            scriptRolesByTeam[team].forEach(role => {
+            let roles = scriptRolesByTeam[team];
+
+            // 智能排序：当镇民角色为13个时，尽量使两列高度一致
+            if (team === 'townsfolk' && roles.length === 13) {
+                // 计算每个角色卡片的预估高度
+                const roleHeights = roles.map(role => {
+                    // 基于技能描述的长度估算高度
+                    const abilityLength = role.ability ? role.ability.length : 0;
+                    // 基础高度 + 技能描述高度（每50个字符增加一行）
+                    return 100 + Math.ceil(abilityLength / 50) * 20;
+                });
+
+                // 贪心算法分配角色到两列
+                let column1 = [];
+                let column2 = [];
+                let height1 = 0;
+                let height2 = 0;
+
+                // 按预估高度降序排序
+                const sortedRoles = roles.map((role, index) => ({ role, height: roleHeights[index] }))
+                    .sort((a, b) => b.height - a.height);
+
+                // 分配角色到两列
+                sortedRoles.forEach(({ role, height }) => {
+                    if (height1 <= height2) {
+                        column1.push(role);
+                        height1 += height;
+                    } else {
+                        column2.push(role);
+                        height2 += height;
+                    }
+                });
+
+                // 重新组合角色顺序，先列1后列2
+                roles = [...column1, ...column2];
+            }
+
+            roles.forEach(role => {
                 const roleCard = document.createElement('div');
                 roleCard.style.cssText = `
                     display: flex;
