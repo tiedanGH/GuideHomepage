@@ -41,6 +41,25 @@ h1 {
     color: transparent;
 }
 
+/* 展开全部按钮 */
+#toggleAll {
+    display: inline-block;
+    padding: 8px 16px;
+    font-size: 14px;
+    border-radius: 20px;
+    border: 1px solid #ddd;
+    background: #ffffff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+#toggleAll:hover {
+    background: #f5f5f5;
+    border-color: #bbb;
+}
+#toggleAll:active {
+    transform: scale(0.96);
+}
+
 /* 游戏分类样式 */
 .category {
     margin-bottom: 18px;
@@ -55,6 +74,21 @@ h1 {
     font-weight: 600;
     border-left: 4px solid transparent;
     box-sizing: border-box;
+    display: flex;
+    gap: 6px;
+    cursor: pointer;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+}
+.category-title:hover {
+    transform: translateX(4px);
+    opacity: 0.85;
+}
+.category-title::after {
+    content: "▸";
+    transition: transform 0.2s ease;
+}
+.category:not(.collapsed) .category-title::after {
+    transform: rotate(90deg);
 }
 
 .category-title.puzzle {
@@ -122,6 +156,8 @@ h1 {
     gap: 15px;
     max-width: 1200px;
     margin: auto;
+    overflow: hidden;
+    transition: max-height 0.25s ease;
 }
 .button-grid a {
     position: relative;
@@ -194,6 +230,11 @@ h1 {
 
     h1 {
         font-size: 1.8rem;
+    }
+
+    #toggleAll {
+        padding: 5px 8px;
+        font-size: 12px;
     }
 
     .category {

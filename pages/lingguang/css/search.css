@@ -8,12 +8,12 @@
     box-sizing: border-box;
     display: flex;
     align-items: center;
-    gap: 10px;
 }
 
 .search-wrapper {
     flex: 1;
     position: relative;
+    padding: 0 6px 0 10px;
 }
 
 #searchInput {
@@ -37,7 +37,7 @@
 .search-icon {
     background: url("../img/search.png") no-repeat center / contain;
     position: absolute;
-    left: 15px;
+    left: 25px;
     top: 50%;
     width: 22px;
     height: 22px;
@@ -123,7 +123,10 @@
         margin: 15px auto;
         padding: 0 10px;
         height: 45px;
-        gap: 8px;
+    }
+
+    .search-wrapper {
+        padding: 0 5px;
     }
 
     #searchInput {
@@ -133,7 +136,7 @@
     }
 
     .search-icon {
-        left: 12px;
+        left: 17px;
     }
 
     .search-clear {
@@ -154,7 +157,6 @@
     .search-container {
         padding: 0 5px;
         height: 42px;
-        gap: 6px;
     }
 
     #searchInput {
@@ -164,7 +166,7 @@
     }
 
     .search-icon {
-        left: 10px;
+        left: 15px;
     }
 
     .search-clear {

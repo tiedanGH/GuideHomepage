@@ -13,7 +13,8 @@
     <link rel="stylesheet" href="css/main.css?v=20260302"/>
     <link rel="stylesheet" href="css/search.css?v=20260129"/>
 
-    <script src="js/script.js?v=20260108" defer></script>
+    <script src="js/core.js?v=20260302" defer></script>
+    <script src="js/search.js?v=20260302" defer></script>
 </head>
 <body>
 
@@ -23,13 +24,14 @@
 
 <!-- 搜索框 -->
 <div class="search-container">
+    <div id="starFilter" class="search-star" title="精选应用"></div>
     <div class="search-wrapper">
         <label for="searchInput"></label>
         <input type="text" id="searchInput" placeholder="搜索应用名称或作者..." autocomplete="off">
         <div class="search-icon"></div>
         <div id="searchClear" class="search-clear"></div>
     </div>
-    <div id="starFilter" class="search-star" title="精选应用"></div>
+    <button id="toggleAll">展开全部</button>
 </div>
 
 <div class="category">
@@ -66,6 +68,8 @@
         <a href="https://www.lingguang.com/share/FLASH_APP-466ec74a-dba5-4c46-8adf-cfad1ab1f35806">扫雷游戏<small class="author">by 左斯特</small></a>
         <a href="https://www.lingguang.com/share/FLASH_APP-abeb9701-0743-43a2-9c19-c8d0eb6c907406">元素对战<small class="author">by 左斯特</small></a>
         <a href="https://www.lingguang.com/share/FLASH_APP-06c483fe-f17c-4c2a-ab4b-8900db53355c06">保护老板<small class="author">by 左斯特</small><small class="note">竖屏游戏</small></a>
+        <a href="https://www.lingguang.com/share/FLASH_APP-dd70aeca-836a-4fe8-ae58-58b0045fb96206">成语扫雷<small class="author">by 左斯特</small></a>
+        <a href="https://www.lingguang.com/share/FLASH_APP-4f21cecc-f644-4716-a769-6731c3b890ce06">奥特曼迷宫<small class="author">by 左斯特</small></a>
         <a href="https://www.lingguang.com/share/FLASH_APP-273d175c-e5c3-4c5d-887e-d9a10c4c077d35">潜影盗宝<small class="author">by 紫晶</small></a>
         <a href="https://render.lingguangcontent.com/p/lingguang/21b767b617669956552618138e2c49/index.html">美国杀<small class="author">by saiwei</small></a>
     </div>
@@ -94,6 +98,7 @@
         <a href="https://www.lingguang.com/share/FLASH_APP-7a76aefd-d18a-4cb2-9d67-42b78076406306">蘑菇猜猜乐<small class="author">by 左斯特</small></a>
         <a href="https://www.lingguang.com/share/FLASH_APP-a53926ac-e2aa-4641-9012-28e444806cf106">推理大师<small class="author">by 左斯特</small></a>
         <a href="https://www.lingguang.com/share/FLASH_APP-9fb8b537-b55a-4998-888c-5e8e032687e488">弹珠游戏<small class="author">by 左斯特</small></a>
+        <a href="https://www.lingguang.com/share/FLASH_APP-5832b6b2-6967-45a3-91ea-ccb009b5e28206">推箱子<small class="author">by 左斯特</small></a>
     </div>
 </div>
 
@@ -111,6 +116,7 @@
         <a href="https://www.lingguang.com/share/FLASH_APP-7bb10eaa-194d-4dd4-94ce-28724505922a83">火锅麻将<small class="author">by daker</small></a>
         <a href="https://www.lingguang.com/share/FLASH_APP-0a0846d4-6743-4e5a-bf5f-3228ef24799106">经典空当接龙<small class="author">by 左斯特</small></a>
         <a href="https://www.lingguang.com/share/FLASH_APP-7079f7b5-d61e-423c-aa0d-94efda07307306">空心文字接龙<small class="author">by 左斯特</small></a>
+        <a href="https://www.lingguang.com/share/FLASH_APP-77686ec6-7afa-403e-b2cb-741e270a86ba06">蜘蛛纸牌<small class="author">by 左斯特</small></a>
         <a href="https://www.lingguang.com/share/FLASH_APP-4acc139c-9337-4ef3-84fe-8e99a1f68b0e35">塔罗占卜<small class="author">by 紫晶</small></a>
     </div>
 </div>
@@ -202,7 +208,7 @@
         <a href="https://www.lingguang.com/share/FLASH_APP-c59a21cd-d5dd-4f3c-bb93-3779203e06a806">五子棋<small class="author">by 左斯特</small></a>
         <a href="https://www.lingguang.com/share/FLASH_APP-1765eac4-87a1-42ab-a6bc-e36068d6f2a706">老鼠戏虎<small class="author">by 左斯特</small></a>
         <a href="https://www.lingguang.com/share/FLASH_APP-a9fd3159-78d0-4604-94d0-d78029027d7806">靶场射击<small class="author">by 左斯特</small></a>
-        <a href="https://www.lingguang.com/share/FLASH_APP-8030b501-fa60-4194-88cf-3ae83a4eb7ab06">节奏大师<small class="author">by 左斯特</small></a>
+        <a href="https://www.lingguang.com/share/FLASH_APP-85215ec9-6b65-40d3-95d1-7d31626559c906">节奏大师<small class="author">by 左斯特</small></a>
         <a href="https://www.lingguang.com/share/FLASH_APP-50a1dcb2-4c87-4747-a806-dbef3ff5caf506">不踩白块<small class="author">by 左斯特</small></a>
         <a href="https://www.lingguang.com/share/FLASH_APP-2d6f80f7-e2e1-45d3-ba9b-4d4ded102e2235">桌面牧场<small class="author">by 紫晶</small></a>
         <a href="https://www.lingguang.com/share/FLASH_APP-42b6fec7-5206-4e82-aa13-45ecd72e769035">云养猫<small class="author">by 紫晶</small></a>
@@ -269,6 +275,7 @@
         <a href="https://www.lingguang.com/share/FLASH_APP-d3bf4e59-557f-4865-add8-51c552a23b1c06">秘诀配对<small class="author">by 左斯特</small></a>
         <a href="https://www.lingguang.com/share/FLASH_APP-340f2c6e-a890-4f92-86f6-86522d7f669e88">萌系消消乐<small class="author">by 左斯特</small></a>
         <a href="https://www.lingguang.com/share/FLASH_APP-b46d52fa-5887-47a5-bf4f-f0e6b1f96c2006">弹珠大师<small class="author">by 左斯特</small></a>
+        <a href="https://www.lingguang.com/share/FLASH_APP-08656c47-8430-41dc-a398-c1b4a70675f206">比奇堡消消乐<small class="author">by 左斯特</small></a>
     </div>
 </div>
 
@@ -364,7 +371,7 @@
 </div>
 
 <div class="category">
-    <h2 class="category-title uncategorized">📦 未分类</h2>
+    <h2 class="category-title uncategorized">📦 尚未分类</h2>
     <div class="button-grid">
         <!-- 暂无同类游戏 -->
         <a href="https://www.lingguang.com/share/FLASH_APP-fbb7feb9-7ed0-439d-8fbb-dc146186c5cd06">游戏日历<small class="author">by 左斯特</small></a>
