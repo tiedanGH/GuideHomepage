@@ -104,6 +104,8 @@ document.addEventListener("DOMContentLoaded", () => {
             } else {
                 grid.style.maxHeight = grid.scrollHeight + 'px';
             }
+            // 更新按钮文字
+            updateToggleButtonText();
         });
     });
 
