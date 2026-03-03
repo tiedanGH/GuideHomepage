@@ -89,6 +89,10 @@ h1 {
     color: #f7d046;
     border-color: #f7d046;
 }
+.category-title.eliminate {
+    color: #00bcd4;
+    border-color: #00bcd4;
+}
 .category-title.workshop {
     color: #a66dd4;
     border-color: #a66dd4;
