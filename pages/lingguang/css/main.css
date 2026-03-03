@@ -159,6 +159,10 @@ h1 {
     overflow: hidden;
     transition: max-height 0.25s ease;
 }
+/* 默认收起分类 */
+.category .button-grid {
+    max-height: 0;
+}
 .button-grid a {
     position: relative;
     display: block;
