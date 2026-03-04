@@ -62,13 +62,13 @@ h1 {
 
 /* 游戏分类样式 */
 .category {
-    margin-bottom: 18px;
+    margin-bottom: 12px;
     padding: 0 15px;
     box-sizing: border-box;
 }
 .category-title {
     max-width: 1200px;
-    margin: 0 auto 8px;
+    margin: 0 auto 5px;
     padding-left: 12px;
     font-size: 20px;
     font-weight: 600;
@@ -163,6 +163,10 @@ h1 {
 .category .button-grid {
     max-height: 0;
 }
+.category:not(.collapsed) .button-grid {
+    padding-top: 3px;
+    padding-bottom: 5px;
+}
 .button-grid a {
     position: relative;
     display: block;
@@ -243,7 +247,7 @@ h1 {
 
     .category {
         padding: 0 10px;
-        margin-bottom: 10px;
+        margin-bottom: 8px;
     }
     .category-title {
         font-size: 18px;
