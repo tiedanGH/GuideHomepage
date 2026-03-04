@@ -22,6 +22,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
             category.style.display = hasVisibleButtons ? '' : 'none';
         });
+
+        // 重新计算已展开分类的 maxHeight，防止内容被截断
+        document.querySelectorAll('.category:not(.collapsed)').forEach(category => {
+            const grid = category.querySelector('.button-grid');
+            grid.style.maxHeight = grid.scrollHeight + 'px';
+        });
     }
 
     // 按钮排序函数
