@@ -111,13 +111,17 @@ h1 {
     color: #ff9f43;
     border-color: #ff9f43;
 }
-.category-title.roguelite {
-    color: #e74c3c;
-    border-color: #c0392b;
+.category-title.operation {
+    color: #ff4757;
+    border-color: #ff4757;
 }
 .category-title.relax {
     color: #2ecc71;
     border-color: #2ecc71;
+}
+.category-title.roguelite {
+    color: #e74c3c;
+    border-color: #c0392b;
 }
 .category-title.luck {
     color: #f7d046;
@@ -130,6 +134,10 @@ h1 {
 .category-title.workshop {
     color: #a66dd4;
     border-color: #a66dd4;
+}
+.category-title.quiz {
+    color: #4a90e2;
+    border-color: #4a90e2;
 }
 .category-title.arcade {
     color: #ff7a18;
@@ -146,7 +154,6 @@ h1 {
 .category-title.uncategorized {
     color: #7f8c8d;
     border-color: #bdc3c7;
-    opacity: 0.9;
 }
 
 /* 按钮网格样式 */
