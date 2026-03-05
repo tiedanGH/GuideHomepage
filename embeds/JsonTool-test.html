@@ -1032,22 +1032,90 @@
             }
 
             #action-buttons {
-                position: fixed;
-                bottom: 0;
-                left: 0;
-                right: 0;
-                background: white;
-                padding: 10px;
-                margin: 0;
-                box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-                z-index: 1000;
-                gap: 6px;
+                display: none;
             }
 
-            #action-buttons .violet-button {
-                padding: 12px 6px;
-                font-size: 12px;
-                flex: 1;
+            #mobile-fab-container {
+                display: flex !important;
+            }
+
+            #mobile-fab-container {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                z-index: 1000;
+            }
+
+            #fab-menu {
+                position: absolute;
+                bottom: 70px;
+                right: 0;
+                display: none;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            #fab-menu.show {
+                display: flex;
+            }
+
+            .fab-button {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                padding: 12px 16px;
+                border: none;
+                border-radius: 8px;
+                color: white;
+                font-size: 14px;
+                cursor: pointer;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                transition: transform 0.2s, box-shadow 0.2s;
+                min-width: 160px;
+            }
+
+            .fab-button:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+            }
+
+            .fab-button:active {
+                transform: translateY(0);
+            }
+
+            .fab-button span {
+                white-space: nowrap;
+            }
+
+            #main-fab {
+                width: 56px;
+                height: 56px;
+                border-radius: 50%;
+                border: none;
+                color: white;
+                cursor: pointer;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                transition: transform 0.2s, box-shadow 0.2s;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            #main-fab:hover {
+                transform: scale(1.1);
+                box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+            }
+
+            #main-fab:active {
+                transform: scale(0.95);
+            }
+
+            #main-fab svg {
+                transition: transform 0.3s;
+            }
+
+            #main-fab.active svg {
+                transform: rotate(45deg);
             }
         }
 
@@ -1754,17 +1822,97 @@
                style="padding: 12px; box-sizing: border-box; font-size: 16px; border: 1px solid var(--border-color); border-radius: 4px; width: 80%; max-width: 600px;">
     </div>
 
+    <!-- 剧本图显示选项 -->
+    <div style="background: var(--card-bg-color); border-radius: 8px; padding: 15px; margin: 10px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <h3 style="margin: 0 0 12px 0; color: var(--text-color); font-size: 16px;">剧本图显示选项</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                <input type="checkbox" id="showNightOrder" checked style="width: 16px; height: 16px;">
+                <span>显示夜间顺序</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                <input type="checkbox" id="showConfigTable" checked style="width: 16px; height: 16px;">
+                <span>显示配置表</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                <input type="checkbox" id="showTravellersFabled" checked style="width: 16px; height: 16px;">
+                <span>显示传奇和旅行者</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                <input type="checkbox" id="showJinxRules" checked style="width: 16px; height: 16px;">
+                <span>显示相克规则</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                <input type="checkbox" id="showStatusBar" checked style="width: 16px; height: 16px;">
+                <span>显示状态栏</span>
+            </label>
+        </div>
+    </div>
+
     <!-- 操作按钮 -->
     <div style="display: flex; justify-content: center; gap: 10px; margin: 0 0 20px 0;" id="action-buttons">
         <button class="violet-button" onclick="generateJson()" style="flex: 1; padding: 12px;">保存JSON文件</button>
         <button class="violet-button" onclick="copyJson()" style="flex: 1; padding: 12px; background-color: #17a2b8;">
             复制JSON
         </button>
+        <button class="violet-button" onclick="copyJsonToClipboard()" style="flex: 1; padding: 12px; background-color: #e67e22;">
+            免下载使用JSON
+        </button>
         <button class="violet-button" onclick="generateScriptImage()" style="flex: 1; padding: 12px; background-color: #28a745;">
             生成剧本图
         </button>
         <button class="violet-button" onclick="generateJinxAndConfigImage()" style="flex: 1; padding: 12px; background-color: #6f42c1;">
             生成细节图
+        </button>
+    </div>
+
+    <!-- 移动端悬浮按钮 -->
+    <div id="mobile-fab-container" style="display: none;">
+        <div id="fab-menu" style="display: none; flex-direction: column; gap: 10px; position: absolute; bottom: 70px; right: 0;">
+            <button class="fab-button" onclick="generateJson()" style="background-color: #501468;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                    <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                    <polyline points="7 3 7 8 15 8"></polyline>
+                </svg>
+                <span>保存JSON</span>
+            </button>
+            <button class="fab-button" onclick="copyJson()" style="background-color: #17a2b8;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                <span>复制JSON</span>
+            </button>
+            <button class="fab-button" onclick="copyJsonToClipboard()" style="background-color: #e67e22;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                </svg>
+                <span>免下载使用JSON</span>
+            </button>
+            <button class="fab-button" onclick="generateScriptImage()" style="background-color: #28a745;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                    <polyline points="21 15 16 10 5 21"></polyline>
+                </svg>
+                <span>生成剧本图</span>
+            </button>
+            <button class="fab-button" onclick="generateJinxAndConfigImage()" style="background-color: #6f42c1;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                <span>生成细节图</span>
+            </button>
+        </div>
+        <button id="main-fab" onclick="toggleFabMenu()" style="background-color: #501468;">
+            <svg id="fab-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
         </button>
     </div>
 
@@ -8618,13 +8766,65 @@
 
             // 复制到剪贴板
             navigator.clipboard.writeText(jsonString).then(function() {
-                const confirmResult = confirm("JSON已复制到剪贴板！是否跳转至魔典？");
-                if (confirmResult) {
+                const userChoice = prompt("JSON已复制！\\n\\n跳转至：\\n[1] 玩家自制魔典\\n[2] 官方魔典\\n\\n输入1或2，取消则留下：");
+                if (userChoice === "1") {
                     window.open("https://botcgrimoire.top/", "_blank");
+                } else if (userChoice === "2") {
+                    window.open("https://clocktower.gstonegames.com/grimoire/", "_blank");
                 }
             }).catch(function(err) {
                 console.error('复制失败:', err);
                 alert("复制失败，请手动复制！");
+            });
+        }
+
+        function copyJsonToClipboard() {
+            // 在生成JSON前保存所有拖拽后的值
+            saveNightValuesFromButtons();
+
+            selectedRoles = getSelectedRoles();
+            if (selectedRoles.length === 0 && dirRolesJson.length === 0)  {
+                alert("请至少选择一个角色！");
+                return;
+            }
+
+            // 处理选中的角色
+            editionRolesJson = [...selectedRoles, ...dirRolesJson];
+            const jsonData = [];
+
+            jsonData.push(metaInfoJson);
+
+            // 添加相克规则
+            const editionJinxes = getJinxRules(jinxes);
+            addJinxInRoleJson(editionJinxes);
+            const editionTrialJinxes = getJinxRules(trialJinxes);
+            addJinxInRoleJson(editionTrialJinxes);
+
+            // 添加角色数据
+            jsonData.push(...editionRolesJson);
+
+            addAJinxInJson(jsonData);
+
+            // 转换为 JSON 字符串
+            const jsonString = JSON.stringify(jsonData, null, 4);
+
+            // Base64 编码
+            const base64Data = btoa(unescape(encodeURIComponent(jsonString)));
+
+            // 创建 Data URI
+            const dataUri = 'data:application/json;base64,' + base64Data;
+
+            // 复制到剪贴板
+            navigator.clipboard.writeText(dataUri).then(function() {
+                const userChoice = prompt("JSON已复制！\\n使用方法：魔典-齿轮-角色-自定义剧本-粘贴URL\\n\\n跳转至：\\n[1] 玩家自制魔典\\n[2] 官方魔典\\n\\n输入1或2，取消则留下：");
+                if (userChoice === "1") {
+                    window.open("https://botcgrimoire.top/", "_blank");
+                } else if (userChoice === "2") {
+                    window.open("https://clocktower.gstonegames.com/grimoire/", "_blank");
+                }
+            }).catch(function(err) {
+                console.error('复制失败: ', err);
+                alert("复制失败，请手动复制以下内容：\\n\\n" + dataUri);
             });
         }
 
@@ -10406,8 +10606,64 @@
             demon: []
         };
 
+        // 全局缩放比例，根据角色列表实际高度动态计算
+        let globalRoleScale = 1.0;
+
+        // 计算左侧角色列表区域的总高度
+        function calculateRolesTotalHeight() {
+            const townsfolkList = document.getElementById('script-townsfolk-list');
+            const outsiderList = document.getElementById('script-outsider-list');
+            const minionList = document.getElementById('script-minion-list');
+            const demonList = document.getElementById('script-demon-list');
+
+            let totalHeight = 0;
+            if (townsfolkList) totalHeight += townsfolkList.offsetHeight;
+            if (outsiderList) totalHeight += outsiderList.offsetHeight;
+            if (minionList) totalHeight += minionList.offsetHeight;
+            if (demonList) totalHeight += demonList.offsetHeight;
+
+            return totalHeight;
+        }
+
+        // 根据角色列表实际高度计算缩放比例
+        // targetHeight: 目标高度（A4页面可用高度约1400px）
+        function calculateScaleByHeight() {
+            const actualHeight = calculateRolesTotalHeight();
+            const targetHeight = 1400; // A4页面中角色列表区域的目标高度
+
+            // 如果实际高度在目标高度的90%-100%之间，不需要调整
+            if (actualHeight >= targetHeight * 0.9 && actualHeight <= targetHeight * 1.0) {
+                return 1.0;
+            }
+
+            // 如果高度超出，需要缩小
+            if (actualHeight > targetHeight) {
+                // 最小缩放到0.75倍
+                return Math.max(0.75, targetHeight / actualHeight);
+            }
+
+            // 如果高度太小（太空），可以适当放大，但最大1.2倍
+            if (actualHeight < targetHeight * 0.7) {
+                return Math.min(1.2, targetHeight * 0.85 / actualHeight);
+            }
+
+            return 1.0;
+        }
+
+        // 应用缩放比例到所有角色卡片
+        function applyRoleScale(scale) {
+            const allRoleCards = document.querySelectorAll('[id^="script-"][id$="-list"] > div');
+            allRoleCards.forEach(card => {
+                card.style.transform = `scale(${scale})`;
+                card.style.transformOrigin = 'top left';
+                // 调整margin来补偿缩放后的间距
+                const baseMargin = 6;
+                card.style.marginBottom = `${baseMargin * scale}px`;
+            });
+        }
+
         // 渲染角色列表
-        function scriptRenderRoles(team, containerId, roleJinxMap, allRoles) {
+        function scriptRenderRoles(team, containerId, roleJinxMap, allRoles, scale = 1.0) {
             const container = document.getElementById(containerId);
             container.innerHTML = '';
 
@@ -10422,17 +10678,27 @@
             };
             const teamColor = teamColors[team] || '#333';
 
+            // 根据缩放比例计算尺寸
+            const imgSize = Math.round(48 * scale);
+            const nameSize = Math.round(15 * scale);
+            const abilitySize = Math.round(12 * scale);
+            const jinxIconSize = Math.round(16 * scale);
+            const gap = Math.round(8 * scale);
+            const padding = Math.round(6 * scale);
+            const marginBottom = Math.round(6 * scale);
+            const borderRadius = Math.max(3, Math.round(5 * scale));
+
             roles.forEach(role => {
                 const roleCard = document.createElement('div');
                 roleCard.style.cssText = `
                     display: flex;
-                    gap: 10px;
-                    padding: 8px;
+                    gap: ${gap}px;
+                    padding: ${padding}px;
                     align-items: flex-start;
                     background: rgba(255,255,255,0.8);
-                    border-radius: 6px;
-                    margin-bottom: 8px;
-                    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+                    border-radius: ${borderRadius}px;
+                    margin-bottom: ${marginBottom}px;
+                    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
                 `;
 
                 // 为爪牙和恶魔设置红色角色名，镇民和外来者使用阵营色
@@ -10456,18 +10722,18 @@
                 const jinxRoleImagesHtml = Array.from(jinxRoleNames).map(jinxRoleName => {
                     const jinxRole = allRoles.find(r => r.name === jinxRoleName);
                     return jinxRole ? `
-                        <img src="${jinxRole.image}" alt="${jinxRole.name}" style="width: 18px; height: 18px; object-fit: cover; border-radius: 3px; margin-left: 4px; border: 1px solid #ddd;">
+                        <img src="${jinxRole.image}" alt="${jinxRole.name}" style="width: ${jinxIconSize}px; height: ${jinxIconSize}px; object-fit: cover; border-radius: 2px; margin-left: 3px; border: 1px solid #ddd;">
                     ` : '';
                 }).join('');
 
                 roleCard.innerHTML = `
-                    <img src="${role.image}" alt="${role.name}" style="width: 56px; height: 56px; object-fit: cover; border-radius: 4px; flex-shrink: 0; box-shadow: 0 2px 4px rgba(0,0,0,0.15);">
+                    <img src="${role.image}" alt="${role.name}" style="width: ${imgSize}px; height: ${imgSize}px; object-fit: cover; border-radius: 3px; flex-shrink: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.12);">
                     <div style="flex: 1; min-width: 0;">
-                        <div style="display: flex; align-items: center; margin-bottom: 4px; flex-wrap: wrap;">
-                            <h4 style="font-size: 16px; font-weight: bold; color: ${nameColor}; margin: 0; font-family: 'SimSun', '宋体', serif;">${role.name}</h4>
+                        <div style="display: flex; align-items: center; margin-bottom: 2px; flex-wrap: wrap;">
+                            <h4 style="font-size: ${nameSize}px; font-weight: bold; color: ${nameColor}; margin: 0; font-family: 'SimSun', '宋体', serif;">${role.name}</h4>
                             ${jinxRoleImagesHtml}
                         </div>
-                        <p style="font-size: 13px; color: #4a3728; line-height: 1.5; margin: 0; text-align: justify;">${role.ability}</p>
+                        <p style="font-size: ${abilitySize}px; color: #4a3728; line-height: 1.4; margin: 0; text-align: justify;">${role.ability}</p>
                     </div>
                 `;
 
@@ -10480,6 +10746,13 @@
             try {
                 // 提示用户角色下载失败的处理方法
                 alert('若发现官方角色或bloodxyz的自制角色下载失败，请复制json→粘贴json，然后多试几次生成剧本图。其余时候请耐心等待。');
+
+                // 获取显示选项
+                const showNightOrder = document.getElementById('showNightOrder')?.checked ?? true;
+                const showConfigTable = document.getElementById('showConfigTable')?.checked ?? true;
+                const showTravellersFabled = document.getElementById('showTravellersFabled')?.checked ?? true;
+                const showJinxRules = document.getElementById('showJinxRules')?.checked ?? true;
+                const showStatusBar = document.getElementById('showStatusBar')?.checked ?? true;
 
                 // 合并所有角色数据：选中角色 + 自制角色
                 const allRoles = [...selectedRoles, ...dirRolesJson];
@@ -10709,7 +10982,7 @@
                                             <!-- 左侧：剧本标题和作者 -->
                                             <div style="display: flex; flex-direction: column; justify-content: center; flex-shrink: 0;">
                                                 <!-- 旅行者和传奇角色 -->
-                                                ${(travellerRoles.length > 0 || fabledRoles.length > 0) ? `
+                                                ${showTravellersFabled && (travellerRoles.length > 0 || fabledRoles.length > 0) ? `
                                                     <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 8px;">
                                                         ${travellerRoles.length > 0 ? `
                                                             <div style="display: flex; gap: 5px;">
@@ -10727,10 +11000,11 @@
                                                         ` : ''}
                                                     </div>
                                                 ` : ''}
-                                                <h1 style="font-size: 24px; margin: 0 0 4px 0; color: #1e3a5f; font-weight: bold; font-family: 'SimSun', '宋体', serif; letter-spacing: 2px; white-space: nowrap;">${editionName}</h1>
+                                                <h1 style="font-size: 32px; margin: 0 0 4px 0; color: #1e3a5f; font-weight: bold; font-family: 'SimSun', '宋体', serif; letter-spacing: 2px; white-space: nowrap;">${editionName}</h1>
                                                 <div style="font-size: 12px; color: #6b5a45; font-style: italic; white-space: nowrap;">${authorName ? `剧本作者：${authorName}` : ''}</div>
                                             </div>
                                             <!-- 右侧：配置表 -->
+                                            ${showConfigTable ? `
                                             <div style="flex: 1; background: white; border-radius: 4px; overflow: hidden; border: 1px solid #c9b896;">
                                                 <table style="border-collapse: collapse; font-size: 11px; width: 100%; table-layout: fixed;">
                                                     <thead>
@@ -10809,6 +11083,7 @@
                                                     </tbody>
                                                 </table>
                                             </div>
+                                            ` : ''}
                                         </div>
                                         <!-- 镇民角色列表 -->
                                         <div id="script-townsfolk-list" style="padding: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;"></div>
@@ -10841,7 +11116,7 @@
                                         <div id="script-demon-list" style="background: rgba(255,255,255,0.7); padding: 10px; border-radius: 0 6px 0 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;"></div>
 
                                         <!-- 相克规则（融入到恶魔区域） -->
-                                        ${jinxRules.length > 0 ? `
+                                        ${showJinxRules && jinxRules.length > 0 ? `
                                             <div style="background: rgba(255,255,255,0.7); padding: 10px; border-radius: 0 0 6px 0; border-top: 2px dashed #c9b896;">
                                                 <div style="display: flex; flex-direction: column; gap: 6px;">
                                                     ${jinxRules.map(rule => {
@@ -10859,10 +11134,26 @@
                                                                     <span style="font-size: 13px; font-weight: bold; color: #333;">${rule.jinxRole2}</span>
                                                                 </div>
                                                                 <span style="color: #666; flex-shrink: 0;">:</span>
-                                                                <span style="font-size: 12px; color: #4a3728; line-height: 1.4; flex: 1;">${rule.jinxRule}</span>
+                                                                <span style="font-size: 13px; font-weight: normal; color: #4a3728; line-height: 1.4; flex: 1;">${rule.jinxRule}</span>
                                                             </div>
                                                         `;
                 }).join('')}
+                                                </div>
+                                            </div>
+                                        ` : ''}
+
+                                        <!-- 状态栏 -->
+                                        ${showStatusBar ? `
+                                            <div style="background: rgba(255,255,255,0.7); padding: 10px; border-radius: 0 0 6px 0; border-top: 2px dashed #c9b896;">
+                                                <div style="display: flex; flex-direction: column; gap: 6px;">
+                                                    <div style="padding: 6px 10px; background: rgba(255,255,255,0.9); border-radius: 4px; border-left: 3px solid #8b4513;">
+                                                        <div style="font-size: 13px; font-weight: bold; color: #8b0000; margin-bottom: 4px;">中毒/醉酒</div>
+                                                        <div style="font-size: 13px; font-weight: normal; color: #4a3728; line-height: 1.4;">当你中毒或者醉酒了，你会失去你的能力，但你并不知道。如果你能得知信息，你可能得知错误信息。</div>
+                                                    </div>
+                                                    <div style="padding: 6px 10px; background: rgba(255,255,255,0.9); border-radius: 4px; border-left: 3px solid #8b4513;">
+                                                        <div style="font-size: 13px; font-weight: bold; color: #9932cc; margin-bottom: 4px;">疯狂</div>
+                                                        <div style="font-size: 13px; font-weight: normal; color: #4a3728; line-height: 1.4;">疯狂代表着你需要诚恳且积极地做这件事。</div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         ` : ''}
@@ -10872,27 +11163,70 @@
                             </div>
 
                             <!-- 右侧：夜间行动顺序 -->
-                            <div style="width: 65px; display: flex; flex-direction: column; align-items: center; background: rgba(255,255,255,0.5); padding: 12px 6px; border-radius: 6px; border: 2px solid #c9b896; flex-shrink: 0;">
+                            ${showNightOrder ? `
+                            <div style="width: 85px; display: flex; flex-direction: column; align-items: center; background: rgba(255,255,255,0.5); padding: 12px 6px; border-radius: 6px; border: 2px solid #c9b896; flex-shrink: 0;">
                                 <div style="writing-mode: vertical-rl; text-orientation: upright; color: #4a3728; font-size: 16px; font-weight: bold; margin-bottom: 12px; letter-spacing: 3px;">夜间顺序</div>
                                 <div style="display: flex; flex-direction: column; gap: 8px; align-items: center;">
-                                    ${nightRoles.map((role) => `
-                                        <div style="display: flex; flex-direction: column; align-items: center; gap: 3px;">
-                                            <img src="${role.image}" alt="${role.name}" style="width: 48px; height: 48px; object-fit: cover; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
-                                            ${role.isFirstNight ? `<div style="width: 100%; height: 4px; background-color: ${role.inBothNights ? '#6b21a8' : '#333'}; border-radius: 2px;"></div>` : '<div style="width: 100%; height: 4px; background-color: transparent;"></div>'}
+                                    ${nightRoles.map((role, index) => {
+                    // 计算首夜和他夜的序号
+                    let firstNightIndex = '';
+                    let otherNightIndex = '';
+
+                    if (role.isFirstNight) {
+                        const firstNightOrder = allFirstNightRoles.findIndex(r => r.image === role.image);
+                        if (firstNightOrder !== -1) {
+                            firstNightIndex = firstNightOrder + 1;
+                        }
+                    }
+
+                    if (!role.isFirstNight || role.inBothNights) {
+                        const otherNightOrder = allOtherNightRoles.findIndex(r => r.image === role.image);
+                        if (otherNightOrder !== -1) {
+                            otherNightIndex = otherNightOrder + 1;
+                        }
+                    }
+
+                    return `
+                                        <div style="display: flex; flex-direction: row; align-items: center; gap: 2px;">
+                                            ${firstNightIndex ? `<span style="font-size: 11px; color: #333; font-weight: bold; min-width: 14px; text-align: center;">${firstNightIndex}</span>` : '<span style="font-size: 11px; min-width: 14px;"></span>'}
+                                            <div style="display: flex; flex-direction: column; align-items: center; gap: 3px;">
+                                                <div style="width: 48px; height: 48px; border-radius: 4px; border: 2px solid #c9b896; box-shadow: 0 3px 6px rgba(0,0,0,0.3); overflow: hidden;">
+                                                    <img src="${role.image}" alt="${role.name}" style="width: 100%; height: 100%; object-fit: cover;">
+                                                </div>
+                                                ${role.isFirstNight ? `<div style="width: 100%; height: 4px; background-color: ${role.inBothNights ? '#6b21a8' : '#333'}; border-radius: 2px;"></div>` : '<div style="width: 100%; height: 4px; background-color: transparent;"></div>'}
+                                            </div>
+                                            ${otherNightIndex ? `<span style="font-size: 11px; color: #6b21a8; font-weight: bold; min-width: 14px; text-align: center;">${otherNightIndex}</span>` : '<span style="font-size: 11px; min-width: 14px;"></span>'}
                                         </div>
-                                    `).join('')}
+                                    `;
+                }).join('')}
                                 </div>
+                                <div style="margin-top: 12px; font-size: 10px; color: #4a3728; text-align: center;">* 代表非首夜</div>
                             </div>
+                            ` : ''}
 
                         </div>
                     </div>
                 `;
 
-                // 渲染所有角色
-                scriptRenderRoles('townsfolk', 'script-townsfolk-list', roleJinxMap, allRoles);
-                scriptRenderRoles('outsider', 'script-outsider-list', roleJinxMap, allRoles);
-                scriptRenderRoles('minion', 'script-minion-list', roleJinxMap, allRoles);
-                scriptRenderRoles('demon', 'script-demon-list', roleJinxMap, allRoles);
+                // 渲染所有角色（先以较大的基准大小渲染，让页面更饱满）
+                const baseScale = 1.15; // 基准缩放比例，让标准大小更饱满
+                scriptRenderRoles('townsfolk', 'script-townsfolk-list', roleJinxMap, allRoles, baseScale);
+                scriptRenderRoles('outsider', 'script-outsider-list', roleJinxMap, allRoles, baseScale);
+                scriptRenderRoles('minion', 'script-minion-list', roleJinxMap, allRoles, baseScale);
+                scriptRenderRoles('demon', 'script-demon-list', roleJinxMap, allRoles, baseScale);
+
+                // 根据角色列表实际高度计算并应用缩放比例
+                setTimeout(function() {
+                    globalRoleScale = calculateScaleByHeight();
+                    if (globalRoleScale !== 1.0) {
+                        // 重新渲染所有角色，应用新的缩放比例（乘以基准比例）
+                        const finalScale = baseScale * globalRoleScale;
+                        scriptRenderRoles('townsfolk', 'script-townsfolk-list', roleJinxMap, allRoles, finalScale);
+                        scriptRenderRoles('outsider', 'script-outsider-list', roleJinxMap, allRoles, finalScale);
+                        scriptRenderRoles('minion', 'script-minion-list', roleJinxMap, allRoles, finalScale);
+                        scriptRenderRoles('demon', 'script-demon-list', roleJinxMap, allRoles, finalScale);
+                    }
+                }, 50);
 
                 // 处理剧本自制规则内容过多的情况
                 if (trimmedCustomRules) {
@@ -11466,6 +11800,19 @@
 
         function clearRolePasteBox() {
             document.getElementById('rolePasteBox').value = '';
+        }
+
+        function toggleFabMenu() {
+            const fabMenu = document.getElementById('fab-menu');
+            const mainFab = document.getElementById('main-fab');
+
+            if (fabMenu.classList.contains('show')) {
+                fabMenu.classList.remove('show');
+                mainFab.classList.remove('active');
+            } else {
+                fabMenu.classList.add('show');
+                mainFab.classList.add('active');
+            }
         }
 
         function toggleRolePasteBox() {
