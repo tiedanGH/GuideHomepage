@@ -144,4 +144,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         requestAnimationFrame(updateToggleButtonText);
     });
+
+    // 页面加载完成后再添加初始化类，防止页面加载时元素闪现
+    requestAnimationFrame(() => {
+        document.body.classList.add('initialized');
+    });
 });

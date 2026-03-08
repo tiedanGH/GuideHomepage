@@ -87,7 +87,7 @@ h1 {
     content: "▸";
     transition: transform 0.2s ease;
 }
-.category:not(.collapsed) .category-title::after {
+body.initialized .category:not(.collapsed) .category-title::after {
     transform: rotate(90deg);
 }
 
@@ -178,7 +178,7 @@ h1 {
 .category .button-grid {
     max-height: 0;
 }
-.category:not(.collapsed) .button-grid {
+body.initialized .category:not(.collapsed) .button-grid {
     padding-top: 3px;
     padding-bottom: 5px;
 }
