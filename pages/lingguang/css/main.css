@@ -127,11 +127,19 @@ h1 {
     color: #f7d046;
     border-color: #f7d046;
 }
+.category-title.growth {
+    color: #2ecc71;
+    border-color: #2ecc71;
+}
 .category-title.eliminate {
     color: #00bcd4;
     border-color: #00bcd4;
 }
 .category-title.workshop {
+    color: #ff6bd6;
+    border-color: #ff6bd6;
+}
+.category-title.music {
     color: #a66dd4;
     border-color: #a66dd4;
 }
