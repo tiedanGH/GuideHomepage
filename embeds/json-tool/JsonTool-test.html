@@ -11348,6 +11348,150 @@
         // 全局缩放比例，根据角色列表实际高度动态计算
         let globalRoleScale = 1.0;
 
+        // ============================================
+        // 角色排序功能
+        // ============================================
+
+        // 能力描述分组排序规则
+        const abilityGroupOrder = [
+            // 信息获取类
+            { pattern: /^在你的首个夜晚，你会得知/, priority: 1 },
+            { pattern: /^You start knowing/, priority: 1 },
+            // 夜晚行动类
+            { pattern: /^在夜晚时|^在夜晚/, priority: 2 },
+            { pattern: /^At night/, priority: 2 },
+            // 每个黄昏
+            { pattern: /^每个黄昏/, priority: 3 },
+            { pattern: /^Each dusk/, priority: 3 },
+            // 每个夜晚
+            { pattern: /^每个夜晚\*/, priority: 5 },
+            { pattern: /^Each night\*/, priority: 5 },
+            { pattern: /^每个夜晚/, priority: 4 },
+            { pattern: /^Each night(?!\*)/, priority: 4 },
+            // 每个白天
+            { pattern: /^每个白天/, priority: 6 },
+            { pattern: /^Each day/, priority: 6 },
+            // 每局游戏限一次（夜晚）
+            { pattern: /^每局游戏限一次，在夜晚时\*/, priority: 8 },
+            { pattern: /^Once per game, at night\*/, priority: 8 },
+            { pattern: /^每局游戏限一次，在夜晚时/, priority: 7 },
+            { pattern: /^Once per game, at night(?!\*)/, priority: 7 },
+            // 每局游戏限一次（白天）
+            { pattern: /^每局游戏限一次，在白天时/, priority: 9 },
+            { pattern: /^Once per game, during the day/, priority: 9 },
+            // 每局游戏限一次
+            { pattern: /^每局游戏限一次/, priority: 10 },
+            { pattern: /^Once per game(?!,)/, priority: 10 },
+            // 首个夜晚/白天
+            { pattern: /^在你的首个白天/, priority: 12 },
+            { pattern: /^On your 1st day/, priority: 12 },
+            { pattern: /^在你的首个夜晚(?!，你会得知)/, priority: 11 },
+            { pattern: /^On your 1st night(?!, you)/, priority: 11 },
+            // 认知类
+            { pattern: /^你认为/, priority: 13 },
+            { pattern: /^You think/, priority: 13 },
+            { pattern: /^你是/, priority: 14 },
+            { pattern: /^You are(?! not)/, priority: 14 },
+            { pattern: /^你拥有/, priority: 15 },
+            { pattern: /^You have/, priority: 15 },
+            { pattern: /^你不知道/, priority: 16 },
+            { pattern: /^You do not know/, priority: 16 },
+            { pattern: /^你可能/, priority: 17 },
+            { pattern: /^You might|^You may/, priority: 17 },
+            { pattern: /^你(?!在|认|是|拥|不|死|得)/, priority: 18 },
+            { pattern: /^You(?! start| think| are| have| do| might| may| die| learn)/, priority: 18 },
+            // 死亡相关
+            { pattern: /^当你死亡时/, priority: 19 },
+            { pattern: /^When you die/, priority: 19 },
+            { pattern: /^当你得知你死亡时/, priority: 20 },
+            { pattern: /^When you learn that you died/, priority: 20 },
+            // 条件类
+            { pattern: /^当/, priority: 21 },
+            { pattern: /^When(?! you)/, priority: 21 },
+            { pattern: /^如果你死亡/, priority: 22 },
+            { pattern: /^If you die/, priority: 22 },
+            { pattern: /^If you died/, priority: 22 },
+            { pattern: /^如果你 "疯狂" 地/, priority: 23 },
+            { pattern: /^If you are "mad"/, priority: 23 },
+            { pattern: /^如果恶魔死亡/, priority: 24 },
+            { pattern: /^If the Demon dies/, priority: 24 },
+            { pattern: /^如果恶魔杀死了/, priority: 25 },
+            { pattern: /^If the Demon kills/, priority: 25 },
+            { pattern: /^如果恶魔(?!死|杀)/, priority: 26 },
+            { pattern: /^If the Demon(?! dies| kills)/, priority: 26 },
+            { pattern: /^如果… 都/, priority: 27 },
+            { pattern: /^If both/, priority: 27 },
+            { pattern: /^如果大于等于五名玩家存活时/, priority: 28 },
+            { pattern: /^If there are 5 or more players alive/, priority: 28 },
+            { pattern: /^如果/, priority: 29 },
+            { pattern: /^If(?! you| the)/, priority: 29 },
+            // 所有玩家
+            { pattern: /^所有玩家都/, priority: 30 },
+            { pattern: /^All players/, priority: 30 },
+            { pattern: /^所有/, priority: 31 },
+            { pattern: /^All(?! players)/, priority: 31 },
+            // 首次/其他
+            { pattern: /^当… 首次/, priority: 32 },
+            { pattern: /^The 1st time/, priority: 32 },
+            { pattern: /^The /, priority: 33 },
+            // 阵营相关
+            { pattern: /^善良/, priority: 34 },
+            { pattern: /^Good/, priority: 34 },
+            { pattern: /^邪恶/, priority: 35 },
+            { pattern: /^Evil/, priority: 35 },
+            { pattern: /^玩家/, priority: 36 },
+            { pattern: /^Players/, priority: 36 },
+            { pattern: /^爪牙/, priority: 37 },
+            { pattern: /^Minions/, priority: 37 }
+        ];
+
+        // 获取能力描述的分组优先级
+        function getAbilityPriority(ability) {
+            if (!ability) return 999;
+
+            for (const rule of abilityGroupOrder) {
+                if (rule.pattern.test(ability.trim())) {
+                    return rule.priority;
+                }
+            }
+            return 999; // 默认优先级（未匹配到的放在最后）
+        }
+
+        // 排序角色列表
+        function sortRolesByAbility(roles) {
+            return roles.sort((a, b) => {
+                const abilityA = a.ability || '';
+                const abilityB = b.ability || '';
+
+                // 1. 首先按能力描述分组排序
+                const priorityA = getAbilityPriority(abilityA);
+                const priorityB = getAbilityPriority(abilityB);
+
+                if (priorityA !== priorityB) {
+                    return priorityA - priorityB;
+                }
+
+                // 2. 同组内按能力文本长度排序（字符数少的在前）
+                const lenA = abilityA.length;
+                const lenB = abilityB.length;
+
+                if (lenA !== lenB) {
+                    return lenA - lenB;
+                }
+
+                // 3. 如果能力文本长度相同，按角色名字数排序
+                const nameA = a.name || '';
+                const nameB = b.name || '';
+
+                if (nameA.length !== nameB.length) {
+                    return nameA.length - nameB.length;
+                }
+
+                // 4. 如果都相同，按字母顺序排序
+                return nameA.localeCompare(nameB);
+            });
+        }
+
         // 计算左侧角色列表区域的总高度
         function calculateRolesTotalHeight() {
             const townsfolkList = document.getElementById('script-townsfolk-list');
@@ -11506,6 +11650,11 @@
                     if (role.team && scriptRolesByTeam[role.team]) {
                         scriptRolesByTeam[role.team].push(role);
                     }
+                });
+
+                // 对每个阵营的角色按能力描述排序
+                Object.keys(scriptRolesByTeam).forEach(team => {
+                    scriptRolesByTeam[team] = sortRolesByAbility(scriptRolesByTeam[team]);
                 });
 
                 // 构建剧本图HTML结构
