@@ -1145,7 +1145,6 @@
         <label><input type="checkbox" name="script" value="旧版角色" checked> 旧版角色</label>
         <label><input type="checkbox" name="script" value="传奇角色" unchecked> 传奇角色</label>
         <label><input type="checkbox" name="script" value="旅行者" unchecked> 旅行者</label>
-        <label><input type="checkbox" name="script" value="自制角色" unchecked> 自制角色</label>
     </div>
 
     <div>
@@ -1187,12 +1186,6 @@
     <div class="role-list" id="travellers-list">
         <h2>旅行者</h2>
         <div class="role-columns" id="travellers-columns">
-            <!-- 角色复选框动态加载 -->
-        </div>
-    </div>
-    <div class="role-list" id="custom-list">
-        <h2>自制角色</h2>
-        <div class="role-columns" id="custom-columns">
             <!-- 角色复选框动态加载 -->
         </div>
     </div>
@@ -1295,14 +1288,6 @@
             <button class="cancel-dir-button" onclick="toggleDirInput()">取消</button>
             <button class="save-dir-button" onclick="addDirRole()">保存</button>
 
-        </div>
-
-        <!-- 自制角色列表 -->
-        <div id="dir-roles-list" style="margin-top: 20px;">
-            <h3 style="color: #ffc107; margin-bottom: 10px;">已添加的自制角色</h3>
-            <div id="dir-roles-container" style="background: #f8f9fa; padding: 15px; border-radius: 4px; max-height: 300px; overflow-y: auto;">
-                <div id="dir-roles-empty" style="text-align: center; color: #999;">暂无自制角色</div>
-            </div>
         </div>
     </div>
 
@@ -1571,6 +1556,10 @@
     <!-- 新增超链接 -->
     <a href="https://clocktower-wiki.gstonegames.com/index.php?title=%E8%A7%84%E5%88%99%E8%B0%83%E6%95%B4%E6%8F%90%E5%89%8D%E5%85%AC%E7%A4%BA" target="_blank" style="font-size: calc(100% + 4px); font-weight: bold;text-align: left;"">点击这里查看新、旧角色能力对比</a>
     <br>
+    <a href="javascript:void(0);" onclick="openOriginalScriptsWindow()" style="font-size: calc(100% + 4px); font-weight: bold;text-align: left;"">点击这里获取全原创角色剧本</a>
+    <br>
+    <a href="javascript:void(0);" onclick="openPartialScriptsWindow()" style="font-size: calc(100% + 4px); font-weight: bold;text-align: left; color: #28a745;"">点击这里获取部分原创角色剧本</a>
+    <br>
     <a href="https://jsontool.netlify.app/findediton" target="_blank" style="font-size: calc(100% + 4px); font-weight: bold;text-align: left;"">根据角色筛选剧本</a>
     <br>
 
@@ -1586,7 +1575,373 @@
         </div>
     </div>
 
+    <!-- 原创剧本窗口 -->
+    <div id="originalScriptsWindow" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 10000;">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 1200px; height: 90%; max-height: 800px; background: white; border-radius: 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); overflow: hidden;">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                <h2 style="margin: 0; font-size: 24px;">全原创角色剧本</h2>
+                <button onclick="closeOriginalScriptsWindow()" style="background: white; color: #667eea; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center;">&times;</button>
+            </div>
+            <div style="padding: 20px; height: calc(100% - 80px); overflow-y: auto;">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <p style="font-size: 16px; color: #666;">点击下方剧本卡片，即可复制完整的JSON内容到剪贴板</p>
+                </div>
+
+                <div style="margin-bottom: 40px;">
+                    <h3 style="margin: 0 0 15px 0; color: #333; font-size: 20px; font-weight: bold; border-bottom: 2px solid #667eea; padding-bottom: 8px;">国内剧本</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;" id="domesticScriptsGrid">
+                        <!-- 国内剧本将通过JavaScript动态添加 -->
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 40px;">
+                    <h3 style="margin: 0 0 15px 0; color: #333; font-size: 20px; font-weight: bold; border-bottom: 2px solid #667eea; padding-bottom: 8px;">海外剧本</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;" id="overseasScriptsGrid">
+                        <!-- 海外剧本将通过JavaScript动态添加 -->
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 40px;">
+                    <h3 style="margin: 0 0 15px 0; color: #333; font-size: 20px; font-weight: bold; border-bottom: 2px solid #667eea; padding-bottom: 8px;">汀西维尔剧本</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;" id="teenseyScriptsGrid">
+                        <!-- 汀西维尔剧本将通过JavaScript动态添加 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 部分原创角色剧本窗口 -->
+    <div id="partialScriptsWindow" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 10000;">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 1200px; height: 90%; max-height: 800px; background: white; border-radius: 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); overflow: hidden;">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white;">
+                <h2 style="margin: 0; font-size: 24px;">部分原创角色剧本</h2>
+                <button onclick="closePartialScriptsWindow()" style="background: white; color: #28a745; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center;">&times;</button>
+            </div>
+            <div style="padding: 20px; height: calc(100% - 80px); overflow-y: auto;">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <p style="font-size: 16px; color: #666;">点击下方剧本卡片，即可复制完整的JSON内容到剪贴板</p>
+                </div>
+
+                <div style="margin-bottom: 40px;">
+                    <h3 style="margin: 0 0 15px 0; color: #333; font-size: 20px; font-weight: bold; border-bottom: 2px solid #28a745; padding-bottom: 8px;">不含私货剧本</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;" id="partialWithoutPrivateGrid">
+                        <!-- 不含私货剧本将通过JavaScript动态添加 -->
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 40px;">
+                    <h3 style="margin: 0 0 15px 0; color: #333; font-size: 20px; font-weight: bold; border-bottom: 2px solid #28a745; padding-bottom: 8px;">包含私货剧本</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;" id="partialWithPrivateGrid">
+                        <!-- 包含私货剧本将通过JavaScript动态添加 -->
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 40px;">
+                    <h3 style="margin: 0 0 15px 0; color: #333; font-size: 20px; font-weight: bold; border-bottom: 2px solid #28a745; padding-bottom: 8px;">汀西维尔剧本</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;" id="partialTeenseyGrid">
+                        <!-- 汀西维尔剧本将通过JavaScript动态添加 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
+        // 剧本数据（包含JSON内容）
+
+
+        // 部分原创角色剧本数据（包含JSON内容）
+
+
+        // 打开原创剧本窗口
+        function openOriginalScriptsWindow() {
+            document.getElementById('originalScriptsWindow').style.display = 'block';
+            renderScripts();
+        }
+
+        // 关闭原创剧本窗口
+        function closeOriginalScriptsWindow() {
+            document.getElementById('originalScriptsWindow').style.display = 'none';
+        }
+
+        // 渲染剧本卡片
+        function renderScripts() {
+            const domesticGrid = document.getElementById('domesticScriptsGrid');
+            const overseasGrid = document.getElementById('overseasScriptsGrid');
+            const teenseyGrid = document.getElementById('teenseyScriptsGrid');
+
+            // 清空网格
+            domesticGrid.innerHTML = '';
+            overseasGrid.innerHTML = '';
+            if (teenseyGrid) teenseyGrid.innerHTML = '';
+
+            // 渲染国内剧本
+            scriptsData.domestic.forEach(script => {
+                const card = createScriptCard(script);
+                domesticGrid.appendChild(card);
+            });
+
+            // 渲染海外剧本
+            scriptsData.overseas.forEach(script => {
+                const card = createScriptCard(script);
+                overseasGrid.appendChild(card);
+            });
+
+            // 渲染汀西维尔剧本
+            if (scriptsData.teensey && teenseyGrid) {
+                scriptsData.teensey.forEach(script => {
+                    const card = createScriptCard(script);
+                    teenseyGrid.appendChild(card);
+                });
+            }
+        }
+
+        // 创建剧本卡片
+        function createScriptCard(script) {
+            const card = document.createElement('div');
+            card.style.cssText = `
+                background: white;
+                border-radius: 12px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                overflow: hidden;
+                transition: transform 0.2s, box-shadow 0.2s;
+                cursor: pointer;
+                border: 1px solid #e0e0e0;
+            `;
+
+            // 鼠标悬停效果
+            card.addEventListener('mouseover', () => {
+                card.style.transform = 'translateY(-4px)';
+                card.style.boxShadow = '0 8px 24px rgba(0,0,0,0.15)';
+            });
+
+            card.addEventListener('mouseout', () => {
+                card.style.transform = 'translateY(0)';
+                card.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+            });
+
+            // 卡片内容
+            let logoHtml = '';
+            if (script.logo) {
+                logoHtml = `
+                    <div style="height: 100px; background: #f5f5f5; display: flex; align-items: center; justify-content: center;">
+                        <img src="${script.logo}" alt="${script.name}" style="max-height: 80px; max-width: 180px; object-fit: contain;">
+                    </div>
+                `;
+            } else {
+                logoHtml = `
+                    <div style="height: 100px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center;">
+                        <h4 style="margin: 0; font-size: 16px; font-weight: bold; color: white; text-align: center; padding: 0 10px;">${script.name}</h4>
+                    </div>
+                `;
+            }
+
+            card.innerHTML = `
+                ${logoHtml}
+                <div style="padding: 15px;">
+                    <h4 style="margin: 0 0 8px 0; font-size: 16px; font-weight: bold; color: #333;">${script.name}</h4>
+                    <p style="margin: 0 0 12px 0; font-size: 14px; color: #666;">作者：${script.author}</p>
+                    <button class="copy-json-btn" style="
+                        width: 100%;
+                        padding: 8px 12px;
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        color: white;
+                        border: none;
+                        border-radius: 6px;
+                        font-size: 14px;
+                        cursor: pointer;
+                        transition: background 0.2s;
+                    ">
+                        复制JSON
+                    </button>
+                </div>
+            `;
+
+            // 添加按钮点击事件
+            const copyBtn = card.querySelector('.copy-json-btn');
+            copyBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                copyScriptJson(script.name, script.json);
+            });
+
+            // 点击卡片也可以复制
+            card.addEventListener('click', (e) => {
+                if (!e.target.closest('button')) {
+                    copyScriptJson(script.name, script.json);
+                }
+            });
+
+            return card;
+        }
+
+        // 复制剧本JSON到剪贴板
+        function copyScriptJson(scriptName, json) {
+            navigator.clipboard.writeText(json).then(() => {
+                // 显示复制成功提示
+                const toast = document.createElement('div');
+                toast.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: #4caf50;
+                    color: white;
+                    padding: 12px 20px;
+                    border-radius: 6px;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                    z-index: 99999;
+                    font-size: 14px;
+                    transition: transform 0.3s, opacity 0.3s;
+                    transform: translateX(100%);
+                    opacity: 0;
+                `;
+                toast.textContent = `${scriptName} JSON 已复制到剪贴板`;
+                document.body.appendChild(toast);
+
+                // 显示提示
+                setTimeout(() => {
+                    toast.style.transform = 'translateX(0)';
+                    toast.style.opacity = '1';
+                }, 100);
+
+                // 隐藏提示
+                setTimeout(() => {
+                    toast.style.transform = 'translateX(100%)';
+                    toast.style.opacity = '0';
+                    setTimeout(() => {
+                        document.body.removeChild(toast);
+                    }, 300);
+                }, 2000);
+            }).catch(err => {
+                console.error('复制失败:', err);
+                alert('复制失败，请手动复制');
+            });
+        }
+
+        // 打开部分原创角色剧本窗口
+        function openPartialScriptsWindow() {
+            document.getElementById('partialScriptsWindow').style.display = 'block';
+            renderPartialScripts();
+        }
+
+        // 关闭部分原创角色剧本窗口
+        function closePartialScriptsWindow() {
+            document.getElementById('partialScriptsWindow').style.display = 'none';
+        }
+
+        // 渲染部分原创角色剧本卡片
+        function renderPartialScripts() {
+            const withoutPrivateGrid = document.getElementById('partialWithoutPrivateGrid');
+            const withPrivateGrid = document.getElementById('partialWithPrivateGrid');
+            const teenseyGrid = document.getElementById('partialTeenseyGrid');
+
+            // 清空网格
+            withoutPrivateGrid.innerHTML = '';
+            withPrivateGrid.innerHTML = '';
+            if (teenseyGrid) teenseyGrid.innerHTML = '';
+
+            // 渲染不含私货剧本
+            if (partialScriptsData.withoutPrivate) {
+                partialScriptsData.withoutPrivate.forEach(script => {
+                    const card = createPartialScriptCard(script);
+                    withoutPrivateGrid.appendChild(card);
+                });
+            }
+
+            // 渲染包含私货剧本
+            if (partialScriptsData.withPrivate) {
+                partialScriptsData.withPrivate.forEach(script => {
+                    const card = createPartialScriptCard(script);
+                    withPrivateGrid.appendChild(card);
+                });
+            }
+
+            // 渲染汀西维尔剧本
+            if (partialScriptsData.teensey && teenseyGrid) {
+                partialScriptsData.teensey.forEach(script => {
+                    const card = createPartialScriptCard(script);
+                    teenseyGrid.appendChild(card);
+                });
+            }
+        }
+
+        // 创建部分原创角色剧本卡片
+        function createPartialScriptCard(script) {
+            const card = document.createElement('div');
+            card.style.cssText = `
+                background: white;
+                border-radius: 12px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                overflow: hidden;
+                transition: transform 0.2s, box-shadow 0.2s;
+                cursor: pointer;
+                border: 1px solid #e0e0e0;
+            `;
+
+            // 鼠标悬停效果
+            card.addEventListener('mouseover', () => {
+                card.style.transform = 'translateY(-4px)';
+                card.style.boxShadow = '0 8px 24px rgba(0,0,0,0.15)';
+            });
+
+            card.addEventListener('mouseout', () => {
+                card.style.transform = 'translateY(0)';
+                card.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+            });
+
+            // 卡片内容
+            let logoHtml = '';
+            if (script.logo) {
+                logoHtml = `
+                    <div style="height: 100px; background: #f5f5f5; display: flex; align-items: center; justify-content: center;">
+                        <img src="${script.logo}" alt="${script.name}" style="max-height: 80px; max-width: 180px; object-fit: contain;">
+                    </div>
+                `;
+            } else {
+                logoHtml = `
+                    <div style="height: 100px; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); display: flex; align-items: center; justify-content: center;">
+                        <h4 style="margin: 0; font-size: 16px; font-weight: bold; color: white; text-align: center; padding: 0 10px;">${script.name}</h4>
+                    </div>
+                `;
+            }
+
+            card.innerHTML = `
+                ${logoHtml}
+                <div style="padding: 15px;">
+                    <h4 style="margin: 0 0 8px 0; font-size: 16px; font-weight: bold; color: #333;">${script.name}</h4>
+                    <p style="margin: 0 0 12px 0; font-size: 14px; color: #666;">作者：${script.author}</p>
+                    <button class="copy-json-btn" style="
+                        width: 100%;
+                        padding: 8px 12px;
+                        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+                        color: white;
+                        border: none;
+                        border-radius: 6px;
+                        font-size: 14px;
+                        cursor: pointer;
+                        transition: background 0.2s;
+                    ">
+                        复制JSON
+                    </button>
+                </div>
+            `;
+
+            // 添加按钮点击事件
+            const copyBtn = card.querySelector('.copy-json-btn');
+            copyBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                copyScriptJson(script.name, script.json);
+            });
+
+            // 点击卡片也可以复制
+            card.addEventListener('click', (e) => {
+                if (!e.target.closest('button')) {
+                    copyScriptJson(script.name, script.json);
+                }
+            });
+
+            return card;
+        }
     </script>
 
 
@@ -1654,60 +2009,12 @@
         <button class="violet-button" onclick="copyJsonToClipboard()" style="flex: 1; padding: 12px; background-color: #e67e22;">
             获取URL
         </button>
-        <button class="violet-button" onclick="toggleRoleSorting()" style="flex: 1; padding: 12px; background-color: #9b59b6;">
-            角色排序
-        </button>
         <button class="violet-button" onclick="generateScriptImage()" style="flex: 1; padding: 12px; background-color: #28a745;">
             生成剧本图
         </button>
         <button class="violet-button" onclick="generateJinxAndConfigImage()" style="flex: 1; padding: 12px; background-color: #6f42c1;">
             生成细节图
         </button>
-    </div>
-
-    <!-- 角色排序区域 -->
-    <div id="role-sorting-area" style="display: none; margin: 20px 0; padding: 20px; background-color: #f8f9fa; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-        <h3 style="margin: 0 0 15px 0; color: #333; font-size: 18px; font-weight: bold; border-bottom: 2px solid #9b59b6; padding-bottom: 8px;">角色排序（拖拽调整顺序）</h3>
-        <p style="margin: 0 0 15px 0; color: #666; font-size: 14px;">提示：角色类型排序是固定的（镇民 → 外来者 → 爪牙 → 恶魔），您可以调整每种类型内部的角色顺序。</p>
-
-        <!-- 镇民排序 -->
-        <div style="margin-bottom: 20px;">
-            <h4 style="margin: 0 0 10px 0; color: #1e3a5f; font-size: 16px; font-weight: bold;">镇民</h4>
-            <div id="townsfolk-sortable" class="sortable-container" style="display: flex; flex-wrap: wrap; gap: 10px; padding: 15px; background-color: white; border-radius: 6px; border: 1px solid #ddd;"></div>
-        </div>
-
-        <!-- 外来者排序 -->
-        <div style="margin-bottom: 20px;">
-            <h4 style="margin: 0 0 10px 0; color: #0d5c5c; font-size: 16px; font-weight: bold;">外来者</h4>
-            <div id="outsider-sortable" class="sortable-container" style="display: flex; flex-wrap: wrap; gap: 10px; padding: 15px; background-color: white; border-radius: 6px; border: 1px solid #ddd;"></div>
-        </div>
-
-        <!-- 爪牙排序 -->
-        <div style="margin-bottom: 20px;">
-            <h4 style="margin: 0 0 10px 0; color: #7c2d12; font-size: 16px; font-weight: bold;">爪牙</h4>
-            <div id="minion-sortable" class="sortable-container" style="display: flex; flex-wrap: wrap; gap: 10px; padding: 15px; background-color: white; border-radius: 6px; border: 1px solid #ddd;"></div>
-        </div>
-
-        <!-- 恶魔排序 -->
-        <div style="margin-bottom: 20px;">
-            <h4 style="margin: 0 0 10px 0; color: #5c164e; font-size: 16px; font-weight: bold;">恶魔</h4>
-            <div id="demon-sortable" class="sortable-container" style="display: flex; flex-wrap: wrap; gap: 10px; padding: 15px; background-color: white; border-radius: 6px; border: 1px solid #ddd;"></div>
-        </div>
-
-        <!-- 旅行者和传奇角色 -->
-        <div style="margin-bottom: 20px;">
-            <h4 style="margin: 0 0 10px 0; color: #6b7280; font-size: 16px; font-weight: bold;">旅行者 & 传奇角色</h4>
-            <div id="other-sortable" class="sortable-container" style="display: flex; flex-wrap: wrap; gap: 10px; padding: 15px; background-color: white; border-radius: 6px; border: 1px solid #ddd;"></div>
-        </div>
-
-        <div style="display: flex; justify-content: center; gap: 10px; margin-top: 20px;">
-            <button class="violet-button" onclick="saveRoleOrder()" style="padding: 10px 20px; background-color: #28a745;">
-                保存排序
-            </button>
-            <button class="violet-button" onclick="toggleRoleSorting()" style="padding: 10px 20px; background-color: #6c757d;">
-                取消
-            </button>
-        </div>
     </div>
 
     <!-- 移动端悬浮按钮 -->
@@ -7845,8 +8152,7 @@
         ]
 
 
-        // 从外部文件加载角色数据
-        // 角色数据已移至 rolesData.js 文件
+        const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demonsRoles, ...fabledRoles, ...travellersRoles];
 
         //存储旧版角色ID的数组，用于判断是否是旧版角色
         const legacyRolesID = ['oldkingCustomVER', 'oldlil_monstaCustomVER', 'oldballoonistCustomVER', 'oldplague_doctorCustomVER', 'oldharpyCustomVER', 'oldlleechCustomVER', 'oldorgan_grinderCustomVER', 'oldacrobatCustomVER', 'oldfarmerCustomVER', 'oldalsaahirCustomVER', 'oldboomdandyCustomVER', 'oldlycanthropeCustomVER', 'oldriotCustomVER', 'oldalchemistCustomVER', 'oldal-hadikhiaCustomVER', 'oldpit-hagCustomVER']
@@ -8029,9 +8335,6 @@
             console.log(roleColumns);
             roleColumns.innerHTML = ''; // 清空容器
 
-            // 角色排序逻辑
-            const sortedRoles = sortRoles(roles);
-
             // 创建两列
             const column1 = document.createElement('div');
             column1.className = 'role-column';
@@ -8039,11 +8342,11 @@
             column2.className = 'role-column';
 
             // 计算分割点
-            const splitIndex = Math.ceil(sortedRoles.length / 2);
+            const splitIndex = Math.ceil(roles.length / 2);
 
             // 第一列
             for (let i = 0; i < splitIndex; i++) {
-                const role = sortedRoles[i];
+                const role = roles[i];
                 const div = document.createElement('div');
                 div.className = 'role-item';
                 div.dataset.scripts = role.scripts ? role.scripts.join(',') : '';
@@ -8056,8 +8359,8 @@
             }
 
             // 第二列
-            for (let i = splitIndex; i < sortedRoles.length; i++) {
-                const role = sortedRoles[i];
+            for (let i = splitIndex; i < roles.length; i++) {
+                const role = roles[i];
                 const div = document.createElement('div');
                 div.className = 'role-item';
                 div.dataset.scripts = role.scripts ? role.scripts.join(',') : '';
@@ -8074,318 +8377,6 @@
 
             // 初始更新角色可见性
             updateRoleVisibility();
-        }
-
-        // 角色排序函数
-        function sortRoles(roles) {
-            // 能力描述分组排序规则
-            const abilityGroupOrder = [
-                // 中文能力描述分组
-                "在你的首个夜晚，你会得知",
-                "在夜晚时",
-                "在夜晚",
-                "每个黄昏 *",
-                "每个夜晚",
-                "每个夜晚 *",
-                "每个白天",
-                "每局游戏限一次，在夜晚时",
-                "每局游戏限一次，在夜晚时 *",
-                "每局游戏限一次，在白天时",
-                "每局游戏限一次",
-                "在你的首个夜晚",
-                "在你的首个白天",
-                "你认为",
-                "你是",
-                "你拥有",
-                "你不知道",
-                "你可能",
-                "你",
-                "当你死亡时",
-                "当你得知你死亡时",
-                "当",
-                "如果你死亡",
-                "如果你死亡",
-                "如果你 “疯狂” 地",
-                "如果你",
-                "如果恶魔死亡",
-                "如果恶魔杀死了",
-                "如果恶魔",
-                "如果… 都",
-                "如果大于等于五名玩家存活时",
-                "如果",
-                "所有玩家都",
-                "所有",
-                "当… 首次",
-                "善良",
-                "邪恶",
-                "玩家",
-                "爪牙",
-                // 英文能力描述分组
-                "You start knowing",
-                "At night",
-                "Each dusk*",
-                "Each night",
-                "Each night*",
-                "Each day",
-                "Once per game, at night",
-                "Once per game, at night*",
-                "Once per game, during the day",
-                "Once per game",
-                "On your 1st night",
-                "On your 1st day",
-                "You think",
-                "You are",
-                "You have",
-                "You do not know",
-                "You might",
-                "You may",
-                "You",
-                "When you die",
-                "When you learn that you died",
-                "When",
-                "If you die",
-                "If you died",
-                "If you are “mad”",
-                "If you",
-                "If the Demon dies",
-                "If the Demon kills",
-                "If the Demon",
-                "If both",
-                "If there are 5 or more players alive",
-                "If",
-                "All players",
-                "All",
-                "The 1st time",
-                "The",
-                "Good",
-                "Evil",
-                "Players",
-                "Minions"
-            ];
-
-            // 角色类型排序规则
-            const teamOrder = {
-                'townsfolk': 0,
-                'outsider': 1,
-                'minion': 2,
-                'demon': 3,
-                'traveller': 4,
-                'fabled': 5
-            };
-
-            return roles.sort((a, b) => {
-                // 1. 按角色类型排序
-                const teamDiff = (teamOrder[a.team] || 999) - (teamOrder[b.team] || 999);
-                if (teamDiff !== 0) {
-                    return teamDiff;
-                }
-
-                // 2. 按能力描述分组排序
-                const abilityA = a.ability || '';
-                const abilityB = b.ability || '';
-
-                let groupIndexA = abilityGroupOrder.length;
-                let groupIndexB = abilityGroupOrder.length;
-
-                for (let i = 0; i < abilityGroupOrder.length; i++) {
-                    if (abilityA.includes(abilityGroupOrder[i])) {
-                        groupIndexA = i;
-                        break;
-                    }
-                }
-
-                for (let i = 0; i < abilityGroupOrder.length; i++) {
-                    if (abilityB.includes(abilityGroupOrder[i])) {
-                        groupIndexB = i;
-                        break;
-                    }
-                }
-
-                if (groupIndexA !== groupIndexB) {
-                    return groupIndexA - groupIndexB;
-                }
-
-                // 3. 按能力文本长度排序
-                const abilityLengthDiff = abilityA.length - abilityB.length;
-                if (abilityLengthDiff !== 0) {
-                    return abilityLengthDiff;
-                }
-
-                // 4. 按角色名字数排序
-                const nameLengthDiff = (a.name || '').length - (b.name || '').length;
-                if (nameLengthDiff !== 0) {
-                    return nameLengthDiff;
-                }
-
-                // 5. 按字母顺序排序
-                return (a.name || '').localeCompare(b.name || '');
-            });
-        }
-
-        // 角色排序功能
-        let sortableInstances = {};
-        let sortedRoles = { townsfolk: [], outsider: [], minion: [], demon: [], other: [] };
-
-        // 切换角色排序区域
-        function toggleRoleSorting() {
-            const sortingArea = document.getElementById('role-sorting-area');
-            if (sortingArea.style.display === 'none') {
-                sortingArea.style.display = 'block';
-                loadRoleSorting();
-            } else {
-                sortingArea.style.display = 'none';
-                destroySortableInstances();
-            }
-        }
-
-        // 加载角色到排序区域
-        function loadRoleSorting() {
-            // 合并所有角色数据：选中角色 + 自制角色
-            const allRoles = [...selectedRoles, ...dirRolesJson];
-
-            // 清空排序区域
-            document.getElementById('townsfolk-sortable').innerHTML = '';
-            document.getElementById('outsider-sortable').innerHTML = '';
-            document.getElementById('minion-sortable').innerHTML = '';
-            document.getElementById('demon-sortable').innerHTML = '';
-            document.getElementById('other-sortable').innerHTML = '';
-
-            // 按角色类型分组
-            const rolesByTeam = {
-                townsfolk: [],
-                outsider: [],
-                minion: [],
-                demon: [],
-                other: []
-            };
-
-            allRoles.forEach(role => {
-                if (role.team === 'townsfolk') {
-                    rolesByTeam.townsfolk.push(role);
-                } else if (role.team === 'outsider') {
-                    rolesByTeam.outsider.push(role);
-                } else if (role.team === 'minion') {
-                    rolesByTeam.minion.push(role);
-                } else if (role.team === 'demon') {
-                    rolesByTeam.demon.push(role);
-                } else {
-                    rolesByTeam.other.push(role);
-                }
-            });
-
-            // 加载每个类型的角色
-            loadRolesToSortable('townsfolk-sortable', rolesByTeam.townsfolk);
-            loadRolesToSortable('outsider-sortable', rolesByTeam.outsider);
-            loadRolesToSortable('minion-sortable', rolesByTeam.minion);
-            loadRolesToSortable('demon-sortable', rolesByTeam.demon);
-            loadRolesToSortable('other-sortable', rolesByTeam.other);
-
-            // 初始化Sortable.js
-            initSortableInstances();
-        }
-
-        // 加载角色到排序容器
-        function loadRolesToSortable(containerId, roles) {
-            const container = document.getElementById(containerId);
-            roles.forEach(role => {
-                const roleElement = document.createElement('div');
-                roleElement.className = 'sortable-item';
-                roleElement.style.cssText = 'display: flex; align-items: center; gap: 10px; padding: 10px; background-color: #f8f9fa; border: 1px solid #ddd; border-radius: 4px; cursor: move; transition: all 0.2s;';
-                roleElement.innerHTML = `
-                    <img src="${role.image || 'https://clocktower-wiki.gstonegames.com/images/thumb/6/62/Fabled_new.png/180px-Fabled_new.png'}" alt="${role.name}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px;">
-                    <span style="font-weight: bold;">${role.name}</span>
-                `;
-                roleElement.dataset.roleId = role.id;
-                container.appendChild(roleElement);
-            });
-        }
-
-        // 初始化Sortable.js实例
-        function initSortableInstances() {
-            // 销毁之前的实例
-            destroySortableInstances();
-
-            // 初始化各个排序容器
-            const containers = [
-                'townsfolk-sortable',
-                'outsider-sortable',
-                'minion-sortable',
-                'demon-sortable',
-                'other-sortable'
-            ];
-
-            containers.forEach(containerId => {
-                const container = document.getElementById(containerId);
-                if (container) {
-                    sortableInstances[containerId] = new Sortable(container, {
-                        animation: 150,
-                        ghostClass: 'sortable-ghost',
-                        chosenClass: 'sortable-chosen',
-                        dragClass: 'sortable-drag',
-                        handle: '.sortable-item',
-                        onStart: function(evt) {
-                            evt.item.style.opacity = '0.5';
-                        },
-                        onEnd: function(evt) {
-                            evt.item.style.opacity = '1';
-                        }
-                    });
-                }
-            });
-        }
-
-        // 销毁Sortable.js实例
-        function destroySortableInstances() {
-            Object.values(sortableInstances).forEach(instance => {
-                if (instance) {
-                    instance.destroy();
-                }
-            });
-            sortableInstances = {};
-        }
-
-        // 保存角色排序
-        function saveRoleOrder() {
-            // 从排序区域获取排序后的角色
-            const townsfolkIds = getSortedRoleIds('townsfolk-sortable');
-            const outsiderIds = getSortedRoleIds('outsider-sortable');
-            const minionIds = getSortedRoleIds('minion-sortable');
-            const demonIds = getSortedRoleIds('demon-sortable');
-            const otherIds = getSortedRoleIds('other-sortable');
-
-            // 合并所有角色数据：选中角色 + 自制角色
-            const allRoles = [...selectedRoles, ...dirRolesJson];
-
-            // 按排序后的ID重新组织角色
-            const orderedRoles = [];
-
-            // 按类型顺序添加角色
-            [townsfolkIds, outsiderIds, minionIds, demonIds, otherIds].forEach(idList => {
-                idList.forEach(id => {
-                    const role = allRoles.find(r => r.id === id);
-                    if (role) {
-                        orderedRoles.push(role);
-                    }
-                });
-            });
-
-            // 更新选中角色和自制角色的顺序
-            selectedRoles = orderedRoles.filter(role => selectedRoles.some(r => r.id === role.id));
-            dirRolesJson = orderedRoles.filter(role => dirRolesJson.some(r => r.id === role.id));
-
-            // 隐藏排序区域
-            document.getElementById('role-sorting-area').style.display = 'none';
-            destroySortableInstances();
-
-            // 显示成功消息
-            alert('角色排序已保存！');
-        }
-
-        // 获取排序后的角色ID
-        function getSortedRoleIds(containerId) {
-            const container = document.getElementById(containerId);
-            const items = container.querySelectorAll('.sortable-item');
-            return Array.from(items).map(item => item.dataset.roleId);
         }
 
 
@@ -9654,17 +9645,16 @@
 
             // 检查数据是否已加载
             const editionLibData = typeof editionLib !== 'undefined' ? editionLib : [];
-            const originalScriptsData = typeof scriptsData !== 'undefined' ? scriptsData : [];
-            const partialScriptsData = typeof partialScriptsData !== 'undefined' ? partialScriptsData : [];
+            const botcscriptsData = typeof botcscripts !== 'undefined' ? botcscripts : [];
 
-            if (editionLibData.length === 0 && originalScriptsData.length === 0 && partialScriptsData.length === 0) {
+            if (editionLibData.length === 0 && botcscriptsData.length === 0) {
                 resultDiv.innerHTML = '<div style="text-align: center; color: #ff6b6b;">剧本数据尚未加载完成，请稍后再试</div>';
                 countSpan.textContent = '';
                 return;
             }
 
-            // 合并所有数据源
-            const allScripts = [...editionLibData, ...originalScriptsData, ...partialScriptsData];
+            // 合并两个数据源
+            const allScripts = [...editionLibData, ...botcscriptsData];
 
             // 过滤剧本
             const filteredScripts = allScripts.filter(script => {
@@ -9975,16 +9965,6 @@
             loadRoles(demonsRoles, 'demons-columns');
             loadRoles(fabledRoles, 'fabled-columns');
             loadRoles(travellersRoles, 'travellers-columns');
-
-            // 加载自制角色（如果数据已加载）
-            if (typeof uniqueRoles !== 'undefined') {
-                // 为每个自制角色添加 scripts 字段
-                const customRolesWithScripts = uniqueRoles.map(role => ({
-                    ...role,
-                    scripts: ['自制角色']
-                }));
-                loadRoles(customRolesWithScripts, 'custom-columns');
-            }
 
 
             // 为脚本选择添加事件监听器
@@ -12591,14 +12571,6 @@
                     name: 'editionLib'
                 },
                 {
-                    src: '剧本JSON工具by黑心恰克_files/rolesData.js',
-                    name: 'rolesData'
-                },
-                {
-                    src: '剧本JSON工具by黑心恰克_files/uniqueRoles.js',
-                    name: 'uniqueRoles'
-                },
-                {
                     src: '剧本JSON工具by黑心恰克_files/scriptsData.js',
                     name: 'scriptsData'
                 },
@@ -12617,19 +12589,7 @@
                     console.log(`成功加载: ${scriptInfo.name}`);
                     // 检查全局变量是否存在
                     if (typeof window[scriptInfo.name] !== 'undefined') {
-                        if (scriptInfo.name === 'rolesData') {
-                            console.log(`${scriptInfo.name} 数据已可用`);
-                        } else if (scriptInfo.name === 'uniqueRoles') {
-                            console.log(`${scriptInfo.name} 数据已可用，共 ${window[scriptInfo.name].length} 个自制角色`);
-                            // 加载自制角色到页面
-                            const customRolesWithScripts = uniqueRoles.map(role => ({
-                                ...role,
-                                scripts: ['自制角色']
-                            }));
-                            loadRoles(customRolesWithScripts, 'custom-columns');
-                        } else {
-                            console.log(`${scriptInfo.name} 数据已可用，共 ${window[scriptInfo.name].length} 个剧本`);
-                        }
+                        console.log(`${scriptInfo.name} 数据已可用，共 ${window[scriptInfo.name].length} 个剧本`);
                     }
                 };
 
