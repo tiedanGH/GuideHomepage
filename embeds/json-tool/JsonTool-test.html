@@ -2007,7 +2007,7 @@
             复制JSON
         </button>
         <button class="violet-button" onclick="copyJsonToClipboard()" style="flex: 1; padding: 12px; background-color: #e67e22;">
-            免下载使用JSON
+            获取URL
         </button>
         <button class="violet-button" onclick="generateScriptImage()" style="flex: 1; padding: 12px; background-color: #28a745;">
             生成剧本图
@@ -2040,7 +2040,7 @@
                     <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
                     <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
                 </svg>
-                <span>免下载使用JSON</span>
+                <span>获取URL</span>
             </button>
             <button class="fab-button" onclick="generateScriptImage()" style="background-color: #28a745;">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -9142,11 +9142,8 @@
 
             // 复制到剪贴板
             navigator.clipboard.writeText(jsonString).then(function() {
-                const userChoice = prompt("JSON已复制！\n\n跳转至：\n[1] 玩家自制魔典\n[2] 官方魔典\n\n输入1或2，取消则留下：");
-                if (userChoice === "1") {
+                if (confirm("JSON已复制！\n使用方法：魔典-齿轮-角色-自定义剧本-使用剪贴板中的json\n\n是否跳转到玩家自制魔典？")) {
                     window.open("https://botcgrimoire.top/", "_blank");
-                } else if (userChoice === "2") {
-                    window.open("https://clocktower.gstonegames.com/grimoire/", "_blank");
                 }
             }).catch(function(err) {
                 console.error('复制失败:', err);
@@ -9192,7 +9189,7 @@
 
             // 复制到剪贴板
             navigator.clipboard.writeText(dataUri).then(function() {
-                const userChoice = prompt("JSON已复制！\n使用方法：魔典-齿轮-角色-自定义剧本-粘贴URL\n\n跳转至：\n[1] 玩家自制魔典\n[2] 官方魔典\n\n输入1或2，取消则留下：");
+                const userChoice = prompt("URL已复制\n使用方法：魔典-齿轮-角色-自定义剧本-粘贴URL\n\n跳转至：\n[1] 玩家自制魔典\n[2] 官方魔典\n\n输入1或2，取消则留下：");
                 if (userChoice === "1") {
                     window.open("https://botcgrimoire.top/", "_blank");
                 } else if (userChoice === "2") {
@@ -9558,7 +9555,13 @@
                 (jinx.jinxRole1 === role2 && jinx.jinxRole2 === role1)
             );
 
-            if (foundInteraction || foundJinx) {
+            // 查询试运行相克规则
+            const foundTrialJinx = trialJinxes.find(jinx =>
+                (jinx.jinxRole1 === role1 && jinx.jinxRole2 === role2) ||
+                (jinx.jinxRole1 === role2 && jinx.jinxRole2 === role1)
+            );
+
+            if (foundInteraction || foundJinx || foundTrialJinx) {
                 let resultHTML = '';
 
                 // 显示特定互动规则
@@ -9590,6 +9593,23 @@
                         </div>
                         <div style="color: #666; font-size: 14px; line-height: 1.5;">
                             ${foundJinx.jinxRule}
+                        </div>
+                    </div>
+                    `;
+                }
+
+                // 显示试运行相克规则
+                if (foundTrialJinx) {
+                    const role1Display = getRoleLink(foundTrialJinx.jinxRole1);
+                    const role2Display = getRoleLink(foundTrialJinx.jinxRole2);
+
+                    resultHTML += `
+                    <div style="background: white; padding: 15px; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 15px; border-left: 4px solid #ff9800;">
+                        <div style="font-weight: bold; color: #ff9800; margin-bottom: 10px;">
+                            ${role1Display} ↔ ${role2Display} (试运行相克规则)
+                        </div>
+                        <div style="color: #666; font-size: 14px; line-height: 1.5;">
+                            ${foundTrialJinx.jinxRule}
                         </div>
                     </div>
                     `;
