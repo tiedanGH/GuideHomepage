@@ -1597,7 +1597,10 @@
         <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 1200px; height: 90%; max-height: 800px; background: white; border-radius: 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); overflow: hidden;">
             <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
                 <h2 style="margin: 0; font-size: 24px;">全原创角色剧本</h2>
-                <button onclick="closeOriginalScriptsWindow()" style="background: white; color: #667eea; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center;">&times;</button>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <input type="text" id="original-script-search" placeholder="搜索剧本名或作者" style="padding: 8px 12px; border: none; border-radius: 4px; font-size: 14px; width: 200px;">
+                    <button onclick="closeOriginalScriptsWindow()" style="background: white; color: #667eea; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center;">&times;</button>
+                </div>
             </div>
             <div style="padding: 20px; height: calc(100% - 80px); overflow-y: auto;">
                 <div style="text-align: center; margin-bottom: 30px;">
@@ -1633,7 +1636,10 @@
         <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 1200px; height: 90%; max-height: 800px; background: white; border-radius: 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); overflow: hidden;">
             <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white;">
                 <h2 style="margin: 0; font-size: 24px;">部分原创角色剧本</h2>
-                <button onclick="closePartialScriptsWindow()" style="background: white; color: #28a745; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center;">&times;</button>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <input type="text" id="partial-script-search" placeholder="搜索剧本名或作者" style="padding: 8px 12px; border: none; border-radius: 4px; font-size: 14px; width: 200px;">
+                    <button onclick="closePartialScriptsWindow()" style="background: white; color: #28a745; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center;">&times;</button>
+                </div>
             </div>
             <div style="padding: 20px; height: calc(100% - 80px); overflow-y: auto;">
                 <div style="text-align: center; margin-bottom: 30px;">
@@ -1675,6 +1681,10 @@
         function openOriginalScriptsWindow() {
             document.getElementById('originalScriptsWindow').style.display = 'block';
             renderScripts();
+            
+            // 添加搜索框事件监听器
+            const searchInput = document.getElementById('original-script-search');
+            searchInput.addEventListener('input', renderScripts);
         }
 
         // 关闭原创剧本窗口
@@ -1687,27 +1697,41 @@
             const domesticGrid = document.getElementById('domesticScriptsGrid');
             const overseasGrid = document.getElementById('overseasScriptsGrid');
             const teenseyGrid = document.getElementById('teenseyScriptsGrid');
+            const searchInput = document.getElementById('original-script-search');
+            const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
 
             // 清空网格
             domesticGrid.innerHTML = '';
             overseasGrid.innerHTML = '';
             if (teenseyGrid) teenseyGrid.innerHTML = '';
 
+            // 过滤剧本
+            function filterScripts(scripts) {
+                if (!searchTerm) return scripts;
+                return scripts.filter(script => 
+                    script.name.toLowerCase().includes(searchTerm) || 
+                    script.author.toLowerCase().includes(searchTerm)
+                );
+            }
+
             // 渲染国内剧本
-            scriptsData.domestic.forEach(script => {
+            const filteredDomestic = filterScripts(scriptsData.domestic);
+            filteredDomestic.forEach(script => {
                 const card = createScriptCard(script);
                 domesticGrid.appendChild(card);
             });
 
             // 渲染海外剧本
-            scriptsData.overseas.forEach(script => {
+            const filteredOverseas = filterScripts(scriptsData.overseas);
+            filteredOverseas.forEach(script => {
                 const card = createScriptCard(script);
                 overseasGrid.appendChild(card);
             });
 
             // 渲染汀西维尔剧本
             if (scriptsData.teensey && teenseyGrid) {
-                scriptsData.teensey.forEach(script => {
+                const filteredTeensey = filterScripts(scriptsData.teensey);
+                filteredTeensey.forEach(script => {
                     const card = createScriptCard(script);
                     teenseyGrid.appendChild(card);
                 });
@@ -1839,6 +1863,10 @@
         function openPartialScriptsWindow() {
             document.getElementById('partialScriptsWindow').style.display = 'block';
             renderPartialScripts();
+            
+            // 添加搜索框事件监听器
+            const searchInput = document.getElementById('partial-script-search');
+            searchInput.addEventListener('input', renderPartialScripts);
         }
 
         // 关闭部分原创角色剧本窗口
@@ -1851,15 +1879,27 @@
             const withoutPrivateGrid = document.getElementById('partialWithoutPrivateGrid');
             const withPrivateGrid = document.getElementById('partialWithPrivateGrid');
             const teenseyGrid = document.getElementById('partialTeenseyGrid');
+            const searchInput = document.getElementById('partial-script-search');
+            const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
 
             // 清空网格
             withoutPrivateGrid.innerHTML = '';
             withPrivateGrid.innerHTML = '';
             if (teenseyGrid) teenseyGrid.innerHTML = '';
 
+            // 过滤剧本
+            function filterScripts(scripts) {
+                if (!searchTerm) return scripts;
+                return scripts.filter(script => 
+                    script.name.toLowerCase().includes(searchTerm) || 
+                    script.author.toLowerCase().includes(searchTerm)
+                );
+            }
+
             // 渲染不含私货剧本
             if (partialScriptsData.withoutPrivate) {
-                partialScriptsData.withoutPrivate.forEach(script => {
+                const filteredWithoutPrivate = filterScripts(partialScriptsData.withoutPrivate);
+                filteredWithoutPrivate.forEach(script => {
                     const card = createPartialScriptCard(script);
                     withoutPrivateGrid.appendChild(card);
                 });
@@ -1867,7 +1907,8 @@
 
             // 渲染包含私货剧本
             if (partialScriptsData.withPrivate) {
-                partialScriptsData.withPrivate.forEach(script => {
+                const filteredWithPrivate = filterScripts(partialScriptsData.withPrivate);
+                filteredWithPrivate.forEach(script => {
                     const card = createPartialScriptCard(script);
                     withPrivateGrid.appendChild(card);
                 });
@@ -1875,7 +1916,8 @@
 
             // 渲染汀西维尔剧本
             if (partialScriptsData.teensey && teenseyGrid) {
-                partialScriptsData.teensey.forEach(script => {
+                const filteredTeensey = filterScripts(partialScriptsData.teensey);
+                filteredTeensey.forEach(script => {
                     const card = createPartialScriptCard(script);
                     teenseyGrid.appendChild(card);
                 });
@@ -9048,7 +9090,10 @@
                     if (legacyRolesID.includes(roleId)) {
                         legacyCount++;
                     }
-                    selectedRoles.push(getRoleJson(roleId));
+                    const role = getRoleJson(roleId);
+                    if (role) {
+                        selectedRoles.push(role);
+                    }
                 }
             });
 
@@ -9964,7 +10009,10 @@
             } else {
                 resultDiv.innerHTML = `
                 <div style="text-align: center; color: #999; padding: 20px;">
-                    未找到 <strong>${getRoleLink(role1)}</strong> 和 <strong>${getRoleLink(role2)}</strong> 的规则
+                    未找到 <strong>${getRoleLink(role1)}</strong> 和 <strong>${getRoleLink(role2)}</strong> 的
+                    <a href="https://clocktower-wiki.gstonegames.com/index.php?title=%E7%9B%B8%E5%85%8B%E8%A7%84%E5%88%99" target="_blank" style="color: #4667ae; text-decoration: underline;">
+                        规则
+                    </a>
                 </div>
                 `;
             }
@@ -11133,7 +11181,7 @@
 
 
                 // 处理标准角色,如果角色id与页面上已有的角色id相同，则选中该角色，保存Json
-                else if (isTpiCustomRole()){  //([...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demonsRoles, ...fabledRoles, ...travellersRoles].some(r => r.id === item.id)) {
+                else if (isTpiCustomRole(item.id)){  //([...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demonsRoles, ...fabledRoles, ...travellersRoles].some(r => r.id === item.id)) {
                     console.log("idCustomPath");
                     const checkbox = document.querySelector(`.role-item input[value="${item.id}"]`);
                     if (checkbox) checkbox.checked = true;
@@ -11850,6 +11898,15 @@
             if (minionList) totalHeight += minionList.offsetHeight;
             if (demonList) totalHeight += demonList.offsetHeight;
 
+            // 计算自定义阵营的高度
+            let customIndex = 0;
+            while (true) {
+                const customList = document.getElementById(`script-custom-${customIndex}-list`);
+                if (!customList) break;
+                totalHeight += customList.offsetHeight;
+                customIndex++;
+            }
+
             return totalHeight;
         }
 
@@ -12446,15 +12503,15 @@
                                     <div id="script-minion-list" style="flex: 1; background: rgba(255,255,255,0.7); padding: 10px; border-radius: 0 6px 6px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;"></div>
                                 </div>
 
-                                ${hasCustomTeam ? `
                                 <!-- 自定义阵营区域 -->
-                                <div class="team-block" data-team="custom" style="display: flex; cursor: move;">
-                                    <div style="width: 40px; background: ${teamConfigs.find(t => t.key === 'custom').gradient}; display: flex; align-items: center; justify-content: center; border-radius: 6px 0 0 6px; flex-shrink: 0;">
-                                        <span style="writing-mode: vertical-rl; text-orientation: upright; color: white; font-size: 22px; font-weight: bold; letter-spacing: 6px;">${customTeamName}</span>
+                                ${validCustomTeams.map((customTeam, index) => `
+                                <div class="team-block" data-team="custom-${index}" style="display: flex; cursor: move;">
+                                    <div style="width: 40px; background: ${teamConfigs.find(t => t.key === 'custom-'+index).gradient}; display: flex; align-items: center; justify-content: center; border-radius: 6px 0 0 6px; flex-shrink: 0;">
+                                        <span style="writing-mode: vertical-rl; text-orientation: upright; color: white; font-size: 22px; font-weight: bold; letter-spacing: 6px;">${customTeam.name}</span>
                                     </div>
-                                    <div id="script-custom-list" style="flex: 1; background: rgba(255,255,255,0.7); padding: 10px; border-radius: 0 6px 6px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;"></div>
+                                    <div id="script-custom-${index}-list" style="flex: 1; background: rgba(255,255,255,0.7); padding: 10px; border-radius: 0 6px 6px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;"></div>
                                 </div>
-                                ` : ''}
+                                `).join('')}
 
                                 <!-- 恶魔区域（包含相克规则） -->
                                 <div class="team-block" data-team="demon" style="display: flex; cursor: move;">
@@ -12665,9 +12722,43 @@
                         'script-demon-list'
                     ];
                     
-                    if (hasCustomTeam) {
-                        roleContainers.push('script-custom-list');
-                    }
+                    // 重新获取自定义阵营信息
+                    const customTeamGroups = document.querySelectorAll('.custom-team-group');
+                    const validCustomTeams = [];
+                    
+                    customTeamGroups.forEach((group, index) => {
+                        const nameInput = group.querySelector('.custom-team-name');
+                        const colorInput = group.querySelector('.custom-team-color');
+                        const name = nameInput?.value?.trim() || '';
+                        const color = colorInput?.value || '#6b5a45';
+                        const roles = customTeams[index]?.roles || [];
+                        
+                        if (name && roles.length > 0) {
+                            validCustomTeams.push({ name, color, roles });
+                        }
+                    });
+                    
+                    // 添加自定义阵营容器
+                    validCustomTeams.forEach((_, index) => {
+                        roleContainers.push(`script-custom-${index}-list`);
+                    });
+                    
+                    // 重新获取角色数据
+                    const selectedRoles = getSelectedRoles();
+                    const allRoles = [...selectedRoles, ...dirRolesJson];
+                    
+                    // 重新获取相克规则
+                    const jinxRules = getJinxRules(jinxes);
+                    const trialJinxRules = getJinxRules(trialJinxes);
+                    const allJinxRules = [...jinxRules, ...trialJinxRules];
+                    
+                    // 重新创建相克规则映射
+                    const roleJinxMap = {};
+                    allRoles.forEach(role => {
+                        roleJinxMap[role.name] = allJinxRules.filter(rule =>
+                            rule.jinxRole1 === role.name || rule.jinxRole2 === role.name
+                        );
+                    });
                     
                     roleContainers.forEach(containerId => {
                         const container = document.getElementById(containerId);
@@ -12731,111 +12822,101 @@
                     sortableInstances = [];
                 }
 
-                // 移动端：添加编辑模式切换按钮
-                if (isMobileDevice) {
-                    let isEditMode = false;
+                // 添加编辑模式切换按钮
+                let isEditMode = false;
+                
+                // 创建编辑模式按钮
+                const editModeButton = document.createElement('button');
+                editModeButton.textContent = '编辑模式';
+                editModeButton.style.cssText = `
+                    position: absolute;
+                    top: 70px;
+                    right: 20px;
+                    padding: 8px 16px;
+                    background: #6c757d;
+                    color: white;
+                    border: none;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    font-size: 14px;
+                    z-index: 10001;
+                `;
+                
+                editModeButton.onclick = function() {
+                    isEditMode = !isEditMode;
                     
-                    // 创建编辑模式按钮
-                    const editModeButton = document.createElement('button');
-                    editModeButton.textContent = '编辑模式';
-                    editModeButton.style.cssText = `
-                        position: absolute;
-                        top: 70px;
-                        right: 20px;
-                        padding: 8px 16px;
-                        background: #6c757d;
-                        color: white;
-                        border: none;
-                        border-radius: 4px;
-                        cursor: pointer;
-                        font-size: 14px;
-                        z-index: 10001;
-                    `;
-                    
-                    editModeButton.onclick = function() {
-                        isEditMode = !isEditMode;
+                    if (isEditMode) {
+                        editModeButton.textContent = '查看模式';
+                        editModeButton.style.background = '#28a745';
+                        initSortable();
                         
-                        if (isEditMode) {
-                            editModeButton.textContent = '查看模式';
-                            editModeButton.style.background = '#28a745';
-                            initSortable();
-                            
-                            // 添加编辑模式视觉提示
-                            const teamBlocks = document.querySelectorAll('.team-block');
-                            teamBlocks.forEach(block => {
-                                block.classList.add('edit-mode-active');
-                            });
-                            
-                            // 显示提示
-                            const hint = document.createElement('div');
-                            hint.id = 'edit-mode-hint';
-                            hint.style.cssText = `
-                                position: absolute;
-                                top: 110px;
-                                left: 50%;
-                                transform: translateX(-50%);
-                                background: rgba(40, 167, 69, 0.9);
-                                color: white;
-                                padding: 8px 16px;
-                                border-radius: 20px;
-                                font-size: 12px;
-                                z-index: 10001;
-                                text-align: center;
-                            `;
-                            hint.innerHTML = '编辑模式：可拖拽角色和阵营块排序';
-                            previewContainer.appendChild(hint);
-                        } else {
-                            editModeButton.textContent = '编辑模式';
-                            editModeButton.style.background = '#6c757d';
-                            destroySortable();
-                            
-                            // 移除编辑模式视觉提示
-                            const teamBlocks = document.querySelectorAll('.team-block');
-                            teamBlocks.forEach(block => {
-                                block.classList.remove('edit-mode-active');
-                            });
-                            
-                            const hint = document.getElementById('edit-mode-hint');
-                            if (hint) hint.remove();
-                        }
-                    };
-                    
-                    previewContainer.appendChild(editModeButton);
-                    
-                    // 移动端默认移除拖拽cursor样式
-                    const teamBlocks = document.querySelectorAll('.team-block');
-                    teamBlocks.forEach(block => {
-                        block.style.cursor = 'default';
-                    });
-                } else {
-                    // 桌面端：直接初始化拖拽并显示提示
-                    const dragHint = document.createElement('div');
-                    dragHint.style.cssText = `
-                        position: absolute;
-                        top: 70px;
-                        left: 50%;
-                        transform: translateX(-50%);
-                        background: rgba(0, 0, 0, 0.8);
-                        color: white;
-                        padding: 10px 20px;
-                        border-radius: 20px;
-                        font-size: 14px;
-                        z-index: 10001;
-                        animation: fadeInOut 4s ease-in-out;
-                        text-align: center;
-                        line-height: 1.6;
-                    `;
-                    dragHint.innerHTML = '提示：你可以拖拽角色卡片来重新排序<br>也可以拖拽外来者、爪牙、恶魔阵营块来调整顺序（镇民区域固定）';
-                    previewContainer.appendChild(dragHint);
-
-                    setTimeout(function() {
-                        if (dragHint.parentNode) {
-                            dragHint.parentNode.removeChild(dragHint);
-                        }
-                    }, 3000);
-
-                    initSortable();
-                }
+                        // 添加编辑模式视觉提示
+                        const teamBlocks = document.querySelectorAll('.team-block');
+                        teamBlocks.forEach(block => {
+                            block.classList.add('edit-mode-active');
+                        });
+                        
+                        // 显示提示
+                        const hint = document.createElement('div');
+                        hint.id = 'edit-mode-hint';
+                        hint.style.cssText = `
+                            position: absolute;
+                            top: 110px;
+                            left: 50%;
+                            transform: translateX(-50%);
+                            background: rgba(40, 167, 69, 0.9);
+                            color: white;
+                            padding: 8px 16px;
+                            border-radius: 20px;
+                            font-size: 12px;
+                            z-index: 10001;
+                            text-align: center;
+                        `;
+                        hint.innerHTML = '编辑模式：可拖拽角色和阵营块排序';
+                        previewContainer.appendChild(hint);
+                    } else {
+                        editModeButton.textContent = '编辑模式';
+                        editModeButton.style.background = '#6c757d';
+                        destroySortable();
+                        
+                        // 移除编辑模式视觉提示
+                        const teamBlocks = document.querySelectorAll('.team-block');
+                        teamBlocks.forEach(block => {
+                            block.classList.remove('edit-mode-active');
+                        });
+                        
+                        const hint = document.getElementById('edit-mode-hint');
+                        if (hint) hint.remove();
+                    }
+                };
+                
+                previewContainer.appendChild(editModeButton);
+                
+                // 显示提示
+                const dragHint = document.createElement('div');
+                dragHint.style.cssText = `
+                    position: absolute;
+                    top: 70px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: rgba(0, 0, 0, 0.8);
+                    color: white;
+                    padding: 10px 20px;
+                    border-radius: 20px;
+                    font-size: 14px;
+                    z-index: 10001;
+                    animation: fadeInOut 4s ease-in-out;
+                    text-align: center;
+                    line-height: 1.6;
+                `;
+                dragHint.innerHTML = '提示：点击"编辑模式"按钮可启用拖拽排序功能<br>可拖拽角色卡片和阵营块调整顺序（镇民区域固定）';
+                previewContainer.appendChild(dragHint);
+                
+                setTimeout(function() {
+                    if (dragHint.parentNode) {
+                        dragHint.parentNode.removeChild(dragHint);
+                    }
+                }, 3000);
 
                 // 创建关闭按钮
                 const closeButton = document.createElement('button');
