@@ -2005,14 +2005,8 @@
 
 
     <div class="jsonUpload">
-        <!-- 切换按钮 -->
-        <div style="display: flex; justify-content: center; align-items: flex-end; gap: 10px; margin: 20px 0;">
-            <button class="toggle-json-button" onclick="toggleJsonUpload()">
-                导入JSON文件继续编辑
-            </button>
-        </div>
-        <!-- JSON 文件上传区域（默认隐藏） -->
-        <div id="json-upload-area" style="display: none; margin-top: 10px; background-color: #b1b1da; padding: 15px; border-radius: 8px;">
+        <!-- JSON 文件上传区域（直接显示） -->
+        <div id="json-upload-area" style="margin-top: 10px; background-color: #b1b1da; padding: 15px; border-radius: 8px;">
             <div style="margin-bottom: 10px;">
                 <input type="file" id="json-file-upload" accept=".json"
                        style="padding: 12px; box-sizing: border-box; font-size: 16px; border: 1px solid var(--border-color); border-radius: 4px; width: 100%;">
@@ -2073,22 +2067,26 @@
             <!-- 阵营名称自定义 -->
             <div style="margin-bottom: 15px;">
                 <h4 style="margin: 0 0 10px 0; color: var(--text-color); font-size: 14px; font-weight: bold;">阵营名称自定义（留空使用默认名称）</h4>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
                     <div style="display: flex; flex-direction: column; gap: 5px;">
                         <label style="font-size: 14px; color: #1e3a5f; font-weight: bold;">镇民</label>
                         <input type="text" id="custom-townsfolk-name" placeholder="镇民" style="padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px;">
+                        <input type="color" id="custom-townsfolk-color" value="#1e3a5f" style="width: 100%; height: 36px; border: 1px solid var(--border-color); border-radius: 4px; cursor: pointer;">
                     </div>
                     <div style="display: flex; flex-direction: column; gap: 5px;">
                         <label style="font-size: 14px; color: #0d5c5c; font-weight: bold;">外来者</label>
                         <input type="text" id="custom-outsider-name" placeholder="外来者" style="padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px;">
+                        <input type="color" id="custom-outsider-color" value="#0d5c5c" style="width: 100%; height: 36px; border: 1px solid var(--border-color); border-radius: 4px; cursor: pointer;">
                     </div>
                     <div style="display: flex; flex-direction: column; gap: 5px;">
                         <label style="font-size: 14px; color: #8b4513; font-weight: bold;">爪牙</label>
                         <input type="text" id="custom-minion-name" placeholder="爪牙" style="padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px;">
+                        <input type="color" id="custom-minion-color" value="#8b4513" style="width: 100%; height: 36px; border: 1px solid var(--border-color); border-radius: 4px; cursor: pointer;">
                     </div>
                     <div style="display: flex; flex-direction: column; gap: 5px;">
                         <label style="font-size: 14px; color: #8b0000; font-weight: bold;">恶魔</label>
                         <input type="text" id="custom-demon-name" placeholder="恶魔" style="padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px;">
+                        <input type="color" id="custom-demon-color" value="#8b0000" style="width: 100%; height: 36px; border: 1px solid var(--border-color); border-radius: 4px; cursor: pointer;">
                     </div>
                 </div>
             </div>
@@ -2618,7 +2616,7 @@
                 "pinyin": "xiyifu",
                 "pinyinsuoxie": "xyf",
                 "scripts": ["暗流涌动"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/_anliu.png",
                 "ability": "在你的首个夜晚，你会得知两名玩家和一个镇民角色：这两名玩家之一是该角色。",
                 "firstNight": 7500,
                 "otherNight": 0,
@@ -2639,7 +2637,7 @@
                 "pinyin": "tushuguanliyuan",
                 "pinyinsuoxie": "tsgly",
                 "scripts": ["暗流涌动"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/1_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/1_anliu.png",
                 "ability": "在你的首个夜晚，你会得知两名玩家和一个外来者角色：这两名玩家之一是该角色（或者你会得知没有外来者在场）。",
                 "firstNight": 7600,
                 "otherNight": 0,
@@ -2660,7 +2658,7 @@
                 "pinyin": "diaochayuan",
                 "pinyinsuoxie": "dcy",
                 "scripts": ["暗流涌动"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/2_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/2_anliu.png",
                 "ability": "在你的首个夜晚，你会得知两名玩家和一个爪牙角色：这两名玩家之一是该角色（或者你会得知没有爪牙在场）。",
                 "firstNight": 7700,
                 "otherNight": 0,
@@ -2681,7 +2679,7 @@
                 "pinyin": "chushi",
                 "pinyinsuoxie": "cs",
                 "scripts": ["暗流涌动"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/3_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/3_anliu.png",
                 "ability": "在你的首个夜晚，你会得知场上邻座的邪恶玩家有多少对。",
                 "firstNight": 7800,
                 "otherNight": 0,
@@ -2702,7 +2700,7 @@
                 "pinyin": "gongqingzhe",
                 "pinyinsuoxie": "gqz",
                 "scripts": ["暗流涌动"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/4_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/4_anliu.png",
                 "ability": "每个夜晚，你会得知与你邻近的两名存活的玩家中邪恶玩家的数量。",
                 "firstNight": 7900,
                 "otherNight": 11000,
@@ -2723,7 +2721,7 @@
                 "pinyin": "zhanbushi",
                 "pinyinsuoxie": "zbs",
                 "scripts": ["暗流涌动"],
-                "image": "https://www.bloodstar.xyz/p/humlet/che/28_che.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/5_anliu.png",
                 "ability": "每个夜晚，你要选择两名玩家：你会得知他们之中是否有恶魔。会有一名善良玩家始终被你的能力当作恶魔。",
                 "firstNight": 8000,
                 "otherNight": 11100,
@@ -2744,7 +2742,7 @@
                 "pinyin": "songzangzhe",
                 "pinyinsuoxie": "szz",
                 "scripts": ["暗流涌动"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/6_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/6_anliu.png",
                 "ability": "每个夜晚*，你会得知今天白天死于处决的玩家的角色。",
                 "firstNight": 0,
                 "otherNight": 11300,
@@ -2765,7 +2763,7 @@
                 "pinyin": "senglv",
                 "pinyinsuoxie": "sl",
                 "scripts": ["暗流涌动"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/7_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/7_anliu.png",
                 "ability": "每个夜晚*，你要选择除你以外的一名玩家：当晚恶魔的负面能力对他无效。",
                 "firstNight": 0,
                 "otherNight": 2200,
@@ -2786,7 +2784,7 @@
                 "pinyin": "shouyaren",
                 "pinyinsuoxie": "syr",
                 "scripts": ["暗流涌动"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/8_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/8_anliu.png",
                 "ability": "如果你在夜晚死亡，你会被唤醒，然后你要选择一名玩家：你会得知他的角色。",
                 "firstNight": 0,
                 "otherNight": 9800,
@@ -2807,7 +2805,7 @@
                 "pinyin": "zhenjiezhe",
                 "pinyinsuoxie": "zjz",
                 "scripts": ["暗流涌动"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/9_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/9_anliu.png",
                 "ability": "当你首次被提名时，如果提名你的玩家是镇民，他立刻被处决。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -2828,7 +2826,7 @@
                 "pinyin": "lieshou",
                 "pinyinsuoxie": "ls",
                 "scripts": ["暗流涌动"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/10_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/10_anliu.png",
                 "ability": "每局游戏限一次，你可以在白天时公开选择一名玩家：如果他是恶魔，他死亡。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -2849,7 +2847,7 @@
                 "pinyin": "shibing",
                 "pinyinsuoxie": "sb",
                 "scripts": ["暗流涌动"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/11_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/11_anliu.png",
                 "ability": "恶魔的负面能力对你无效。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -2870,7 +2868,7 @@
                 "pinyin": "zhenzhang",
                 "pinyinsuoxie": "zz",
                 "scripts": ["暗流涌动"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/12_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/12_anliu.png",
                 "ability": "如果只有三名玩家存活且白天没有人被处决，你的阵营获胜。如果你在夜晚即将死亡，可能会有一名其他玩家代替你死亡。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -2891,7 +2889,7 @@
                 "pinyin": "zumu",
                 "pinyinsuoxie": "zm",
                 "scripts": ["黯月初升"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/13_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/13_anliu.png",
                 "ability": "在你的首个夜晚，你会得知一名善良玩家和他的角色。如果恶魔杀死了他，你也会死亡。",
                 "firstNight": 8300,
                 "otherNight": 9500,
@@ -2912,7 +2910,7 @@
                 "pinyin": "shuishou",
                 "pinyinsuoxie": "ss",
                 "scripts": ["黯月初升"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/14_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/14_anliu.png",
                 "ability": "每个夜晚，你要选择一名存活的玩家：你或他之一会醉酒直到下个黄昏。你不会死亡。",
                 "firstNight": 3500,
                 "otherNight": 1000,
@@ -2933,7 +2931,7 @@
                 "pinyin": "shinv",
                 "pinyinsuoxie": "sn",
                 "scripts": ["黯月初升"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/15_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/15_anliu.png",
                 "ability": "每个夜晚，你要选择除你以外的两名存活的玩家：你会得知他们中有几人在当晚因其自身能力而被唤醒。",
                 "firstNight": 12400,
                 "otherNight": 14800,
@@ -2954,7 +2952,7 @@
                 "pinyin": "qumoren",
                 "pinyinsuoxie": "qmr",
                 "scripts": ["黯月初升"],
-                "image": "https://www.bloodstar.xyz/p/humlet/JI-SHI/20_jishi.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/16_anliu.png",
                 "ability": "每个夜晚*，你要选择一名玩家（与上个夜晚不同）：如果你选中了恶魔，他会得知你是驱魔人，但他当晚不会因其自身能力而被唤醒。",
                 "firstNight": 0,
                 "otherNight": 4300,
@@ -2975,7 +2973,7 @@
                 "pinyin": "lvdianlaoban",
                 "pinyinsuoxie": "ldlb",
                 "scripts": ["黯月初升"],
-                "image": "https://www.bloodstar.xyz/p/humlet/JI-SHI/22_jishi.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/17_anliu.png",
                 "ability": "每个夜晚*，你要选择两名玩家：他们当晚不会死亡，但其中一人会醉酒到下个黄昏。",
                 "firstNight": 0,
                 "otherNight": 1800,
@@ -2996,7 +2994,7 @@
                 "pinyin": "dutu",
                 "pinyinsuoxie": "dt",
                 "scripts": ["黯月初升"],
-                "image": "https://www.bloodstar.xyz/p/humlet/JI-SHI/19_jishi.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/18_anliu.png",
                 "ability": "每个夜晚*，你要选择一名玩家并猜测该玩家的角色：如果你猜错了，你会死亡。",
                 "firstNight": 0,
                 "otherNight": 2000,
@@ -3017,7 +3015,7 @@
                 "pinyin": "zaoyaozhe",
                 "pinyinsuoxie": "zyz",
                 "scripts": ["黯月初升"],
-                "image": "https://www.bloodstar.xyz/p/humlet/che/47_che.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/19_anliu.png",
                 "ability": "每个白天，你可以公开发表一个声明。如果该声明正确，在当晚会有一名玩家死亡。",
                 "firstNight": 0,
                 "otherNight": 9100,
@@ -3038,7 +3036,7 @@
                 "pinyin": "shichen",
                 "pinyinsuoxie": "sc",
                 "scripts": ["黯月初升"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/20_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/20_anliu.png",
                 "ability": "每局游戏限一次，在夜晚时，你可以选择一个角色：如果该角色在场，该角色之一从当晚开始醉酒三天三夜。",
                 "firstNight": 5100,
                 "otherNight": 1900,
@@ -3059,7 +3057,7 @@
                 "pinyin": "jiaoshou",
                 "pinyinsuoxie": "js",
                 "scripts": ["黯月初升"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/21_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/21_anliu.png",
                 "ability": "每局游戏限一次，在夜晚时*，你可以选择一名死亡的玩家：如果他是镇民，你会将他起死回生。",
                 "firstNight": 0,
                 "otherNight": 10500,
@@ -3080,7 +3078,7 @@
                 "pinyin": "yinyoushiren",
                 "pinyinsuoxie": "yysr",
                 "scripts": ["黯月初升"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/22_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/22_anliu.png",
                 "ability": "当一名爪牙死于处决时，除了你和旅行者以外的所有其他玩家醉酒直到明天黄昏。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -3101,7 +3099,7 @@
                 "pinyin": "chayishi",
                 "pinyinsuoxie": "cys",
                 "scripts": ["黯月初升"],
-                "image": "https://www.bloodstar.xyz/p/humlet/che/31_che.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/23_anliu.png",
                 "ability": "如果与你邻近的两名存活的玩家是善良的，他们不会死亡。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -3122,7 +3120,7 @@
                 "pinyin": "hepingzhuyizhe",
                 "pinyinsuoxie": "hpzyz",
                 "scripts": ["黯月初升"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/24_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/24_anliu.png",
                 "ability": "被处决的善良玩家可能不会死亡。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -3143,7 +3141,7 @@
                 "pinyin": "nongchen",
                 "pinyinsuoxie": "nc",
                 "scripts": ["黯月初升"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/25_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/25_anliu.png",
                 "ability": "当你首次将要死亡时，你不会死亡。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -3164,7 +3162,7 @@
                 "pinyin": "zhongbiaojiang",
                 "pinyinsuoxie": "zbj",
                 "scripts": ["梦殒春宵"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/26_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/26_anliu.png",
                 "ability": "在你的首个夜晚，你会得知恶魔与爪牙之间最近的距离。（邻座的玩家距离为1）",
                 "firstNight": 8400,
                 "otherNight": 0,
@@ -3185,7 +3183,7 @@
                 "pinyin": "zhumengshi",
                 "pinyinsuoxie": "zms",
                 "scripts": ["梦殒春宵"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/27_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/27_anliu.png",
                 "ability": "每个夜晚，你要选择除你及旅行者以外的一名玩家：你会得知一个善良角色和一个邪恶角色，该玩家是其中一个角色。",
                 "firstNight": 8500,
                 "otherNight": 11500,
@@ -3206,7 +3204,7 @@
                 "pinyin": "wusheren",
                 "pinyinsuoxie": "wsr",
                 "scripts": ["梦殒春宵"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/28_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/28_anliu.png",
                 "ability": "每个夜晚，你要选择一名存活的玩家：如果你选中了恶魔，你和他交换角色和阵营，然后他中毒。",
                 "firstNight": 5200,
                 "otherNight": 2100,
@@ -3227,7 +3225,7 @@
                 "pinyin": "shuxuejia",
                 "pinyinsuoxie": "sxj",
                 "scripts": ["梦殒春宵"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/29_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/29_anliu.png",
                 "ability": "每个夜晚，你会得知有多少名玩家的能力因为其他角色的能力而未正常生效。（从上个黎明到你被唤醒时）",
                 "firstNight": 12500,
                 "otherNight": 14900,
@@ -3248,7 +3246,7 @@
                 "pinyin": "maihuanvhai",
                 "pinyinsuoxie": "mhnh",
                 "scripts": ["梦殒春宵"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/30_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/30_anliu.png",
                 "ability": "每个夜晚*，你会得知在今天白天时是否有恶魔投过票。",
                 "firstNight": 0,
                 "otherNight": 11600,
@@ -3269,7 +3267,7 @@
                 "pinyin": "chengzhengonggaoyuan",
                 "pinyinsuoxie": "czggy",
                 "scripts": ["梦殒春宵"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/31_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/31_anliu.png",
                 "ability": "每个夜晚*，你会得知在今天白天时是否有爪牙发起过提名。",
                 "firstNight": 0,
                 "otherNight": 11700,
@@ -3290,7 +3288,7 @@
                 "pinyin": "shenyuzhe",
                 "pinyinsuoxie": "syz",
                 "scripts": ["梦殒春宵"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/32_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/32_anliu.png",
                 "ability": "每个夜晚*，你会得知有多少名死亡的玩家是邪恶的。",
                 "firstNight": 0,
                 "otherNight": 11800,
@@ -3311,7 +3309,7 @@
                 "pinyin": "boxuezhe",
                 "pinyinsuoxie": "bxz",
                 "scripts": ["梦殒春宵"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/33_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/33_anliu.png",
                 "ability": "每个白天，你可以私下询问说书人以得知两条信息：一个是正确的，一个是错误的。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -3332,7 +3330,7 @@
                 "pinyin": "nvcaifeng",
                 "pinyinsuoxie": "ncf",
                 "scripts": ["梦殒春宵"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/34_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/34_anliu.png",
                 "ability": "每局游戏限一次，在夜晚时，你可以选择除你以外的两名玩家：你会得知他们是否为同一阵营。",
                 "firstNight": 8600,
                 "otherNight": 11900,
@@ -3353,7 +3351,7 @@
                 "pinyin": "zhexuejia",
                 "pinyinsuoxie": "zxj",
                 "scripts": ["梦殒春宵"],
-                "image": "https://www.bloodstar.xyz/p/humlet/JI-SHI/59_jishi.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/35_anliu.png",
                 "ability": "每局游戏限一次，在夜晚时，你可以选择一个善良角色：你获得该角色的能力。如果这个角色在场，他醉酒。",
                 "firstNight": 300,
                 "otherNight": 400,
@@ -3374,7 +3372,7 @@
                 "pinyin": "yishujia",
                 "pinyinsuoxie": "ysj",
                 "scripts": ["梦殒春宵"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/36_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/36_anliu.png",
                 "ability": "每局游戏限一次，在白天时，你可以私下询问说书人一个是非问题，你会得知该问题的答案。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -3395,7 +3393,7 @@
                 "pinyin": "zashuayiren",
                 "pinyinsuoxie": "zsyr",
                 "scripts": ["梦殒春宵"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/37_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/37_anliu.png",
                 "ability": "在你的首个白天，你可以公开猜测任意玩家的角色最多五次。在当晚，你会得知猜测正确的角色数量。",
                 "firstNight": 0,
                 "otherNight": 12000,
@@ -3416,7 +3414,7 @@
                 "pinyin": "xianzhe",
                 "pinyinsuoxie": "xz",
                 "scripts": ["梦殒春宵"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/38_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/38_anliu.png",
                 "ability": "如果恶魔杀死了你，在当晚你会被唤醒并得知两名玩家，其中一名是杀死你的那个恶魔。",
                 "firstNight": 0,
                 "otherNight": 9900,
@@ -3437,7 +3435,7 @@
                 "pinyin": "banshouren",
                 "pinyinsuoxie": "bsr",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/39_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/39_anliu.png",
                 "ability": "每个夜晚*，你要选择一名存活玩家：如果他是善良的，他死亡，并且当晚恶魔不会造成死亡。会有一名善良玩家始终被当作邪恶阵营。",
                 "firstNight": 0,
                 "otherNight": 4400,
@@ -3458,7 +3456,7 @@
                 "pinyin": "baosangnvyao",
                 "pinyinsuoxie": "bsny",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/40_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/40_anliu.png",
                 "ability": "如果恶魔杀死了你，所有玩家都会得知此事。从现在开始，你每天可以发起两次提名，每次投票时可以投两票。",
                 "firstNight": 0,
                 "otherNight": 10400,
@@ -3479,7 +3477,7 @@
                 "pinyin": "changshinanhai",
                 "pinyinsuoxie": "csnh",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/41_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/41_anliu.png",
                 "ability": "如果恶魔杀死了国王，你会得知哪名玩家是恶魔。[+国王]",
                 "firstNight": 0,
                 "otherNight": 10200,
@@ -3500,7 +3498,7 @@
                 "pinyin": "chuanjiaoshi",
                 "pinyinsuoxie": "cjs",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/42_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/42_anliu.png",
                 "ability": "每个夜晚，你要选择一名玩家：如果你选中了爪牙，他会得知被传教士选中。所有被你选中的爪牙失去能力。",
                 "firstNight": 4200,
                 "otherNight": 1200,
@@ -3521,7 +3519,7 @@
                 "pinyin": "cunfu",
                 "pinyinsuoxie": "cf",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/43_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/43_anliu.png",
                 "ability": "每个夜晚，你要选择一名玩家：你会得知他的阵营。[+0~2村夫，复数村夫中有一人醉酒]",
                 "firstNight": 10100,
                 "otherNight": 12800,
@@ -3542,7 +3540,7 @@
                 "pinyin": "gongchengshi",
                 "pinyinsuoxie": "gcs",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/44_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/44_anliu.png",
                 "ability": "每局游戏限一次，在夜晚时，你可以选择让恶魔变成你选择的恶魔角色，或让所有爪牙变成你选择的爪牙角色。",
                 "firstNight": 4100,
                 "otherNight": 1100,
@@ -3563,7 +3561,7 @@
                 "pinyin": "gongzhu",
                 "pinyinsuoxie": "gz",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/45_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/45_anliu.png",
                 "ability": "在你的首个白天，如果你提名并处决了一名玩家，当晚恶魔不会造成死亡。",
                 "firstNight": 0,
                 "otherNight": 4500,
@@ -3584,7 +3582,7 @@
                 "pinyin": "guizu",
                 "pinyinsuoxie": "gz",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/humlet/JI-SHI/56_jishi.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/46_anliu.png",
                 "ability": "在你的首个夜晚，你会得知三名玩家：其中有且只有一名玩家是邪恶的。",
                 "firstNight": 8900,
                 "otherNight": 0,
@@ -3605,7 +3603,7 @@
                 "pinyin": "guowang",
                 "pinyinsuoxie": "gw",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/47_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/47_anliu.png",
                 "ability": "每个夜晚，如果死亡的玩家数量大于或等于存活的玩家数量，你会得知一个存活的角色。恶魔知道你是国王。",
                 "firstNight": 3100,
                 "otherNight": 13100,
@@ -3626,7 +3624,7 @@
                 "pinyin": "jiangjun",
                 "pinyinsuoxie": "jj",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/48_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/48_anliu.png",
                 "ability": "每个夜晚，你会得知说书人认为哪个阵营当前更有优势（善良/邪恶/均势）。",
                 "firstNight": 12300,
                 "otherNight": 14700,
@@ -3647,7 +3645,7 @@
                 "pinyin": "lianjinshushi",
                 "pinyinsuoxie": "ljss",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/49_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/49_anliu.png",
                 "ability": "你拥有一个爪牙角色的能力。当你使用能力时，说书人可能会要求你更换选择。",
                 "firstNight": 600,
                 "otherNight": 0,
@@ -3668,7 +3666,7 @@
                 "pinyin": "moshushi",
                 "pinyinsuoxie": "mss",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/50_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/50_anliu.png",
                 "ability": "恶魔会以为你是爪牙。爪牙会以为你是恶魔。",
                 "firstNight": 1100,
                 "otherNight": 0,
@@ -3689,7 +3687,7 @@
                 "pinyin": "nongfu",
                 "pinyinsuoxie": "nf",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/51_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/51_anliu.png",
                 "ability": "当你在夜晚死亡时，一名存活的善良玩家会变成农夫。",
                 "firstNight": 0,
                 "otherNight": 10300,
@@ -3710,7 +3708,7 @@
                 "pinyin": "nvjisi",
                 "pinyinsuoxie": "njs",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/humlet/JI-SHI/57_jishi.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/52_anliu.png",
                 "ability": "每个夜晚，你会得知一名说书人认为你最应该与其交流的玩家。",
                 "firstNight": 11900,
                 "otherNight": 14500,
@@ -3731,7 +3729,7 @@
                 "pinyin": "qiqiujiashiyuan",
                 "pinyinsuoxie": "qqjsy",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/53_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/53_anliu.png",
                 "ability": "每个夜晚，你会得知一名与上个夜晚得知的玩家角色类型不同的玩家。[+0~1外来者]",
                 "firstNight": 9000,
                 "otherNight": 12100,
@@ -3752,7 +3750,7 @@
                 "pinyin": "qishi",
                 "pinyinsuoxie": "qs",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/54_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/54_anliu.png",
                 "ability": "在你的首个夜晚，你会得知两名非恶魔玩家。",
                 "firstNight": 8800,
                 "otherNight": 0,
@@ -3773,7 +3771,7 @@
                 "pinyin": "shangjinlieren",
                 "pinyinsuoxie": "sjlr",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/55_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/55_anliu.png",
                 "ability": "在你的首个夜晚，你会得知一名邪恶玩家。每当你得知的玩家死亡，你会在当晚得知另一名邪恶玩家。[会有一名镇民转变为邪恶阵营]",
                 "firstNight": 10600,
                 "otherNight": 13300,
@@ -3794,7 +3792,7 @@
                 "pinyin": "shiyizhe",
                 "pinyinsuoxie": "syz",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/56_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/56_anliu.png",
                 "ability": "你不知道你的能力是什么。每个白天你可以找说书人猜测一次，你会得知你的猜测有多准确。",
                 "firstNight": 200,
                 "otherNight": 300,
@@ -3815,7 +3813,7 @@
                 "pinyin": "shirenzu",
                 "pinyinsuoxie": "srz",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/57_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/57_anliu.png",
                 "ability": "你拥有上个死于处决的玩家的能力。如果该玩家属于邪恶阵营，你中毒直到下个善良玩家死于处决。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -3836,7 +3834,7 @@
                 "pinyin": "shiwuguan",
                 "pinyinsuoxie": "swg",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/58_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/58_anliu.png",
                 "ability": "在你的首个夜晚，你会得知一名善良玩家。",
                 "firstNight": 8700,
                 "otherNight": 0,
@@ -3857,7 +3855,7 @@
                 "pinyin": "shouyeren",
                 "pinyinsuoxie": "syr",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/59_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/59_anliu.png",
                 "ability": "每局游戏限一次，在夜晚时，你可以选择一名玩家：他会得知你是守夜人。",
                 "firstNight": 10700,
                 "otherNight": 13400,
@@ -3878,7 +3876,7 @@
                 "pinyin": "wushenlunzhe",
                 "pinyinsuoxie": "wslz",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/60_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/60_anliu.png",
                 "ability": "说书人可以打破游戏规则，如果说书人被处决，善良阵营获胜，即使你已死亡。[无邪恶角色在场]",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -3899,7 +3897,7 @@
                 "pinyin": "xifashi",
                 "pinyinsuoxie": "xfs",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/61_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/61_anliu.png",
                 "ability": "每个白天，你可以公开进行一次谁是爪牙，谁是恶魔的猜测。如果你猜对，善良阵营获胜。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -3920,7 +3918,7 @@
                 "pinyin": "xiaojingling",
                 "pinyinsuoxie": "xjl",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/62_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/62_anliu.png",
                 "ability": "在你的首个夜晚，你会得知一个在场的镇民角色。如果你“疯狂”地证明你是该角色，当他死亡时你获得该角色的能力。",
                 "firstNight": 7300,
                 "otherNight": 0,
@@ -3941,7 +3939,7 @@
                 "pinyin": "xiuxingzhe",
                 "pinyinsuoxie": "xxz",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/63_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/63_anliu.png",
                 "ability": "在你的首个夜晚，你会得知距离最近的邪恶玩家位于你的顺时针还是逆时针方向。如果两侧的邪恶玩家与你距离相等，你得知的信息由说书人决定。",
                 "firstNight": 12000,
                 "otherNight": 0,
@@ -3962,7 +3960,7 @@
                 "pinyin": "xunshanren",
                 "pinyinsuoxie": "xsr",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/64_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/64_anliu.png",
                 "ability": "每局游戏限一次，在夜晚时，你可以选择一名存活的玩家：如果你选中了落难少女，她会变成一个不在场的镇民角色。[+落难少女]",
                 "firstNight": 7400,
                 "otherNight": 10900,
@@ -3983,7 +3981,7 @@
                 "pinyin": "yijiaolingxiu",
                 "pinyinsuoxie": "yjlx",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/65_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/65_anliu.png",
                 "ability": "每个夜晚，你会转变为与你邻近的一名存活的玩家的阵营。每个白天，你可以提议所有玩家加入你的教派，如果所有善良玩家同意加入，你的阵营获胜。",
                 "firstNight": 11600,
                 "otherNight": 14200,
@@ -4004,7 +4002,7 @@
                 "pinyin": "yingsuzhongzhizhe",
                 "pinyinsuoxie": "yszzz",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/66_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/66_anliu.png",
                 "ability": "爪牙和恶魔互相不认识。如果你死亡，当晚他们会互相认识。",
                 "firstNight": 700,
                 "otherNight": 900,
@@ -4025,7 +4023,7 @@
                 "pinyin": "yufu",
                 "pinyinsuoxie": "yf",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/67_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/67_anliu.png",
                 "ability": "每局游戏限一次，在白天时，你可以让说书人给你一些能帮助你的阵营获胜的建议。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -4046,7 +4044,7 @@
                 "pinyin": "zajiyanyuan",
                 "pinyinsuoxie": "zjyy",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/68_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/68_anliu.png",
                 "ability": "每个夜晚*，你要选择一名玩家：如果当晚他醉酒或中毒，你死亡。",
                 "firstNight": 0,
                 "otherNight": 2050,
@@ -4067,7 +4065,7 @@
                 "pinyin": "banxian",
                 "pinyinsuoxie": "bx",
                 "scripts": ["华灯初上"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/69_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/69_anliu.png",
                 "ability": "任何在夜晚使用自身能力选择你的其他玩家，会改为选中另一名邪恶玩家作为替代。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -4088,7 +4086,7 @@
                 "pinyin": "bianlianshi",
                 "pinyinsuoxie": "bls",
                 "scripts": ["华灯初上"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/70_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/70_anliu.png",
                 "ability": "每个白天，如果你“疯狂”地证明自己是一个善良角色（与之前不同），你可能会在当晚获得那个角色的能力，直到下个黄昏。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -4109,7 +4107,7 @@
                 "pinyin": "dagengren",
                 "pinyinsuoxie": "dgr",
                 "scripts": ["华灯初上"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/71_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/71_anliu.png",
                 "ability": "每个夜晚*，你要猜测今晚首个死亡的玩家与你的距离。如果你猜测正确，则除你以外的所有玩家今晚不会死亡，但你可能会死亡。",
                 "firstNight": 0,
                 "otherNight": 1960,
@@ -4130,7 +4128,7 @@
                 "pinyin": "dianxiaoer",
                 "pinyinsuoxie": "dxe",
                 "scripts": ["华灯初上"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/72_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/72_anliu.png",
                 "ability": "在你的首个夜晚，你会得知两名善良玩家。他们之中会有一人醉酒，即使你已死亡。",
                 "firstNight": 9400,
                 "otherNight": 0,
@@ -4151,7 +4149,7 @@
                 "pinyin": "geling",
                 "pinyinsuoxie": "gl",
                 "scripts": ["华灯初上"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/73_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/73_anliu.png",
                 "ability": "每局游戏限一次，在白天时，你可以提议所有玩家观看你的演出，并从同意参加的玩家中选择你的观众。如果恶魔成为了观众，你会在当晚死亡。",
                 "firstNight": 0,
                 "otherNight": 9000,
@@ -4172,7 +4170,7 @@
                 "pinyin": "heshang",
                 "pinyinsuoxie": "hs",
                 "scripts": ["华灯初上"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/74_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/74_anliu.png",
                 "ability": "每个夜晚，当有邪恶玩家的能力首次选择或影响与你邻近的存活玩家时，改为此次能力不生效并持续至下个黎明，且你会得知你的能力被触发。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -4193,7 +4191,7 @@
                 "pinyin": "jinyiwei",
                 "pinyinsuoxie": "jiw",
                 "scripts": ["华灯初上"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/75_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/75_anliu.png",
                 "ability": "每个夜晚*，你要选择一名玩家：如果他在下个黄昏前死亡，你代替他死亡。",
                 "firstNight": 0,
                 "otherNight": 1970,
@@ -4214,7 +4212,7 @@
                 "pinyin": "langzhong",
                 "pinyinsuoxie": "lz",
                 "scripts": ["华灯初上"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/76_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/76_anliu.png",
                 "ability": "每个夜晚，你要选择除你以外的一名玩家：你会得知一个与他能力相关的词语。",
                 "firstNight": 9300,
                 "otherNight": 12200,
@@ -4235,7 +4233,7 @@
                 "pinyin": "qintianjian",
                 "pinyinsuoxie": "qtj",
                 "scripts": ["华灯初上"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/77_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/77_anliu.png",
                 "ability": "在你的首个夜晚，你会得知离你最近的邪恶玩家位于你的哪一侧（左/右/相同）。如果与你邻近的玩家中有邪恶阵营，你会得知错误信息作为替代。",
                 "firstNight": 12100,
                 "otherNight": 0,
@@ -4256,7 +4254,7 @@
                 "pinyin": "wudaozhe",
                 "pinyinsuoxie": "wdz",
                 "scripts": ["华灯初上"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/78_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/78_anliu.png",
                 "ability": "你以为你是一个外来者，但你实际上不是。如果有邪恶玩家的能力选择或影响了你，你会立即变成一个不在场的镇民角色。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -4277,7 +4275,7 @@
                 "pinyin": "xizi",
                 "pinyinsuoxie": "xz",
                 "scripts": ["华灯初上"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/79_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/79_anliu.png",
                 "ability": "所有戏子互相认识。不论在场的戏子数量多少或存活与否，胜负结果会被对调。[所有善良玩家都是戏子]",
                 "firstNight": 3400,
                 "otherNight": 0,
@@ -4298,7 +4296,7 @@
                 "pinyin": "xionghaizi",
                 "pinyinsuoxie": "xhz",
                 "scripts": ["华灯初上"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/80_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/80_anliu.png",
                 "ability": "每个夜晚，你要选择一个镇民角色：他的能力会产生错误信息，直到下个黄昏。",
                 "firstNight": 7200,
                 "otherNight": 2500,
@@ -4319,7 +4317,7 @@
                 "pinyin": "yinyangshi",
                 "pinyinsuoxie": "yys",
                 "scripts": ["华灯初上"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/81_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/81_anliu.png",
                 "ability": "在你的首个夜晚，你会得知两个善良角色和两个邪恶角色，其中有且只有两个角色在场。",
                 "firstNight": 9200,
                 "otherNight": 0,
@@ -4340,7 +4338,7 @@
                 "pinyin": "bingbi",
                 "pinyinsuoxie": "bb",
                 "scripts": ["山雨欲来"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/82_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/82_anliu.png",
                 "ability": "如果你在白天死亡，当晚你会得知一名善良玩家。如果你在夜晚死亡，当晚你会得知一名邪恶玩家。",
                 "firstNight": 0,
                 "otherNight": 9950,
@@ -4361,7 +4359,7 @@
                 "pinyin": "chongfei",
                 "pinyinsuoxie": "cf",
                 "scripts": ["山雨欲来"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/94_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/93_anliu.png",
                 "ability": "每局游戏限一次，说书人会在关于你的事情上打破规则。随后，你会秘密得知说书人为此做了什么。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -4382,7 +4380,7 @@
                 "pinyin": "daoke",
                 "pinyinsuoxie": "dk",
                 "scripts": ["山雨欲来"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/82_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/94_anliu.png",
                 "ability": "在你的首个夜晚，你会得知一个在场的爪牙角色。每局游戏限一次，你可以在白天公开选择一名玩家：如果他是你得知的角色，他死亡。",
                 "firstNight": 9600,
                 "otherNight": 0,
@@ -4403,7 +4401,7 @@
                 "pinyin": "daoshi",
                 "pinyinsuoxie": "ds",
                 "scripts": ["山雨欲来"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/83_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/83_anliu.png",
                 "ability": "每个夜晚*，你要选择一名玩家：如果你选中了恶魔，你死亡，然后他醉酒直到下个黎明。",
                 "firstNight": 0,
                 "otherNight": 4350,
@@ -4424,7 +4422,7 @@
                 "pinyin": "fangshi",
                 "pinyinsuoxie": "fs",
                 "scripts": ["山雨欲来"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/84_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/84_anliu.png",
                 "ability": "在你的首个夜晚，你要选择一个数字。在该数字对应的那一个夜晚，你会得知对应数量的在场角色。",
                 "firstNight": 12350,
                 "otherNight": 14725,
@@ -4445,7 +4443,7 @@
                 "pinyin": "fengshuishi",
                 "pinyinsuoxie": "fss",
                 "scripts": ["山雨欲来"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/95_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/95_anliu.png",
                 "ability": "在你的首个夜晚，你会得知一名玩家的角色类型。每个夜晚*，你会从他的顺时针方向得知下一名非旅行者玩家的角色类型。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -4466,7 +4464,7 @@
                 "pinyin": "limao",
                 "pinyinsuoxie": "lm",
                 "scripts": ["山雨欲来"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/85_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/96_anliu.png",
                 "ability": "每个夜晚*，你要选择一名玩家：如果他是善良角色且当晚被邪恶角色杀死，你和他交换角色。",
                 "firstNight": 0,
                 "otherNight": 1980,
@@ -4487,7 +4485,7 @@
                 "pinyin": "qianke",
                 "pinyinsuoxie": "qk",
                 "scripts": ["山雨欲来"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/86_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/85_anliu.png",
                 "ability": "每个夜晚，你要选择两名存活玩家：如果他们阵营相同，今晚任何玩家使用自身能力选择他们之一作为目标时，改为选中另一名玩家。",
                 "firstNight": 3450,
                 "otherNight": 950,
@@ -4508,7 +4506,7 @@
                 "pinyin": "ranfangfangzhu",
                 "pinyinsuoxie": "rffz",
                 "scripts": ["山雨欲来"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/96_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/86_anliu.png",
                 "ability": "如果你在夜晚死亡，恶魔的能力变成“每个夜晚*，可能会有一名玩家死亡。”",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -4529,7 +4527,7 @@
                 "pinyin": "shiguan",
                 "pinyinsuoxie": "sg",
                 "scripts": ["山雨欲来"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/87_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/87_anliu.png",
                 "ability": "每个夜晚*，如果今天白天有玩家死于处决，你会得知存活镇民的数量。",
                 "firstNight": 0,
                 "otherNight": 14750,
@@ -4550,7 +4548,7 @@
                 "pinyin": "tixingguan",
                 "pinyinsuoxie": "txg",
                 "scripts": ["山雨欲来"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/88_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/88_anliu.png",
                 "ability": "在你首次提名玩家后，你会在当晚得知他的角色。恶魔会被你的能力当作善良角色。",
                 "firstNight": 0,
                 "otherNight": 11400,
@@ -4567,11 +4565,11 @@
             },
             {
                 "id": "xunchaCustomVER",
-                "name": "巡查",
+                "name": "巡察",
                 "pinyin": "xuncha",
                 "pinyinsuoxie": "xc",
                 "scripts": ["山雨欲来"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/89_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/89_anliu.png",
                 "ability": "每个夜晚*，你要选择两个善良角色（与上个夜晚不同）：如果他们都存活，他们当晚不会死亡。",
                 "firstNight": 0,
                 "otherNight": 1990,
@@ -4592,7 +4590,7 @@
                 "pinyin": "yanshi",
                 "pinyinsuoxie": "ys",
                 "scripts": ["山雨欲来"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/97_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/97_anliu.png",
                 "ability": "如果你在夜晚死亡，你与一名存活爪牙玩家交换角色。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -4613,7 +4611,7 @@
                 "pinyin": "yishi",
                 "pinyinsuoxie": "ys",
                 "scripts": ["山雨欲来"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/98_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/98_anliu.png",
                 "ability": "每个白天，你可以公开声明一个角色。在当晚，你会得知该角色是否在场。如果你因此得知了否，你失去此能力。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -4634,7 +4632,7 @@
                 "pinyin": "yinluren",
                 "pinyinsuoxie": "ylr",
                 "scripts": ["山雨欲来"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/90_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/90_anliu.png",
                 "ability": "每个夜晚，你要选择至多三名玩家：你会得知今晚是否有邪恶玩家的能力选择或影响了他们之中的玩家。",
                 "firstNight": 12450,
                 "otherNight": 14850,
@@ -4655,7 +4653,7 @@
                 "pinyin": "yongjiang",
                 "pinyinsuoxie": "yj",
                 "scripts": ["山雨欲来"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/91_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/99_anliu.png",
                 "ability": "如果已死亡玩家中没有邪恶玩家，你只会死于处决。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -4676,7 +4674,7 @@
                 "pinyin": "zhen",
                 "pinyinsuoxie": "z",
                 "scripts": ["山雨欲来"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/92_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/91_anliu.png",
                 "ability": "每局游戏限一次，在夜晚时*，你可以选择一个镇民角色：如果他在场，他中毒并死亡。",
                 "firstNight": 0,
                 "otherNight": 9050,
@@ -4697,7 +4695,7 @@
                 "pinyin": "zhifu",
                 "pinyinsuoxie": "zf",
                 "scripts": ["山雨欲来"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/93_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/92_anliu.png",
                 "ability": "每个夜晚*，你会得知今天是否有非镇民且非旅行者的玩家死亡。",
                 "firstNight": 0,
                 "otherNight": 14775,
@@ -4718,7 +4716,7 @@
                 "pinyin": "xizigai",
                 "pinyinsuoxie": "xzg",
                 "scripts": ["山雨欲来"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/79_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/79_anliu.png",
                 "ability": "其他善良玩家醉酒（旅行者除外），你们互相认识且无法转变阵营，对调胜负结果，即使你失去能力。",
                 "firstNight": 3410,
                 "otherNight": 0,
@@ -4739,7 +4737,7 @@
                 "pinyin": "jiuguowang",
                 "pinyinsuoxie": "jgw",
                 "scripts": ["旧版角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/47_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/47_anliu.png",
                 "ability": "每个夜晚，如果死亡的玩家数量大于存活的玩家数量，你会得知一个存活的角色。恶魔知道你是国王。",
                 "firstNight": 3110,
                 "otherNight": 13110,
@@ -4760,7 +4758,7 @@
                 "pinyin": "jiuqiqiujianshiyuan",
                 "pinyinsuoxie": "jqjqjs",
                 "scripts": ["旧版角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/53_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/53_anliu.png",
                 "ability": "每个夜晚，你会得知一名不同角色类型的玩家，直到场上所有的角色类型你都得知过一次。[+1 外来者]",
                 "firstNight": 9010,
                 "otherNight": 12110,
@@ -4781,7 +4779,7 @@
                 "pinyin": "jiunongfu",
                 "pinyinsuoxie": "jnf",
                 "scripts": ["旧版角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/51_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/51_anliu.png",
                 "ability": "如果你在夜晚死亡，一名存活的善良玩家会变成农夫。",
                 "firstNight": 0,
                 "otherNight": 10310,
@@ -4802,7 +4800,7 @@
                 "pinyin": "jiuxifashi",
                 "pinyinsuoxie": "jxfs",
                 "scripts": ["旧版角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/61_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/61_anliu.png",
                 "ability": "每个白天限一次，你可以公开猜测谁是爪牙，谁是恶魔。如果你猜对，善良阵营获胜",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -4823,7 +4821,7 @@
                 "pinyin": "jiubanshouren",
                 "pinyinsuoxie": "jbsr",
                 "scripts": ["旧版角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/39_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/39_anliu.png",
                 "ability": "每个夜晚*，你要选择一名存活的玩家，如果他是善良的，他死亡，并且当晚不会再有其他玩家死亡。",
                 "firstNight": 0,
                 "otherNight": 4410,
@@ -4844,7 +4842,7 @@
                 "pinyin": "jiulianjinshushi",
                 "pinyinsuoxie": "jljss",
                 "scripts": ["旧版角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/49_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/49_anliu.png",
                 "ability": "你拥有一个不在场的爪牙角色的能力。",
                 "firstNight": 610,
                 "otherNight": 0,
@@ -4868,7 +4866,7 @@
                 "pinyin": "guanjia",
                 "pinyinsuoxie": "gj",
                 "scripts": ["暗流涌动"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anyue/_anyue.png",
                 "ability": "每个夜晚，你要选择除你以外的一名玩家：明天白天，只有他投票时你才能投票。",
                 "firstNight": 8100,
                 "otherNight": 11200,
@@ -4889,7 +4887,7 @@
                 "pinyin": "jiugui",
                 "pinyinsuoxie": "jg",
                 "scripts": ["暗流涌动"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/1_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anyue/1_anyue.png",
                 "ability": "你不知道你是酒鬼。你以为你是一个镇民角色，但其实你不是。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -4910,7 +4908,7 @@
                 "pinyin": "moke",
                 "pinyinsuoxie": "mk",
                 "scripts": ["暗流涌动"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/2_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anyue/2_anyue.png",
                 "ability": "你可能会被当作邪恶阵营、爪牙角色或恶魔角色，即使你已死亡。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -4931,7 +4929,7 @@
                 "pinyin": "shengtu",
                 "pinyinsuoxie": "st",
                 "scripts": ["暗流涌动"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/3_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anyue/3_anyue.png",
                 "ability": "如果你死于处决，你的阵营落败。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -4952,7 +4950,7 @@
                 "pinyin": "xiubujiang",
                 "pinyinsuoxie": "xbj",
                 "scripts": ["黯月初升"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/4_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anyue/4_anyue.png",
                 "ability": "你随时可能死亡。",
                 "firstNight": 0,
                 "otherNight": 9200,
@@ -4973,7 +4971,7 @@
                 "pinyin": "yuezhizi",
                 "pinyinsuoxie": "yzz",
                 "scripts": ["黯月初升"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/5_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anyue/5_anyue.png",
                 "ability": "当你得知你死亡时，你要公开选择一名存活的玩家。如果他是善良的，在当晚他会死亡。",
                 "firstNight": 0,
                 "otherNight": 9300,
@@ -4994,7 +4992,7 @@
                 "pinyin": "mangfu",
                 "pinyinsuoxie": "mf",
                 "scripts": ["黯月初升"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/6_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anyue/6_anyue.png",
                 "ability": "每个夜晚，首个使用其自身能力选择了你的玩家会醉酒直到下个黄昏。你会转变为他的阵营。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -5015,7 +5013,7 @@
                 "pinyin": "fengzi",
                 "pinyinsuoxie": "fz",
                 "scripts": ["黯月初升"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/7_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anyue/7_anyue.png",
                 "ability": "你以为你是一个恶魔，但其实你不是。恶魔知道你是疯子以及你在每个夜晚选择了哪些玩家。",
                 "firstNight": 2300,
                 "otherNight": 4200,
@@ -5036,7 +5034,7 @@
                 "pinyin": "jixingxiuyanyuan",
                 "pinyinsuoxie": "jxxyy",
                 "scripts": ["梦殒春宵"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/8_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anyue/8_anyue.png",
                 "ability": "如果你“疯狂”地证明自己是外来者，你可能被处决。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -5057,7 +5055,7 @@
                 "pinyin": "xinshangren",
                 "pinyinsuoxie": "xsr",
                 "scripts": ["梦殒春宵"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/9_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anyue/9_anyue.png",
                 "ability": "当你死亡时，会有一名玩家开始醉酒。",
                 "firstNight": 0,
                 "otherNight": 9700,
@@ -5078,7 +5076,7 @@
                 "pinyin": "lifashi",
                 "pinyinsuoxie": "lfs",
                 "scripts": ["梦殒春宵"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/10_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anyue/10_anyue.png",
                 "ability": "如果你死亡，在当晚恶魔可以选择两名玩家（不能选择其他恶魔）交换角色。",
                 "firstNight": 0,
                 "otherNight": 9600,
@@ -5099,7 +5097,7 @@
                 "pinyin": "daigua",
                 "pinyinsuoxie": "dg",
                 "scripts": ["梦殒春宵"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/11_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anyue/11_anyue.png",
                 "ability": "当你得知你死亡时，你要公开选择一名存活的玩家：如果他是邪恶的，你的阵营落败。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -5120,7 +5118,7 @@
                 "pinyin": "gaomizhe",
                 "pinyinsuoxie": "gmz",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/12_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anyue/12_anyue.png",
                 "ability": "爪牙会在其首个夜晚得知三个伪装。",
                 "firstNight": 2100,
                 "otherNight": 0,
@@ -5141,7 +5139,7 @@
                 "pinyin": "jiemidashi",
                 "pinyinsuoxie": "jmds",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/humlet/che/13_che.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anyue/13_anyue.png",
                 "ability": "一名玩家醉酒，即使你已死亡。每局游戏限一次，你可以猜测谁是那个醉酒的玩家，如果猜对了，你会得知谁是恶魔，但如果猜错了，你会得知错误的“谁是恶魔”信息。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -5162,7 +5160,7 @@
                 "pinyin": "kuangrezhe",
                 "pinyinsuoxie": "krz",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/14_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anyue/14_anyue.png",
                 "ability": "如果有大于等于五名玩家存活，你必须在所有提名中投票。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -5183,7 +5181,7 @@
                 "pinyin": "luonanshaonv",
                 "pinyinsuoxie": "lnsn",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/15_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anyue/15_anyue.png",
                 "ability": "所有爪牙都知道落难少女在场。每局游戏限一次，任意爪牙可以公开猜测你是落难少女，如果猜对，你的阵营落败。",
                 "firstNight": 2200,
                 "otherNight": 0,
@@ -5204,7 +5202,7 @@
                 "pinyin": "maojiang",
                 "pinyinsuoxie": "mj",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/16_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anyue/16_anyue.png",
                 "ability": "如果你死亡，当晚爪牙和恶魔玩家可以选择变成新的爪牙和恶魔角色。",
                 "firstNight": 0,
                 "otherNight": 800,
@@ -5225,7 +5223,7 @@
                 "pinyin": "moxiang",
                 "pinyinsuoxie": "mx",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/17_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anyue/17_anyue.png",
                 "ability": "每局游戏你只能发起提名一次。当你发起提名时，如果被你提名的玩家不是恶魔，他死亡。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -5246,7 +5244,7 @@
                 "pinyin": "shirenmo",
                 "pinyinsuoxie": "srm",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/18_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anyue/18_anyue.png",
                 "ability": "在你的首个夜晚，你要选择除你以外的一名玩家：你转变为他的阵营，即使你已醉酒或中毒，但你不知道你转变后的阵营。",
                 "firstNight": 11750,
                 "otherNight": 0,
@@ -5267,7 +5265,7 @@
                 "pinyin": "wenyiyisheng",
                 "pinyinsuoxie": "wyys",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/19_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anyue/19_anyue.png",
                 "ability": "当你死亡时，说书人会获得一个爪牙能力。",
                 "firstNight": 0,
                 "otherNight": 10000,
@@ -5288,7 +5286,7 @@
                 "pinyin": "yiduanfenzi",
                 "pinyinsuoxie": "ydfz",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/20_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anyue/20_anyue.png",
                 "ability": "对调胜负结果，即使你已死亡。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -5309,7 +5307,7 @@
                 "pinyin": "yinshi",
                 "pinyinsuoxie": "ys",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/21_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anyue/21_anyue.png",
                 "ability": "你拥有所有外来者能力。[-0~1外来者]",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -5330,7 +5328,7 @@
                 "pinyin": "zhengke",
                 "pinyinsuoxie": "zk",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/22_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anyue/22_anyue.png",
                 "ability": "如果你是对你的阵营落败负最大责任的人，你转变阵营并获胜，即使你已死亡。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -5351,7 +5349,7 @@
                 "pinyin": "nichen",
                 "pinyinsuoxie": "nc",
                 "scripts": ["华灯初上"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/23_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anyue/23_anyue.png",
                 "ability": "在你的首个夜晚，你要选择除你以外的一名玩家：如果他先死于处决，你会在当晚转变为邪恶；如果你先死于处决，他会在当晚转变为邪恶。",
                 "firstNight": 8200,
                 "otherNight": 3400,
@@ -5372,7 +5370,7 @@
                 "pinyin": "shaxing",
                 "pinyinsuoxie": "sx",
                 "scripts": ["华灯初上"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/24_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anyue/24_anyue.png",
                 "ability": "如果你死亡，当晚与你邻近的存活玩家之一可能会死亡。",
                 "firstNight": 0,
                 "otherNight": 9400,
@@ -5393,7 +5391,7 @@
                 "pinyin": "shijie",
                 "pinyinsuoxie": "sj",
                 "scripts": ["华灯初上"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/25_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anyue/25_anyue.png",
                 "ability": "每个夜晚限一次，一名玩家在使用自身能力选择邪恶玩家时会改为选中你，即使你已死亡。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -5414,7 +5412,7 @@
                 "pinyin": "shusheng",
                 "pinyinsuoxie": "ss",
                 "scripts": ["华灯初上"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/26_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anyue/26_anyue.png",
                 "ability": "恶魔知道书生在场。每局游戏限一次，恶魔可以拜访说书人并猜测你是书生。如果恶魔猜测正确，即使你已死亡，当晚该恶魔可以选择一名玩家：他死亡。",
                 "firstNight": 3300,
                 "otherNight": 8500,
@@ -5435,7 +5433,7 @@
                 "pinyin": "jiubao",
                 "pinyinsuoxie": "jb",
                 "scripts": ["山雨欲来"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/27_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anyue/27_anyue.png",
                 "ability": "与你邻近的善良玩家之一醉酒，即使你已死亡。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -5456,7 +5454,7 @@
                 "pinyin": "rulianshi",
                 "pinyinsuoxie": "rls",
                 "scripts": ["山雨欲来"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/28_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anyue/28_anyue.png",
                 "ability": "如果你提名了恶魔且他死于这次处决，你会变成那个邪恶的恶魔。当剩余存活玩家小于等于四人时（旅行者除外），你失去能力。",
                 "firstNight": 0,
                 "otherNight": 3500,
@@ -5477,7 +5475,7 @@
                 "pinyin": "shutong",
                 "pinyinsuoxie": "st",
                 "scripts": ["山雨欲来"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/87_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anyue/29_anyue.png",
                 "ability": "在你的首个夜晚，你要选择除你以外的一名玩家：除首个夜晚以外，当他被邪恶玩家的能力选择或影响时，你会在当晚死亡。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -5498,7 +5496,7 @@
                 "pinyin": "jiuwenyiyisheng",
                 "pinyinsuoxie": "jwyys",
                 "scripts": ["旧版角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/19_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anyue/19_anyue.png",
                 "ability": "如果你死亡，说书人获得一个不在场的爪牙能力。",
                 "firstNight": 0,
                 "otherNight": 10020,
@@ -5519,7 +5517,7 @@
                 "pinyin": "jiuzajiyanyuan",
                 "pinyinsuoxie": "jzjyy",
                 "scripts": ["旧版角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image/68_image.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/68_anliu.png",
                 "ability": "每个夜晚*，如果与你邻近的存活善良玩家之一醉酒或中毒，你死亡。",
                 "firstNight": 0,
                 "otherNight": 8900,
@@ -5543,7 +5541,7 @@
                 "pinyin": "touduzhe",
                 "pinyinsuoxie": "tdz",
                 "scripts": ["暗流涌动"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/29_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/ziluolan/_ziluolan.png",
                 "ability": "每个夜晚，你要选择一名玩家：他在当晚和明天白天中毒。",
                 "firstNight": 4600,
                 "otherNight": 1400,
@@ -5564,7 +5562,7 @@
                 "pinyin": "jiandie",
                 "pinyinsuoxie": "jd",
                 "scripts": ["暗流涌动"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/30_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/ziluolan/1_ziluolan.png",
                 "ability": "每个夜晚，你能查看魔典。你可能会被当作善良阵营、镇民角色或外来者角色，即使你已死亡。",
                 "firstNight": 11700,
                 "otherNight": 14400,
@@ -5585,7 +5583,7 @@
                 "pinyin": "hongchunnvlang",
                 "pinyinsuoxie": "hcnl",
                 "scripts": ["暗流涌动"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/31_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/ziluolan/2_ziluolan.png",
                 "ability": "如果大于等于五名玩家存活时（旅行者不计算在内）恶魔死亡，你变成那个恶魔。",
                 "firstNight": 0,
                 "otherNight": 3700,
@@ -5606,7 +5604,7 @@
                 "pinyin": "nanjue",
                 "pinyinsuoxie": "nj",
                 "scripts": ["暗流涌动"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/32_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/ziluolan/3_ziluolan.png",
                 "ability": "会有额外的外来者在场。[+2 外来者]",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -5627,7 +5625,7 @@
                 "pinyin": "jiaofu",
                 "pinyinsuoxie": "jf",
                 "scripts": ["黯月初升"],
-                "image": "https://www.bloodstar.xyz/p/humlet/JI-SHI/52_jishi.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/ziluolan/4_ziluolan.png",
                 "ability": "在你的首个夜晚，你会得知有哪些外来者角色在场。如果有外来者在白天死亡，你会在当晚被唤醒并且你要选择一名玩家：他死亡。[-1或+1外来者]",
                 "firstNight": 5400,
                 "otherNight": 8700,
@@ -5648,7 +5646,7 @@
                 "pinyin": "moguidaiyanren",
                 "pinyinsuoxie": "mgdyr",
                 "scripts": ["黯月初升"],
-                "image": "https://www.bloodstar.xyz/p/humlet/che/41_che.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/ziluolan/5_ziluolan.png",
                 "ability": "每个夜晚，你要选择一名存活的玩家（与上个夜晚不同）：如果明天白天他被处决，他不会死亡。",
                 "firstNight": 5500,
                 "otherNight": 2600,
@@ -5669,7 +5667,7 @@
                 "pinyin": "cike",
                 "pinyinsuoxie": "ck",
                 "scripts": ["黯月初升"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/35_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/ziluolan/6_ziluolan.png",
                 "ability": "每局游戏限一次，在夜晚时*，你可以选择一名玩家：他死亡，即使因为任何原因让他不会死亡。",
                 "firstNight": 0,
                 "otherNight": 8600,
@@ -5690,7 +5688,7 @@
                 "pinyin": "zhumou",
                 "pinyinsuoxie": "zm",
                 "scripts": ["黯月初升"],
-                "image": "https://www.bloodstar.xyz/p/humlet/JI-SHI/30_jishi.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/ziluolan/7_ziluolan.png",
                 "ability": "如果恶魔因为死于处决而因此导致游戏结束时，再额外进行一个夜晚和一个白天。在那个白天如果有玩家被处决，他的阵营落败。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -5711,7 +5709,7 @@
                 "pinyin": "jingxiangshuangzi",
                 "pinyinsuoxie": "jxsz",
                 "scripts": ["梦殒春宵"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/37_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/ziluolan/8_ziluolan.png",
                 "ability": "你与一名对立阵营的玩家互相知道对方是什么角色。如果其中善良玩家被处决，邪恶阵营获胜。如果你们都存活，善良阵营无法获胜。",
                 "firstNight": 5600,
                 "otherNight": 0,
@@ -5732,7 +5730,7 @@
                 "pinyin": "nvwu",
                 "pinyinsuoxie": "nw",
                 "scripts": ["梦殒春宵"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/38_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/ziluolan/9_ziluolan.png",
                 "ability": "每个夜晚，你要选择一名玩家：如果他明天白天发起提名，他死亡。如果只有三名存活的玩家，你失去此能力。",
                 "firstNight": 5700,
                 "otherNight": 2700,
@@ -5753,7 +5751,7 @@
                 "pinyin": "xinaoshi",
                 "pinyinsuoxie": "xns",
                 "scripts": ["梦殒春宵"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/39_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/ziluolan/10_ziluolan.png",
                 "ability": "每个夜晚，你要选择一名玩家和一个善良角色。他明天白天和夜晚需要“疯狂”地证明自己是这个角色，不然他可能被处决。",
                 "firstNight": 5800,
                 "otherNight": 2800,
@@ -5774,7 +5772,7 @@
                 "pinyin": "malianwupo",
                 "pinyinsuoxie": "mlwp",
                 "scripts": ["梦殒春宵"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/40_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/ziluolan/11_ziluolan.png",
                 "ability": "每个夜晚*，你要选择一名玩家和一个角色，如果该角色不在场，他变成该角色。如果因此创造了一个恶魔，当晚的死亡由说书人决定。",
                 "firstNight": 0,
                 "otherNight": 1300,
@@ -5795,7 +5793,7 @@
                 "pinyin": "gebulin",
                 "pinyinsuoxie": "gbl",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/41_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/ziluolan/12_ziluolan.png",
                 "ability": "如果你在被提名后公开声明自己是哥布林且在那个白天被处决，你的阵营获胜。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -5816,7 +5814,7 @@
                 "pinyin": "guafu",
                 "pinyinsuoxie": "gf",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/42_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/ziluolan/13_ziluolan.png",
                 "ability": "在你的首个夜晚，你能查看魔典并选择一名玩家：他中毒。随后，始终会有一名善良玩家知道寡妇在场。",
                 "firstNight": 4700,
                 "otherNight": 0,
@@ -5837,7 +5835,7 @@
                 "pinyin": "jietoufengqinshou",
                 "pinyinsuoxie": "jtfqs",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/43_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/ziluolan/14_ziluolan.png",
                 "ability": "所有玩家在投票时闭眼，且票数会秘密统计。每个夜晚，你要选择自己是否醉酒直到下个黄昏。",
                 "firstNight": 5410,
                 "otherNight": 2520,
@@ -5858,7 +5856,7 @@
                 "pinyin": "jingshenbinghuanzhe",
                 "pinyinsuoxie": "jsbhz",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/humlet/che/56_che.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/ziluolan/15_ziluolan.png",
                 "ability": "每个白天，在提名开始前，你可以公开选择一名玩家：他死亡。如果你被处决，提名你的玩家需要和你猜拳，只有你输了你才会死亡。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -5879,7 +5877,7 @@
                 "pinyin": "kexueguairen",
                 "pinyinsuoxie": "kxgr",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/45_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/ziluolan/16_ziluolan.png",
                 "ability": "恶魔拥有一个不在场的善良角色的能力，即使他醉酒或中毒。你和他都知道他获得了什么能力。",
                 "firstNight": 150,
                 "otherNight": 0,
@@ -5900,7 +5898,7 @@
                 "pinyin": "kongjuzhiling",
                 "pinyinsuoxie": "kjzl",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/46_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/ziluolan/17_ziluolan.png",
                 "ability": "每个夜晚，你要选择一名玩家：如果你提名他且他被处决，他的阵营落败。当你首次选择或更换目标时，所有玩家都会得知你选择了新的玩家。",
                 "firstNight": 5900,
                 "otherNight": 3000,
@@ -5921,7 +5919,7 @@
                 "pinyin": "lingyanshi",
                 "pinyinsuoxie": "lys",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/47_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/ziluolan/18_ziluolan.png",
                 "ability": "在你的首个夜晚，你会得知一个关键词。首个说出该关键词的善良玩家会在当晚转变为邪恶阵营。",
                 "firstNight": 6100,
                 "otherNight": 3200,
@@ -5942,7 +5940,7 @@
                 "pinyin": "tixianmuou",
                 "pinyinsuoxie": "txmo",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/48_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/ziluolan/19_ziluolan.png",
                 "ability": "你以为你是一个善良角色，但其实你不是。恶魔会知道你是提线木偶。[提线木偶会与恶魔邻座]",
                 "firstNight": 3200,
                 "otherNight": 0,
@@ -5963,7 +5961,7 @@
                 "pinyin": "wanghun",
                 "pinyinsuoxie": "wh",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/49_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/ziluolan/20_ziluolan.png",
                 "ability": "你可以在夜晚睁眼。当其他邪恶玩家被唤醒时，你也会被唤醒。",
                 "firstNight": 145,
                 "otherNight": 200,
@@ -5984,7 +5982,7 @@
                 "pinyin": "weiqier",
                 "pinyinsuoxie": "wqe",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/50_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/ziluolan/21_ziluolan.png",
                 "ability": "所有玩家都知道你是维齐尔。你在白天时不会死亡。如果一次提名中有善良玩家投票，你可以让被提名者立即被处决。",
                 "firstNight": 12900,
                 "otherNight": 0,
@@ -6005,7 +6003,7 @@
                 "pinyin": "wushi",
                 "pinyinsuoxie": "ws",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/51_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/ziluolan/22_ziluolan.png",
                 "ability": "每局游戏限一次，你可以向说书人许愿。如果愿望被实现，可能会伴随着代价和线索。",
                 "firstNight": 5150,
                 "otherNight": 1950,
@@ -6026,7 +6024,7 @@
                 "pinyin": "xian",
                 "pinyinsuoxie": "x",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/52_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/ziluolan/23_ziluolan.png",
                 "ability": "在等同于初始外来者数量的夜晚，所有镇民玩家中毒直到下个黄昏。[外来者数量任意]",
                 "firstNight": 4575,
                 "otherNight": 1350,
@@ -6047,7 +6045,7 @@
                 "pinyin": "yingshennvyao",
                 "pinyinsuoxie": "ysny",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/53_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/ziluolan/24_ziluolan.png",
                 "ability": "每个夜晚，你要选择两名玩家：明天第一名玩家需要“疯狂”地证明第二名玩家是邪恶的，否则他们之中可能会有人死亡。",
                 "firstNight": 6000,
                 "otherNight": 3100,
@@ -6068,7 +6066,7 @@
                 "pinyin": "zhadanren",
                 "pinyinsuoxie": "zdr",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/54_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/ziluolan/25_ziluolan.png",
                 "ability": "如果你被处决，除三名玩家以外的其他所有玩家均会死亡。倒数十声后，被最多玩家手指指着的玩家死亡。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -6089,7 +6087,7 @@
                 "pinyin": "zhaohuanshi",
                 "pinyinsuoxie": "zhs",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/55_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/ziluolan/26_ziluolan.png",
                 "ability": "在首个夜晚，你会得知三个伪装。在第三个夜晚，你要选择一名玩家：他变成由你选择的邪恶恶魔。[无恶魔在场]",
                 "firstNight": 2210,
                 "otherNight": 3710,
@@ -6110,7 +6108,7 @@
                 "pinyin": "ganshiren",
                 "pinyinsuoxie": "gsr",
                 "scripts": ["华灯初上"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/56_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/ziluolan/27_ziluolan.png",
                 "ability": "与你邻近的两名镇民玩家会在其首次死亡时被当作仍然存活。[-1外来者]",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -6131,7 +6129,7 @@
                 "pinyin": "humeiniang",
                 "pinyinsuoxie": "hmn",
                 "scripts": ["华灯初上"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/57_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/ziluolan/28_ziluolan.png",
                 "ability": "在你的首个夜晚，你要选择一名玩家：他会知道狐 TORTURED 在场。如果你死于处决，当晚他转变为邪恶阵营。",
                 "firstNight": 6200,
                 "otherNight": 3300,
@@ -6152,7 +6150,7 @@
                 "pinyin": "jinweijun",
                 "pinyinsuoxie": "jwj",
                 "scripts": ["华灯初上"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/58_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/ziluolan/29_ziluolan.png",
                 "ability": "“疯狂”地想要死亡的玩家可能会立即被处决。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -6173,7 +6171,7 @@
                 "pinyin": "yangguren",
                 "pinyinsuoxie": "ygr",
                 "scripts": ["华灯初上"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/59_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/ziluolan/30_ziluolan.png",
                 "ability": "在你存活时提名你的玩家会在当晚死亡，即使你已死亡。",
                 "firstNight": 0,
                 "otherNight": 8800,
@@ -6194,7 +6192,7 @@
                 "pinyin": "gudiao",
                 "pinyinsuoxie": "gd",
                 "scripts": ["山雨欲来"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/89_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/ziluolan/31_ziluolan.png",
                 "ability": "每个夜晚，你要选择左或右：你得知该方向上的下一名存活善良玩家的角色，他中毒且其他善良玩家以为他是邪恶的蛊雕，直到下个黄昏。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -6215,7 +6213,7 @@
                 "pinyin": "huapi",
                 "pinyinsuoxie": "hp",
                 "scripts": ["山雨欲来"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/60_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/ziluolan/32_ziluolan.png",
                 "ability": "在你的首个夜晚，你要选择一名存活玩家：他死亡但会被当作存活。当他下一次即将死亡时，他重生，随后你重获能力。",
                 "firstNight": 4550,
                 "otherNight": 0,
@@ -6236,7 +6234,7 @@
                 "pinyin": "jinweijun2",
                 "pinyinsuoxie": "jwj2",
                 "scripts": ["山雨欲来"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/58_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/ziluolan/29_ziluolan.png",
                 "ability": "在你的首个夜晚，你要选择存活或死亡。“疯狂”地想要这样做的玩家可能会立即被处决。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -6257,7 +6255,7 @@
                 "pinyin": "mengpo",
                 "pinyinsuoxie": "mp",
                 "scripts": ["山雨欲来"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/88_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/ziluolan/33_ziluolan.png",
                 "ability": "每个夜晚*，你要选择一名玩家：如果他存活，那么他要选择让自己失去能力，或死亡并保留能力直到下个黄昏。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -6278,7 +6276,7 @@
                 "pinyin": "niangjiushi",
                 "pinyinsuoxie": "nj",
                 "scripts": ["山雨欲来"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/61_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/ziluolan/34_ziluolan.png",
                 "ability": "每个夜晚，你要选择一个镇民角色：当他下一次通过自身能力获取信息时，改为得知你给出的信息。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -6299,7 +6297,7 @@
                 "pinyin": "jiumalianwupo",
                 "pinyinsuoxie": "jmlwp",
                 "scripts": ["旧版角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/40_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/ziluolan/11_ziluolan.png",
                 "ability": "每个夜晚*，你要选择一名玩家和一个角色，如果该角色不在场，他变成该角色。如果因此创造了一个恶魔，当晚的死亡由说书人决定。",
                 "firstNight": 0,
                 "otherNight": 2900,
@@ -6320,7 +6318,7 @@
                 "pinyin": "jiuyingshennvyao",
                 "pinyinsuoxie": "jysny",
                 "scripts": ["旧版角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/53_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/ziluolan/24_ziluolan.png",
                 "ability": "每个夜晚，你要选择两名玩家：明天第一名玩家需要“疯狂”地证明第二名玩家是邪恶的，否则他们可能会死亡。",
                 "firstNight": 6010,
                 "otherNight": 3110,
@@ -6341,7 +6339,7 @@
                 "pinyin": "jiujietoufengqinshou",
                 "pinyinsuoxie": "jjtfqs",
                 "scripts": ["旧版角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/43_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/ziluolan/14_ziluolan.png",
                 "ability": "所有玩家在投票时闭眼，且票数会秘密统计。对你的提名只在你投票时才会统计票数。",
                 "firstNight": 5420,
                 "otherNight": 2530,
@@ -6362,7 +6360,7 @@
                 "pinyin": "jiuzhadanren",
                 "pinyinsuoxie": "jzdr",
                 "scripts": ["旧版角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/54_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/ziluolan/25_ziluolan.png",
                 "ability": "如果你被处决，除三名玩家以外的其他所有玩家均会死亡。一分钟之后，被最多玩家手指指着的玩家死亡。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -6386,7 +6384,7 @@
                 "pinyin": "xiaoemo",
                 "pinyinsuoxie": "xem",
                 "scripts": ["暗流涌动"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/62_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/shiyanxing/_shiyanxing.png",
                 "ability": "每个夜晚*，你要选择一名玩家：他死亡。如果你以这种方式自杀，一名爪牙会变成小恶魔。",
                 "firstNight": 0,
                 "otherNight": 4900,
@@ -6407,7 +6405,7 @@
                 "pinyin": "jiangbu",
                 "pinyinsuoxie": "jb",
                 "scripts": ["黯月初升"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/63_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/shiyanxing/1_shiyanxing.png",
                 "ability": "每个夜晚*，如果今天白天没有人死亡，你会被唤醒并要选择一名玩家：他死亡。当你首次死亡后，你仍存活，但会被当作死亡。",
                 "firstNight": 0,
                 "otherNight": 5000,
@@ -6428,7 +6426,7 @@
                 "pinyin": "puka",
                 "pinyinsuoxie": "pk",
                 "scripts": ["黯月初升"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/64_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/shiyanxing/2_shiyanxing.png",
                 "ability": "每个夜晚，你要选择一名玩家：他中毒。上个因你的能力中毒的玩家会死亡并恢复健康。",
                 "firstNight": 6600,
                 "otherNight": 5100,
@@ -6449,7 +6447,7 @@
                 "pinyin": "shabaluosi",
                 "pinyinsuoxie": "sbls",
                 "scripts": ["黯月初升"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/65_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/shiyanxing/3_shiyanxing.png",
                 "ability": "每个夜晚*，你要选择两名玩家：他们死亡。你上个夜晚选择过且当前死亡的玩家之一可能会被你反刍。",
                 "firstNight": 0,
                 "otherNight": 5200,
@@ -6470,7 +6468,7 @@
                 "pinyin": "po",
                 "pinyinsuoxie": "p",
                 "scripts": ["黯月初升"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/66_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/shiyanxing/4_shiyanxing.png",
                 "ability": "每个夜晚*，你可以选择一名玩家：他死亡。如果你上次选择时没有选择任何玩家，当晚你要选择三名玩家：他们死亡。",
                 "firstNight": 0,
                 "otherNight": 5300,
@@ -6491,7 +6489,7 @@
                 "pinyin": "fanggu",
                 "pinyinsuoxie": "fg",
                 "scripts": ["梦殒春宵"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/67_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/shiyanxing/5_shiyanxing.png",
                 "ability": "每个夜晚*，你要选择一名玩家：他死亡。被该能力杀死的外来者改为变成邪恶的方古且你代替他死亡，但每局游戏仅能成功转化一次。[+1外来者]",
                 "firstNight": 0,
                 "otherNight": 5400,
@@ -6512,7 +6510,7 @@
                 "pinyin": "wanggumo",
                 "pinyinsuoxie": "wgm",
                 "scripts": ["梦殒春宵"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/68_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/shiyanxing/6_shiyanxing.png",
                 "ability": "每个夜晚*，你要选择一名玩家：他死亡。被你杀死的爪牙保留他的能力，且与他邻近的两名镇民之一中毒。[-1外来者]",
                 "firstNight": 0,
                 "otherNight": 6100,
@@ -6533,7 +6531,7 @@
                 "pinyin": "nuodashi",
                 "pinyinsuoxie": "nds",
                 "scripts": ["梦殒春宵"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/69_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/shiyanxing/7_shiyanxing.png",
                 "ability": "每个夜晚*，你要选择一名玩家：他死亡。与你邻近的两名镇民中毒。",
                 "firstNight": 0,
                 "otherNight": 5500,
@@ -6554,7 +6552,7 @@
                 "pinyin": "woliu",
                 "pinyinsuoxie": "wl",
                 "scripts": ["梦殒春宵"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/70_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/shiyanxing/8_shiyanxing.png",
                 "ability": "每个夜晚*，你要选择一名玩家：他死亡。镇民玩家的能力都会产生错误信息。如果白天没人被处决，邪恶阵营获胜。",
                 "firstNight": 0,
                 "otherNight": 5600,
@@ -6575,7 +6573,7 @@
                 "pinyin": "aohe",
                 "pinyinsuoxie": "ah",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/71_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/shiyanxing/9_shiyanxing.png",
                 "ability": "每个夜晚*，你要选择一个角色：他死亡。如果该角色不在场，则由说书人来决定谁会被你杀死。",
                 "firstNight": 0,
                 "otherNight": 6200,
@@ -6596,7 +6594,7 @@
                 "pinyin": "baoluan",
                 "pinyinsuoxie": "bl",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/72_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/shiyanxing/10_shiyanxing.png",
                 "ability": "在第三个白天，所有爪牙会变成暴乱，当天被提名的玩家会立即死亡且必须再次提名一名存活的玩家。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -6617,7 +6615,7 @@
                 "pinyin": "difengzhishou",
                 "pinyinsuoxie": "dfzs",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/73_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/shiyanxing/11_shiyanxing.png",
                 "ability": "每个夜晚*，你要选择一名玩家：他死亡。[邪恶角色全部邻座，你靠近正中，+1爪牙，-或+任意数量外来者]",
                 "firstNight": 140,
                 "otherNight": 6300,//5700,
@@ -6638,7 +6636,7 @@
                 "pinyin": "hadijiya",
                 "pinyinsuoxie": "hdjy",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/74_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/shiyanxing/12_shiyanxing.png",
                 "ability": "每个夜晚*，你可以选择三名玩家（所有玩家都会得知你选了谁）：他们分别秘密决定自己的生死，然后如果他们都存活则都死亡。",
                 "firstNight": 0,
                 "otherNight": 7000,
@@ -6659,7 +6657,7 @@
                 "pinyin": "juntuan",
                 "pinyinsuoxie": "jt",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/75_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/shiyanxing/13_shiyanxing.png",
                 "ability": "每个夜晚*，可能有一名玩家死亡。如果一项提名只有邪恶玩家投票，投票无效。你也会被当作是爪牙。[多数玩家为军团]",
                 "firstNight": 0,
                 "otherNight": 4600,//6000,
@@ -6680,7 +6678,7 @@
                 "pinyin": "kazhali",
                 "pinyinsuoxie": "kzl",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/76_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/shiyanxing/14_shiyanxing.png",
                 "ability": "每个夜晚*，你要选择一名玩家：他死亡。[由你决定谁是什么爪牙，-或+任意数量外来者]",
                 "firstNight": 1000,
                 "otherNight": 7700,
@@ -6701,7 +6699,7 @@
                 "pinyin": "liweitan",
                 "pinyinsuoxie": "lwt",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/77_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/shiyanxing/15_shiyanxing.png",
                 "ability": "如果多于一名善良玩家被处决，邪恶阵营获胜。所有玩家都知道利维坦在场。在第五个白天结束时，邪恶阵营获胜。",
                 "firstNight": 12800,
                 "otherNight": 15100,
@@ -6722,7 +6720,7 @@
                 "pinyin": "lizhi",
                 "pinyinsuoxie": "lz",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/78_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/shiyanxing/16_shiyanxing.png",
                 "ability": "每个夜晚*，你要选择一名玩家：他死亡。在你的首个夜晚，你要选择一名存活的玩家：他中毒，只有当他处于死亡状态时你才会立即死亡。",
                 "firstNight": 4500,
                 "otherNight": 7200,
@@ -6743,7 +6741,7 @@
                 "pinyin": "xiaoguaibao",
                 "pinyinsuoxie": "xgb",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/79_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/shiyanxing/17_shiyanxing.png",
                 "ability": "每个夜晚，所有爪牙要秘密决定由哪名玩家来照看小怪宝并且“是恶魔”。每个夜晚*，可能会有一名玩家死亡。[+1爪牙]",
                 "firstNight": 4400,
                 "otherNight": 7300,
@@ -6764,7 +6762,7 @@
                 "pinyin": "yagababu",
                 "pinyinsuoxie": "ygbb",
                 "scripts": ["实验性角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/80_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/shiyanxing/18_shiyanxing.png",
                 "ability": "在你的首个夜晚，你会得知一段秘密短语。每次你在白天公开说出这段短语，当天便可能会有一名玩家在这之后死亡。",
                 "firstNight": 6610,
                 "otherNight": 7400,
@@ -6785,7 +6783,7 @@
                 "pinyin": "hundun",
                 "pinyinsuoxie": "hd",
                 "scripts": ["华灯初上"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/81_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/shiyanxing/19_shiyanxing.png",
                 "ability": "每个夜晚*，你要选择一名玩家：他死亡。如果你以这种方式杀死了一名与你邻近的镇民玩家，除旅行者外的所有善良玩家会中毒直到下个黄昏。",
                 "firstNight": 0,
                 "otherNight": 7900,
@@ -6806,7 +6804,7 @@
                 "pinyin": "qiongqi",
                 "pinyinsuoxie": "qq",
                 "scripts": ["华灯初上"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/82_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/shiyanxing/20_shiyanxing.png",
                 "ability": "每个夜晚*，你要选择一名玩家：他死亡。如果今天白天有外来者死亡，当晚改为你要选择一名玩家：他死亡，但被当作仍然存活，随后会有一名其他玩家死亡。[+1外来者]",
                 "firstNight": 0,
                 "otherNight": 8000,
@@ -6827,7 +6825,7 @@
                 "pinyin": "taotie",
                 "pinyinsuoxie": "tt",
                 "scripts": ["华灯初上"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/83_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/shiyanxing/21_shiyanxing.png",
                 "ability": "每个夜晚*，你要选择任意数量的非旅行者玩家或一名旅行者玩家：如果他们的角色类型均不相同，他们死亡。[+1外来者]",
                 "firstNight": 0,
                 "otherNight": 8100,
@@ -6848,7 +6846,7 @@
                 "pinyin": "taowu",
                 "pinyinsuoxie": "tw",
                 "scripts": ["华灯初上"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/84_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/shiyanxing/22_shiyanxing.png",
                 "ability": "每个夜晚*，你要选择一名玩家：他死亡。当你将要死亡时，改为一名存活且具有能力的爪牙失去能力。你不会得知恶魔信息。",
                 "firstNight": 2800,
                 "otherNight": 8200,
@@ -6869,7 +6867,7 @@
                 "pinyin": "baojun",
                 "pinyinsuoxie": "bj",
                 "scripts": ["山雨欲来"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/85_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/shiyanxing/23_shiyanxing.png",
                 "ability": "每个夜晚*，你可以选择至多两名玩家：他们死亡。你选择的玩家数量不能与上个夜晚死亡的玩家数量相同（超过二人时算作二人）。",
                 "firstNight": 0,
                 "otherNight": 8300,
@@ -6890,7 +6888,7 @@
                 "pinyin": "dianyuzhang",
                 "pinyinsuoxie": "dyz",
                 "scripts": ["山雨欲来"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/90_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/shiyanxing/24_shiyanxing.png",
                 "ability": "每个夜晚，你要选择至多三名玩家：如果明天白天他们之一死于处决，上次被你选择的其他玩家会在当晚死亡。否则，当晚他们之中会有一名玩家死亡。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -6911,7 +6909,7 @@
                 "pinyin": "guhuoniao",
                 "pinyinsuoxie": "ghn",
                 "scripts": ["山雨欲来"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/86_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/shiyanxing/25_shiyanxing.png",
                 "ability": "每个夜晚*，你要选择一名玩家：他死亡。当爪牙死于处决时，你可能会获得他的能力，但每局游戏仅能获得一次。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -6932,7 +6930,7 @@
                 "pinyin": "jianning",
                 "pinyinsuoxie": "jn",
                 "scripts": ["山雨欲来"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/91_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/shiyanxing/26_shiyanxing.png",
                 "ability": "每个夜晚*，你要选择一名玩家：他死亡。如果你今天白天没有投票，今晚你可以行动两次。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -6953,7 +6951,7 @@
                 "pinyin": "yanluo",
                 "pinyinsuoxie": "yl",
                 "scripts": ["山雨欲来"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/92_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/shiyanxing/27_shiyanxing.png",
                 "ability": "在你的首个夜晚，你能查看魔典并选择一名玩家：他在第三个夜晚死亡，即使因为任何原因让他不会死亡。每个夜晚，你要选择一名玩家：上个夜晚被你选择的玩家死亡。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -6974,7 +6972,7 @@
                 "pinyin": "jiuxiaoguaibao",
                 "pinyinsuoxie": "jxgb",
                 "scripts": ["旧版角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/79_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/shiyanxing/17_shiyanxing.png",
                 "ability": "每个夜晚，所有爪牙要秘密决定由哪名玩家来照看小怪宝并且“是恶魔”。每个夜晚*，会有一名玩家死亡。[+1爪牙]",
                 "firstNight": 4410,
                 "otherNight": 7310,
@@ -6995,7 +6993,7 @@
                 "pinyin": "jiulizhi",
                 "pinyinsuoxie": "jlz",
                 "scripts": ["旧版角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/78_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/shiyanxing/16_shiyanxing.png",
                 "ability": "每个夜晚*，你要选择一名玩家：他死亡。在你的首个夜晚，你要选择一名存活的玩家：他中毒，只有他死亡时你才会一同死亡。",
                 "firstNight": 4510,
                 "otherNight": 7210,
@@ -7016,7 +7014,7 @@
                 "pinyin": "jiubaoluan",
                 "pinyinsuoxie": "jbl",
                 "scripts": ["旧版角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/72_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/shiyanxing/10_shiyanxing.png",
                 "ability": "被提名的玩家死亡，但他可以立刻再次发起提名（第三天白天他必须这么做）。在第三个白天结束时，邪恶阵营获胜。[所有爪牙都是暴乱]",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -7037,7 +7035,7 @@
                 "pinyin": "guhuoniao",
                 "pinyinsuoxie": "ghn",
                 "scripts": ["旧版角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/86_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/jiuban/_jiuban.png",
                 "ability": "每个夜晚*，你要选择一名玩家：他死亡。你可能会拥有上一个死于处决的爪牙的能力。",
                 "firstNight": 0,
                 "otherNight": 0,
@@ -7058,7 +7056,7 @@
                 "pinyin": "jiuhadijiya",
                 "pinyinsuoxie": "jhdjy",
                 "scripts": ["旧版角色"],
-                "image": "https://www.bloodstar.xyz/p/Haimian0421/image2/74_image2.png",
+                "image": "https://www.bloodstar.xyz/p/shifenfantuan/shiyanxing/12_shiyanxing.png",
                 "ability": "每个夜晚*，你要选择三名玩家（所有玩家会得知你选了谁）：他们分别秘密决定自己的生死，然后如果他们都存活则都死亡。",
                 "firstNight": 0,
                 "otherNight": 7010,
@@ -9620,7 +9618,10 @@
                 if (!listContainer) continue;
 
                 const checkboxes = listContainer.querySelectorAll('input[type="checkbox"]:not(:disabled)');
-                const availableCheckboxes = Array.from(checkboxes);
+                const availableCheckboxes = Array.from(checkboxes).filter(cb => {
+                    const roleItem = cb.closest('.role-item');
+                    return roleItem && !roleItem.classList.contains('hidden');
+                });
 
                 if (availableCheckboxes.length === 0) {
                     alert(`没有可用的${team === 'townsfolk' ? '镇民' : team === 'outsiders' ? '外来者' : team === 'minions' ? '爪牙' : '恶魔'}角色！`);
@@ -11950,19 +11951,16 @@
         // 渲染角色列表
         function scriptRenderRoles(team, containerId, roleJinxMap, allRoles, scale = 1.0, customColor = null) {
             const container = document.getElementById(containerId);
+            if (!container) {
+                console.error(`容器 ${containerId} 未找到`);
+                return;
+            }
             container.innerHTML = '';
 
             let roles = scriptRolesByTeam[team];
 
             // 设置阵营对应的颜色
-            const teamColors = {
-                'townsfolk': '#1e3a5f',
-                'outsider': '#0d5c5c',
-                'minion': '#8b4513',
-                'demon': '#8b0000',
-                'custom': customColor || '#6b5a45'
-            };
-            const teamColor = teamColors[team] || '#333';
+            const teamColor = customColor || '#333';
 
             // 根据缩放比例计算尺寸
             const imgSize = Math.round(54 * scale);
@@ -11996,9 +11994,9 @@
                     this.style.cursor = 'grab';
                 });
 
-                // 为爪牙和恶魔设置红色角色名，镇民和外来者使用阵营色
+                // 为爪牙和恶魔设置红色角色名，镇民和外来者使用固定颜色
                 const isEvil = team === 'minion' || team === 'demon';
-                const nameColor = isEvil ? '#c41e3a' : teamColor;
+                const nameColor = isEvil ? '#c41e3a' : '#333';
 
                 // 获取当前角色的相克角色
                 const jinxRules = roleJinxMap[role.name] || [];
@@ -12039,10 +12037,18 @@
         }
 
         // 生成剧本图
+        let isGeneratingScriptImage = false;
         function generateScriptImage() {
+            // 防止重复点击
+            if (isGeneratingScriptImage) {
+                console.log('剧本图生成中，请稍候...');
+                return;
+            }
+            isGeneratingScriptImage = true;
+            
             try {
                 // 提示用户角色下载失败的处理方法
-                alert('若发现官方角色或bloodxyz的自制角色下载失败，请复制json→粘贴json，然后多试几次生成剧本图。其余时候请耐心等待。');
+                alert('若发现官方角色或bloodxyz的自制角色下载失败，请多生成几次，其余时候请请耐心等待。');
 
                 // 获取显示选项
                 const showNightOrder = document.getElementById('showNightOrder')?.checked ?? true;
@@ -12075,12 +12081,27 @@
                     }
                 });
 
-                // 获取自定义阵营名称
+                // 获取自定义阵营名称和颜色
                 const customTeamNames = {
                     townsfolk: document.getElementById('custom-townsfolk-name')?.value?.trim() || '镇民',
                     outsider: document.getElementById('custom-outsider-name')?.value?.trim() || '外来者',
                     minion: document.getElementById('custom-minion-name')?.value?.trim() || '爪牙',
                     demon: document.getElementById('custom-demon-name')?.value?.trim() || '恶魔'
+                };
+                
+                const customTeamColors = {
+                    townsfolk: document.getElementById('custom-townsfolk-color')?.value || '#1e3a5f',
+                    outsider: document.getElementById('custom-outsider-color')?.value || '#0d5c5c',
+                    minion: document.getElementById('custom-minion-color')?.value || '#8b4513',
+                    demon: document.getElementById('custom-demon-color')?.value || '#8b0000'
+                };
+                
+                // 颜色转换函数
+                const hexToRgba = (hex, alpha) => {
+                    const r = parseInt(hex.slice(1, 3), 16);
+                    const g = parseInt(hex.slice(3, 5), 16);
+                    const b = parseInt(hex.slice(5, 7), 16);
+                    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
                 };
 
                 // 获取自定义阵营信息
@@ -12101,20 +12122,14 @@
 
                 // 阵营配置（用于动态生成阵营块）
                 let teamConfigs = [
-                    { key: 'townsfolk', name: customTeamNames.townsfolk, color: '#1e3a5f', gradient: 'linear-gradient(180deg, #1e3a5f 0%, #2d4a6f 100%)', containerId: 'script-townsfolk-list', hasHeader: true },
-                    { key: 'outsider', name: customTeamNames.outsider, color: '#0d5c5c', gradient: 'linear-gradient(180deg, #0d5c5c 0%, #1a6b6b 100%)', containerId: 'script-outsider-list', hasHeader: false },
-                    { key: 'minion', name: customTeamNames.minion, color: '#8b4513', gradient: 'linear-gradient(180deg, #8b4513 0%, #a0522d 100%)', containerId: 'script-minion-list', hasHeader: false },
-                    { key: 'demon', name: customTeamNames.demon, color: '#8b0000', gradient: 'linear-gradient(180deg, #8b0000 0%, #a52a2a 100%)', containerId: 'script-demon-list', hasHeader: false }
+                    { key: 'townsfolk', name: customTeamNames.townsfolk, color: customTeamColors.townsfolk, gradient: `linear-gradient(180deg, ${customTeamColors.townsfolk} 0%, ${hexToRgba(customTeamColors.townsfolk, 0.8)} 100%)`, containerId: 'script-townsfolk-list', hasHeader: true },
+                    { key: 'outsider', name: customTeamNames.outsider, color: customTeamColors.outsider, gradient: `linear-gradient(180deg, ${customTeamColors.outsider} 0%, ${hexToRgba(customTeamColors.outsider, 0.8)} 100%)`, containerId: 'script-outsider-list', hasHeader: false },
+                    { key: 'minion', name: customTeamNames.minion, color: customTeamColors.minion, gradient: `linear-gradient(180deg, ${customTeamColors.minion} 0%, ${hexToRgba(customTeamColors.minion, 0.8)} 100%)`, containerId: 'script-minion-list', hasHeader: false },
+                    { key: 'demon', name: customTeamNames.demon, color: customTeamColors.demon, gradient: `linear-gradient(180deg, ${customTeamColors.demon} 0%, ${hexToRgba(customTeamColors.demon, 0.8)} 100%)`, containerId: 'script-demon-list', hasHeader: false }
                 ];
 
                 // 如果有自定义阵营，添加到配置中
                 validCustomTeams.forEach((customTeam, index) => {
-                    const hexToRgba = (hex, alpha) => {
-                        const r = parseInt(hex.slice(1, 3), 16);
-                        const g = parseInt(hex.slice(3, 5), 16);
-                        const b = parseInt(hex.slice(5, 7), 16);
-                        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-                    };
                     teamConfigs.push({
                         key: `custom-${index}`,
                         name: customTeam.name,
@@ -12163,7 +12178,18 @@
                 });
 
                 // 构建剧本图HTML结构
-                const scriptImageContainer = document.getElementById('script-image-container');
+                let scriptImageContainer = document.getElementById('script-image-container');
+                if (!scriptImageContainer) {
+                    // 如果元素不存在，创建一个
+                    scriptImageContainer = document.createElement('div');
+                    scriptImageContainer.id = 'script-image-container';
+                    scriptImageContainer.style.display = 'none';
+                    scriptImageContainer.style.marginBottom = '40px';
+                    scriptImageContainer.style.maxWidth = '100%';
+                    scriptImageContainer.style.maxHeight = 'calc(100vh - 100px)';
+                    scriptImageContainer.style.overflow = 'auto';
+                    document.body.appendChild(scriptImageContainer);
+                }
                 scriptImageContainer.style.display = 'block';
 
                 // 获取剧本标题和作者信息
@@ -12182,7 +12208,7 @@
                 ];
 
                 // 合并并排序所有首夜顺序角色
-                const allFirstNightRoles = [...firstNightRoles, ...customFirstNightRoles].sort((a, b) => a.firstNight - b.firstNight);
+                const allFirstNightRoles = [...firstNightRoles, ...customFirstNightRoles].filter(role => role && role.firstNight !== undefined).sort((a, b) => a.firstNight - b.firstNight);
 
                 // 添加用户指定的他夜顺序角色
                 const customOtherNightRoles = [
@@ -12190,7 +12216,7 @@
                 ];
 
                 // 合并并排序所有其他夜晚顺序角色
-                const allOtherNightRoles = [...otherNightRoles, ...customOtherNightRoles].sort((a, b) => a.otherNight - b.otherNight);
+                const allOtherNightRoles = [...otherNightRoles, ...customOtherNightRoles].filter(role => role && role.otherNight !== undefined).sort((a, b) => a.otherNight - b.otherNight);
 
                 // 合并首夜和他夜角色，去重
                 const nightRolesMap = new Map();
@@ -12265,7 +12291,7 @@
                 const trimmedCustomRules = customRules.trim();
 
                 // 获取相克规则
-                const getJinxRules = () => {
+                const getJinxRulesForScript = () => {
                     const jinxRules = [];
                     const roleNames = allRoles.map(role => role.name);
 
@@ -12327,7 +12353,7 @@
                     return jinxRules;
                 };
 
-                const jinxRules = getJinxRules();
+                const jinxRules = getJinxRulesForScript();
 
                 // 为每个角色创建相克规则映射
                 const roleJinxMap = {};
@@ -12366,7 +12392,7 @@
 
                                 <!-- 镇民区域（包含剧本标题、作者和配置表）- 固定位置，不可拖拽 -->
                                 <div data-team="townsfolk" style="display: flex;">
-                                    <div style="width: 40px; background: linear-gradient(180deg, #1e3a5f 0%, #2d4a6f 100%); display: flex; align-items: center; justify-content: center; border-radius: 6px 0 0 6px; flex-shrink: 0;">
+                                    <div style="width: 40px; background: ${teamConfigs.find(t => t.key === 'townsfolk')?.gradient || '#1e3a5f'}; display: flex; align-items: center; justify-content: center; border-radius: 6px 0 0 6px; flex-shrink: 0;">
                                         <span style="writing-mode: vertical-rl; text-orientation: upright; color: white; font-size: 22px; font-weight: bold; letter-spacing: 6px;">${customTeamNames.townsfolk}</span>
                                     </div>
                                     <div style="flex: 1; display: flex; flex-direction: column; background: rgba(255,255,255,0.7); border-radius: 0 6px 6px 0;">
@@ -12489,7 +12515,7 @@
 
                                 <!-- 外来者区域 -->
                                 <div class="team-block" data-team="outsider" style="display: flex; cursor: move;">
-                                    <div style="width: 40px; background: linear-gradient(180deg, #0d5c5c 0%, #1a6b6b 100%); display: flex; align-items: center; justify-content: center; border-radius: 6px 0 0 6px; flex-shrink: 0;">
+                                    <div style="width: 40px; background: ${teamConfigs.find(t => t.key === 'outsider')?.gradient || '#0d5c5c'}; display: flex; align-items: center; justify-content: center; border-radius: 6px 0 0 6px; flex-shrink: 0;">
                                         <span style="writing-mode: vertical-rl; text-orientation: upright; color: white; font-size: 22px; font-weight: bold; letter-spacing: 6px;">${customTeamNames.outsider}</span>
                                     </div>
                                     <div id="script-outsider-list" style="flex: 1; background: rgba(255,255,255,0.7); padding: 10px; border-radius: 0 6px 6px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;"></div>
@@ -12497,7 +12523,7 @@
 
                                 <!-- 爪牙区域 -->
                                 <div class="team-block" data-team="minion" style="display: flex; cursor: move;">
-                                    <div style="width: 40px; background: linear-gradient(180deg, #8b4513 0%, #a0522d 100%); display: flex; align-items: center; justify-content: center; border-radius: 6px 0 0 6px; flex-shrink: 0;">
+                                    <div style="width: 40px; background: ${teamConfigs.find(t => t.key === 'minion')?.gradient || '#8b4513'}; display: flex; align-items: center; justify-content: center; border-radius: 6px 0 0 6px; flex-shrink: 0;">
                                         <span style="writing-mode: vertical-rl; text-orientation: upright; color: white; font-size: 22px; font-weight: bold; letter-spacing: 6px;">${customTeamNames.minion}</span>
                                     </div>
                                     <div id="script-minion-list" style="flex: 1; background: rgba(255,255,255,0.7); padding: 10px; border-radius: 0 6px 6px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;"></div>
@@ -12506,7 +12532,7 @@
                                 <!-- 自定义阵营区域 -->
                                 ${validCustomTeams.map((customTeam, index) => `
                                 <div class="team-block" data-team="custom-${index}" style="display: flex; cursor: move;">
-                                    <div style="width: 40px; background: ${teamConfigs.find(t => t.key === 'custom-'+index).gradient}; display: flex; align-items: center; justify-content: center; border-radius: 6px 0 0 6px; flex-shrink: 0;">
+                                    <div style="width: 40px; background: ${teamConfigs.find(t => t.key === 'custom-'+index)?.gradient || customTeam.color}; display: flex; align-items: center; justify-content: center; border-radius: 6px 0 0 6px; flex-shrink: 0;">
                                         <span style="writing-mode: vertical-rl; text-orientation: upright; color: white; font-size: 22px; font-weight: bold; letter-spacing: 6px;">${customTeam.name}</span>
                                     </div>
                                     <div id="script-custom-${index}-list" style="flex: 1; background: rgba(255,255,255,0.7); padding: 10px; border-radius: 0 6px 6px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;"></div>
@@ -12515,7 +12541,7 @@
 
                                 <!-- 恶魔区域（包含相克规则） -->
                                 <div class="team-block" data-team="demon" style="display: flex; cursor: move;">
-                                    <div style="width: 40px; background: linear-gradient(180deg, #8b0000 0%, #a52a2a 100%); display: flex; align-items: center; justify-content: center; border-radius: 6px 0 0 6px; flex-shrink: 0;">
+                                    <div style="width: 40px; background: ${teamConfigs.find(t => t.key === 'demon')?.gradient || '#8b0000'}; display: flex; align-items: center; justify-content: center; border-radius: 6px 0 0 6px; flex-shrink: 0;">
                                         <span style="writing-mode: vertical-rl; text-orientation: upright; color: white; font-size: 22px; font-weight: bold; letter-spacing: 6px;">${customTeamNames.demon}</span>
                                     </div>
                                     <div style="flex: 1; display: flex; flex-direction: column;">
@@ -12530,7 +12556,7 @@
                     const role1 = allRoles.find(r => r.name === rule.jinxRole1);
                     const role2 = allRoles.find(r => r.name === rule.jinxRole2);
                     return `
-                                                            <div style="display: flex; align-items: baseline; gap: 8px; padding: 6px 10px; background: rgba(255,255,255,0.9); border-radius: 4px; border-left: 3px solid #8b4513;">
+                                                            <div style="display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: rgba(255,255,255,0.9); border-radius: 4px; border-left: 3px solid #8b4513;">
                                                                 <div style="display: flex; align-items: center; gap: 4px; flex-shrink: 0;">
                                                                     ${role1 ? `<div style="width: 28px; height: 28px; border: 2px solid #d4c1a4; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.15), 0 1px 2px rgba(0,0,0,0.1); overflow: hidden;"><img src="${role1.image}" alt="${role1.name}" style="width: 100%; height: 100%; object-fit: cover; display: block;"></div>` : ''}
                                                                     <span style="font-size: 13px; font-weight: bold; color: #333;">${rule.jinxRole1}</span>
@@ -12615,10 +12641,10 @@
 
                 // 渲染所有角色（先以较大的基准大小渲染，让页面更饱满）
                 const baseScale = 1.15; // 基准缩放比例，让标准大小更饱满
-                scriptRenderRoles('townsfolk', 'script-townsfolk-list', roleJinxMap, allRoles, baseScale);
-                scriptRenderRoles('outsider', 'script-outsider-list', roleJinxMap, allRoles, baseScale);
-                scriptRenderRoles('minion', 'script-minion-list', roleJinxMap, allRoles, baseScale);
-                scriptRenderRoles('demon', 'script-demon-list', roleJinxMap, allRoles, baseScale);
+                scriptRenderRoles('townsfolk', 'script-townsfolk-list', roleJinxMap, allRoles, baseScale, customTeamColors.townsfolk);
+                scriptRenderRoles('outsider', 'script-outsider-list', roleJinxMap, allRoles, baseScale, customTeamColors.outsider);
+                scriptRenderRoles('minion', 'script-minion-list', roleJinxMap, allRoles, baseScale, customTeamColors.minion);
+                scriptRenderRoles('demon', 'script-demon-list', roleJinxMap, allRoles, baseScale, customTeamColors.demon);
                 validCustomTeams.forEach((customTeam, index) => {
                     scriptRenderRoles(`custom-${index}`, `script-custom-${index}-list`, roleJinxMap, allRoles, baseScale, customTeam.color);
                 });
@@ -12629,10 +12655,10 @@
                     if (globalRoleScale !== 1.0) {
                         // 重新渲染所有角色，应用新的缩放比例（乘以基准比例）
                         const finalScale = baseScale * globalRoleScale;
-                        scriptRenderRoles('townsfolk', 'script-townsfolk-list', roleJinxMap, allRoles, finalScale);
-                        scriptRenderRoles('outsider', 'script-outsider-list', roleJinxMap, allRoles, finalScale);
-                        scriptRenderRoles('minion', 'script-minion-list', roleJinxMap, allRoles, finalScale);
-                        scriptRenderRoles('demon', 'script-demon-list', roleJinxMap, allRoles, finalScale);
+                        scriptRenderRoles('townsfolk', 'script-townsfolk-list', roleJinxMap, allRoles, finalScale, customTeamColors.townsfolk);
+                        scriptRenderRoles('outsider', 'script-outsider-list', roleJinxMap, allRoles, finalScale, customTeamColors.outsider);
+                        scriptRenderRoles('minion', 'script-minion-list', roleJinxMap, allRoles, finalScale, customTeamColors.minion);
+                        scriptRenderRoles('demon', 'script-demon-list', roleJinxMap, allRoles, finalScale, customTeamColors.demon);
                         validCustomTeams.forEach((customTeam, index) => {
                             scriptRenderRoles(`custom-${index}`, `script-custom-${index}-list`, roleJinxMap, allRoles, finalScale, customTeam.color);
                         });
@@ -12646,7 +12672,7 @@
                         const rulesContainer = document.getElementById('custom-rules-container');
                         const rulesContent = document.getElementById('custom-rules-content');
 
-                        if (rulesContainer && rulesContent) {
+                        if (container && rulesContainer && rulesContent) {
                             let fontSize = 14;
                             rulesContent.style.fontSize = fontSize + 'px';
 
@@ -12738,6 +12764,49 @@
                         }
                     });
                     
+                    // 重新获取自定义阵营名称和颜色
+                    const customTeamNames = {
+                        townsfolk: document.getElementById('custom-townsfolk-name')?.value?.trim() || '镇民',
+                        outsider: document.getElementById('custom-outsider-name')?.value?.trim() || '外来者',
+                        minion: document.getElementById('custom-minion-name')?.value?.trim() || '爪牙',
+                        demon: document.getElementById('custom-demon-name')?.value?.trim() || '恶魔'
+                    };
+                    
+                    const customTeamColors = {
+                        townsfolk: document.getElementById('custom-townsfolk-color')?.value || '#1e3a5f',
+                        outsider: document.getElementById('custom-outsider-color')?.value || '#0d5c5c',
+                        minion: document.getElementById('custom-minion-color')?.value || '#8b4513',
+                        demon: document.getElementById('custom-demon-color')?.value || '#8b0000'
+                    };
+                    
+                    // 颜色转换函数
+                    const hexToRgba = (hex, alpha) => {
+                        const r = parseInt(hex.slice(1, 3), 16);
+                        const g = parseInt(hex.slice(3, 5), 16);
+                        const b = parseInt(hex.slice(5, 7), 16);
+                        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+                    };
+                    
+                    // 重新创建阵营配置
+                    const teamConfigs = [
+                        { key: 'townsfolk', name: customTeamNames.townsfolk, color: customTeamColors.townsfolk, gradient: `linear-gradient(180deg, ${customTeamColors.townsfolk} 0%, ${hexToRgba(customTeamColors.townsfolk, 0.8)} 100%)`, containerId: 'script-townsfolk-list', hasHeader: true },
+                        { key: 'outsider', name: customTeamNames.outsider, color: customTeamColors.outsider, gradient: `linear-gradient(180deg, ${customTeamColors.outsider} 0%, ${hexToRgba(customTeamColors.outsider, 0.8)} 100%)`, containerId: 'script-outsider-list', hasHeader: false },
+                        { key: 'minion', name: customTeamNames.minion, color: customTeamColors.minion, gradient: `linear-gradient(180deg, ${customTeamColors.minion} 0%, ${hexToRgba(customTeamColors.minion, 0.8)} 100%)`, containerId: 'script-minion-list', hasHeader: false },
+                        { key: 'demon', name: customTeamNames.demon, color: customTeamColors.demon, gradient: `linear-gradient(180deg, ${customTeamColors.demon} 0%, ${hexToRgba(customTeamColors.demon, 0.8)} 100%)`, containerId: 'script-demon-list', hasHeader: false }
+                    ];
+                    
+                    // 添加自定义阵营配置
+                    validCustomTeams.forEach((customTeam, index) => {
+                        teamConfigs.push({
+                            key: `custom-${index}`,
+                            name: customTeam.name,
+                            color: customTeam.color,
+                            gradient: `linear-gradient(180deg, ${customTeam.color} 0%, ${hexToRgba(customTeam.color, 0.8)} 100%)`,
+                            containerId: `script-custom-${index}-list`,
+                            hasHeader: false
+                        });
+                    });
+                    
                     // 添加自定义阵营容器
                     validCustomTeams.forEach((_, index) => {
                         roleContainers.push(`script-custom-${index}-list`);
@@ -12781,7 +12850,8 @@
                                     scriptRolesByTeam[team] = reorderedRoles;
                                     
                                     const baseScale = 1.15;
-                                    scriptRenderRoles(team, containerId, roleJinxMap, allRoles, baseScale, team.startsWith('custom-') ? validCustomTeams[parseInt(team.split('-')[1])]?.color : null);
+                                    const teamColor = teamConfigs.find(config => config.key === team)?.color || (team.startsWith('custom-') ? validCustomTeams[parseInt(team.split('-')[1])]?.color : null);
+                                    scriptRenderRoles(team, containerId, roleJinxMap, allRoles, baseScale, teamColor);
                                     
                                     setTimeout(function() {
                                         globalRoleScale = calculateScaleByHeight();
@@ -12964,6 +13034,11 @@
                     setTimeout(function() {
                         // 获取内部实际内容容器
                         const contentContainer = scriptImageContainer.querySelector('div');
+                        
+                        if (!contentContainer) {
+                            alert('无法找到内容容器');
+                            return;
+                        }
 
                         // 确保容器高度正确计算
                         contentContainer.style.height = 'auto';
@@ -13017,6 +13092,9 @@
             } catch (error) {
                 alert('生成剧本图失败，请检查角色数据');
                 console.error('生成剧本图错误:', error);
+            } finally {
+                // 重置生成标志
+                isGeneratingScriptImage = false;
             }
         }
 
@@ -13076,7 +13154,7 @@
                 const roleNames = allRoles.map(role => role.name);
 
                 // 获取相克规则
-                const getJinxRules = () => {
+                const getJinxRulesForPreview = () => {
                     const jinxRules = [];
 
                     // 检查是否存在相克规则库
@@ -13127,7 +13205,7 @@
                     return jinxRules;
                 };
 
-                const jinxRules = getJinxRules();
+                const jinxRules = getJinxRulesForPreview();
 
                 // 过滤出旅行者和传奇角色
                 // 尝试不同的team值
