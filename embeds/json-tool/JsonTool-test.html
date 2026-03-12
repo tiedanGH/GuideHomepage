@@ -1297,9 +1297,21 @@
 
             </div>
             <div>
-                <h4>角色图标网址（选填）：</h4>
-                <textarea id="image"  style="min-width: 300px; min-height: 60px;" placeholder="自制角色使用的图片URL。
-（工具暂不支持上传图片，你可以将图片上传至https://www.bloodstar.xyz，把图片URL拷贝在这里。）"></textarea>
+                <h4>角色图标（选填）：</h4>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <button type="button" style="padding: 8px 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.3s ease;">
+                            上传图片
+                            <input type="file" id="image-upload" accept="image/*" style="position: absolute; opacity: 0; z-index: -1; cursor: pointer;">
+                        </button>
+                        <span style="font-size: 12px; color: #666;">支持 JPG、PNG、WebP 格式</span>
+                    </div>
+                    <div id="image-preview" style="display: none; margin: 10px 0;">
+                        <img id="preview-img" src="" alt="预览" style="max-width: 200px; max-height: 200px; border-radius: 4px; border: 2px solid #ddd;">
+                        <button type="button" id="clear-image" style="margin-top: 5px; padding: 5px 10px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">清除图片</button>
+                    </div>
+                    <textarea id="image"  style="min-width: 300px; min-height: 60px;" placeholder="自制角色使用的图片URL，或使用上方上传功能"></textarea>
+                </div>
             </div>
             <!-- 移动按钮到 dirArea 底端 -->
             <button class="cancel-dir-button" onclick="toggleDirInput()">取消</button>
@@ -8927,10 +8939,64 @@
             if (dirInputGroup.style.display === 'none') {
                 dirInputGroup.style.display = 'block';
                 button.textContent = '收起自制角色';
+                
+                // 初始化文件上传功能
+                initImageUpload();
             } else {
                 dirInputGroup.style.display = 'none';
                 button.textContent = '添加自制角色';
             }
+        }
+        
+        // 初始化图片上传功能
+        function initImageUpload() {
+            const fileInput = document.getElementById('image-upload');
+            const previewDiv = document.getElementById('image-preview');
+            const previewImg = document.getElementById('preview-img');
+            const clearButton = document.getElementById('clear-image');
+            const imageInput = document.getElementById('image');
+            
+            if (!fileInput || !previewDiv || !previewImg || !clearButton || !imageInput) return;
+            
+            // 找到上传按钮（通过查找包含文件输入的按钮）
+            const uploadButton = fileInput.closest('button');
+            if (!uploadButton) return;
+            
+            // 点击上传按钮触发文件选择
+            uploadButton.addEventListener('click', function() {
+                fileInput.click();
+            });
+            
+            // 处理文件选择
+            fileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                // 检查文件类型
+                const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+                if (!validTypes.includes(file.type)) {
+                    alert('请上传 JPG、PNG 或 WebP 格式的图片');
+                    return;
+                }
+                
+                // 使用 FileReader 读取文件
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const base64 = e.target.result;
+                    previewImg.src = base64;
+                    previewDiv.style.display = 'block';
+                    imageInput.value = base64;
+                };
+                reader.readAsDataURL(file);
+            });
+            
+            // 清除图片
+            clearButton.addEventListener('click', function() {
+                previewDiv.style.display = 'none';
+                previewImg.src = '';
+                imageInput.value = '';
+                fileInput.value = '';
+            });
         }
 
         function toggleMetaInfoInput() {
@@ -11949,6 +12015,71 @@
         }
 
         // 渲染角色列表
+        // 高亮技能描述中的关键词
+        function highlightAbility(ability) {
+            if (!ability) return '';
+            
+            // 定义关键词和对应的颜色
+            const highlightMap = [
+                { keywords: ['不会死亡', '存活', '善良', '醉酒', '外来者', '镇民', '不在场的角色', '外来者数量','镇民玩家','镇民角色','外来者角色','善良阵营','善良角色','存活玩家','存活的玩家'], color: '#1e90ff' },
+                { keywords: ['死亡', '死于处决', '处决', '邪恶玩家', '恶魔', '杀死', '错误', '信息', '爪牙', '所有爪牙','恶魔玩家','爪牙角色','邪恶','中毒','邪恶阵营','存活爪牙','邪恶角色','镇民中毒','伪装'], color: '#dc143c' },
+                { keywords: ['疯狂'], color: '#9932cc' }
+            ];
+            
+            let highlightedAbility = ability;
+            
+            // 按优先级和长度排序：先按组优先级，再按关键词长度降序
+            const allKeywords = [];
+            highlightMap.forEach((item, groupIndex) => {
+                item.keywords.forEach(keyword => {
+                    allKeywords.push({ 
+                        word: keyword, 
+                        color: item.color, 
+                        groupIndex: groupIndex,
+                        length: keyword.length 
+                    });
+                });
+            });
+            
+            // 排序：先按组索引（优先级），再按长度降序
+            allKeywords.sort((a, b) => {
+                if (a.groupIndex !== b.groupIndex) {
+                    return a.groupIndex - b.groupIndex; // 优先级高的组先处理
+                }
+                return b.length - a.length; // 同组内长词优先
+            });
+            
+            // 使用占位符标记已匹配的内容，避免重复替换
+            const placeholderMap = new Map();
+            let placeholderCounter = 0;
+            
+            // 替换关键词为高亮版本（按长度降序，先处理长词）
+            allKeywords.forEach(item => {
+                // 转义关键词中的特殊字符，确保正则表达式正确
+                const escapedWord = item.word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const regex = new RegExp(escapedWord, 'g');
+                
+                highlightedAbility = highlightedAbility.replace(regex, (match) => {
+                    // 生成唯一的占位符
+                    const placeholder = `___PLACEHOLDER_${placeholderCounter}___`;
+                    placeholderCounter++;
+                    // 存储高亮后的内容
+                    placeholderMap.set(placeholder, `<span style="color: ${item.color}; font-weight: bold;">${match}</span>`);
+                    return placeholder;
+                });
+            });
+            
+            // 将占位符替换回高亮内容
+            placeholderMap.forEach((value, key) => {
+                highlightedAbility = highlightedAbility.replace(new RegExp(key, 'g'), value);
+            });
+            
+            // 处理方括号[]内的内容，连同方括号一起加粗
+            highlightedAbility = highlightedAbility.replace(/\[([^\]]+)\]/g, '<strong>[$1]</strong>');
+            
+            return highlightedAbility;
+        }
+
         function scriptRenderRoles(team, containerId, roleJinxMap, allRoles, scale = 1.0, customColor = null) {
             const container = document.getElementById(containerId);
             if (!container) {
@@ -11962,17 +12093,24 @@
             // 设置阵营对应的颜色
             const teamColor = customColor || '#333';
 
-            // 根据缩放比例计算尺寸
-            const imgSize = Math.round(54 * scale);
-            const nameSize = Math.round(15 * scale);
+            // 根据缩放比例计算尺寸 - 参考样式：更大的图标，两列布局
+            const imgSize = Math.round(70 * scale);
+            const nameSize = Math.round(16 * scale);
             const abilitySize = Math.round(12 * scale);
-            const jinxIconSize = Math.round(16 * scale);
-            const gap = Math.round(8 * scale);
-            const padding = Math.round(6 * scale);
+            const jinxIconSize = Math.round(14 * scale);
+            const gap = Math.round(10 * scale);
+            const padding = Math.round(8 * scale);
             const marginBottom = Math.round(6 * scale);
-            const borderRadius = Math.max(3, Math.round(5 * scale));
+            const borderRadius = Math.max(3, Math.round(6 * scale));
 
-            roles.forEach(role => {
+            // 直接使用容器作为两列布局，而不是创建额外的容器
+            container.style.cssText = `
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px 12px;
+            `;
+
+            roles.forEach((role, index) => {
                 const roleCard = document.createElement('div');
                 roleCard.dataset.roleId = role.id || role.name;
                 roleCard.dataset.roleName = role.name;
@@ -11981,11 +12119,12 @@
                     gap: ${gap}px;
                     padding: ${padding}px;
                     align-items: flex-start;
-                    background: rgba(255,255,255,0.8);
+                    background: rgba(255,255,255,0.95);
                     border-radius: ${borderRadius}px;
-                    margin-bottom: ${marginBottom}px;
-                    box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
                     cursor: grab;
+                    border-bottom: 1px solid #e8e0d5;
+                    transition: all 0.2s ease;
                 `;
                 roleCard.addEventListener('mousedown', function() {
                     this.style.cursor = 'grabbing';
@@ -12015,12 +12154,15 @@
                 const jinxRoleImagesHtml = Array.from(jinxRoleNames).map(jinxRoleName => {
                     const jinxRole = allRoles.find(r => r.name === jinxRoleName);
                     return jinxRole ? `
-                        <img src="${jinxRole.image}" alt="${jinxRole.name}" style="width: ${jinxIconSize}px; height: ${jinxIconSize}px; object-fit: cover; border-radius: 2px; margin-left: 3px; border: 1px solid #ddd;">
+                        <img src="${jinxRole.image}" alt="${jinxRole.name}" style="width: ${jinxIconSize}px; height: ${jinxIconSize}px; object-fit: cover; border-radius: 2px; margin-left: 4px; border: 1px solid #ddd;">
                     ` : '';
                 }).join('');
 
+                // 处理技能描述高亮
+                const highlightedAbility = highlightAbility(role.ability);
+
                 roleCard.innerHTML = `
-                    <div style="width: ${imgSize}px; height: ${imgSize}px; flex-shrink: 0; border: 2px solid #d4c1a4; border-radius: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.1); overflow: hidden;">
+                    <div style="width: ${imgSize}px; height: ${imgSize}px; flex-shrink: 0; overflow: hidden;">
                         <img src="${role.image}" alt="${role.name}" style="width: 100%; height: 100%; object-fit: cover; display: block;">
                     </div>
                     <div style="flex: 1; min-width: 0;">
@@ -12028,7 +12170,7 @@
                             <h4 style="font-size: ${nameSize}px; font-weight: bold; color: ${nameColor}; margin: 0; font-family: 'SimSun', '宋体', serif;">${role.name}</h4>
                             ${jinxRoleImagesHtml}
                         </div>
-                        <p style="font-size: ${abilitySize}px; color: #4a3728; line-height: 1.4; margin: 0; text-align: justify;">${role.ability}</p>
+                        <p style="font-size: ${abilitySize}px; color: #4a3728; line-height: 1.4; margin: 0; text-align: left;">${highlightedAbility}</p>
                     </div>
                 `;
 
@@ -12245,7 +12387,7 @@
                 const first21NightRolesHtml = first21Roles.map((role) => `
                     <div style="display: flex; flex-direction: column; align-items: center; gap: 2px; width: 40px;">
                         <img src="${role.image}" alt="${role.name}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 2px;">
-                        ${role.isFirstNight ? `<div style="width: 100%; height: 2px; background-color: ${role.inBothNights ? '#6b21a8' : '#333'};"></div>` : ''}
+                        ${role.isFirstNight ? `<div style="width: 100%; height: 2px; background-color: ${role.inBothNights ? '#9932cc' : '#333'};"></div>` : ''}
                     </div>
                 `).join('');
 
@@ -12254,7 +12396,7 @@
                 const remainingNightRolesHtml = remainingRoles.length > 0 ? remainingRoles.map((role) => `
                     <div style="display: flex; flex-direction: column; align-items: center; gap: 2px; width: 40px;">
                         <img src="${role.image}" alt="${role.name}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 2px;">
-                        ${role.isFirstNight ? `<div style="width: 100%; height: 2px; background-color: ${role.inBothNights ? '#6b21a8' : '#333'};"></div>` : ''}
+                        ${role.isFirstNight ? `<div style="width: 100%; height: 2px; background-color: ${role.inBothNights ? '#9932cc' : '#333'};"></div>` : ''}
                     </div>
                 `).join('') : '';
 
@@ -12378,17 +12520,23 @@
                 const minionRoles = scriptRolesByTeam.minion;
                 const demonRoles = scriptRolesByTeam.demon;
 
-                // 构建HTML - 类似官方剧本图布局
+                // 构建HTML - 参考样式改进
                 scriptImageContainer.innerHTML = `
-                    <div style="${containerStyle} background: linear-gradient(135deg, #f5f0e6 0%, #ebe4d6 100%); padding: 30px; border-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); box-sizing: border-box; font-family: 'Microsoft YaHei', sans-serif; position: relative;">
-                        <!-- 装饰性边框 -->
-                        <div style="position: absolute; top: 10px; left: 10px; right: 10px; bottom: 10px; border: 2px solid #c9b896; border-radius: 8px; pointer-events: none;"></div>
+                    <div style="${containerStyle} background: linear-gradient(180deg, #f8f4ed 0%, #f0ebe0 100%); padding: 25px; border-radius: 0; box-shadow: inset 0 0 100px rgba(139, 115, 85, 0.1); box-sizing: border-box; font-family: 'Microsoft YaHei', 'SimSun', sans-serif; position: relative;">
+                        <!-- 装饰性边框 - 复古风格 -->
+                        <div style="position: absolute; top: 15px; left: 15px; right: 15px; bottom: 15px; border: 3px double #b8a88a; pointer-events: none; box-shadow: inset 0 0 20px rgba(184, 168, 138, 0.3);"></div>
+                        
+                        <!-- 角落装饰 -->
+                        <div style="position: absolute; top: 10px; left: 10px; width: 30px; height: 30px; border-top: 3px solid #8b7355; border-left: 3px solid #8b7355; pointer-events: none;"></div>
+                        <div style="position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; border-top: 3px solid #8b7355; border-right: 3px solid #8b7355; pointer-events: none;"></div>
+                        <div style="position: absolute; bottom: 10px; left: 10px; width: 30px; height: 30px; border-bottom: 3px solid #8b7355; border-left: 3px solid #8b7355; pointer-events: none;"></div>
+                        <div style="position: absolute; bottom: 10px; right: 10px; width: 30px; height: 30px; border-bottom: 3px solid #8b7355; border-right: 3px solid #8b7355; pointer-events: none;"></div>
 
                         <!-- 主内容区域 -->
-                        <div style="display: flex; gap: 15px; position: relative; z-index: 1;">
+                        <div style="display: flex; gap: 12px; position: relative; z-index: 1;">
 
                             <!-- 左侧：角色列表（垂直排列，每个阵营内部两列） -->
-                            <div id="team-blocks-container" style="flex: 1; display: flex; flex-direction: column; gap: 12px;">
+                            <div id="team-blocks-container" style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
 
                                 <!-- 镇民区域（包含剧本标题、作者和配置表）- 固定位置，不可拖拽 -->
                                 <div data-team="townsfolk" style="display: flex;">
@@ -12509,44 +12657,44 @@
                                             ` : '')}
                                         </div>
                                         <!-- 镇民角色列表 -->
-                                        <div id="script-townsfolk-list" style="padding: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;"></div>
+                                        <div id="script-townsfolk-list" style="padding: 8px;"></div>
                                     </div>
                                 </div>
 
                                 <!-- 外来者区域 -->
-                                <div class="team-block" data-team="outsider" style="display: flex; cursor: move;">
-                                    <div style="width: 40px; background: ${teamConfigs.find(t => t.key === 'outsider')?.gradient || '#0d5c5c'}; display: flex; align-items: center; justify-content: center; border-radius: 6px 0 0 6px; flex-shrink: 0;">
-                                        <span style="writing-mode: vertical-rl; text-orientation: upright; color: white; font-size: 22px; font-weight: bold; letter-spacing: 6px;">${customTeamNames.outsider}</span>
+                                <div class="team-block" data-team="outsider" style="display: flex; cursor: move; border-top: 2px solid #d4c1a4;">
+                                    <div style="width: 36px; background: ${teamConfigs.find(t => t.key === 'outsider')?.gradient || '#0d5c5c'}; display: flex; align-items: center; justify-content: center; border-radius: 6px 0 0 6px; flex-shrink: 0;">
+                                        <span style="writing-mode: vertical-rl; text-orientation: upright; color: white; font-size: 18px; font-weight: bold; letter-spacing: 4px;">${customTeamNames.outsider}</span>
                                     </div>
-                                    <div id="script-outsider-list" style="flex: 1; background: rgba(255,255,255,0.7); padding: 10px; border-radius: 0 6px 6px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;"></div>
+                                    <div id="script-outsider-list" style="flex: 1; background: rgba(255,255,255,0.7); padding: 8px; border-radius: 0 6px 6px 0;"></div>
                                 </div>
 
                                 <!-- 爪牙区域 -->
-                                <div class="team-block" data-team="minion" style="display: flex; cursor: move;">
-                                    <div style="width: 40px; background: ${teamConfigs.find(t => t.key === 'minion')?.gradient || '#8b4513'}; display: flex; align-items: center; justify-content: center; border-radius: 6px 0 0 6px; flex-shrink: 0;">
-                                        <span style="writing-mode: vertical-rl; text-orientation: upright; color: white; font-size: 22px; font-weight: bold; letter-spacing: 6px;">${customTeamNames.minion}</span>
+                                <div class="team-block" data-team="minion" style="display: flex; cursor: move; border-top: 2px solid #d4c1a4;">
+                                    <div style="width: 36px; background: ${teamConfigs.find(t => t.key === 'minion')?.gradient || '#8b4513'}; display: flex; align-items: center; justify-content: center; border-radius: 6px 0 0 6px; flex-shrink: 0;">
+                                        <span style="writing-mode: vertical-rl; text-orientation: upright; color: white; font-size: 18px; font-weight: bold; letter-spacing: 4px;">${customTeamNames.minion}</span>
                                     </div>
-                                    <div id="script-minion-list" style="flex: 1; background: rgba(255,255,255,0.7); padding: 10px; border-radius: 0 6px 6px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;"></div>
+                                    <div id="script-minion-list" style="flex: 1; background: rgba(255,255,255,0.7); padding: 8px; border-radius: 0 6px 6px 0;"></div>
                                 </div>
 
                                 <!-- 自定义阵营区域 -->
                                 ${validCustomTeams.map((customTeam, index) => `
-                                <div class="team-block" data-team="custom-${index}" style="display: flex; cursor: move;">
-                                    <div style="width: 40px; background: ${teamConfigs.find(t => t.key === 'custom-'+index)?.gradient || customTeam.color}; display: flex; align-items: center; justify-content: center; border-radius: 6px 0 0 6px; flex-shrink: 0;">
-                                        <span style="writing-mode: vertical-rl; text-orientation: upright; color: white; font-size: 22px; font-weight: bold; letter-spacing: 6px;">${customTeam.name}</span>
+                                <div class="team-block" data-team="custom-${index}" style="display: flex; cursor: move; border-top: 2px solid #d4c1a4;">
+                                    <div style="width: 36px; background: ${teamConfigs.find(t => t.key === 'custom-'+index)?.gradient || customTeam.color}; display: flex; align-items: center; justify-content: center; border-radius: 6px 0 0 6px; flex-shrink: 0;">
+                                        <span style="writing-mode: vertical-rl; text-orientation: upright; color: white; font-size: 18px; font-weight: bold; letter-spacing: 4px;">${customTeam.name}</span>
                                     </div>
-                                    <div id="script-custom-${index}-list" style="flex: 1; background: rgba(255,255,255,0.7); padding: 10px; border-radius: 0 6px 6px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;"></div>
+                                    <div id="script-custom-${index}-list" style="flex: 1; background: rgba(255,255,255,0.7); padding: 8px; border-radius: 0 6px 6px 0;"></div>
                                 </div>
                                 `).join('')}
 
                                 <!-- 恶魔区域（包含相克规则） -->
-                                <div class="team-block" data-team="demon" style="display: flex; cursor: move;">
-                                    <div style="width: 40px; background: ${teamConfigs.find(t => t.key === 'demon')?.gradient || '#8b0000'}; display: flex; align-items: center; justify-content: center; border-radius: 6px 0 0 6px; flex-shrink: 0;">
-                                        <span style="writing-mode: vertical-rl; text-orientation: upright; color: white; font-size: 22px; font-weight: bold; letter-spacing: 6px;">${customTeamNames.demon}</span>
+                                <div class="team-block" data-team="demon" style="display: flex; cursor: move; border-top: 2px solid #d4c1a4;">
+                                    <div style="width: 36px; background: ${teamConfigs.find(t => t.key === 'demon')?.gradient || '#8b0000'}; display: flex; align-items: center; justify-content: center; border-radius: 6px 0 0 6px; flex-shrink: 0;">
+                                        <span style="writing-mode: vertical-rl; text-orientation: upright; color: white; font-size: 18px; font-weight: bold; letter-spacing: 4px;">${customTeamNames.demon}</span>
                                     </div>
                                     <div style="flex: 1; display: flex; flex-direction: column;">
                                         <!-- 恶魔角色列表 -->
-                                        <div id="script-demon-list" style="background: rgba(255,255,255,0.7); padding: 10px; border-radius: 0 6px 0 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;"></div>
+                                        <div id="script-demon-list" style="background: rgba(255,255,255,0.7); padding: 8px; border-radius: 0 6px 0 0;"></div>
 
                                         <!-- 相克规则（融入到恶魔区域） -->
                                         ${showJinxRules && jinxRules.length > 0 ? `
@@ -12556,18 +12704,18 @@
                     const role1 = allRoles.find(r => r.name === rule.jinxRole1);
                     const role2 = allRoles.find(r => r.name === rule.jinxRole2);
                     return `
-                                                            <div style="display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: rgba(255,255,255,0.9); border-radius: 4px; border-left: 3px solid #8b4513;">
-                                                                <div style="display: flex; align-items: center; gap: 4px; flex-shrink: 0;">
-                                                                    ${role1 ? `<div style="width: 28px; height: 28px; border: 2px solid #d4c1a4; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.15), 0 1px 2px rgba(0,0,0,0.1); overflow: hidden;"><img src="${role1.image}" alt="${role1.name}" style="width: 100%; height: 100%; object-fit: cover; display: block;"></div>` : ''}
-                                                                    <span style="font-size: 13px; font-weight: bold; color: #333;">${rule.jinxRole1}</span>
+                                                            <div style="display: flex; align-items: center; gap: 6px; padding: 8px 10px; background: rgba(255,255,255,0.95); border-radius: 4px; border: 1px solid #e0d5c5;">
+                                                                <div style="display: flex; align-items: center; gap: 3px; flex-shrink: 0;">
+                                                                    ${role1 ? `<div style="width: 24px; height: 24px; border-radius: 3px; overflow: hidden;"><img src="${role1.image}" alt="${role1.name}" style="width: 100%; height: 100%; object-fit: cover; display: block;"></div>` : ''}
+                                                                    <span style="font-size: 12px; font-weight: bold; color: #333;">${rule.jinxRole1}</span>
                                                                 </div>
-                                                                <span style="color: #8b4513; font-weight: bold; flex-shrink: 0;">×</span>
-                                                                <div style="display: flex; align-items: center; gap: 4px; flex-shrink: 0;">
-                                                                    ${role2 ? `<div style="width: 28px; height: 28px; border: 2px solid #d4c1a4; border-radius: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.15), 0 1px 2px rgba(0,0,0,0.1); overflow: hidden;"><img src="${role2.image}" alt="${role2.name}" style="width: 100%; height: 100%; object-fit: cover; display: block;"></div>` : ''}
-                                                                    <span style="font-size: 13px; font-weight: bold; color: #333;">${rule.jinxRole2}</span>
+                                                                <span style="color: #b8860b; font-weight: bold; flex-shrink: 0;">×</span>
+                                                                <div style="display: flex; align-items: center; gap: 3px; flex-shrink: 0;">
+                                                                    ${role2 ? `<div style="width: 24px; height: 24px; border-radius: 3px; overflow: hidden;"><img src="${role2.image}" alt="${role2.name}" style="width: 100%; height: 100%; object-fit: cover; display: block;"></div>` : ''}
+                                                                    <span style="font-size: 12px; font-weight: bold; color: #333;">${rule.jinxRole2}</span>
                                                                 </div>
-                                                                <span style="color: #666; flex-shrink: 0;">:</span>
-                                                                <span style="font-size: 13px; font-weight: normal; color: #4a3728; line-height: 1.4; flex: 1;">${rule.jinxRule}</span>
+                                                                <span style="color: #999; flex-shrink: 0;">:</span>
+                                                                <span style="font-size: 12px; font-weight: normal; color: #5a4a3a; line-height: 1.5; flex: 1;">${rule.jinxRule}</span>
                                                             </div>
                                                         `;
                 }).join('')}
@@ -12577,12 +12725,13 @@
 
                                         <!-- 状态栏 -->
                                         ${showStatusBar && statesForDisplay.length > 0 ? `
-                                            <div style="background: rgba(255,255,255,0.7); padding: 10px; border-radius: 0 0 6px 0; border-top: 2px dashed #c9b896;">
-                                                <div style="display: flex; flex-direction: column; gap: 6px;">
+                                            <div style="background: rgba(248,244,237,0.8); padding: 12px; border-radius: 0 0 6px 0; border-top: 1px solid #d4c1a4;">
+
+                                                <div style="display: flex; flex-direction: column; gap: 8px;">
                                                     ${statesForDisplay.map(state => `
-                                                    <div style="padding: 6px 10px; background: rgba(255,255,255,0.9); border-radius: 4px; border-left: 3px solid #8b4513;">
-                                                        <div style="font-size: 13px; font-weight: bold; color: ${state.color}; margin-bottom: 4px;">${state.name}</div>
-                                                        <div style="font-size: 13px; font-weight: normal; color: #4a3728; line-height: 1.4;">${state.desc}</div>
+                                                    <div style="padding: 8px 12px; background: rgba(255,255,255,0.95); border-radius: 4px; border-left: 3px solid ${state.color};">
+                                                        <div style="font-size: 12px; font-weight: bold; color: ${state.color}; margin-bottom: 3px;">${state.name}</div>
+                                                        <div style="font-size: 12px; font-weight: normal; color: #5a4a3a; line-height: 1.5;">${state.desc}</div>
                                                     </div>
                                                     `).join('')}
                                                 </div>
@@ -12595,9 +12744,9 @@
 
                             <!-- 右侧：夜间行动顺序 -->
                             ${showNightOrder ? `
-                            <div style="width: 85px; display: flex; flex-direction: column; align-items: center; background: rgba(255,255,255,0.5); padding: 12px 6px; border-radius: 6px; border: 2px solid #c9b896; flex-shrink: 0;">
-                                <div style="color: #4a3728; font-size: 16px; font-weight: bold; margin-bottom: 12px; text-align: center; line-height: 1.3;">夜间<br>顺序</div>
-                                <div style="display: flex; flex-direction: column; gap: 8px; align-items: center;">
+                            <div style="width: 70px; display: flex; flex-direction: column; align-items: center; background: rgba(255,255,255,0.6); padding: 10px 4px; border-left: 2px solid #d4c1a4; flex-shrink: 0;">
+                                <div style="color: #4a3728; font-size: 14px; font-weight: bold; margin-bottom: 10px; text-align: center; line-height: 1.3; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: 2px;">夜间顺序</div>
+                                <div style="display: flex; flex-direction: column; gap: 6px; align-items: center;">
                                     ${nightRoles.map((role, index) => {
                     // 计算首夜和他夜的序号
                     let firstNightIndex = '';
@@ -12618,20 +12767,20 @@
                     }
 
                     return `
-                                        <div style="display: flex; flex-direction: row; align-items: center; gap: 2px;">
-                                            ${firstNightIndex ? `<span style="font-size: 11px; color: #333; font-weight: bold; min-width: 14px; text-align: center;">${firstNightIndex}</span>` : '<span style="font-size: 11px; min-width: 14px;"></span>'}
-                                            <div style="display: flex; flex-direction: column; align-items: center; gap: 3px;">
-                                                <div style="width: 48px; height: 48px; border-radius: 4px; border: 2px solid #c9b896; box-shadow: 0 3px 6px rgba(0,0,0,0.3); overflow: hidden;">
+                                        <div style="display: flex; flex-direction: row; align-items: center; gap: 3px;">
+                                            ${firstNightIndex ? `<span style="font-size: 10px; color: #333; font-weight: bold; min-width: 12px; text-align: center;">${firstNightIndex}</span>` : '<span style="font-size: 10px; min-width: 12px;"></span>'}
+                                            <div style="display: flex; flex-direction: column; align-items: center; gap: 2px;">
+                                                <div style="width: 40px; height: 40px; border-radius: 3px; border: 1px solid #b8a88a; overflow: hidden;">
                                                     <img src="${role.image}" alt="${role.name}" style="width: 100%; height: 100%; object-fit: cover;">
                                                 </div>
-                                                ${role.isFirstNight ? `<div style="width: 100%; height: 4px; background-color: ${role.inBothNights ? '#6b21a8' : '#333'}; border-radius: 2px;"></div>` : '<div style="width: 100%; height: 4px; background-color: transparent;"></div>'}
+                                                ${role.isFirstNight ? `<div style="width: 100%; height: 3px; background-color: ${role.inBothNights ? '#9932cc' : '#555'}; border-radius: 1px;"></div>` : '<div style="width: 100%; height: 3px; background-color: transparent;"></div>'}
                                             </div>
-                                            ${otherNightIndex ? `<span style="font-size: 11px; color: #6b21a8; font-weight: bold; min-width: 14px; text-align: center;">${otherNightIndex}</span>` : '<span style="font-size: 11px; min-width: 14px;"></span>'}
+                                            ${otherNightIndex ? `<span style="font-size: 10px; color: #9932cc; font-weight: bold; min-width: 12px; text-align: center;">${otherNightIndex}</span>` : '<span style="font-size: 10px; min-width: 12px;"></span>'}
                                         </div>
                                     `;
                 }).join('')}
                                 </div>
-                                <div style="margin-top: 12px; font-size: 10px; color: #4a3728; text-align: center;">* 代表非首夜</div>
+                                <div style="margin-top: 10px; font-size: 9px; color: #8b7355; text-align: center; writing-mode: vertical-rl; letter-spacing: 1px;">*代表非首夜</div>
                             </div>
                             ` : ''}
 
@@ -12892,143 +13041,63 @@
                     sortableInstances = [];
                 }
 
-                // 添加编辑模式切换按钮
-                let isEditMode = false;
-                
-                // 创建编辑模式按钮
-                const editModeButton = document.createElement('button');
-                editModeButton.textContent = '编辑模式';
-                editModeButton.style.cssText = `
-                    position: absolute;
-                    top: 70px;
-                    right: 20px;
-                    padding: 8px 16px;
-                    background: #6c757d;
-                    color: white;
-                    border: none;
-                    border-radius: 4px;
-                    cursor: pointer;
-                    font-size: 14px;
-                    z-index: 10001;
-                `;
-                
-                editModeButton.onclick = function() {
-                    isEditMode = !isEditMode;
-                    
-                    if (isEditMode) {
-                        editModeButton.textContent = '查看模式';
-                        editModeButton.style.background = '#28a745';
-                        initSortable();
-                        
-                        // 添加编辑模式视觉提示
-                        const teamBlocks = document.querySelectorAll('.team-block');
-                        teamBlocks.forEach(block => {
-                            block.classList.add('edit-mode-active');
-                        });
-                        
-                        // 显示提示
-                        const hint = document.createElement('div');
-                        hint.id = 'edit-mode-hint';
-                        hint.style.cssText = `
-                            position: absolute;
-                            top: 110px;
-                            left: 50%;
-                            transform: translateX(-50%);
-                            background: rgba(40, 167, 69, 0.9);
-                            color: white;
-                            padding: 8px 16px;
-                            border-radius: 20px;
-                            font-size: 12px;
-                            z-index: 10001;
-                            text-align: center;
-                        `;
-                        hint.innerHTML = '编辑模式：可拖拽角色和阵营块排序';
-                        previewContainer.appendChild(hint);
-                    } else {
-                        editModeButton.textContent = '编辑模式';
-                        editModeButton.style.background = '#6c757d';
-                        destroySortable();
-                        
-                        // 移除编辑模式视觉提示
-                        const teamBlocks = document.querySelectorAll('.team-block');
-                        teamBlocks.forEach(block => {
-                            block.classList.remove('edit-mode-active');
-                        });
-                        
-                        const hint = document.getElementById('edit-mode-hint');
-                        if (hint) hint.remove();
-                    }
-                };
-                
-                previewContainer.appendChild(editModeButton);
-                
-                // 显示提示
-                const dragHint = document.createElement('div');
-                dragHint.style.cssText = `
-                    position: absolute;
-                    top: 70px;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    background: rgba(0, 0, 0, 0.8);
-                    color: white;
-                    padding: 10px 20px;
-                    border-radius: 20px;
-                    font-size: 14px;
-                    z-index: 10001;
-                    animation: fadeInOut 4s ease-in-out;
-                    text-align: center;
-                    line-height: 1.6;
-                `;
-                dragHint.innerHTML = '提示：点击"编辑模式"按钮可启用拖拽排序功能<br>可拖拽角色卡片和阵营块调整顺序（镇民区域固定）';
-                previewContainer.appendChild(dragHint);
-                
-                setTimeout(function() {
-                    if (dragHint.parentNode) {
-                        dragHint.parentNode.removeChild(dragHint);
-                    }
-                }, 3000);
-
-                // 创建关闭按钮
-                const closeButton = document.createElement('button');
-                closeButton.textContent = '关闭';
-                closeButton.style.cssText = `
-                    position: absolute;
-                    top: 20px;
-                    right: 20px;
-                    padding: 10px 20px;
-                    background: #dc3545;
-                    color: white;
-                    border: none;
-                    border-radius: 4px;
-                    cursor: pointer;
-                    font-size: 16px;
-                    z-index: 10000;
-                    max-width: calc(50% - 10px);
-                    box-sizing: border-box;
-                `;
-                closeButton.onclick = function() {
-                    document.body.removeChild(previewContainer);
-                };
-                previewContainer.appendChild(closeButton);
-
-                // 创建下载按钮
-                const downloadButton = document.createElement('button');
-                downloadButton.textContent = '下载图片';
-                downloadButton.style.cssText = `
+                // 创建按钮容器 - 统一管理所有按钮
+                const buttonContainer = document.createElement('div');
+                buttonContainer.style.cssText = `
                     position: absolute;
                     top: 20px;
                     left: 20px;
-                    padding: 10px 20px;
-                    background: #28a745;
+                    right: 20px;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: flex-start;
+                    z-index: 10001;
+                    pointer-events: none;
+                `;
+
+                // 创建左侧按钮组
+                const leftButtonGroup = document.createElement('div');
+                leftButtonGroup.style.cssText = `
+                    display: flex;
+                    gap: 12px;
+                    pointer-events: auto;
+                `;
+
+                // 创建下载按钮
+                const downloadButton = document.createElement('button');
+                downloadButton.innerHTML = `
+                    <span style="display: flex; align-items: center; gap: 6px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        下载图片
+                    </span>
+                `;
+                downloadButton.style.cssText = `
+                    padding: 10px 18px;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                     color: white;
                     border: none;
-                    border-radius: 4px;
+                    border-radius: 8px;
                     cursor: pointer;
-                    font-size: 16px;
-                    z-index: 10000;
-                    max-width: calc(50% - 10px);
-                    box-sizing: border-box;
+                    font-size: 14px;
+                    font-weight: 500;
+                    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+                    transition: all 0.3s ease;
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
                 `;
+                downloadButton.onmouseenter = function() {
+                    this.style.transform = 'translateY(-2px)';
+                    this.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.6)';
+                };
+                downloadButton.onmouseleave = function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.4)';
+                };
                 downloadButton.onclick = function() {
                     // 等待DOM更新完成
                     setTimeout(function() {
@@ -13040,8 +13109,32 @@
                             return;
                         }
 
-                        // 确保容器高度正确计算
+                        // 计算A4比例
+                        const a4Ratio = 1240 / 1754;
+                        
+                        // 先让容器高度自适应内容，计算实际需要的高度
                         contentContainer.style.height = 'auto';
+                        const actualHeight = contentContainer.offsetHeight;
+                        const actualWidth = contentContainer.offsetWidth;
+                        
+                        // 计算实际比例
+                        const actualRatio = actualWidth / actualHeight;
+                        
+                        let finalWidth, finalHeight;
+                        
+                        if (actualRatio > a4Ratio) {
+                            // 以宽度为基准，按A4比例计算高度
+                            finalWidth = actualWidth;
+                            finalHeight = actualWidth / a4Ratio;
+                        } else {
+                            // 以高度为基准，按A4比例计算宽度
+                            finalHeight = actualHeight;
+                            finalWidth = actualHeight * a4Ratio;
+                        }
+                        
+                        // 设置容器尺寸
+                        contentContainer.style.width = finalWidth + 'px';
+                        contentContainer.style.height = finalHeight + 'px';
 
                         // 再次检查并调整剧本自制规则的字体大小
                         if (trimmedCustomRules) {
@@ -13053,7 +13146,7 @@
                                 rulesContent.style.fontSize = fontSize + 'px';
 
                                 // 检查内容是否超出容器高度
-                                while (rulesContainer.offsetHeight > contentContainer.offsetHeight * 0.3 && fontSize > 10) {
+                                while (rulesContainer.offsetHeight > finalHeight * 0.3 && fontSize > 10) {
                                     fontSize--;
                                     rulesContent.style.fontSize = fontSize + 'px';
                                 }
@@ -13071,8 +13164,8 @@
                             backgroundColor: 'rgb(247, 244, 233)', // 设置背景色
                             scrollX: 0, // 从容器顶部开始捕获
                             scrollY: 0, // 从容器左侧开始捕获
-                            windowWidth: contentContainer.offsetWidth, // 使用容器的实际宽度
-                            windowHeight: contentContainer.offsetHeight // 使用容器的实际高度
+                            windowWidth: finalWidth, // 使用计算后的宽度
+                            windowHeight: finalHeight // 使用计算后的高度
                         }).then(function(canvas) {
                             // 创建下载链接
                             const link = document.createElement('a');
@@ -13085,7 +13178,195 @@
                         });
                     }, 100);
                 };
-                previewContainer.appendChild(downloadButton);
+                leftButtonGroup.appendChild(downloadButton);
+
+                // 创建右侧按钮组
+                const rightButtonGroup = document.createElement('div');
+                rightButtonGroup.style.cssText = `
+                    display: flex;
+                    gap: 12px;
+                    pointer-events: auto;
+                `;
+
+                // 添加编辑模式切换按钮
+                let isEditMode = false;
+                
+                const editModeButton = document.createElement('button');
+                editModeButton.innerHTML = `
+                    <span style="display: flex; align-items: center; gap: 6px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                        编辑模式
+                    </span>
+                `;
+                editModeButton.style.cssText = `
+                    padding: 10px 18px;
+                    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+                    color: white;
+                    border: none;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    font-size: 14px;
+                    font-weight: 500;
+                    box-shadow: 0 4px 15px rgba(245, 87, 108, 0.4);
+                    transition: all 0.3s ease;
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                `;
+                editModeButton.onmouseenter = function() {
+                    this.style.transform = 'translateY(-2px)';
+                    this.style.boxShadow = '0 6px 20px rgba(245, 87, 108, 0.6)';
+                };
+                editModeButton.onmouseleave = function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = '0 4px 15px rgba(245, 87, 108, 0.4)';
+                };
+                
+                editModeButton.onclick = function() {
+                    isEditMode = !isEditMode;
+                    
+                    if (isEditMode) {
+                        editModeButton.innerHTML = `
+                            <span style="display: flex; align-items: center; gap: 6px;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                                查看模式
+                            </span>
+                        `;
+                        editModeButton.style.background = 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)';
+                        editModeButton.style.boxShadow = '0 4px 15px rgba(79, 172, 254, 0.4)';
+                        initSortable();
+                        
+                        // 添加编辑模式视觉提示
+                        const teamBlocks = document.querySelectorAll('.team-block');
+                        teamBlocks.forEach(block => {
+                            block.classList.add('edit-mode-active');
+                        });
+                        
+                        // 显示提示
+                        const hint = document.createElement('div');
+                        hint.id = 'edit-mode-hint';
+                        hint.style.cssText = `
+                            position: absolute;
+                            top: 80px;
+                            left: 50%;
+                            transform: translateX(-50%);
+                            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                            color: white;
+                            padding: 10px 24px;
+                            border-radius: 25px;
+                            font-size: 13px;
+                            font-weight: 500;
+                            z-index: 10002;
+                            text-align: center;
+                            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+                            backdrop-filter: blur(10px);
+                        `;
+                        hint.innerHTML = '✨ 编辑模式已启用：可拖拽角色和阵营块排序';
+                        previewContainer.appendChild(hint);
+                    } else {
+                        editModeButton.innerHTML = `
+                            <span style="display: flex; align-items: center; gap: 6px;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                                </svg>
+                                编辑模式
+                            </span>
+                        `;
+                        editModeButton.style.background = 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)';
+                        editModeButton.style.boxShadow = '0 4px 15px rgba(245, 87, 108, 0.4)';
+                        destroySortable();
+                        
+                        // 移除编辑模式视觉提示
+                        const teamBlocks = document.querySelectorAll('.team-block');
+                        teamBlocks.forEach(block => {
+                            block.classList.remove('edit-mode-active');
+                        });
+                        
+                        const hint = document.getElementById('edit-mode-hint');
+                        if (hint) hint.remove();
+                    }
+                };
+                rightButtonGroup.appendChild(editModeButton);
+
+                // 创建关闭按钮
+                const closeButton = document.createElement('button');
+                closeButton.innerHTML = `
+                    <span style="display: flex; align-items: center; gap: 6px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                        关闭
+                    </span>
+                `;
+                closeButton.style.cssText = `
+                    padding: 10px 18px;
+                    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+                    color: white;
+                    border: none;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    font-size: 14px;
+                    font-weight: 500;
+                    box-shadow: 0 4px 15px rgba(238, 90, 36, 0.4);
+                    transition: all 0.3s ease;
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                `;
+                closeButton.onmouseenter = function() {
+                    this.style.transform = 'translateY(-2px)';
+                    this.style.boxShadow = '0 6px 20px rgba(238, 90, 36, 0.6)';
+                };
+                closeButton.onmouseleave = function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = '0 4px 15px rgba(238, 90, 36, 0.4)';
+                };
+                closeButton.onclick = function() {
+                    document.body.removeChild(previewContainer);
+                };
+                rightButtonGroup.appendChild(closeButton);
+
+                // 将按钮组添加到按钮容器
+                buttonContainer.appendChild(leftButtonGroup);
+                buttonContainer.appendChild(rightButtonGroup);
+                previewContainer.appendChild(buttonContainer);
+
+                // 显示提示
+                const dragHint = document.createElement('div');
+                dragHint.style.cssText = `
+                    position: absolute;
+                    top: 80px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
+                    color: white;
+                    padding: 12px 24px;
+                    border-radius: 25px;
+                    font-size: 13px;
+                    font-weight: 500;
+                    z-index: 10001;
+                    animation: fadeInOut 4s ease-in-out;
+                    text-align: center;
+                    line-height: 1.6;
+                    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+                    backdrop-filter: blur(10px);
+                `;
+                dragHint.innerHTML = '💡 提示：点击"编辑模式"按钮可启用拖拽排序功能<br>可拖拽角色卡片和阵营块调整顺序（镇民区域固定）';
+                previewContainer.appendChild(dragHint);
+                
+                setTimeout(function() {
+                    if (dragHint.parentNode) {
+                        dragHint.parentNode.removeChild(dragHint);
+                    }
+                }, 4000);
 
                 // 添加预览容器到页面
                 document.body.appendChild(previewContainer);
@@ -13437,52 +13718,95 @@
                 // 添加容器到预览区域
                 previewContainer.appendChild(jinxConfigContainer);
 
-                // 创建关闭按钮
-                const closeButton = document.createElement('button');
-                closeButton.textContent = '关闭';
-                closeButton.style.cssText = `
-                    position: absolute;
-                    top: 20px;
-                    right: 20px;
-                    padding: 10px 20px;
-                    background: #dc3545;
-                    color: white;
-                    border: none;
-                    border-radius: 4px;
-                    cursor: pointer;
-                    font-size: 16px;
-                    z-index: 10000;
-                    max-width: calc(50% - 10px);
-                    box-sizing: border-box;
-                `;
-                closeButton.onclick = function() {
-                    document.body.removeChild(previewContainer);
-                };
-                previewContainer.appendChild(closeButton);
-
-                // 创建下载按钮
-                const downloadButton = document.createElement('button');
-                downloadButton.textContent = '下载图片';
-                downloadButton.style.cssText = `
+                // 创建按钮容器 - 统一管理所有按钮
+                const buttonContainer = document.createElement('div');
+                buttonContainer.style.cssText = `
                     position: absolute;
                     top: 20px;
                     left: 20px;
-                    padding: 10px 20px;
-                    background: #28a745;
+                    right: 20px;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: flex-start;
+                    z-index: 10001;
+                    pointer-events: none;
+                `;
+
+                // 创建左侧按钮组
+                const leftButtonGroup = document.createElement('div');
+                leftButtonGroup.style.cssText = `
+                    display: flex;
+                    gap: 12px;
+                    pointer-events: auto;
+                `;
+
+                // 创建下载按钮
+                const downloadButton = document.createElement('button');
+                downloadButton.innerHTML = `
+                    <span style="display: flex; align-items: center; gap: 6px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        下载图片
+                    </span>
+                `;
+                downloadButton.style.cssText = `
+                    padding: 10px 18px;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                     color: white;
                     border: none;
-                    border-radius: 4px;
+                    border-radius: 8px;
                     cursor: pointer;
-                    font-size: 16px;
-                    z-index: 10000;
-                    max-width: calc(50% - 10px);
-                    box-sizing: border-box;
+                    font-size: 14px;
+                    font-weight: 500;
+                    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+                    transition: all 0.3s ease;
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
                 `;
+                downloadButton.onmouseenter = function() {
+                    this.style.transform = 'translateY(-2px)';
+                    this.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.6)';
+                };
+                downloadButton.onmouseleave = function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.4)';
+                };
                 downloadButton.onclick = function() {
                     // 等待DOM更新完成
                     setTimeout(function() {
                         // 获取内部实际内容容器
                         const contentContainer = jinxConfigContainer.querySelector('div');
+
+                        // 计算A4比例
+                        const a4Ratio = 1240 / 1754;
+                        
+                        // 先让容器高度自适应内容，计算实际需要的高度
+                        contentContainer.style.height = 'auto';
+                        const actualHeight = contentContainer.offsetHeight;
+                        const actualWidth = contentContainer.offsetWidth;
+                        
+                        // 计算实际比例
+                        const actualRatio = actualWidth / actualHeight;
+                        
+                        let finalWidth, finalHeight;
+                        
+                        if (actualRatio > a4Ratio) {
+                            // 以宽度为基准，按A4比例计算高度
+                            finalWidth = actualWidth;
+                            finalHeight = actualWidth / a4Ratio;
+                        } else {
+                            // 以高度为基准，按A4比例计算宽度
+                            finalHeight = actualHeight;
+                            finalWidth = actualHeight * a4Ratio;
+                        }
+                        
+                        // 设置容器尺寸
+                        contentContainer.style.width = finalWidth + 'px';
+                        contentContainer.style.height = finalHeight + 'px';
 
                         // 使用html2canvas生成图片
                         html2canvas(contentContainer, {
@@ -13492,8 +13816,8 @@
                             backgroundColor: 'rgb(247, 244, 233)', // 设置背景色
                             scrollX: 0, // 从容器顶部开始捕获
                             scrollY: 0, // 从容器左侧开始捕获
-                            windowWidth: contentContainer.scrollWidth, // 使用容器的实际宽度
-                            windowHeight: contentContainer.scrollHeight // 使用容器的实际高度
+                            windowWidth: finalWidth, // 使用计算后的宽度
+                            windowHeight: finalHeight // 使用计算后的高度
                         }).then(function(canvas) {
                             // 创建下载链接
                             const link = document.createElement('a');
@@ -13506,7 +13830,59 @@
                         });
                     }, 100);
                 };
-                previewContainer.appendChild(downloadButton);
+                leftButtonGroup.appendChild(downloadButton);
+
+                // 创建右侧按钮组
+                const rightButtonGroup = document.createElement('div');
+                rightButtonGroup.style.cssText = `
+                    display: flex;
+                    gap: 12px;
+                    pointer-events: auto;
+                `;
+
+                // 创建关闭按钮
+                const closeButton = document.createElement('button');
+                closeButton.innerHTML = `
+                    <span style="display: flex; align-items: center; gap: 6px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                        关闭
+                    </span>
+                `;
+                closeButton.style.cssText = `
+                    padding: 10px 18px;
+                    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+                    color: white;
+                    border: none;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    font-size: 14px;
+                    font-weight: 500;
+                    box-shadow: 0 4px 15px rgba(238, 90, 36, 0.4);
+                    transition: all 0.3s ease;
+                    display: flex;
+                    align-items: center;
+                    gap: 6px;
+                `;
+                closeButton.onmouseenter = function() {
+                    this.style.transform = 'translateY(-2px)';
+                    this.style.boxShadow = '0 6px 20px rgba(238, 90, 36, 0.6)';
+                };
+                closeButton.onmouseleave = function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = '0 4px 15px rgba(238, 90, 36, 0.4)';
+                };
+                closeButton.onclick = function() {
+                    document.body.removeChild(previewContainer);
+                };
+                rightButtonGroup.appendChild(closeButton);
+
+                // 将按钮组添加到按钮容器
+                buttonContainer.appendChild(leftButtonGroup);
+                buttonContainer.appendChild(rightButtonGroup);
+                previewContainer.appendChild(buttonContainer);
 
                 // 添加预览容器到页面
                 document.body.appendChild(previewContainer);
