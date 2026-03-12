@@ -9677,6 +9677,8 @@
                 demons: 'demons-columns'
             };
 
+            let hasError = false;
+            
             for (const [team, count] of Object.entries(counts)) {
                 if (count <= 0) continue;
 
@@ -9684,32 +9686,127 @@
                 if (!listContainer) continue;
 
                 const checkboxes = listContainer.querySelectorAll('input[type="checkbox"]:not(:disabled)');
-                const availableCheckboxes = Array.from(checkboxes).filter(cb => {
+                let availableCheckboxes = Array.from(checkboxes).filter(cb => {
                     const roleItem = cb.closest('.role-item');
                     return roleItem && !roleItem.classList.contains('hidden');
                 });
 
                 if (availableCheckboxes.length === 0) {
                     alert(`没有可用的${team === 'townsfolk' ? '镇民' : team === 'outsiders' ? '外来者' : team === 'minions' ? '爪牙' : '恶魔'}角色！`);
+                    hasError = true;
                     continue;
                 }
 
                 if (count > availableCheckboxes.length) {
                     alert(`${team === 'townsfolk' ? '镇民' : team === 'outsiders' ? '外来者' : team === 'minions' ? '爪牙' : '恶魔'}只有 ${availableCheckboxes.length} 个可用角色，无法选择 ${count} 个！`);
+                    hasError = true;
+                    continue;
+                }
+
+                // 处理旧角色和新角色的冲突，避免同时出现
+                // 1. 分离旧角色和新角色
+                const oldRoles = availableCheckboxes.filter(cb => {
+                    const roleItem = cb.closest('.role-item');
+                    if (!roleItem) return false;
+                    const roleName = roleItem.querySelector('.role-name');
+                    if (!roleName) return false;
+                    return roleName.textContent.startsWith('旧');
+                });
+                
+                const newRoles = availableCheckboxes.filter(cb => {
+                    const roleItem = cb.closest('.role-item');
+                    if (!roleItem) return false;
+                    const roleName = roleItem.querySelector('.role-name');
+                    if (!roleName) return false;
+                    return !roleName.textContent.startsWith('旧');
+                });
+                
+                // 2. 检查是否存在对应的新旧角色
+                const hasOldRoles = oldRoles.length > 0;
+                const hasNewRoles = newRoles.length > 0;
+                
+                // 3. 随机选择使用旧角色还是新角色
+                let finalCheckboxes = availableCheckboxes;
+                if (hasOldRoles && hasNewRoles) {
+                    // 随机决定使用旧角色还是新角色
+                    const useOldRoles = Math.random() > 0.5;
+                    if (useOldRoles) {
+                        // 使用旧角色，但确保有足够的数量
+                        if (oldRoles.length >= count) {
+                            finalCheckboxes = oldRoles;
+                        } else {
+                            // 如果旧角色不够，使用所有旧角色和部分新角色（排除与旧角色冲突的）
+                            // 收集所有旧角色的基础名称（去掉"旧"字）
+                            const oldRoleBaseNames = oldRoles.map(cb => {
+                                const roleItem = cb.closest('.role-item');
+                                if (!roleItem) return '';
+                                const roleName = roleItem.querySelector('.role-name');
+                                if (!roleName) return '';
+                                return roleName.textContent.replace('旧', '');
+                            }).filter(Boolean);
+                            
+                            // 过滤新角色，排除与旧角色冲突的
+                            const compatibleNewRoles = newRoles.filter(cb => {
+                                const roleItem = cb.closest('.role-item');
+                                if (!roleItem) return false;
+                                const roleName = roleItem.querySelector('.role-name');
+                                if (!roleName) return false;
+                                return !oldRoleBaseNames.includes(roleName.textContent);
+                            });
+                            
+                            finalCheckboxes = [...oldRoles, ...compatibleNewRoles];
+                        }
+                    } else {
+                        // 使用新角色，但确保有足够的数量
+                        if (newRoles.length >= count) {
+                            finalCheckboxes = newRoles;
+                        } else {
+                            // 如果新角色不够，使用所有新角色和部分旧角色（排除与新角色冲突的）
+                            // 收集所有新角色的名称
+                            const newRoleNames = newRoles.map(cb => {
+                                const roleItem = cb.closest('.role-item');
+                                if (!roleItem) return '';
+                                const roleName = roleItem.querySelector('.role-name');
+                                if (!roleName) return '';
+                                return roleName.textContent;
+                            }).filter(Boolean);
+                            
+                            // 过滤旧角色，排除与新角色冲突的
+                            const compatibleOldRoles = oldRoles.filter(cb => {
+                                const roleItem = cb.closest('.role-item');
+                                if (!roleItem) return false;
+                                const roleName = roleItem.querySelector('.role-name');
+                                if (!roleName) return false;
+                                const baseName = roleName.textContent.replace('旧', '');
+                                return !newRoleNames.includes(baseName);
+                            });
+                            
+                            finalCheckboxes = [...newRoles, ...compatibleOldRoles];
+                        }
+                    }
+                }
+
+                // 确保最终可用角色数量足够
+                if (finalCheckboxes.length < count) {
+                    alert(`${team === 'townsfolk' ? '镇民' : team === 'outsiders' ? '外来者' : team === 'minions' ? '爪牙' : '恶魔'}只有 ${finalCheckboxes.length} 个可用角色，无法选择 ${count} 个！`);
+                    hasError = true;
                     continue;
                 }
 
                 availableCheckboxes.forEach(cb => cb.checked = false);
 
-                const shuffled = [...availableCheckboxes].sort(() => Math.random() - 0.5);
+                const shuffled = [...finalCheckboxes].sort(() => Math.random() - 0.5);
                 const selected = shuffled.slice(0, count);
                 selected.forEach(cb => cb.checked = true);
             }
 
-            getSelectedRoles();
-            updateSelectionCount();
-            updateFirstNightButtons();
-            updateOtherNightButtons();
+            // 只有在没有错误的情况下才更新角色选择
+            if (!hasError) {
+                getSelectedRoles();
+                updateSelectionCount();
+                updateFirstNightButtons();
+                updateOtherNightButtons();
+            }
         }
 
         function clearAllSelections() {
@@ -12021,8 +12118,8 @@
             
             // 定义关键词和对应的颜色
             const highlightMap = [
-                { keywords: ['不会死亡', '存活', '善良', '醉酒', '外来者', '镇民', '不在场的角色', '外来者数量','镇民玩家','镇民角色','外来者角色','善良阵营','善良角色','存活玩家','存活的玩家'], color: '#1e90ff' },
-                { keywords: ['死亡', '死于处决', '处决', '邪恶玩家', '恶魔', '杀死', '错误', '信息', '爪牙', '所有爪牙','恶魔玩家','爪牙角色','邪恶','中毒','邪恶阵营','存活爪牙','邪恶角色','镇民中毒','伪装'], color: '#dc143c' },
+                { keywords: ['不会死亡', '存活', '善良', '醉酒', '外来者', '镇民', '不在场的角色', '外来者数量','镇民玩家','镇民角色','外来者角色','善良阵营','善良角色','存活玩家','存活的玩家','正确','在场','善良玩家'], color: '#1e90ff' },
+                { keywords: ['死亡', '死于处决', '处决', '邪恶玩家', '恶魔', '杀死', '错误', '信息', '爪牙', '所有爪牙','恶魔玩家','爪牙角色','邪恶','中毒','邪恶阵营','存活爪牙','邪恶角色','镇民中毒','伪装','恶魔角色','存活爪牙'], color: '#dc143c' },
                 { keywords: ['疯狂'], color: '#9932cc' }
             ];
             
@@ -13049,11 +13146,26 @@
                     left: 20px;
                     right: 20px;
                     display: flex;
-                    justify-content: space-between;
-                    align-items: flex-start;
+                    gap: 12px;
+                    justify-content: center;
                     z-index: 10001;
                     pointer-events: none;
+                    align-items: center;
                 `;
+                // 添加媒体查询，在小屏幕设备上自动换行
+                const buttonStyle = document.createElement('style');
+                buttonStyle.textContent = `
+                    @media (max-width: 768px) {
+                        .script-button-container {
+                            flex-wrap: wrap;
+                        }
+                    }
+                `;
+                buttonContainer.className = 'script-button-container';
+                if (!document.querySelector('style[data-button-styles]')) {
+                    buttonStyle.setAttribute('data-button-styles', 'true');
+                    document.head.appendChild(buttonStyle);
+                }
 
                 // 创建左侧按钮组
                 const leftButtonGroup = document.createElement('div');
@@ -13061,6 +13173,7 @@
                     display: flex;
                     gap: 12px;
                     pointer-events: auto;
+                    align-items: center;
                 `;
 
                 // 创建下载按钮
@@ -13186,6 +13299,7 @@
                     display: flex;
                     gap: 12px;
                     pointer-events: auto;
+                    align-items: center;
                 `;
 
                 // 添加编辑模式切换按钮
@@ -13726,11 +13840,26 @@
                     left: 20px;
                     right: 20px;
                     display: flex;
-                    justify-content: space-between;
-                    align-items: flex-start;
+                    gap: 12px;
+                    justify-content: center;
                     z-index: 10001;
                     pointer-events: none;
+                    align-items: center;
                 `;
+                // 添加媒体查询，在小屏幕设备上自动换行
+                const buttonStyle = document.createElement('style');
+                buttonStyle.textContent = `
+                    @media (max-width: 768px) {
+                        .script-button-container {
+                            flex-wrap: wrap;
+                        }
+                    }
+                `;
+                buttonContainer.className = 'script-button-container';
+                if (!document.querySelector('style[data-button-styles]')) {
+                    buttonStyle.setAttribute('data-button-styles', 'true');
+                    document.head.appendChild(buttonStyle);
+                }
 
                 // 创建左侧按钮组
                 const leftButtonGroup = document.createElement('div');
@@ -13738,6 +13867,7 @@
                     display: flex;
                     gap: 12px;
                     pointer-events: auto;
+                    align-items: center;
                 `;
 
                 // 创建下载按钮
@@ -13838,6 +13968,7 @@
                     display: flex;
                     gap: 12px;
                     pointer-events: auto;
+                    align-items: center;
                 `;
 
                 // 创建关闭按钮
