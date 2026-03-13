@@ -9045,6 +9045,7 @@
 
         // 动态加载角色复选框
         function loadRoles(roles, containerId) {
+            // 获取角色列容器
             const roleColumns = document.getElementById(containerId);
             console.log(roles);
             console.log(roleColumns);
@@ -9933,49 +9934,42 @@
         // }
 
 
-        // 生成JSON文件
+        // 生成JSON文件并下载
         function generateJson() {
             // 在生成JSON前保存所有拖拽后的值
             saveNightValuesFromButtons();
 
+            // 获取选中的角色
             selectedRoles = getSelectedRoles();
+            // 检查是否至少选择了一个角色
             if (selectedRoles.length === 0 && dirRolesJson.length === 0)  {
                 alert("请至少选择一个角色！");
                 return;
             }
 
             // 处理选中的角色，区分 legacyRole 和非 legacyRole
-//            const processedRoles = selectedRoles.map(role => {
-//                const legacyRole = legacyRolesJson.find(r => r.id === role.id);
-//                if (legacyRole) {
-//                    return legacyRole;
-//                }
-//                return role;
-//            });
+            // 注：以下代码已注释，当前直接使用原始角色数据
+            // const processedRoles = selectedRoles.map(role => {
+            //     const legacyRole = legacyRolesJson.find(r => r.id === role.id);
+            //     if (legacyRole) {
+            //         return legacyRole;
+            //     }
+            //     return role;
+            // });
+            
             // 将 dirRolesJson 中的内容添加到处理后的角色列表中
-            //const editionRolesJson = [...selectedRoles, ...dirRolesJson];
             editionRolesJson = [...selectedRoles, ...dirRolesJson];
+            
             // 创建最终要导出的 JSON 数据
             const jsonData = [];
 
             // 如果有剧本信息，添加到最前面
             jsonData.push(metaInfoJson);
-            // if (metaData.length > 0)
-            // jsonData.push(...metaData);
-
-
-
-
-            // if (metaInfoJson.length > 0) {
-            //     jsonData.push(...metaInfoJson);
-            // }
-
-            //console.log(jsonData);
-
+            
             // 添加相克规则
             const editionJinxes = getJinxRules(jinxes);
-
             addJinxInRoleJson(editionJinxes);
+            
             // 添加试运行相克规则
             const editionTrialJinxes = getJinxRules(trialJinxes);
             addJinxInRoleJson(editionTrialJinxes);
@@ -9983,16 +9977,16 @@
             // 添加角色数据
             jsonData.push(...editionRolesJson);
 
-            // 遍历editionJinx，添加相克规则到jsonData中，以{"id": jinxRule+jinxRole1+jinxRole2,"image":jinxRole1的图片,"name":jinxRole1+'&'+jinxRole2,"team":"jinx","setup":false,"ability":jinxRule}的形式
-
+            // 遍历editionJinx，添加相克规则到jsonData中
+            // 格式：{"id": jinxRule+jinxRole1+jinxRole2,"image":jinxRole1的图片,"name":jinxRole1+'&'+jinxRole2,"team":"jinx","setup":false,"ability":jinxRule}
             addAJinxInJson(jsonData);
-
 
             // 转换为 JSON 字符串
             const jsonString = JSON.stringify(jsonData, null, 4);
             const blob = new Blob([jsonString], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
 
+            // 创建下载链接并触发下载
             const a = document.createElement('a');
             a.href = url;
             // json文件名优先使用json-file-name
@@ -10005,15 +9999,16 @@
             a.click();
             URL.revokeObjectURL(url);
 
-            //alert("JSON文件已生成！");
-
         }
 
+        // 复制JSON到剪贴板并提供跳转选项
         function copyJson() {
             // 在生成JSON前保存所有拖拽后的值
             saveNightValuesFromButtons();
 
+            // 获取选中的角色
             selectedRoles = getSelectedRoles();
+            // 检查是否至少选择了一个角色
             if (selectedRoles.length === 0 && dirRolesJson.length === 0)  {
                 alert("请至少选择一个角色！");
                 return;
@@ -10023,6 +10018,7 @@
             editionRolesJson = [...selectedRoles, ...dirRolesJson];
             const jsonData = [];
 
+            // 添加剧本信息
             jsonData.push(metaInfoJson);
 
             // 添加相克规则
@@ -10034,6 +10030,7 @@
             // 添加角色数据
             jsonData.push(...editionRolesJson);
 
+            // 添加相克规则到JSON数据中
             addAJinxInJson(jsonData);
 
             // 转换为 JSON 字符串
@@ -10056,11 +10053,14 @@
             });
         }
 
+        // 复制JSON到剪贴板（备用函数）
         function copyJsonToClipboard() {
             // 在生成JSON前保存所有拖拽后的值
             saveNightValuesFromButtons();
 
+            // 获取选中的角色
             selectedRoles = getSelectedRoles();
+            // 检查是否至少选择了一个角色
             if (selectedRoles.length === 0 && dirRolesJson.length === 0)  {
                 alert("请至少选择一个角色！");
                 return;
@@ -10070,6 +10070,7 @@
             editionRolesJson = [...selectedRoles, ...dirRolesJson];
             const jsonData = [];
 
+            // 添加剧本信息
             jsonData.push(metaInfoJson);
 
             // 添加相克规则
@@ -10081,6 +10082,7 @@
             // 添加角色数据
             jsonData.push(...editionRolesJson);
 
+            // 添加相克规则到JSON数据中
             addAJinxInJson(jsonData);
 
             // 转换为 JSON 字符串
@@ -10119,6 +10121,7 @@
         }
 
         function randomSelectRoles() {
+            // 定义各角色类型的选择数量
             const counts = {
                 townsfolk: parseInt(document.getElementById('random-townsfolk').value) || 0,
                 outsiders: parseInt(document.getElementById('random-outsiders').value) || 0,
@@ -10126,6 +10129,7 @@
                 demons: parseInt(document.getElementById('random-demons').value) || 0
             };
 
+            // 定义角色类型ID映射
             const teamIds = {
                 townsfolk: 'townsfolk',
                 outsiders: 'outsider',
@@ -10133,6 +10137,7 @@
                 demons: 'demon'
             };
 
+            // 定义角色列表容器ID映射
             const listIds = {
                 townsfolk: 'townsfolk-columns',
                 outsiders: 'outsiders-columns',
@@ -10142,24 +10147,28 @@
 
             let hasError = false;
             
+            // 遍历各角色类型进行随机选择
             for (const [team, count] of Object.entries(counts)) {
                 if (count <= 0) continue;
 
                 const listContainer = document.getElementById(listIds[team]);
                 if (!listContainer) continue;
 
+                // 获取所有可用的角色复选框
                 const checkboxes = listContainer.querySelectorAll('input[type="checkbox"]:not(:disabled)');
                 let availableCheckboxes = Array.from(checkboxes).filter(cb => {
                     const roleItem = cb.closest('.role-item');
                     return roleItem && !roleItem.classList.contains('hidden');
                 });
 
+                // 检查是否有可用角色
                 if (availableCheckboxes.length === 0) {
                     alert(`没有可用的${team === 'townsfolk' ? '镇民' : team === 'outsiders' ? '外来者' : team === 'minions' ? '爪牙' : '恶魔'}角色！`);
                     hasError = true;
                     continue;
                 }
 
+                // 检查角色数量是否足够
                 if (count > availableCheckboxes.length) {
                     alert(`${team === 'townsfolk' ? '镇民' : team === 'outsiders' ? '外来者' : team === 'minions' ? '爪牙' : '恶魔'}只有 ${availableCheckboxes.length} 个可用角色，无法选择 ${count} 个！`);
                     hasError = true;
@@ -10184,11 +10193,31 @@
                     return !roleName.textContent.startsWith('旧');
                 });
                 
-                // 2. 检查是否存在对应的新旧角色
+                // 2. 处理"（改）"角色的互斥
+                // 分离带有"（改）"后缀的角色和普通角色
+                const modifiedRoles = availableCheckboxes.filter(cb => {
+                    const roleItem = cb.closest('.role-item');
+                    if (!roleItem) return false;
+                    const roleName = roleItem.querySelector('.role-name');
+                    if (!roleName) return false;
+                    return roleName.textContent.includes('（改）');
+                });
+                
+                const originalRoles = availableCheckboxes.filter(cb => {
+                    const roleItem = cb.closest('.role-item');
+                    if (!roleItem) return false;
+                    const roleName = roleItem.querySelector('.role-name');
+                    if (!roleName) return false;
+                    return !roleName.textContent.includes('（改）');
+                });
+                
+                // 3. 检查是否存在对应的新旧角色
                 const hasOldRoles = oldRoles.length > 0;
                 const hasNewRoles = newRoles.length > 0;
+                const hasModifiedRoles = modifiedRoles.length > 0;
+                const hasOriginalRoles = originalRoles.length > 0;
                 
-                // 3. 随机选择使用旧角色还是新角色
+                // 4. 随机选择使用旧角色还是新角色
                 let finalCheckboxes = availableCheckboxes;
                 if (hasOldRoles && hasNewRoles) {
                     // 随机决定使用旧角色还是新角色
@@ -10248,6 +10277,30 @@
                         }
                     }
                 }
+                
+                // 5. 处理"（改）"角色的互斥
+                if (hasModifiedRoles && hasOriginalRoles) {
+                    // 收集所有"（改）"角色的基础名称（去掉"（改）"后缀）
+                    const modifiedRoleBaseNames = modifiedRoles.map(cb => {
+                        const roleItem = cb.closest('.role-item');
+                        if (!roleItem) return '';
+                        const roleName = roleItem.querySelector('.role-name');
+                        if (!roleName) return '';
+                        return roleName.textContent.replace('（改）', '');
+                    }).filter(Boolean);
+                    
+                    // 过滤最终选择的角色，排除与"（改）"角色冲突的原角色
+                    finalCheckboxes = finalCheckboxes.filter(cb => {
+                        const roleItem = cb.closest('.role-item');
+                        if (!roleItem) return true;
+                        const roleName = roleItem.querySelector('.role-name');
+                        if (!roleName) return true;
+                        // 如果是"（改）"角色，保留
+                        if (roleName.textContent.includes('（改）')) return true;
+                        // 如果是原角色，检查是否与"（改）"角色冲突
+                        return !modifiedRoleBaseNames.includes(roleName.textContent);
+                    });
+                }
 
                 // 确保最终可用角色数量足够
                 if (finalCheckboxes.length < count) {
@@ -10256,8 +10309,10 @@
                     continue;
                 }
 
+                // 清空所有复选框的选中状态
                 availableCheckboxes.forEach(cb => cb.checked = false);
 
+                // 随机打乱角色顺序并选择指定数量的角色
                 const shuffled = [...finalCheckboxes].sort(() => Math.random() - 0.5);
                 const selected = shuffled.slice(0, count);
                 selected.forEach(cb => cb.checked = true);
@@ -13463,6 +13518,7 @@
 
                 // 初始化拖拽排序功能
                 function initSortable() {
+                    // 定义角色容器ID列表
                     const roleContainers = [
                         'script-townsfolk-list',
                         'script-outsider-list',
@@ -13976,10 +14032,10 @@
 
 
 
-        // 生成细节图
+        // 生成细节图（相克规则和配置图）
         async function generateJinxAndConfigImage() {
             try {
-                // ============================================
+                // ============================================ 
                 // 第一步：初始化和容器创建
                 // ============================================
 
@@ -14542,10 +14598,12 @@
             alert(`已自动选择 ${foundCount} 个角色`);
         }
 
+        // 清空角色粘贴框
         function clearRolePasteBox() {
             document.getElementById('rolePasteBox').value = '';
         }
 
+        // 切换浮动操作按钮菜单
         function toggleFabMenu() {
             const fabMenu = document.getElementById('fab-menu');
             const mainFab = document.getElementById('main-fab');
@@ -14559,6 +14617,7 @@
             }
         }
 
+        // 切换角色粘贴框显示/隐藏
         function toggleRolePasteBox() {
             const container = document.getElementById('rolePasteBoxContainer');
             if (container.style.display === 'none') {
@@ -14570,6 +14629,7 @@
 
         // 动态加载外部剧本数据文件
         function loadScriptDataFiles() {
+            // 定义需要加载的脚本文件列表
             const scriptsToLoad = [
                 {
                     src: 'data_files/editionLib.js',
@@ -14585,6 +14645,7 @@
                 }
             ];
 
+            // 遍历加载每个脚本文件
             scriptsToLoad.forEach(scriptInfo => {
                 const script = document.createElement('script');
                 script.src = scriptInfo.src;
