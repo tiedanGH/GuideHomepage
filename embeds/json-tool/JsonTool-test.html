@@ -10,24 +10,36 @@
            全局CSS变量定义
            ============================================ */
         :root {
-            /* 主要主题配色 - 参考官网配色 */
-            --primary-color: #501468;      /* 主要按钮和链接颜色 - 深紫色 */
-            --secondary-color: #320744;    /* 悬停状态颜色 - 更深的紫色 */
-            --background-color: #f4e9d8;   /* 页面背景色 - 米黄色 */
-            --text-color: #333;            /* 主要文字颜色 - 深灰色 */
-            --border-color: #d4c1a4;       /* 边框颜色 - 浅棕色 */
-            --header-bg-color: #3d055f;    /* 页头背景色 - 深紫色 */
+            /* 主要主题配色 - 优化后的配色方案 */
+            --primary-color: #6b46c1;      /* 主要按钮和链接颜色 - 现代紫色 */
+            --primary-gradient: linear-gradient(135deg, #6b46c1 0%, #9f7aea 100%); /* 主色调渐变 */
+            --secondary-color: #553c9a;    /* 悬停状态颜色 - 深紫色 */
+            --background-color: #faf7f2;   /* 页面背景色 - 更柔和的米色 */
+            --text-color: #2d3748;        /* 主要文字颜色 - 深灰色，提高对比度 */
+            --border-color: #e2e8f0;      /* 边框颜色 - 现代浅灰色 */
+            --header-bg-color: #553c9a;    /* 页头背景色 - 深紫色渐变 */
+            --header-gradient: linear-gradient(135deg, #553c9a 0%, #6b46c1 100%); /* 页头渐变 */
             --header-text-color: #fff;     /* 页头文字颜色 - 白色 */
-            --card-bg-color: #fff;         /* 卡片背景色 - 白色 */
-            --hover-color: #f8f0e2;        /* 悬停背景色 - 浅米色 */
+            --card-bg-color: #ffffff;     /* 卡片背景色 - 纯白色 */
+            --hover-color: #f7fafc;       /* 悬停背景色 - 浅灰蓝色 */
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24); /* 小阴影 */
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06); /* 中阴影 */
+            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05); /* 大阴影 */
+            --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04); /* 超大阴影 */
 
-            /* 不同角色类型的配色方案 */
-            --townsfolkRoles-color: #27076f;   /* 镇民角色 - 深蓝色 */
-            --outsidersRoles-color: #086359;   /* 外来者角色 - 深青色 */
-            --minionRoles-color: #da820f;      /* 爪牙角色 - 橙色 */
-            --demonRoles-color: #f40c0c;       /* 恶魔角色 - 红色 */
-            --travellerRoles-color: #550388;   /* 旅行者角色 - 紫色 */
-            --fabledRoles-color: #e6d708;     /* 传奇角色 - 金黄色 */
+            /* 不同角色类型的配色方案 - 优化后的配色 */
+            --townsfolkRoles-color: #3182ce;   /* 镇民角色 - 现代蓝色 */
+            --townsfolkRoles-gradient: linear-gradient(135deg, #3182ce 0%, #63b3ed 100%);
+            --outsidersRoles-color: #38a169;   /* 外来者角色 - 现代绿色 */
+            --outsidersRoles-gradient: linear-gradient(135deg, #38a169 0%, #68d391 100%);
+            --minionRoles-color: #dd6b20;      /* 爪牙角色 - 现代橙色 */
+            --minionRoles-gradient: linear-gradient(135deg, #dd6b20 0%, #ed8936 100%);
+            --demonRoles-color: #e53e3e;       /* 恶魔角色 - 现代红色 */
+            --demonRoles-gradient: linear-gradient(135deg, #e53e3e 0%, #fc8181 100%);
+            --travellerRoles-color: #805ad5;   /* 旅行者角色 - 现代紫色 */
+            --travellerRoles-gradient: linear-gradient(135deg, #805ad5 0%, #b794f4 100%);
+            --fabledRoles-color: #d69e2e;     /* 传奇角色 - 现代金黄色 */
+            --fabledRoles-gradient: linear-gradient(135deg, #d69e2e 0%, #ecc94b 100%);
         }
 
         /* ============================================
@@ -45,24 +57,57 @@
        页头样式
        ============================================ */
         .header {
-            background-color: var(--header-bg-color);          /* 页头背景色 - 深紫色 */
+            background: var(--header-gradient);                /* 页头渐变背景 */
             color: var(--header-text-color);                   /* 页头文字颜色 - 白色 */
-            padding: 20px;                                     /* 页头内边距 */
+            padding: 30px 20px;                              /* 页头内边距 - 增大 */
             text-align: center;                                /* 文字居中对齐 */
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);         /* 添加轻微阴影效果 */
+            box-shadow: var(--shadow-lg);                       /* 使用新的阴影变量 */
+            position: relative;                                 /* 相对定位 */
+            overflow: hidden;                                   /* 隐藏溢出 */
+        }
+
+        /* 页头背景装饰 */
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -50%;
+            left: -10%;
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+            border-radius: 50%;
         }
 
         /* 页头主标题样式 */
         .header h1 {
             margin: 0;                                         /* 移除标题外边距 */
             color: var(--header-text-color);                   /* 继承页头文字颜色 */
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);     /* 添加文字阴影增强可读性 */
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);     /* 增强文字阴影 */
+            font-size: 2.5em;                                  /* 增大标题字体 */
+            font-weight: 700;                                  /* 标题加粗 */
+            position: relative;                                 /* 相对定位 */
+            z-index: 1;                                       /* 确保在装饰之上 */
         }
 
         /* 页头副标题样式 */
         .header h4 {
             color: var(--header-text-color);                   /* 继承页头文字颜色 */
-            margin: 10px 0 0;                                 /* 上边距10px，左右和下边距为0 */
+            margin: 15px 0 0;                                 /* 上边距15px，左右和下边距为0 */
+            font-weight: 400;                                  /* 副标题正常字重 */
+            opacity: 0.9;                                     /* 轻微透明 */
+            position: relative;                                 /* 相对定位 */
+            z-index: 1;                                       /* 确保在装饰之上 */
         }
 
         /* ============================================
@@ -70,27 +115,28 @@
        ============================================ */
         /* 主体容器样式 */
         .container {
-            max-width: 1200px;                               /* 最大宽度限制 */
+            max-width: 1280px;                               /* 最大宽度限制 - 增大 */
             margin: 0 auto;                                   /* 水平居中 */
-            padding: 20px;                                    /* 容器内边距 */
+            padding: 24px;                                    /* 容器内边距 - 增大 */
         }
 
         /* 剧本选择区域样式 */
         .script-selection {
-            margin: 20px 0;                                  /* 上下外边距20px */
-            padding: 20px;                                    /* 内边距 */
+            margin: 24px 0;                                  /* 上下外边距 - 增大 */
+            padding: 24px;                                    /* 内边距 - 增大 */
             background: var(--card-bg-color);                /* 卡片背景色 - 白色 */
-            border-radius: 8px;                               /* 圆角边框 */
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);         /* 卡片阴影效果 */
+            border-radius: 16px;                               /* 圆角边框 - 增大 */
+            box-shadow: var(--shadow-md);                       /* 使用新的阴影变量 */
             display: flex;                                    /* 使用flex布局 */
             flex-wrap: wrap;                                  /* 允许换行 */
-            gap: 15px;                                        /* 元素间距 */
-            transition: transform 0.2s ease;                 /* 悬停动画过渡 */
+            gap: 20px;                                        /* 元素间距 - 增大 */
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* 更平滑的过渡 */
         }
 
         /* 剧本选择区域悬停效果 */
         .script-selection:hover {
-            transform: translateY(-3px);                       /* 悬停时向上移动3px */
+            transform: translateY(-4px);                       /* 悬停时向上移动4px */
+            box-shadow: var(--shadow-lg);                       /* 增强阴影 */
         }
 
         /* 剧本选择标签样式 */
@@ -114,33 +160,37 @@
         /* 搜索输入框样式 */
         #search-role-input {
             width: 100%;                                      /* 宽度填满父容器 */
-            padding: 12px;                                    /* 内边距 */
-            margin-bottom: 20px;                              /* 下外边距 */
-            border: 1px solid var(--border-color);            /* 边框样式 */
-            border-radius: 4px;                                /* 圆角 */
+            padding: 16px;                                    /* 内边距 - 增大 */
+            margin-bottom: 24px;                              /* 下外边距 - 增大 */
+            border: 2px solid var(--border-color);            /* 边框样式 - 加粗 */
+            border-radius: 12px;                               /* 圆角 - 增大 */
             font-size: 16px;                                  /* 字体大小 */
             box-sizing: border-box;                           /* 盒模型计算方式 */
-            transition: border-color 0.3s ease;               /* 边框颜色过渡 */
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* 更平滑的过渡 */
+            background: var(--card-bg-color);                /* 背景色 */
+            box-shadow: var(--shadow-sm);                       /* 小阴影 */
         }
 
         /* 搜索输入框聚焦状态 */
         #search-role-input:focus {
             outline: none;                                    /* 移除默认聚焦轮廓 */
             border-color: var(--primary-color);               /* 聚焦时边框变为主色调 */
+            box-shadow: var(--shadow-md);                       /* 增强阴影 */
+            transform: translateY(-2px);                       /* 轻微上移 */
         }
 
         /* 搜索结果下拉框样式 */
         #search-results {
             position: absolute;                                /* 绝对定位 */
             background: white;                                 /* 背景色 */
-            border: 1px solid var(--border-color);            /* 边框 */
+            border: 2px solid var(--border-color);            /* 边框 - 加粗 */
             max-height: 300px;                                /* 最大高度 */
             overflow-y: auto;                                  /* 垂直滚动 */
             z-index: 100;                                     /* 层级 */
             width: calc(100% - 40px);                         /* 宽度计算 */
             margin-top: -10px;                                /* 上外边距（重叠效果） */
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);           /* 阴影效果 */
-            border-radius: 4px;                                /* 圆角 */
+            box-shadow: var(--shadow-lg);                       /* 使用新的阴影变量 */
+            border-radius: 12px;                               /* 圆角 - 增大 */
         }
 
         /* ============================================
@@ -148,57 +198,90 @@
        ============================================ */
         /* 角色列表容器样式 */
         .role-list {
-            max-height: 400px;                                /* 最大高度限制 */
+            max-height: 450px;                                /* 最大高度限制 - 增大 */
             overflow-y: auto;                                  /* 超出高度时显示滚动条 */
-            border: 1px solid var(--border-color);            /* 边框 */
+            border: 2px solid var(--border-color);            /* 边框 - 加粗 */
+            border-radius: 16px;                               /* 圆角 - 增大 */
             padding: 20px;                                    /* 内边距 */
-            margin-bottom: 20px;                              /* 下外边距 */
+            margin-bottom: 24px;                              /* 下外边距 - 增大 */
             background: var(--card-bg-color);                /* 卡片背景色 */
-            border-radius: 8px;                                /* 圆角 */
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);         /* 阴影效果 */
-            transition: transform 0.2s ease;                 /* 悬停动画过渡 */
+            box-shadow: var(--shadow-md);                       /* 使用新的阴影变量 */
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* 更平滑的过渡 */
         }
 
         /* 角色列表悬停效果 */
         .role-list:hover {
-            transform: translateY(-3px);                       /* 悬停时向上移动 */
+            transform: translateY(-4px);                       /* 悬停时向上移动 */
+            box-shadow: var(--shadow-lg);                       /* 增强阴影 */
         }
 
         /* 角色列布局容器 */
         .role-columns {
             display: flex;                                    /* flex布局 */
             flex-wrap: wrap;                                  /* 允许换行 */
-            gap: 15px;                                        /* 列间距 */
+            gap: 20px;                                        /* 列间距 - 增大 */
         }
 
         /* 单个角色列 */
         .role-column {
             flex: 1;                                          /* 等分剩余空间 */
-            min-width: 200px;                                 /* 最小宽度 */
+            min-width: 220px;                                 /* 最小宽度 - 增大 */
         }
 
         /* 角色项样式 */
         .role-item {
-            margin-bottom: 10px;                              /* 下外边距 */
+            margin-bottom: 12px;                              /* 下外边距 - 增大 */
             display: flex;                                    /* flex布局 */
             align-items: center;                               /* 垂直居中 */
-            gap: 10px;                                        /* 元素间距 */
-            transition: transform 0.2s ease, background-color 0.3s ease; /* 多重过渡效果 */
-            padding: 8px;                                     /* 内边距 */
-            border-radius: 4px;                                /* 圆角 */
+            gap: 12px;                                        /* 元素间距 - 增大 */
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* 更平滑的过渡 */
+            padding: 12px;                                    /* 内边距 - 增大 */
+            border-radius: 12px;                               /* 圆角 - 增大 */
+            border: 1px solid var(--border-color);            /* 边框 */
+            background: var(--card-bg-color);                /* 背景色 */
+            box-shadow: var(--shadow-sm);                       /* 小阴影 */
+        }
+
+        /* 选中的角色项样式 */
+        .role-item input[type="checkbox"]:checked + label,
+        .role-item input[type="checkbox"]:checked {
+            color: white;
+        }
+
+        .role-item:has(input[type="checkbox"]:checked) {
+            background: linear-gradient(135deg, #6b46c1 0%, #9f7aea 100%); /* 紫色渐变 */
+            border-color: #6b46c1;
+            box-shadow: 0 4px 12px rgba(107, 70, 193, 0.3);
+            color: white;
         }
 
         /* 角色项悬停效果 */
         .role-item:hover {
-            transform: translateX(5px);                       /* 悬停时向右移动 */
+            transform: translateX(6px) scale(1.02);           /* 悬停时向右移动并轻微放大 */
             background-color: var(--hover-color);             /* 悬停背景色 */
+            box-shadow: var(--shadow-md);                       /* 增强阴影 */
+            border-color: var(--primary-color);               /* 边框变为主色调 */
+        }
+
+        /* 选中的角色项悬停效果 */
+        .role-item:has(input[type="checkbox"]:checked):hover {
+            background: linear-gradient(135deg, #553c9a 0%, #805ad5 100%); /* 深紫色渐变 */
+            transform: translateX(6px) scale(1.02);
         }
 
         /* 角色图片样式 */
         .role-item-img {
-            max-width: 50px;                                  /* 最大宽度 */
-            max-height: 50px;                                 /* 最大高度 */
-            border-radius: 4px;                                /* 圆角 */
+            max-width: 60px;                                  /* 最大宽度 - 增大 */
+            max-height: 60px;                                 /* 最大高度 - 增大 */
+            border-radius: 8px;                                /* 圆角 - 增大 */
+            box-shadow: var(--shadow-sm);                       /* 小阴影 */
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* 平滑过渡 */
+        }
+
+        /* 角色图片悬停效果 */
+        .role-item-img:hover {
+            transform: scale(1.1);                           /* 悬停时放大 */
+            box-shadow: var(--shadow-md);                       /* 增强阴影 */
         }
 
         /* ============================================
@@ -261,56 +344,59 @@
         @media (max-width: 768px) {
             /* 容器样式调整 */
             .container {
-                padding: 10px;
+                padding: 16px;
                 max-width: 100%;
             }
 
             /* 页头样式调整 */
             .header {
-                padding: 15px;
+                padding: 20px 16px;
             }
 
             .header h1 {
-                font-size: 1.5em;
+                font-size: 1.8em;
             }
 
             .header h4 {
-                font-size: 1em;
+                font-size: 0.9em;
             }
 
             /* 剧本选择区域调整 */
             .script-selection {
-                padding: 15px;
-                gap: 10px;
+                padding: 16px;
+                gap: 12px;
             }
 
             .script-selection label {
-                margin-right: 10px;
+                margin-right: 12px;
                 font-size: 14px;
             }
 
             /* 搜索框调整 */
             #search-role-input {
-                padding: 10px;
+                padding: 12px;
                 font-size: 14px;
+                border-radius: 8px;
             }
 
             /* 搜索结果下拉框调整 */
             #search-results {
-                width: calc(100% - 20px);
-                left: 10px;
+                width: calc(100% - 32px);
+                left: 16px;
+                border-radius: 8px;
             }
 
             /* 角色列表调整 */
             .role-list {
-                padding: 15px;
-                max-height: 300px;
+                padding: 16px;
+                max-height: 350px;
+                border-radius: 12px;
             }
 
             /* 角色列调整 - 手机端只显示一列 */
             .role-columns {
                 flex-direction: column;
-                gap: 10px;
+                gap: 12px;
             }
 
             .role-column {
@@ -319,39 +405,19 @@
 
             /* 角色项调整 */
             .role-item {
-                padding: 6px;
-                gap: 8px;
+                padding: 10px;
+                gap: 10px;
+                border-radius: 8px;
             }
 
             .role-item-img {
-                max-width: 40px;
-                max-height: 40px;
+                max-width: 45px;
+                max-height: 45px;
+                border-radius: 6px;
             }
 
             /* 按钮调整 */
-            button {
-                padding: 10px 20px;
-                font-size: 14px;
-                margin-top: 15px;
-                width: 100%;
-                box-sizing: border-box;
-            }
-
-            /* 选择信息调整 */
-            .selection-info {
-                padding: 12px;
-                font-size: 14px;
-            }
-
-            /* 角色卡片调整 */
-            .role-card {
-                padding: 15px;
-                margin: 5px;
-                max-width: 100%;
-                box-sizing: border-box;
-            }
-
-            /* 其他按钮调整 */
+            button,
             .load-json-button,
             .dir-button,
             .save-dir-button,
@@ -361,11 +427,28 @@
             .save-meta-info-button,
             .add-state-btn,
             .violet-button {
-                padding: 10px 16px;
+                padding: 12px 20px;
                 font-size: 14px;
-                margin-top: 10px;
+                margin-top: 16px;
                 width: 100%;
                 box-sizing: border-box;
+                border-radius: 12px;
+            }
+
+            /* 选择信息调整 */
+            .selection-info {
+                padding: 16px;
+                font-size: 14px;
+                border-radius: 12px;
+            }
+
+            /* 角色卡片调整 */
+            .role-card {
+                padding: 16px;
+                margin: 8px;
+                max-width: 100%;
+                box-sizing: border-box;
+                border-radius: 12px;
             }
 
             /* 随机选择工具调整 */
@@ -425,9 +508,45 @@
 
         /* 平板屏幕适配 */
         @media (min-width: 769px) and (max-width: 1024px) {
+            /* 容器样式调整 */
+            .container {
+                padding: 20px;
+                max-width: 95%;
+            }
+
+            /* 页头样式调整 */
+            .header {
+                padding: 25px 20px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            /* 角色列表调整 */
+            .role-list {
+                max-height: 400px;
+                padding: 18px;
+            }
+
             /* 角色列调整 - 平板端显示两列 */
             .role-columns {
-                grid-template-columns: repeat(2, 1fr);
+                gap: 16px;
+            }
+
+            .role-column {
+                min-width: calc(50% - 8px);
+            }
+
+            /* 角色项调整 */
+            .role-item {
+                padding: 10px;
+                gap: 10px;
+            }
+
+            .role-item-img {
+                max-width: 50px;
+                max-height: 50px;
             }
 
             /* 剧本卡片网格调整 */
@@ -435,6 +554,176 @@
             #overseasScriptsGrid {
                 grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
             }
+        }
+
+        /* 大屏幕优化 */
+        @media (min-width: 1400px) {
+            /* 容器样式调整 */
+            .container {
+                max-width: 1400px;
+            }
+
+            /* 角色列表调整 */
+            .role-list {
+                max-height: 500px;
+            }
+
+            /* 角色列调整 - 大屏幕显示三列 */
+            .role-column {
+                min-width: calc(33.333% - 14px);
+            }
+        }
+
+        /* ============================================
+       动画效果
+       ============================================ */
+        /* 页面加载动画 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 淡入动画 */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* 缩放动画 */
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* 旋转加载动画 */
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* 脉冲动画 */
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        /* 弹跳动画 */
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* 为容器添加淡入动画 */
+        .container {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* 为卡片添加缩放动画 */
+        .script-selection,
+        .role-list,
+        .selection-info {
+            animation: scaleIn 0.4s ease-out;
+        }
+
+        /* 为角色项添加淡入动画 */
+        .role-item {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        /* 按钮点击波纹效果 */
+        button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s, opacity 0.6s;
+        }
+
+        button:active::after {
+            width: 300px;
+            height: 300px;
+            opacity: 0;
+        }
+
+        /* 加载指示器 */
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(107, 70, 193, 0.2);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        /* 成功提示动画 */
+        @keyframes successPulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(56, 161, 105, 0.7);
+            }
+            70% {
+                transform: scale(1.05);
+                box-shadow: 0 0 0 10px rgba(56, 161, 105, 0);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(56, 161, 105, 0);
+            }
+        }
+
+        .success-animation {
+            animation: successPulse 0.6s ease-out;
+        }
+
+        /* 错误提示动画 */
+        @keyframes errorShake {
+            0%, 100% {
+                transform: translateX(0);
+            }
+            25% {
+                transform: translateX(-5px);
+            }
+            75% {
+                transform: translateX(5px);
+            }
+        }
+
+        .error-animation {
+            animation: errorShake 0.4s ease-in-out;
         }
 
         /* ============================================
@@ -477,14 +766,35 @@
         .save-meta-info-button,
         .add-state-btn,
         .violet-button {
-            padding: 12px 24px;                               /* 内边距 */
+            padding: 14px 28px;                               /* 内边距 - 增大 */
             font-size: 16px;                                  /* 字体大小 */
+            font-weight: 600;                                 /* 字体加粗 */
             border: none;                                      /* 移除边框 */
-            border-radius: 12px;                               /* 圆角（更大的圆角） */
+            border-radius: 16px;                               /* 圆角 - 更大 */
             cursor: pointer;                                  /* 鼠标指针 */
-            transition: all 0.3s ease;                       /* 所有属性过渡 */
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);         /* 阴影效果 */
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* 更平滑的过渡 */
+            box-shadow: var(--shadow-md);                       /* 使用新的阴影变量 */
             margin-top: 20px;                                 /* 上外边距 */
+            background: var(--primary-gradient);                 /* 使用渐变背景 */
+            color: white;                                      /* 白色文字 */
+            position: relative;                                 /* 相对定位 */
+            overflow: hidden;                                   /* 隐藏溢出 */
+        }
+
+        /* 按钮光效动画 */
+        .meta-info-button::before,
+        .cancel-meta-info-button::before,
+        .save-meta-info-button::before,
+        .add-state-btn::before,
+        .violet-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
         }
 
         /* 所有按钮悬停效果 */
@@ -498,8 +808,17 @@
         .save-meta-info-button:hover,
         .add-state-btn:hover,
         .violet-button:hover {
-            transform: translateY(-3px);                        /* 悬停时向上移动 */
-            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);        /* 增强阴影 */
+            transform: translateY(-4px) scale(1.02);           /* 悬停时向上移动并轻微放大 */
+            box-shadow: var(--shadow-lg);                       /* 增强阴影 */
+        }
+
+        /* 按钮悬停时的光效 */
+        .meta-info-button:hover::before,
+        .cancel-meta-info-button:hover::before,
+        .save-meta-info-button:hover::before,
+        .add-state-btn:hover::before,
+        .violet-button:hover::before {
+            left: 100%;
         }
 
         /* 所有按钮点击效果 */
@@ -513,13 +832,13 @@
         .save-meta-info-button:active,
         .add-state-btn:active,
         .violet-button:active {
-            transform: translateY(-1px);                        /* 点击时轻微上移 */
-            box-shadow: 0 3px 4px rgba(0, 0, 0, 0.1);         /* 减弱阴影 */
+            transform: translateY(-2px) scale(0.98);           /* 点击时轻微缩小 */
+            box-shadow: var(--shadow-sm);                       /* 减弱阴影 */
         }
 
         /* 保留原有按钮颜色 - 主要按钮 */
         button {
-            background-color: var(--primary-color);            /* 主色调背景 */
+            background: var(--primary-gradient);                 /* 主色调渐变 */
             color: white;                                      /* 白色文字 */
         }
 
@@ -529,7 +848,7 @@
         .add-state-btn,
         .meta-info-button,
         .dir-button {
-            background-color: #6b6b87;                       /* 灰紫色背景 */
+            background: linear-gradient(135deg, #718096 0%, #a0aec0 100%); /* 灰色渐变 */
             color: white;                                      /* 白色文字 */
         }
 
@@ -539,16 +858,16 @@
         .add-state-btn:hover,
         .meta-info-button:hover,
         .dir-button:hover {
-            background-color: #5a5a75;                       /* 悬停时变深的灰紫色 */
+            background: linear-gradient(135deg, #4a5568 0%, #718096 100%); /* 悬停时变深的灰色 */
         }
 
         /* 特定按钮的重复悬停效果（可能需要合并） */
         .add-state-btn:hover,
         .meta-info-button:hover,
         .dir-button:hover {
-            background-color: #5a5a75;                       /* 悬停背景色 */
-            transform: translateY(-3px);                        /* 向上移动 */
-            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);        /* 增强阴影 */
+            background: linear-gradient(135deg, #4a5568 0%, #718096 100%); /* 悬停背景色 */
+            transform: translateY(-4px) scale(1.02);           /* 向上移动并放大 */
+            box-shadow: var(--shadow-lg);                       /* 增强阴影 */
         }
 
         /* ============================================
@@ -645,17 +964,16 @@
         .jsonUpload,
         .metaInfo,
         .dirArea {
-            width: 95%;                                       /* 相对宽度 */
-            max-width: 1200px;                               /* 最大宽度限制 */
-            max-height: 400px;                                /* 最大高度，超出滚动 */
-            overflow-y: auto;                                  /* 垂直滚动 */
-            border: 1px solid var(--border-color);            /* 边框 */
+            /* 与角色列表保持一致的宽度 */
+            max-height: 450px;                                /* 最大高度 - 增大 */
+            overflow-y: auto;                                  /* 超出高度时显示滚动条 */
+            border: 2px solid var(--border-color);            /* 边框 - 加粗 */
+            border-radius: 16px;                               /* 圆角 - 增大 */
             padding: 20px;                                    /* 内边距 */
-            margin: 20px 0;                                   /* 上下外边距 */
+            margin-bottom: 24px;                              /* 下外边距 - 增大 */
             background: var(--card-bg-color);                /* 卡片背景色 */
-            border-radius: 8px;                                /* 圆角 */
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);         /* 阴影效果 */
-            transition: transform 0.2s ease;                 /* 悬停动画 */
+            box-shadow: var(--shadow-md);                       /* 使用新的阴影变量 */
+            transition: all 0.3s cubic-bezier(0.4, 0.2, 1); /* 更平滑的过渡 */
             box-sizing: border-box;                           /* 盒模型计算 */
             overflow-x: hidden;                                /* 禁止水平滚动 */
         }
@@ -664,7 +982,8 @@
         .jsonUpload:hover,
         .metaInfo:hover,
         .dirArea:hover {
-            transform: translateY(-3px);                        /* 悬停时向上移动 */
+            transform: translateY(-4px);                       /* 悬停时向上移动 */
+            box-shadow: var(--shadow-lg);                       /* 增强阴影 */
         }
 
         /* 表单输入组容器 */
@@ -1376,15 +1695,39 @@
             </div>
 
             <div>
-                <h4>剧本图标网址（选填）：</h4>
-                <textarea id="logo"  style="min-width: 300px; min-height: 60px;" placeholder="剧本图片URL，会显示在魔典中间。
-（工具暂不支持上传图片，你可以将图片上传至https://www.bloodstar.xyz，把图片URL拷贝在这里。）" ></textarea>
+                <h4>剧本图标（选填）：</h4>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <button type="button" style="padding: 8px 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.3s ease;">
+                            上传图片
+                            <input type="file" id="logo-upload" accept="image/*" style="position: absolute; opacity: 0; z-index: -1; cursor: pointer;">
+                        </button>
+                        <span style="font-size: 12px; color: #666;">支持 JPG、PNG、WebP 格式</span>
+                    </div>
+                    <div id="logo-preview" style="display: none; margin: 10px 0;">
+                        <img id="preview-logo" src="" alt="预览" style="max-width: 100px; max-height: 100px; border-radius: 4px; border: 2px solid #ddd;">
+                        <button type="button" id="clear-logo" style="margin-top: 5px; padding: 5px 10px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">清除图片</button>
+                    </div>
+                    <textarea id="logo"  style="min-width: 300px; min-height: 60px;" placeholder="剧本图片URL，会显示在魔典中间，或使用上方上传功能"></textarea>
+                </div>
             </div>
 
             <div>
-                <h4>魔典背景图网址（选填）：</h4>
-                <textarea id="background"  style="min-width: 300px; min-height: 60px;" placeholder="魔典背景图URL。
-（工具暂不支持上传图片，你可以将图片上传至https://www.bloodstar.xyz，把图片URL拷贝在这里。）" ></textarea>
+                <h4>魔典背景图（选填）：</h4>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <button type="button" style="padding: 8px 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.3s ease;">
+                            上传图片
+                            <input type="file" id="background-upload" accept="image/*" style="position: absolute; opacity: 0; z-index: -1; cursor: pointer;">
+                        </button>
+                        <span style="font-size: 12px; color: #666;">支持 JPG、PNG、WebP 格式</span>
+                    </div>
+                    <div id="background-preview" style="display: none; margin: 10px 0;">
+                        <img id="preview-background" src="" alt="预览" style="max-width: 200px; max-height: 100px; border-radius: 4px; border: 2px solid #ddd;">
+                        <button type="button" id="clear-background" style="margin-top: 5px; padding: 5px 10px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">清除图片</button>
+                    </div>
+                    <textarea id="background"  style="min-width: 300px; min-height: 60px;" placeholder="魔典背景图URL，或使用上方上传功能"></textarea>
+                </div>
             </div>
 
             <div>
@@ -1566,10 +1909,10 @@
             </div>
         </div>
         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-            <button onclick="randomSelectRoles()" style="background-color: #ffc107; color: #333; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">
+            <button onclick="randomSelectRoles()" style="background: linear-gradient(135deg, #d69e2e 0%, #ed8936 100%); color: #000; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 600;">
                 按所选人数随机勾选
             </button>
-            <button onclick="clearAllSelections()" style="background-color: #dc3545; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">
+            <button onclick="clearAllSelections()" style="background: linear-gradient(135deg, #e53e3e 0%, #f56565 100%); color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 600;">
                 清空选择
             </button>
         </div>
@@ -2024,8 +2367,8 @@
                        style="padding: 12px; box-sizing: border-box; font-size: 16px; border: 1px solid var(--border-color); border-radius: 4px; width: 100%;">
             </div>
             <div style="display: flex; gap: 10px;">
-                <button class="load-json-button" onclick="loadJsonFile()" style="flex: 1;">导入JSON文件</button>
-                <button class="load-json-button" onclick="pasteJson()" style="flex: 1; background-color: #17a2b8;">粘贴JSON</button>
+                <button class="load-json-button" onclick="loadJsonFile()" style="flex: 1; background: linear-gradient(135deg, #3182ce 0%, #63b3ed 100%);">导入JSON文件</button>
+                <button class="load-json-button" onclick="pasteJson()" style="flex: 1; background: linear-gradient(135deg, #38a169 0%, #68d391 100%);">粘贴JSON</button>
             </div>
             <!-- 其他相关元素（如文件选择器） -->
         </div>
@@ -2141,18 +2484,18 @@
     </div>
 
     <!-- 操作按钮 -->
-    <div style="display: flex; justify-content: center; gap: 10px; margin: 0 0 20px 0;" id="action-buttons">
-        <button class="violet-button" onclick="generateJson()" style="flex: 1; padding: 12px;">保存JSON文件</button>
-        <button class="violet-button" onclick="copyJson()" style="flex: 1; padding: 12px; background-color: #17a2b8;">
+    <div style="display: flex; justify-content: center; gap: 10px; margin: 0 0 20px 0; flex-wrap: wrap;" id="action-buttons">
+        <button class="violet-button" onclick="generateJson()" style="flex: 1; padding: 14px; background: linear-gradient(135deg, #4299e1 0%, #63b3ed 100%);">保存JSON文件</button>
+        <button class="violet-button" onclick="copyJson()" style="flex: 1; padding: 14px; background: linear-gradient(135deg, #38a169 0%, #68d391 100%);">
             复制JSON
         </button>
-        <button class="violet-button" onclick="copyJsonToClipboard()" style="flex: 1; padding: 12px; background-color: #e67e22;">
+        <button class="violet-button" onclick="copyJsonToClipboard()" style="flex: 1; padding: 14px; background: linear-gradient(135deg, #ed8936 0%, #f6ad55 100%);">
             获取URL
         </button>
-        <button class="violet-button" onclick="generateScriptImage()" style="flex: 1; padding: 12px; background-color: #28a745;">
+        <button class="violet-button" onclick="generateScriptImage()" style="flex: 1; padding: 14px; background: linear-gradient(135deg, #48bb78 0%, #68d391 100%);">
             生成剧本图
         </button>
-        <button class="violet-button" onclick="generateJinxAndConfigImage()" style="flex: 1; padding: 12px; background-color: #6f42c1;">
+        <button class="violet-button" onclick="generateJinxAndConfigImage()" style="flex: 1; padding: 14px; background: linear-gradient(135deg, #9f7aea 0%, #b794f4 100%);">
             生成细节图
         </button>
     </div>
@@ -8998,6 +9341,115 @@
                 fileInput.value = '';
             });
         }
+        
+        // 初始化剧本图标和魔典背景上传功能
+        function initMetaImageUpload() {
+            // 处理剧本图标上传
+            const logoFileInput = document.getElementById('logo-upload');
+            const logoPreviewDiv = document.getElementById('logo-preview');
+            const logoPreviewImg = document.getElementById('preview-logo');
+            const logoClearButton = document.getElementById('clear-logo');
+            const logoInput = document.getElementById('logo');
+            
+            if (logoFileInput && logoPreviewDiv && logoPreviewImg && logoClearButton && logoInput) {
+                // 找到上传按钮（通过查找包含文件输入的按钮）
+                const logoUploadButton = logoFileInput.closest('button');
+                if (logoUploadButton) {
+                    // 点击上传按钮触发文件选择
+                    logoUploadButton.addEventListener('click', function() {
+                        logoFileInput.click();
+                    });
+                    
+                    // 处理文件选择
+                    logoFileInput.addEventListener('change', function(e) {
+                        const file = e.target.files[0];
+                        if (!file) return;
+                        
+                        // 检查文件类型
+                        const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+                        if (!validTypes.includes(file.type)) {
+                            alert('请上传 JPG、PNG 或 WebP 格式的图片');
+                            return;
+                        }
+                        
+                        // 使用 FileReader 读取文件
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const base64 = e.target.result;
+                            logoPreviewImg.src = base64;
+                            logoPreviewDiv.style.display = 'block';
+                            logoInput.value = base64;
+                        };
+                        reader.readAsDataURL(file);
+                    });
+                    
+                    // 清除图片
+                    logoClearButton.addEventListener('click', function() {
+                        logoPreviewDiv.style.display = 'none';
+                        logoPreviewImg.src = '';
+                        logoInput.value = '';
+                        logoFileInput.value = '';
+                        // 清空metaInfoJson中的logo字段
+                        if (metaInfoJson.logo) {
+                            metaInfoJson.logo = '';
+                        }
+                    });
+                }
+            }
+            
+            // 处理魔典背景上传
+            const backgroundFileInput = document.getElementById('background-upload');
+            const backgroundPreviewDiv = document.getElementById('background-preview');
+            const backgroundPreviewImg = document.getElementById('preview-background');
+            const backgroundClearButton = document.getElementById('clear-background');
+            const backgroundInput = document.getElementById('background');
+            
+            if (backgroundFileInput && backgroundPreviewDiv && backgroundPreviewImg && backgroundClearButton && backgroundInput) {
+                // 找到上传按钮（通过查找包含文件输入的按钮）
+                const backgroundUploadButton = backgroundFileInput.closest('button');
+                if (backgroundUploadButton) {
+                    // 点击上传按钮触发文件选择
+                    backgroundUploadButton.addEventListener('click', function() {
+                        backgroundFileInput.click();
+                    });
+                    
+                    // 处理文件选择
+                    backgroundFileInput.addEventListener('change', function(e) {
+                        const file = e.target.files[0];
+                        if (!file) return;
+                        
+                        // 检查文件类型
+                        const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+                        if (!validTypes.includes(file.type)) {
+                            alert('请上传 JPG、PNG 或 WebP 格式的图片');
+                            return;
+                        }
+                        
+                        // 使用 FileReader 读取文件
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const base64 = e.target.result;
+                            backgroundPreviewImg.src = base64;
+                            backgroundPreviewDiv.style.display = 'block';
+                            backgroundInput.value = base64;
+                        };
+                        reader.readAsDataURL(file);
+                    });
+                    
+                    // 清除图片
+                    backgroundClearButton.addEventListener('click', function() {
+                        backgroundPreviewDiv.style.display = 'none';
+                        backgroundPreviewImg.src = '';
+                        backgroundInput.value = '';
+                        backgroundFileInput.value = '';
+                        // 清空metaInfoJson中的background字段
+                        if (metaInfoJson.background) {
+                            metaInfoJson.background = '';
+                        }
+                    });
+                }
+            }
+        }
 
         function toggleMetaInfoInput() {
             const metaInfoGroup = document.getElementById('meta-info-group');
@@ -9005,6 +9457,9 @@
             if (metaInfoGroup.style.display === 'none') {
                 metaInfoGroup.style.display = 'block';
                 button.textContent = '收起剧本信息';
+                
+                // 初始化剧本图标和魔典背景上传功能
+                initMetaImageUpload();
             } else {
                 metaInfoGroup.style.display = 'none';
                 button.textContent = '添加剧本信息';
@@ -9586,13 +10041,11 @@
 
             // 复制到剪贴板
             navigator.clipboard.writeText(jsonString).then(function() {
-                const userChoice = prompt("JSON已复制！\n\n请选择操作：\n1. 转魔典（使用方法：魔典-齿轮-角色-自定义剧本-使用剪贴板中的json）\n2. 转paste.org.cn（分享给你的哈基米们）\n\n请输入数字1或2：");
+                const userChoice = prompt("JSON已复制！\n\n请选择操作：\n1. 转玩家自制魔典（https://botcgrimoire.top/）\n2. 转paste.org.cn（分享给你的哈基米们）\n\n请输入数字1或2：");
                 
                 if (userChoice === '1') {
-                    // 转魔典
-                    if (confirm("是否跳转到玩家自制魔典？")) {
-                        window.open("https://botcgrimoire.top/", "_blank");
-                    }
+                    // 转玩家自制魔典
+                    window.open("https://botcgrimoire.top/", "_blank");
                 } else if (userChoice === '2') {
                     // 转paste.org.cn
                     window.open("https://paste.org.cn", "_blank");
@@ -9633,6 +10086,18 @@
             // 转换为 JSON 字符串
             const jsonString = JSON.stringify(jsonData, null, 4);
 
+            // 检查是否包含本地图片（Base64格式）
+            const hasLocalImages = jsonString.includes('data:image');
+            const hasLogoImage = metaInfoJson.logo && metaInfoJson.logo.startsWith('data:image');
+            const hasBackgroundImage = metaInfoJson.background && metaInfoJson.background.startsWith('data:image');
+            const hasRoleImages = editionRolesJson.some(role => role.image && role.image.startsWith('data:image'));
+            
+            if (hasLocalImages || hasLogoImage || hasBackgroundImage || hasRoleImages) {
+                const alertMsg = '检测到上传了本地图片（剧本图标、魔典背景图或角色图片），URL长度过长无法解析！\n\n请使用"复制JSON"功能，将JSON数据复制后手动粘贴到魔典中。';
+                alert(alertMsg);
+                return;
+            }
+
             // Base64 编码
             const base64Data = btoa(unescape(encodeURIComponent(jsonString)));
 
@@ -9641,13 +10106,11 @@
 
             // 复制到剪贴板
             navigator.clipboard.writeText(dataUri).then(function() {
-                const userChoice = prompt("URL已复制！\n\n请选择操作：\n1. 转魔典（使用方法：魔典-齿轮-角色-自定义剧本-粘贴URL）\n2. 转paste.org.cn（分享给你的哈基米们）\n\n请输入数字1或2：");
+                const userChoice = prompt("URL已复制！\n\n请选择操作：\n1. 转官方魔典（https://clocktower.gstonegames.com/grimoire/）\n2. 转玩家自制魔典（https://botcgrimoire.top/）\n\n请输入数字1或2：");
                 if (userChoice === "1") {
-                    if (confirm("是否跳转到玩家自制魔典？")) {
-                        window.open("https://botcgrimoire.top/", "_blank");
-                    }
+                    window.open("https://clocktower.gstonegames.com/grimoire/", "_blank");
                 } else if (userChoice === "2") {
-                    window.open("https://paste.org.cn", "_blank");
+                    window.open("https://botcgrimoire.top/", "_blank");
                 }
             }).catch(function(err) {
                 console.error('复制失败: ', err);
@@ -10742,37 +11205,50 @@
                     const button = document.createElement('button');
                     button.textContent = role.name;
                     button.className = 'role-button';
-                    button.style.margin = '5px';
-                    button.style.padding = '12px 24px';
+                    button.style.margin = '8px';
+                    button.style.padding = '14px 28px';
                     button.style.fontSize = '16px';
+                    button.style.fontWeight = '600';
                     button.style.border = 'none';
-                    button.style.borderRadius = '4px';
+                    button.style.borderRadius = '12px';
                     button.style.cursor = 'pointer';
                     button.style.color = 'white';
-                    button.style.transition = 'transform 0.2s ease';
+                    button.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+                    button.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
+
+                    // 鼠标悬停效果
+                    button.addEventListener('mouseenter', function() {
+                        this.style.transform = 'translateY(-3px) scale(1.02)';
+                        this.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+                    });
+
+                    button.addEventListener('mouseleave', function() {
+                        this.style.transform = 'translateY(0) scale(1)';
+                        this.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
+                    });
 
                     // 为不同类型角色设置不同颜色按钮
                     switch (role.team) {
                         case 'townsfolk':
-                            button.style.backgroundColor = '#00008B';
+                            button.style.background = 'linear-gradient(135deg, #3182ce 0%, #63b3ed 100%)';
                             break;
                         case 'outsider':
-                            button.style.backgroundColor = '#0000FF';
+                            button.style.background = 'linear-gradient(135deg, #38a169 0%, #68d391 100%)';
                             break;
                         case 'minion':
-                            button.style.backgroundColor = '#FF6666';
+                            button.style.background = 'linear-gradient(135deg, #ed8936 0%, #f6ad55 100%)';
                             break;
                         case 'demon':
-                            button.style.backgroundColor = '#FF0000';
+                            button.style.background = 'linear-gradient(135deg, #e53e3e 0%, #f56565 100%)';
                             break;
                         case 'traveller':
-                            button.style.backgroundColor = '#550388';
+                            button.style.background = 'linear-gradient(135deg, #805ad5 0%, #a78bfa 100%)';
                             break;
                         case 'fabled':
-                            button.style.backgroundColor = '#e6d708';
+                            button.style.background = 'linear-gradient(135deg, #d69e2e 0%, #f6e05e 100%)';
                             break;
                         default:
-                            button.style.backgroundColor = '#000000';
+                            button.style.background = 'linear-gradient(135deg, #718096 0%, #a0aec0 100%)';
                     }
 
                     // 使用定时器区分单击和双击
@@ -13159,6 +13635,11 @@
                         .script-button-container {
                             flex-wrap: wrap;
                         }
+                        .script-button-container button {
+                            flex: 1;
+                            min-width: 120px;
+                            justify-content: center;
+                        }
                     }
                 `;
                 buttonContainer.className = 'script-button-container';
@@ -13852,6 +14333,11 @@
                     @media (max-width: 768px) {
                         .script-button-container {
                             flex-wrap: wrap;
+                        }
+                        .script-button-container button {
+                            flex: 1;
+                            min-width: 120px;
+                            justify-content: center;
                         }
                     }
                 `;
