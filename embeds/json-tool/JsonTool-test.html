@@ -994,21 +994,22 @@
             max-width: 1200px;                               /* 最大宽度 */
             box-sizing: border-box;                           /* 盒模型计算 */
             margin: 0 auto;                                   /* 水平居中 */
-            background: var(--card-bg-color);                /* 卡片背景色 */
-            padding: 20px;                                    /* 内边距 */
-            border-radius: 8px;                                /* 圆角 */
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);         /* 阴影 */
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);                /* 渐变背景色 */
+            padding: 24px;                                    /* 内边距 */
+            border-radius: 12px;                                /* 圆角 */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);         /* 阴影 */
             margin-top: 10px;                                 /* 上外边距 */
             overflow-x: hidden;                                /* 禁止水平滚动 */
+            border: 1px solid rgba(255, 255, 255, 0.5);       /* 半透明边框 */
         }
 
         /* 表单内部分组容器 */
         #json-upload-area div,
         #meta-info-group div,
         #dir-input-group div {
-            width: 95%;                                       /* 分组宽度 */
+            width: 100%;                                       /* 分组宽度 */
             max-width: 1200px;                               /* 最大宽度 */
-            margin-bottom: 15px;                              /* 下外边距 */
+            margin-bottom: 18px;                              /* 下外边距 */
         }
 
         /* 表单输入元素统一样式 */
@@ -1019,17 +1020,113 @@
         #dir-input-group input,
         #dir-input-group textarea,
         #dir-input-group select {
-            width: 95%;                                       /* 输入框宽度 */
+            width: 100%;                                       /* 输入框宽度 */
             box-sizing: border-box;                           /* 盒模型计算 */
-            padding: 8px;                                     /* 内边距 */
-            border: 1px solid var(--border-color);            /* 边框 */
-            border-radius: 4px;                                /* 圆角 */
+            padding: 12px 16px;                                     /* 内边距 */
+            border: 2px solid #e2e8f0;            /* 边框 */
+            border-radius: 8px;                                /* 圆角 */
+            font-size: 14px;                                  /* 字体大小 */
+            transition: all 0.3s ease;                       /* 过渡效果 */
+            background-color: white;                         /* 背景色 */
+        }
+
+        /* 表单输入元素聚焦效果 */
+        #json-upload-area input:focus,
+        #meta-info-group input:focus,
+        #meta-info-group textarea:focus,
+        #meta-info-group select:focus,
+        #dir-input-group input:focus,
+        #dir-input-group textarea:focus,
+        #dir-input-group select:focus {
+            outline: none;                                   /* 移除默认轮廓 */
+            border-color: #667eea;                          /* 聚焦边框颜色 */
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15); /* 聚焦阴影 */
+        }
+
+        /* 表单标签样式 */
+        #dir-input-group h4,
+        #dir-input-group h5 {
+            color: #2d3748;                                 /* 文字颜色 */
+            font-weight: 600;                               /* 字体粗细 */
+            margin-bottom: 8px;                             /* 下外边距 */
+            font-size: 14px;                                /* 字体大小 */
+        }
+
+        /* 必填标记样式 */
+        #dir-input-group h4:contains('必填') {
+            color: #e53e3e;                                 /* 必填项红色 */
         }
 
         /* 文本域最小高度 */
         #meta-info-group textarea,
         #dir-input-group textarea {
-            min-height: 80px;                                 /* 最小高度 */
+            min-height: 100px;                                 /* 最小高度 */
+            resize: vertical;                                  /* 允许垂直调整 */
+        }
+
+        /* Almanac信息区域样式 */
+        #dir-input-group div[style*="background-color: #f0f0f0"] {
+            background: linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%) !important;  /* 渐变背景 */
+            border: 1px solid #e2e8f0 !important;                                      /* 边框 */
+            border-radius: 12px !important;                                             /* 圆角 */
+            padding: 20px !important;                                                   /* 内边距 */
+            margin-top: 20px !important;                                                /* 上外边距 */
+        }
+
+        #dir-input-group div[style*="background-color: #f0f0f0"] h4 {
+            color: #6b46c1 !important;                                                  /* 标题颜色 */
+            font-size: 16px !important;                                                 /* 标题大小 */
+            border-bottom: 2px solid #e2e8f0;                                          /* 底部边框 */
+            padding-bottom: 10px;                                                       /* 底部内边距 */
+            margin-bottom: 15px !important;                                             /* 下外边距 */
+        }
+
+        #dir-input-group div[style*="background-color: #f0f0f0"] h5 {
+            color: #4a5568;                                                             /* 子标题颜色 */
+            font-size: 13px;                                                            /* 子标题大小 */
+            margin-top: 12px;                                                           /* 上外边距 */
+            margin-bottom: 6px;                                                         /* 下外边距 */
+        }
+
+        /* 按钮容器样式 */
+        #dir-input-group .button-container {
+            display: flex;                                                              /* flex布局 */
+            gap: 12px;                                                                  /* 间距 */
+            justify-content: flex-end;                                                  /* 右对齐 */
+            margin-top: 24px;                                                           /* 上外边距 */
+            padding-top: 20px;                                                          /* 顶部内边距 */
+            border-top: 1px solid #e2e8f0;                                             /* 顶部边框 */
+        }
+
+        /* 保存和取消按钮样式 */
+        #dir-input-group .save-dir-button,
+        #dir-input-group .cancel-dir-button {
+            padding: 12px 24px;                                                         /* 内边距 */
+            border: none;                                                               /* 无边框 */
+            border-radius: 8px;                                                         /* 圆角 */
+            font-size: 14px;                                                            /* 字体大小 */
+            font-weight: 600;                                                           /* 字体粗细 */
+            cursor: pointer;                                                            /* 鼠标样式 */
+            transition: all 0.3s ease;                                                 /* 过渡效果 */
+        }
+
+        #dir-input-group .save-dir-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);             /* 渐变背景 */
+            color: white;                                                               /* 文字颜色 */
+        }
+
+        #dir-input-group .save-dir-button:hover {
+            transform: translateY(-2px);                                               /* 悬停上移 */
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);                          /* 悬停阴影 */
+        }
+
+        #dir-input-group .cancel-dir-button {
+            background: #e2e8f0;                                                       /* 背景色 */
+            color: #4a5568;                                                            /* 文字颜色 */
+        }
+
+        #dir-input-group .cancel-dir-button:hover {
+            background: #cbd5e0;                                                       /* 悬停背景 */
         }
 
 
@@ -1244,14 +1341,49 @@
         .first-night-buttons-container,
         .other-night-buttons-container {
             display: flex;                                    /* flex布局 */
-            flex-wrap: wrap;                                  /* 允许换行 */
-            gap: 5px;                                         /* 按钮间距 */
-            margin: 10px 0;                                   /* 上下外边距 */
-            padding: 10px;                                    /* 内边距 */
-            background-color: #f8f0e2;                        /* 背景色 - 浅米色 */
-            border-radius: 4px;                                /* 圆角 */
-            border: 1px solid #d4c1a4;                       /* 边框色 */
-            min-height: 50px;                                 /* 最小高度 */
+            flex-direction: column;                            /* 垂直排列 */
+            gap: 8px;                                         /* 按钮间距 */
+            margin: 15px 0;                                   /* 上下外边距 */
+            padding: 16px;                                    /* 内边距 */
+            background: linear-gradient(135deg, #f6f8fa 0%, #e9ecef 100%);  /* 渐变背景 */
+            border-radius: 12px;                               /* 圆角 */
+            border: 1px solid #dee2e6;                       /* 边框色 */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);         /* 轻微阴影 */
+        }
+
+        /* 行动顺序按钮样式 */
+        .first-night-buttons-container button,
+        .other-night-buttons-container button {
+            display: flex;                                    /* flex布局 */
+            justify-content: space-between;                    /* 两端对齐 */
+            align-items: center;                               /* 垂直居中 */
+            width: 100%;                                       /* 宽度100% */
+            padding: 12px 16px;                               /* 内边距 */
+            background: linear-gradient(135deg, #6b46c1 0%, #805ad5 100%);  /* 紫色渐变 */
+            color: white;                                      /* 文字颜色 */
+            border: none;                                      /* 无边框 */
+            border-radius: 8px;                                /* 圆角 */
+            font-size: 14px;                                  /* 字体大小 */
+            font-weight: 500;                                 /* 字体粗细 */
+            cursor: pointer;                                   /* 鼠标指针 */
+            transition: all 0.3s ease;                        /* 过渡效果 */
+            text-align: left;                                  /* 文字左对齐 */
+        }
+
+        /* 行动顺序按钮悬停效果 */
+        .first-night-buttons-container button:hover,
+        .other-night-buttons-container button:hover {
+            transform: translateY(-2px);                       /* 轻微上移 */
+            box-shadow: 0 4px 8px rgba(107, 70, 193, 0.3);     /* 增强阴影 */
+            background: linear-gradient(135deg, #553c9a 0%, #6b46c1 100%);  /* 加深渐变 */
+        }
+
+        /* 行动顺序值样式 */
+        .first-night-buttons-container button span,
+        .other-night-buttons-container button span {
+            font-size: 12px;                                  /* 字体大小 */
+            opacity: 0.9;                                      /* 透明度 */
+            font-weight: 400;                                 /* 字体粗细 */
         }
 
         /* ============================================
@@ -1605,6 +1737,31 @@
                 <textarea id="flavor" placeholder="自制角色背景故事"></textarea>
             </div>
 
+            <!-- Almanac 相关字段 -->
+            <div style="margin-top: 20px; padding: 15px; background-color: #f0f0f0; border-radius: 8px;">
+                <h4 style="color: #6b46c1; margin-bottom: 15px;">Almanac 信息（选填）</h4>
+                <div>
+                    <h5>Flavor：</h5>
+                    <textarea id="almanac-flavor" placeholder="角色的风味描述"></textarea>
+                </div>
+                <div style="margin-top: 10px;">
+                    <h5>Overview：</h5>
+                    <textarea id="almanac-overview" placeholder="角色概述"></textarea>
+                </div>
+                <div style="margin-top: 10px;">
+                    <h5>Examples：</h5>
+                    <textarea id="almanac-examples" placeholder="角色能力的例子"></textarea>
+                </div>
+                <div style="margin-top: 10px;">
+                    <h5>How To Run：</h5>
+                    <textarea id="almanac-how-to-run" placeholder="如何运行这个角色"></textarea>
+                </div>
+                <div style="margin-top: 10px;">
+                    <h5>Tip：</h5>
+                    <textarea id="almanac-tip" placeholder="提示"></textarea>
+                </div>
+            </div>
+
             <div>
 
 
@@ -1633,8 +1790,10 @@
                 </div>
             </div>
             <!-- 移动按钮到 dirArea 底端 -->
-            <button class="cancel-dir-button" onclick="toggleDirInput()">取消</button>
-            <button class="save-dir-button" onclick="addDirRole()">保存</button>
+            <div class="button-container">
+                <button class="cancel-dir-button" onclick="toggleDirInput()">取消</button>
+                <button class="save-dir-button" onclick="addDirRole()">保存</button>
+            </div>
 
         </div>
     </div>
@@ -1727,6 +1886,24 @@
                         <button type="button" id="clear-background" style="margin-top: 5px; padding: 5px 10px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">清除图片</button>
                     </div>
                     <textarea id="background"  style="min-width: 300px; min-height: 60px;" placeholder="魔典背景图URL，或使用上方上传功能"></textarea>
+                </div>
+            </div>
+
+            <div>
+                <h4>二维码图片（选填）：</h4>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <button type="button" style="padding: 8px 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.3s ease;">
+                            上传二维码
+                            <input type="file" id="qrcode-upload" accept="image/*" style="position: absolute; opacity: 0; z-index: -1; cursor: pointer;">
+                        </button>
+                        <span style="font-size: 12px; color: #666;">支持 JPG、PNG、WebP 格式</span>
+                    </div>
+                    <div id="qrcode-preview" style="display: none; margin: 10px 0;">
+                        <img id="preview-qrcode" src="" alt="预览" style="max-width: 100px; max-height: 100px; border-radius: 4px; border: 2px solid #ddd;">
+                        <button type="button" id="clear-qrcode" style="margin-top: 5px; padding: 5px 10px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">清除图片</button>
+                    </div>
+                    <textarea id="qrcode-image-input"  style="min-width: 300px; min-height: 60px;" placeholder="二维码图片URL，或使用上方上传功能"></textarea>
                 </div>
             </div>
 
@@ -1906,6 +2083,25 @@
             <div style="display: flex; align-items: center; gap: 8px;">
                 <label style="font-weight: bold; color: #FF0000;">恶魔：</label>
                 <input type="number" id="random-demons" min="0" value="4" placeholder="数量" style="width: 80px; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px;">
+            </div>
+        </div>
+        <!-- 排除角色选择区域 -->
+        <div style="margin-bottom: 15px; padding: 10px 15px; background: #f8fafc; border-radius: 6px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <h3 style="color: #4a5568; margin: 0; font-size: 14px;">排除角色</h3>
+                    <span id="exclude-count-badge" style="display: none; background: #e53e3e; color: white; padding: 2px 6px; border-radius: 10px; font-size: 11px;">0</span>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button onclick="toggleExcludeRoles()" id="toggle-exclude-btn" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">展开</button>
+                    <button onclick="generateExcludeRolesOptions()" style="background: linear-gradient(135deg, #3182ce 0%, #4299e1 100%); color: white; padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">刷新</button>
+                </div>
+            </div>
+            <div id="exclude-roles-content" style="display: none; margin-top: 10px;">
+                <div style="display: flex; flex-wrap: wrap; gap: 8px;" id="exclude-roles-container">
+                    <!-- 动态生成角色选择 -->
+                </div>
+                <p style="font-size: 12px; color: #718096; margin-top: 10px;">选择要从随机选择中排除的角色（点击"刷新角色列表"加载可用角色）</p>
             </div>
         </div>
         <div style="display: flex; gap: 10px; flex-wrap: wrap;">
@@ -2498,6 +2694,7 @@
         <button class="violet-button" onclick="generateJinxAndConfigImage()" style="flex: 1; padding: 14px; background: linear-gradient(135deg, #9f7aea 0%, #b794f4 100%);">
             生成细节图
         </button>
+
     </div>
 
     <!-- 移动端悬浮按钮 -->
@@ -2541,6 +2738,7 @@
                 </svg>
                 <span>生成细节图</span>
             </button>
+
         </div>
         <button id="main-fab" onclick="toggleFabMenu()" style="background-color: #501468;">
             <svg id="fab-icon" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -2560,6 +2758,92 @@
 
     <script>
 
+        // 解析URL参数中的Almanac数据
+        function parseAlmanacFromUrl() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const almanacParam = urlParams.get('almanac');
+            
+            if (almanacParam) {
+                try {
+                    // 解码数据
+                    const decodedData = decodeURIComponent(escape(atob(almanacParam)));
+                    const almanacData = JSON.parse(decodedData);
+                    
+                    if (almanacData.roles && almanacData.roles.length > 0) {
+                        // 显示Almanac册子
+                        showAlmanacFromData(almanacData.roles);
+                    }
+                } catch (error) {
+                    console.error('解析Almanac数据失败:', error);
+                }
+            }
+        }
+
+        // 从解析的数据显示Almanac册子
+        function showAlmanacFromData(rolesWithAlmanac) {
+            // 创建Almanac册子模态框
+            const modal = document.createElement('div');
+            modal.style.cssText = `position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); display: flex; justify-content: center; align-items: center; z-index: 10000;`;
+            
+            const modalContent = document.createElement('div');
+            modalContent.style.cssText = `background-color: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 900px; max-height: 80vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);`;
+            
+            // 构建Almanac册子HTML
+            let almanacBookHTML = `<h2 style="margin-top: 0; color: #6b46c1; text-align: center;">Almanac 册子</h2><div style="margin-top: 30px;">`;
+            
+            // 按角色类型分组
+            const rolesByTeam = {};
+            rolesWithAlmanac.forEach(role => {
+                if (!rolesByTeam[role.team]) {
+                    rolesByTeam[role.team] = [];
+                }
+                rolesByTeam[role.team].push(role);
+            });
+            
+            // 定义团队名称映射
+            const teamNames = {
+                'townsfolk': '镇民',
+                'outsider': '外来者',
+                'minion': '爪牙',
+                'demon': '恶魔',
+                'traveller': '旅行者',
+                'fabled': '传奇角色'
+            };
+            
+            // 为每个团队生成Almanac信息
+            Object.keys(rolesByTeam).forEach(team => {
+                const teamRole = rolesByTeam[team];
+                almanacBookHTML += `<div style="margin-bottom: 40px;"><h3 style="color: #4a5568; margin-bottom: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">${teamNames[team] || team}</h3>`;
+                
+                teamRole.forEach(role => {
+                    almanacBookHTML += `<div style="margin-bottom: 30px; padding: 20px; background-color: #f8fafc; border-radius: 8px;">`;
+                    almanacBookHTML += `<h4 style="color: #2d3748; margin-bottom: 15px;">${role.name}</h4>`;
+                    
+                    if (role.almanac) {
+                        const almanac = role.almanac;
+                        if (almanac.flavor) almanacBookHTML += `<div style="margin-bottom: 15px;"><h5 style="color: #4a5568; margin-bottom: 5px;">Flavor</h5><p style="line-height: 1.6; color: #4a5568;">${almanac.flavor}</p></div>`;
+                        if (almanac.overview) almanacBookHTML += `<div style="margin-bottom: 15px;"><h5 style="color: #4a5568; margin-bottom: 5px;">Overview</h5><p style="line-height: 1.6; color: #4a5568;">${almanac.overview}</p></div>`;
+                        if (almanac.examples) almanacBookHTML += `<div style="margin-bottom: 15px;"><h5 style="color: #4a5568; margin-bottom: 5px;">Examples</h5><p style="line-height: 1.6; color: #4a5568;">${almanac.examples}</p></div>`;
+                        if (almanac.howToRun) almanacBookHTML += `<div style="margin-bottom: 15px;"><h5 style="color: #4a5568; margin-bottom: 5px;">How To Run</h5><p style="line-height: 1.6; color: #4a5568;">${almanac.howToRun}</p></div>`;
+                        if (almanac.tip) almanacBookHTML += `<div style="margin-bottom: 15px;"><h5 style="color: #4a5568; margin-bottom: 5px;">Tip</h5><p style="line-height: 1.6; color: #4a5568;">${almanac.tip}</p></div>`;
+                    }
+                    
+                    almanacBookHTML += `</div>`;
+                });
+                
+                almanacBookHTML += `</div>`;
+            });
+            
+            almanacBookHTML += `</div><div style="margin-top: 30px; text-align: right;"><button id="close-almanac-book" style="background-color: #6b46c1; color: white; border: none; padding: 10px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; transition: background-color 0.2s;">关闭</button></div>`;
+            
+            modalContent.innerHTML = almanacBookHTML;
+            modal.appendChild(modalContent);
+            document.body.appendChild(modal);
+            
+            document.getElementById('close-almanac-book').addEventListener('click', () => document.body.removeChild(modal));
+            modal.addEventListener('click', (e) => e.target === modal && document.body.removeChild(modal));
+        }
+
         // 页面加载完成后检查访问协议
         window.addEventListener('DOMContentLoaded', function() {
             if (isLocalFile()) {
@@ -2569,6 +2853,9 @@
                     warning.style.display = 'none';
                 }
             }
+
+            // 解析URL中的Almanac数据
+            parseAlmanacFromUrl();
 
             // 配置表和剧本自制规则互斥逻辑
             const showConfigTableCheckbox = document.getElementById('showConfigTable');
@@ -7385,7 +7672,7 @@
                 "setup": false
             },
             {
-                "id": "guhuoniaoCustomVER",
+                "id": "oldguhuoniaoCustomVER",
                 "name": "旧姑获鸟",
                 "pinyin": "guhuoniao",
                 "pinyinsuoxie": "ghn",
@@ -9132,7 +9419,8 @@
                 'dir-role-name', 'ability', 'firstNight', 'otherNight',
                 'firstNightReminder', 'otherNightReminder', 'reminders1', 'reminders2',
                 'reminders3', 'reminders4', 'remindersGlobal1', 'remindersGlobal2',
-                'remindersGlobal3', 'remindersGlobal4', 'flavor','image'
+                'remindersGlobal3', 'remindersGlobal4', 'flavor','image',
+                'almanac-flavor', 'almanac-overview', 'almanac-examples', 'almanac-how-to-run', 'almanac-tip'
             ];
 
             fields.forEach(id => {
@@ -9234,6 +9522,15 @@
                     document.getElementById('remindersGlobal3').value.trim(),
                     document.getElementById('remindersGlobal4').value.trim()
                 ].filter(Boolean),
+
+                // Almanac 相关字段
+                almanac: {
+                    flavor: document.getElementById('almanac-flavor').value.trim(),
+                    overview: document.getElementById('almanac-overview').value.trim(),
+                    examples: document.getElementById('almanac-examples').value.trim(),
+                    howToRun: document.getElementById('almanac-how-to-run').value.trim(),
+                    tip: document.getElementById('almanac-tip').value.trim()
+                },
 
                 setup: setupValue,
                 jinxes: [],
@@ -9447,6 +9744,55 @@
                         if (metaInfoJson.background) {
                             metaInfoJson.background = '';
                         }
+                    });
+                }
+            }
+            
+            // 处理二维码图片上传
+            const qrcodeFileInput = document.getElementById('qrcode-upload');
+            const qrcodePreviewDiv = document.getElementById('qrcode-preview');
+            const qrcodePreviewImg = document.getElementById('preview-qrcode');
+            const qrcodeClearButton = document.getElementById('clear-qrcode');
+            const qrcodeInput = document.getElementById('qrcode-image-input');
+            
+            if (qrcodeFileInput && qrcodePreviewDiv && qrcodePreviewImg && qrcodeClearButton && qrcodeInput) {
+                // 找到上传按钮（通过查找包含文件输入的按钮）
+                const qrcodeUploadButton = qrcodeFileInput.closest('button');
+                if (qrcodeUploadButton) {
+                    // 点击上传按钮触发文件选择
+                    qrcodeUploadButton.addEventListener('click', function() {
+                        qrcodeFileInput.click();
+                    });
+                    
+                    // 处理文件选择
+                    qrcodeFileInput.addEventListener('change', function(e) {
+                        const file = e.target.files[0];
+                        if (!file) return;
+                        
+                        // 检查文件类型
+                        const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+                        if (!validTypes.includes(file.type)) {
+                            alert('请上传 JPG、PNG 或 WebP 格式的图片');
+                            return;
+                        }
+                        
+                        // 使用 FileReader 读取文件
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const base64 = e.target.result;
+                            qrcodePreviewImg.src = base64;
+                            qrcodePreviewDiv.style.display = 'block';
+                            qrcodeInput.value = base64;
+                        };
+                        reader.readAsDataURL(file);
+                    });
+                    
+                    // 清除图片
+                    qrcodeClearButton.addEventListener('click', function() {
+                        qrcodePreviewDiv.style.display = 'none';
+                        qrcodePreviewImg.src = '';
+                        qrcodeInput.value = '';
+                        qrcodeFileInput.value = '';
                     });
                 }
             }
@@ -9934,8 +10280,8 @@
         // }
 
 
-        // 生成JSON文件并下载
-        function generateJson() {
+        // 生成JSON数据（通用函数）
+        function generateJsonData() {
             // 在生成JSON前保存所有拖拽后的值
             saveNightValuesFromButtons();
 
@@ -9944,42 +10290,36 @@
             // 检查是否至少选择了一个角色
             if (selectedRoles.length === 0 && dirRolesJson.length === 0)  {
                 alert("请至少选择一个角色！");
-                return;
+                return null;
             }
 
-            // 处理选中的角色，区分 legacyRole 和非 legacyRole
-            // 注：以下代码已注释，当前直接使用原始角色数据
-            // const processedRoles = selectedRoles.map(role => {
-            //     const legacyRole = legacyRolesJson.find(r => r.id === role.id);
-            //     if (legacyRole) {
-            //         return legacyRole;
-            //     }
-            //     return role;
-            // });
-            
-            // 将 dirRolesJson 中的内容添加到处理后的角色列表中
+            // 处理选中的角色
             editionRolesJson = [...selectedRoles, ...dirRolesJson];
-            
-            // 创建最终要导出的 JSON 数据
             const jsonData = [];
 
-            // 如果有剧本信息，添加到最前面
+            // 添加剧本信息
             jsonData.push(metaInfoJson);
-            
+
             // 添加相克规则
             const editionJinxes = getJinxRules(jinxes);
             addJinxInRoleJson(editionJinxes);
-            
-            // 添加试运行相克规则
             const editionTrialJinxes = getJinxRules(trialJinxes);
             addJinxInRoleJson(editionTrialJinxes);
 
             // 添加角色数据
             jsonData.push(...editionRolesJson);
 
-            // 遍历editionJinx，添加相克规则到jsonData中
-            // 格式：{"id": jinxRule+jinxRole1+jinxRole2,"image":jinxRole1的图片,"name":jinxRole1+'&'+jinxRole2,"team":"jinx","setup":false,"ability":jinxRule}
+            // 添加相克规则到JSON数据中
             addAJinxInJson(jsonData);
+
+            return jsonData;
+        }
+
+        // 生成JSON文件并下载
+        function generateJson() {
+            // 生成JSON数据
+            const jsonData = generateJsonData();
+            if (!jsonData) return;
 
             // 转换为 JSON 字符串
             const jsonString = JSON.stringify(jsonData, null, 4);
@@ -10003,35 +10343,9 @@
 
         // 复制JSON到剪贴板并提供跳转选项
         function copyJson() {
-            // 在生成JSON前保存所有拖拽后的值
-            saveNightValuesFromButtons();
-
-            // 获取选中的角色
-            selectedRoles = getSelectedRoles();
-            // 检查是否至少选择了一个角色
-            if (selectedRoles.length === 0 && dirRolesJson.length === 0)  {
-                alert("请至少选择一个角色！");
-                return;
-            }
-
-            // 处理选中的角色
-            editionRolesJson = [...selectedRoles, ...dirRolesJson];
-            const jsonData = [];
-
-            // 添加剧本信息
-            jsonData.push(metaInfoJson);
-
-            // 添加相克规则
-            const editionJinxes = getJinxRules(jinxes);
-            addJinxInRoleJson(editionJinxes);
-            const editionTrialJinxes = getJinxRules(trialJinxes);
-            addJinxInRoleJson(editionTrialJinxes);
-
-            // 添加角色数据
-            jsonData.push(...editionRolesJson);
-
-            // 添加相克规则到JSON数据中
-            addAJinxInJson(jsonData);
+            // 生成JSON数据
+            const jsonData = generateJsonData();
+            if (!jsonData) return;
 
             // 转换为 JSON 字符串
             const jsonString = JSON.stringify(jsonData, null, 4);
@@ -10055,35 +10369,9 @@
 
         // 复制JSON到剪贴板（备用函数）
         function copyJsonToClipboard() {
-            // 在生成JSON前保存所有拖拽后的值
-            saveNightValuesFromButtons();
-
-            // 获取选中的角色
-            selectedRoles = getSelectedRoles();
-            // 检查是否至少选择了一个角色
-            if (selectedRoles.length === 0 && dirRolesJson.length === 0)  {
-                alert("请至少选择一个角色！");
-                return;
-            }
-
-            // 处理选中的角色
-            editionRolesJson = [...selectedRoles, ...dirRolesJson];
-            const jsonData = [];
-
-            // 添加剧本信息
-            jsonData.push(metaInfoJson);
-
-            // 添加相克规则
-            const editionJinxes = getJinxRules(jinxes);
-            addJinxInRoleJson(editionJinxes);
-            const editionTrialJinxes = getJinxRules(trialJinxes);
-            addJinxInRoleJson(editionTrialJinxes);
-
-            // 添加角色数据
-            jsonData.push(...editionRolesJson);
-
-            // 添加相克规则到JSON数据中
-            addAJinxInJson(jsonData);
+            // 生成JSON数据
+            const jsonData = generateJsonData();
+            if (!jsonData) return;
 
             // 转换为 JSON 字符串
             const jsonString = JSON.stringify(jsonData, null, 4);
@@ -10120,7 +10408,176 @@
             });
         }
 
+        // 切换排除角色区域的展开/折叠
+        function toggleExcludeRoles() {
+            const content = document.getElementById('exclude-roles-content');
+            const btn = document.getElementById('toggle-exclude-btn');
+            
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                btn.textContent = '折叠';
+                // 如果还没有加载角色，自动加载
+                const container = document.getElementById('exclude-roles-container');
+                if (container && container.children.length === 0) {
+                    generateExcludeRolesOptions();
+                }
+            } else {
+                content.style.display = 'none';
+                btn.textContent = '展开';
+            }
+        }
+
+        // 更新排除角色数量徽章
+        function updateExcludeCountBadge() {
+            const badge = document.getElementById('exclude-count-badge');
+            const checkboxes = document.querySelectorAll('#exclude-roles-container input[type="checkbox"]:checked');
+            const count = checkboxes.length;
+            
+            if (count > 0) {
+                badge.textContent = count;
+                badge.style.display = 'inline';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        // 生成排除角色选择区域
+        function generateExcludeRolesOptions() {
+            const container = document.getElementById('exclude-roles-container');
+            if (!container) return;
+            
+            // 清空容器
+            container.innerHTML = '';
+            
+            // 获取所有角色类型的容器
+            const roleContainers = [
+                { id: 'townsfolk-columns', name: '镇民', color: '#3182ce' },
+                { id: 'outsiders-columns', name: '外来者', color: '#38a169' },
+                { id: 'minions-columns', name: '爪牙', color: '#ed8936' },
+                { id: 'demons-columns', name: '恶魔', color: '#e53e3e' }
+            ];
+            
+            let totalRoleCount = 0;
+            
+            // 遍历所有角色容器
+            roleContainers.forEach(teamInfo => {
+                const containerEl = document.getElementById(teamInfo.id);
+                if (!containerEl) return;
+                
+                // 获取所有角色项
+                const roleItems = containerEl.querySelectorAll('.role-item');
+                if (roleItems.length === 0) return;
+                
+                // 创建角色类型分组
+                const teamGroup = document.createElement('div');
+                teamGroup.style.width = '100%';
+                teamGroup.style.marginBottom = '10px';
+                
+                // 添加角色类型标题
+                const teamTitle = document.createElement('div');
+                teamTitle.textContent = teamInfo.name;
+                teamTitle.style.fontSize = '12px';
+                teamTitle.style.fontWeight = 'bold';
+                teamTitle.style.color = teamInfo.color;
+                teamTitle.style.marginBottom = '5px';
+                teamGroup.appendChild(teamTitle);
+                
+                // 创建角色按钮容器
+                const rolesWrapper = document.createElement('div');
+                rolesWrapper.style.display = 'flex';
+                rolesWrapper.style.flexWrap = 'wrap';
+                rolesWrapper.style.gap = '6px';
+                
+                roleItems.forEach(roleItem => {
+                    const roleId = roleItem.querySelector('input[type="checkbox"]');
+                    if (!roleId) return;
+                    
+                    // 获取角色名称 - 从label标签内获取文本
+                    const labelElement = roleItem.querySelector('label');
+                    if (!labelElement) return;
+                    
+                    // 获取角色名称（去掉input元素的文本）
+                    let roleNameText = '';
+                    const textNodes = Array.from(labelElement.childNodes).filter(node => node.nodeType === Node.TEXT_NODE);
+                    if (textNodes.length > 0) {
+                        roleNameText = textNodes[textNodes.length - 1].textContent.trim();
+                    } else {
+                        roleNameText = labelElement.textContent.replace(roleId.name, '').trim();
+                    }
+                    
+                    if (!roleNameText) return;
+                    
+                    // 创建角色按钮样式选项
+                    const option = document.createElement('div');
+                    option.style.display = 'flex';
+                    option.style.alignItems = 'center';
+                    option.style.gap = '4px';
+                    option.style.padding = '4px 8px';
+                    option.style.background = 'white';
+                    option.style.border = '1px solid #e2e8f0';
+                    option.style.borderRadius = '4px';
+                    option.style.cursor = 'pointer';
+                    option.style.transition = 'all 0.2s';
+                    option.dataset.roleId = roleId.value;
+                    
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.id = `exclude-${roleId.value}`;
+                    checkbox.value = roleId.value;
+                    checkbox.style.cursor = 'pointer';
+                    
+                    const label = document.createElement('label');
+                    label.htmlFor = `exclude-${roleId.value}`;
+                    label.textContent = roleNameText;
+                    label.style.fontSize = '11px';
+                    label.style.cursor = 'pointer';
+                    label.style.userSelect = 'none';
+                    
+                    // 点击整个选项时切换复选框
+                    option.addEventListener('click', (e) => {
+                        if (e.target !== checkbox) {
+                            checkbox.checked = !checkbox.checked;
+                        }
+                        // 更新选中样式
+                        if (checkbox.checked) {
+                            option.style.background = '#fed7d7';
+                            option.style.borderColor = '#fc8181';
+                        } else {
+                            option.style.background = 'white';
+                            option.style.borderColor = '#e2e8f0';
+                        }
+                        
+                        // 更新徽章数量
+                        updateExcludeCountBadge();
+                    });
+                    
+                    option.appendChild(checkbox);
+                    option.appendChild(label);
+                    rolesWrapper.appendChild(option);
+                    
+                    totalRoleCount++;
+                });
+                
+                teamGroup.appendChild(rolesWrapper);
+                container.appendChild(teamGroup);
+            });
+            
+            // 如果没有找到任何角色
+            if (totalRoleCount === 0) {
+                container.innerHTML = '<p style="font-size: 12px; color: #718096;">暂无可用角色，请确保角色列表已加载</p>';
+            }
+        }
+
+        // 页面加载时生成排除角色选项
+        window.addEventListener('DOMContentLoaded', function() {
+            generateExcludeRolesOptions();
+        });
+
         function randomSelectRoles() {
+            // 获取要排除的角色
+            const excludeCheckboxes = document.querySelectorAll('#exclude-roles-container input[type="checkbox"]:checked');
+            const excludedRoleIds = Array.from(excludeCheckboxes).map(cb => cb.value);
+            
             // 定义各角色类型的选择数量
             const counts = {
                 townsfolk: parseInt(document.getElementById('random-townsfolk').value) || 0,
@@ -10158,7 +10615,8 @@
                 const checkboxes = listContainer.querySelectorAll('input[type="checkbox"]:not(:disabled)');
                 let availableCheckboxes = Array.from(checkboxes).filter(cb => {
                     const roleItem = cb.closest('.role-item');
-                    return roleItem && !roleItem.classList.contains('hidden');
+                    // 排除用户选择的角色
+                    return roleItem && !roleItem.classList.contains('hidden') && !excludedRoleIds.includes(cb.value);
                 });
 
                 // 检查是否有可用角色
@@ -11270,6 +11728,9 @@
                     button.style.color = 'white';
                     button.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
                     button.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
+                    button.style.position = 'relative';
+
+
 
                     // 鼠标悬停效果
                     button.addEventListener('mouseenter', function() {
@@ -11482,6 +11943,13 @@
                     buttonsContainer.appendChild(button);
                 });
 
+                // 添加生成Almanac册子按钮
+                const almanacButton = document.createElement('button');
+                almanacButton.textContent = '生成Almanac册子';
+                almanacButton.style.cssText = `margin: 20px auto; padding: 14px 28px; font-size: 16px; font-weight: 600; border: none; border-radius: 12px; cursor: pointer; color: white; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); display: block;`;
+                almanacButton.onclick = generateAlmanacBook;
+                buttonsContainer.appendChild(almanacButton);
+
                 // 检查是否已经存在按钮容器，如果存在则替换，否则添加
                 const existingButtonsContainer = document.getElementById('role-buttons-container');
                 if (existingButtonsContainer) {
@@ -11657,6 +12125,14 @@
                     document.getElementById('remindersGlobal3').value.trim(),
                     document.getElementById('remindersGlobal4').value.trim()
                 ].filter(Boolean),
+                // Almanac 相关字段
+                almanac: {
+                    flavor: document.getElementById('almanac-flavor').value.trim(),
+                    overview: document.getElementById('almanac-overview').value.trim(),
+                    examples: document.getElementById('almanac-examples').value.trim(),
+                    howToRun: document.getElementById('almanac-how-to-run').value.trim(),
+                    tip: document.getElementById('almanac-tip').value.trim()
+                },
                 setup: setupValue,
                 jinxes: [],//是否需要开放给用户待定
                 special: []//是否需要开放给用户待定
@@ -11947,6 +12423,7 @@
                 otherNightReminder: baseRole.otherNightReminder,
                 reminders: baseRole.reminders,
                 remindersGlobal: baseRole.remindersGlobal,
+                almanac: baseRole.almanac,
                 setup: baseRole.setup,
                 jinxes: baseRole.jinxes,
                 special: baseRole.special
@@ -12644,38 +13121,38 @@
 
         // 渲染角色列表
         // 高亮技能描述中的关键词
+        // 定义关键词和对应的颜色（全局变量，只初始化一次）
+        const highlightMap = [
+            { keywords: ['不会死亡', '存活', '善良', '醉酒', '外来者', '镇民', '不在场的角色', '外来者数量','镇民玩家','镇民角色','外来者角色','善良阵营','善良角色','存活玩家','存活的玩家','正确','在场','善良玩家'], color: '#1e90ff' },
+            { keywords: ['死亡', '死于处决', '处决', '邪恶玩家', '恶魔', '杀死', '错误', '信息', '爪牙', '所有爪牙','恶魔玩家','爪牙角色','邪恶','中毒','邪恶阵营','存活爪牙','邪恶角色','镇民中毒','伪装','恶魔角色','存活爪牙'], color: '#dc143c' },
+            { keywords: ['疯狂'], color: '#9932cc' }
+        ];
+        
+        // 预排序关键词（只执行一次）
+        const allKeywords = [];
+        highlightMap.forEach((item, groupIndex) => {
+            item.keywords.forEach(keyword => {
+                allKeywords.push({ 
+                    word: keyword, 
+                    color: item.color, 
+                    groupIndex: groupIndex,
+                    length: keyword.length 
+                });
+            });
+        });
+        
+        // 排序：先按组索引（优先级），再按长度降序
+        allKeywords.sort((a, b) => {
+            if (a.groupIndex !== b.groupIndex) {
+                return a.groupIndex - b.groupIndex; // 优先级高的组先处理
+            }
+            return b.length - a.length; // 同组内长词优先
+        });
+
         function highlightAbility(ability) {
             if (!ability) return '';
             
-            // 定义关键词和对应的颜色
-            const highlightMap = [
-                { keywords: ['不会死亡', '存活', '善良', '醉酒', '外来者', '镇民', '不在场的角色', '外来者数量','镇民玩家','镇民角色','外来者角色','善良阵营','善良角色','存活玩家','存活的玩家','正确','在场','善良玩家'], color: '#1e90ff' },
-                { keywords: ['死亡', '死于处决', '处决', '邪恶玩家', '恶魔', '杀死', '错误', '信息', '爪牙', '所有爪牙','恶魔玩家','爪牙角色','邪恶','中毒','邪恶阵营','存活爪牙','邪恶角色','镇民中毒','伪装','恶魔角色','存活爪牙'], color: '#dc143c' },
-                { keywords: ['疯狂'], color: '#9932cc' }
-            ];
-            
             let highlightedAbility = ability;
-            
-            // 按优先级和长度排序：先按组优先级，再按关键词长度降序
-            const allKeywords = [];
-            highlightMap.forEach((item, groupIndex) => {
-                item.keywords.forEach(keyword => {
-                    allKeywords.push({ 
-                        word: keyword, 
-                        color: item.color, 
-                        groupIndex: groupIndex,
-                        length: keyword.length 
-                    });
-                });
-            });
-            
-            // 排序：先按组索引（优先级），再按长度降序
-            allKeywords.sort((a, b) => {
-                if (a.groupIndex !== b.groupIndex) {
-                    return a.groupIndex - b.groupIndex; // 优先级高的组先处理
-                }
-                return b.length - a.length; // 同组内长词优先
-            });
             
             // 使用占位符标记已匹配的内容，避免重复替换
             const placeholderMap = new Map();
@@ -12828,6 +13305,9 @@
                 const showTravellersFabled = document.getElementById('showTravellersFabled')?.checked ?? true;
                 const showJinxRules = document.getElementById('showJinxRules')?.checked ?? true;
                 const showStatusBar = document.getElementById('showStatusBar')?.checked ?? true;
+
+                // 获取二维码图片
+                const qrcodeImage = document.getElementById('qrcode-image-input')?.value?.trim() || '';
 
                 // 收集状态信息
                 const statesForDisplay = [];
@@ -13173,7 +13653,7 @@
                                     </div>
                                     <div style="flex: 1; display: flex; flex-direction: column; background: rgba(255,255,255,0.7); border-radius: 0 6px 6px 0;">
                                         <!-- 剧本标题、作者和配置表 -->
-                                        <div style="display: flex; gap: 260px; padding: 10px; border-bottom: 2px solid #c9b896;">
+                                        <div style="display: flex; gap: 20px; padding: 10px; border-bottom: 2px solid #c9b896;">
                                             <!-- 左侧：剧本标题和作者 -->
                                             <div style="display: flex; flex-direction: column; justify-content: center; flex-shrink: 0;">
                                                 <!-- 旅行者和传奇角色 -->
@@ -13198,6 +13678,13 @@
                                                 <h1 style="font-size: 32px; margin: 0 0 4px 0; color: #1e3a5f; font-weight: bold; font-family: 'SimSun', '宋体', serif; letter-spacing: 2px; white-space: nowrap;">${editionName}</h1>
                                                 <div style="font-size: 12px; color: #6b5a45; font-style: italic; white-space: nowrap;">${authorName ? `剧本作者：${authorName}` : ''}</div>
                                             </div>
+                                            <!-- 中间：二维码图片 -->
+                                            ${qrcodeImage ? `
+                                                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0;">
+                                                    <img src="${qrcodeImage}" alt="二维码" style="width: 100px; height: 100px; object-fit: contain; border: 2px solid #c9b896; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                                                    <div style="font-size: 10px; color: #6b5a45; margin-top: 4px;">扫码查看运作</div>
+                                                </div>
+                                            ` : ''}
                                             <!-- 右侧：配置表或自制规则 -->
                                             ${showConfigTable ? `
                                             <div style="flex: 1; background: white; border-radius: 4px; overflow: hidden; border: 1px solid #c9b896;">
@@ -14676,6 +15163,351 @@
         window.addEventListener('DOMContentLoaded', function() {
             loadScriptDataFiles();
         });
+
+        // 显示角色Almanac信息函数
+        function showRoleAlmanac(role) {
+            const modal = document.createElement('div');
+            modal.style.cssText = `position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); display: flex; justify-content: center; align-items: center; z-index: 10000;`;
+            
+            const modalContent = document.createElement('div');
+            modalContent.style.cssText = `background-color: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 800px; max-height: 80vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);`;
+            
+            let almanacHTML = `<h2 style="margin-top: 0; color: #6b46c1;">${role.name} - Almanac</h2><div style="margin-top: 20px;">`;
+            if (role.almanac) {
+                const almanac = role.almanac;
+                if (almanac.flavor) almanacHTML += `<div style="margin-bottom: 20px;"><h3 style="color: #4a5568; margin-bottom: 10px;">Flavor</h3><p style="line-height: 1.6;">${almanac.flavor}</p></div>`;
+                if (almanac.overview) almanacHTML += `<div style="margin-bottom: 20px;"><h3 style="color: #4a5568; margin-bottom: 10px;">Overview</h3><p style="line-height: 1.6;">${almanac.overview}</p></div>`;
+                if (almanac.examples) almanacHTML += `<div style="margin-bottom: 20px;"><h3 style="color: #4a5568; margin-bottom: 10px;">Examples</h3><p style="line-height: 1.6;">${almanac.examples}</p></div>`;
+                if (almanac.howToRun) almanacHTML += `<div style="margin-bottom: 20px;"><h3 style="color: #4a5568; margin-bottom: 10px;">How To Run</h3><p style="line-height: 1.6;">${almanac.howToRun}</p></div>`;
+                if (almanac.tip) almanacHTML += `<div style="margin-bottom: 20px;"><h3 style="color: #4a5568; margin-bottom: 10px;">Tip</h3><p style="line-height: 1.6;">${almanac.tip}</p></div>`;
+            } else {
+                almanacHTML += `<p style="color: #718096; font-style: italic;">此角色暂无Almanac信息</p>`;
+            }
+            almanacHTML += `</div><div style="margin-top: 30px; text-align: right;"><button id="close-almanac" style="background-color: #6b46c1; color: white; border: none; padding: 10px 20px; border-radius: 6px; font-size: 14px; cursor: pointer; transition: background-color 0.2s;">关闭</button></div>`;
+            
+            modalContent.innerHTML = almanacHTML;
+            modal.appendChild(modalContent);
+            document.body.appendChild(modal);
+            
+            document.getElementById('close-almanac').addEventListener('click', () => document.body.removeChild(modal));
+            modal.addEventListener('click', (e) => e.target === modal && document.body.removeChild(modal));
+        }
+
+        // 生成Almanac册子函数
+        function generateAlmanacBook() {
+            const selectionInfo = document.getElementById('selection-info');
+            
+            // 获取所有选中的角色
+            const editionRoles = [...selectedRoles, ...dirRolesJson];
+            
+            // 过滤出有Almanac信息的角色
+            const rolesWithAlmanac = editionRoles.filter(role => role.almanac && 
+                (role.almanac.flavor || role.almanac.overview || role.almanac.examples || 
+                 role.almanac.howToRun || role.almanac.tip));
+            
+            if (rolesWithAlmanac.length === 0) {
+                alert('没有角色包含Almanac信息');
+                return;
+            }
+            
+            // 创建Almanac册子模态框
+            const modal = document.createElement('div');
+            modal.style.cssText = `position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); display: flex; justify-content: center; align-items: center; z-index: 10000;`;
+            
+            const modalContent = document.createElement('div');
+            modalContent.style.cssText = `background-color: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 900px; max-height: 80vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);`;
+            
+            // 构建Almanac册子HTML
+            let almanacBookHTML = `<h2 style="margin-top: 0; color: #6b46c1; text-align: center;">Almanac 册子</h2><div style="margin-top: 30px;">`;
+            
+            // 按角色类型分组
+            const rolesByTeam = {};
+            rolesWithAlmanac.forEach(role => {
+                if (!rolesByTeam[role.team]) {
+                    rolesByTeam[role.team] = [];
+                }
+                rolesByTeam[role.team].push(role);
+            });
+            
+            // 定义团队名称映射
+            const teamNames = {
+                'townsfolk': '镇民',
+                'outsider': '外来者',
+                'minion': '爪牙',
+                'demon': '恶魔',
+                'traveller': '旅行者',
+                'fabled': '传奇角色'
+            };
+            
+            // 为每个团队生成Almanac信息
+            Object.keys(rolesByTeam).forEach(team => {
+                const teamRole = rolesByTeam[team];
+                almanacBookHTML += `<div style="margin-bottom: 40px;"><h3 style="color: #4a5568; margin-bottom: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px;">${teamNames[team] || team}</h3>`;
+                
+                teamRole.forEach(role => {
+                    almanacBookHTML += `<div style="margin-bottom: 30px; padding: 20px; background-color: #f8fafc; border-radius: 8px;">`;
+                    almanacBookHTML += `<h4 style="color: #2d3748; margin-bottom: 15px;">${role.name}</h4>`;
+                    
+                    if (role.almanac) {
+                        const almanac = role.almanac;
+                        if (almanac.flavor) almanacBookHTML += `<div style="margin-bottom: 15px;"><h5 style="color: #4a5568; margin-bottom: 5px;">Flavor</h5><p style="line-height: 1.6; color: #4a5568;">${almanac.flavor}</p></div>`;
+                        if (almanac.overview) almanacBookHTML += `<div style="margin-bottom: 15px;"><h5 style="color: #4a5568; margin-bottom: 5px;">Overview</h5><p style="line-height: 1.6; color: #4a5568;">${almanac.overview}</p></div>`;
+                        if (almanac.examples) almanacBookHTML += `<div style="margin-bottom: 15px;"><h5 style="color: #4a5568; margin-bottom: 5px;">Examples</h5><p style="line-height: 1.6; color: #4a5568;">${almanac.examples}</p></div>`;
+                        if (almanac.howToRun) almanacBookHTML += `<div style="margin-bottom: 15px;"><h5 style="color: #4a5568; margin-bottom: 5px;">How To Run</h5><p style="line-height: 1.6; color: #4a5568;">${almanac.howToRun}</p></div>`;
+                        if (almanac.tip) almanacBookHTML += `<div style="margin-bottom: 15px;"><h5 style="color: #4a5568; margin-bottom: 5px;">Tip</h5><p style="line-height: 1.6; color: #4a5568;">${almanac.tip}</p></div>`;
+                    }
+                    
+                    almanacBookHTML += `</div>`;
+                });
+                
+                almanacBookHTML += `</div>`;
+            });
+            
+            almanacBookHTML += `</div><div style="margin-top: 30px; text-align: right;"><button id="download-almanac" style="background: linear-gradient(135deg, #38a169 0%, #48bb78 100%); color: white; border: none; padding: 8px 16px; border-radius: 16px; font-size: 14px; cursor: pointer; margin: 0 5px 5px 0; transition: background-color 0.2s;">下载册子</button><button id="generate-qrcode" style="background: linear-gradient(135deg, #3182ce 0%, #4299e1 100%); color: white; border: none; padding: 8px 16px; border-radius: 16px; font-size: 14px; cursor: pointer; margin: 0 5px 5px 0; transition: background-color 0.2s;">生成二维码</button><button id="close-almanac-book" style="background: linear-gradient(135deg, #6b46c1 0%, #805ad5 100%); color: white; border: none; padding: 8px 16px; border-radius: 16px; font-size: 14px; cursor: pointer; margin: 0 5px 5px 0; transition: background-color 0.2s;">关闭</button></div>`;
+            
+            modalContent.innerHTML = almanacBookHTML;
+            modal.appendChild(modalContent);
+            document.body.appendChild(modal);
+            
+            document.getElementById('close-almanac-book').addEventListener('click', () => document.body.removeChild(modal));
+            modal.addEventListener('click', (e) => e.target === modal && document.body.removeChild(modal));
+            
+            // 添加生成二维码按钮事件
+            document.getElementById('generate-qrcode').addEventListener('click', () => {
+                window.open('https://cli.im/', '_blank');
+            });
+            
+            // 添加下载按钮事件
+            document.getElementById('download-almanac').addEventListener('click', () => {
+                downloadAlmanac(rolesWithAlmanac, teamNames);
+            });
+            
+            // 自动复制Almanac内容到剪贴板
+            copyAlmanacToClipboard(rolesWithAlmanac, teamNames);
+        }
+        
+        // 下载Almanac内容为文本文件
+        function downloadAlmanac(rolesWithAlmanac, teamNames) {
+            let textContent = "Almanac 册子\n\n";
+            
+            // 按角色类型分组
+            const rolesByTeam = {};
+            rolesWithAlmanac.forEach(role => {
+                if (!rolesByTeam[role.team]) {
+                    rolesByTeam[role.team] = [];
+                }
+                rolesByTeam[role.team].push(role);
+            });
+            
+            // 生成纯文本内容
+            Object.keys(rolesByTeam).forEach(team => {
+                const teamRole = rolesByTeam[team];
+                textContent += `${teamNames[team] || team}\n`;
+                textContent += "-" .repeat(50) + "\n";
+                
+                teamRole.forEach(role => {
+                    textContent += `\n${role.name}\n`;
+                    textContent += "=" .repeat(30) + "\n";
+                    
+                    if (role.almanac) {
+                        const almanac = role.almanac;
+                        if (almanac.flavor) textContent += `Flavor:\n${almanac.flavor}\n\n`;
+                        if (almanac.overview) textContent += `Overview:\n${almanac.overview}\n\n`;
+                        if (almanac.examples) textContent += `Examples:\n${almanac.examples}\n\n`;
+                        if (almanac.howToRun) textContent += `How To Run:\n${almanac.howToRun}\n\n`;
+                        if (almanac.tip) textContent += `Tip:\n${almanac.tip}\n\n`;
+                    }
+                    
+                    textContent += "-" .repeat(50) + "\n";
+                });
+                
+                textContent += "\n";
+            });
+            
+            // 创建Blob对象
+            const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
+            
+            // 创建下载链接
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Almanac_册子.txt';
+            document.body.appendChild(a);
+            
+            // 触发下载
+            a.click();
+            
+            // 清理
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 100);
+            
+            // 显示下载成功消息
+            showDownloadSuccessMessage();
+        }
+        
+        // 显示下载成功消息
+        function showDownloadSuccessMessage() {
+            const message = document.createElement('div');
+            message.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #38a169 0%, #48bb78 100%);
+                color: white;
+                padding: 12px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                z-index: 10001;
+                font-size: 14px;
+                font-weight: 500;
+                animation: slideIn 0.3s ease-out;
+            `;
+            
+            // 添加动画
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from {
+                        transform: translateX(100%);
+                        opacity: 0;
+                    }
+                    to {
+                        transform: translateX(0);
+                        opacity: 1;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            message.textContent = 'Almanac册子已下载！';
+            document.body.appendChild(message);
+            
+            // 3秒后移除消息
+            setTimeout(() => {
+                message.style.animation = 'slideIn 0.3s ease-out reverse';
+                setTimeout(() => {
+                    document.body.removeChild(message);
+                    document.head.removeChild(style);
+                }, 300);
+            }, 3000);
+        }
+        
+        // 复制Almanac内容到剪贴板
+        function copyAlmanacToClipboard(rolesWithAlmanac, teamNames) {
+            let textContent = "Almanac 册子\n\n";
+            
+            // 按角色类型分组
+            const rolesByTeam = {};
+            rolesWithAlmanac.forEach(role => {
+                if (!rolesByTeam[role.team]) {
+                    rolesByTeam[role.team] = [];
+                }
+                rolesByTeam[role.team].push(role);
+            });
+            
+            // 生成纯文本内容
+            Object.keys(rolesByTeam).forEach(team => {
+                const teamRole = rolesByTeam[team];
+                textContent += `${teamNames[team] || team}\n`;
+                textContent += "-" .repeat(50) + "\n";
+                
+                teamRole.forEach(role => {
+                    textContent += `\n${role.name}\n`;
+                    textContent += "=" .repeat(30) + "\n";
+                    
+                    if (role.almanac) {
+                        const almanac = role.almanac;
+                        if (almanac.flavor) textContent += `Flavor:\n${almanac.flavor}\n\n`;
+                        if (almanac.overview) textContent += `Overview:\n${almanac.overview}\n\n`;
+                        if (almanac.examples) textContent += `Examples:\n${almanac.examples}\n\n`;
+                        if (almanac.howToRun) textContent += `How To Run:\n${almanac.howToRun}\n\n`;
+                        if (almanac.tip) textContent += `Tip:\n${almanac.tip}\n\n`;
+                    }
+                    
+                    textContent += "-" .repeat(50) + "\n";
+                });
+                
+                textContent += "\n";
+            });
+            
+            // 复制到剪贴板
+            if (navigator.clipboard && window.isSecureContext) {
+                // 现代浏览器
+                navigator.clipboard.writeText(textContent).then(() => {
+                    showCopySuccessMessage();
+                }).catch(err => {
+                    console.error('无法复制内容:', err);
+                });
+            } else {
+                // 旧浏览器备用方法
+                const textArea = document.createElement('textarea');
+                textArea.value = textContent;
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-999999px';
+                textArea.style.top = '-999999px';
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                
+                try {
+                    document.execCommand('copy');
+                    showCopySuccessMessage();
+                } catch (err) {
+                    console.error('无法复制内容:', err);
+                } finally {
+                    document.body.removeChild(textArea);
+                }
+            }
+        }
+        
+        // 显示复制成功消息
+        function showCopySuccessMessage() {
+            const message = document.createElement('div');
+            message.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: linear-gradient(135deg, #38a169 0%, #48bb78 100%);
+                color: white;
+                padding: 12px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                z-index: 10001;
+                font-size: 14px;
+                font-weight: 500;
+                animation: slideIn 0.3s ease-out;
+            `;
+            
+            // 添加动画
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from {
+                        transform: translateX(100%);
+                        opacity: 0;
+                    }
+                    to {
+                        transform: translateX(0);
+                        opacity: 1;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            message.textContent = 'Almanac内容已复制到剪贴板！';
+            document.body.appendChild(message);
+            
+            // 3秒后移除消息
+            setTimeout(() => {
+                message.style.animation = 'slideIn 0.3s ease-out reverse';
+                setTimeout(() => {
+                    document.body.removeChild(message);
+                    document.head.removeChild(style);
+                }, 300);
+            }, 3000);
+        }
     </script>
 
 </body>
