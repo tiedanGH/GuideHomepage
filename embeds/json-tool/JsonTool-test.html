@@ -1890,7 +1890,7 @@
             </div>
 
             <div>
-                <h4>二维码图片（选填）：</h4>
+                <h4>历书（选填）：</h4>
                 <div style="display: flex; flex-direction: column; gap: 10px;">
                     <div style="display: flex; gap: 10px; align-items: center;">
                         <button type="button" style="padding: 8px 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.3s ease;">
@@ -1905,11 +1905,6 @@
                     </div>
                     <textarea id="qrcode-image-input"  style="min-width: 300px; min-height: 60px;" placeholder="二维码图片URL，或使用上方上传功能"></textarea>
                 </div>
-            </div>
-
-            <div>
-                <h4>历书（选填）：</h4>
-                <textarea id="almanac"  style="min-width: 300px; min-height: 60px;" placeholder="剧本的运作手册网址。" ></textarea>
             </div>
 
             <div>
@@ -15263,7 +15258,7 @@
                 almanacBookHTML += `</div>`;
             });
             
-            almanacBookHTML += `</div><div style="margin-top: 30px; text-align: right;"><button id="download-almanac" style="background: linear-gradient(135deg, #38a169 0%, #48bb78 100%); color: white; border: none; padding: 8px 16px; border-radius: 16px; font-size: 14px; cursor: pointer; margin: 0 5px 5px 0; transition: background-color 0.2s;">下载册子</button><button id="generate-qrcode" style="background: linear-gradient(135deg, #3182ce 0%, #4299e1 100%); color: white; border: none; padding: 8px 16px; border-radius: 16px; font-size: 14px; cursor: pointer; margin: 0 5px 5px 0; transition: background-color 0.2s;">生成二维码</button><button id="close-almanac-book" style="background: linear-gradient(135deg, #6b46c1 0%, #805ad5 100%); color: white; border: none; padding: 8px 16px; border-radius: 16px; font-size: 14px; cursor: pointer; margin: 0 5px 5px 0; transition: background-color 0.2s;">关闭</button></div>`;
+            almanacBookHTML += `</div><div style="margin-top: 30px; text-align: right;"><button id="download-almanac-book" style="background: linear-gradient(135deg, #38a169 0%, #48bb78 100%); color: white; border: none; padding: 8px 16px; border-radius: 16px; font-size: 14px; cursor: pointer; margin: 0 5px 5px 0; transition: background-color 0.2s;">下载PDF</button><button id="generate-qrcode" style="background: linear-gradient(135deg, #3182ce 0%, #4299e1 100%); color: white; border: none; padding: 8px 16px; border-radius: 16px; font-size: 14px; cursor: pointer; margin: 0 5px 5px 0; transition: background-color 0.2s;">复制文字生成二维码</button><button id="close-almanac-book" style="background: linear-gradient(135deg, #6b46c1 0%, #805ad5 100%); color: white; border: none; padding: 8px 16px; border-radius: 16px; font-size: 14px; cursor: pointer; margin: 0 5px 5px 0; transition: background-color 0.2s;">关闭</button></div>`;
             
             modalContent.innerHTML = almanacBookHTML;
             modal.appendChild(modalContent);
@@ -15272,241 +15267,177 @@
             document.getElementById('close-almanac-book').addEventListener('click', () => document.body.removeChild(modal));
             modal.addEventListener('click', (e) => e.target === modal && document.body.removeChild(modal));
             
-            // 添加生成二维码按钮事件
-            document.getElementById('generate-qrcode').addEventListener('click', () => {
-                window.open('https://cli.im/', '_blank');
-            });
-            
-            // 添加下载按钮事件
-            document.getElementById('download-almanac').addEventListener('click', () => {
-                downloadAlmanac(rolesWithAlmanac, teamNames);
-            });
-            
-            // 自动复制Almanac内容到剪贴板
-            copyAlmanacToClipboard(rolesWithAlmanac, teamNames);
+            // 添加下载PDF按钮事件
+            document.getElementById('download-almanac-book').addEventListener('click', () => {
+                // 创建打印窗口
+                const printWindow = window.open('', '_blank');
+                if (!printWindow) {
+                    alert('请允许弹出窗口以生成PDF');
+                    return;
+                }
+                
+                const printContent = `
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Almanac 册子</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 20mm;
         }
-        
-        // 下载Almanac内容为文本文件
-        function downloadAlmanac(rolesWithAlmanac, teamNames) {
-            let textContent = "Almanac 册子\n\n";
-            
-            // 按角色类型分组
-            const rolesByTeam = {};
-            rolesWithAlmanac.forEach(role => {
-                if (!rolesByTeam[role.team]) {
-                    rolesByTeam[role.team] = [];
-                }
-                rolesByTeam[role.team].push(role);
-            });
-            
-            // 生成纯文本内容
-            Object.keys(rolesByTeam).forEach(team => {
-                const teamRole = rolesByTeam[team];
-                textContent += `${teamNames[team] || team}\n`;
-                textContent += "-" .repeat(50) + "\n";
-                
-                teamRole.forEach(role => {
-                    textContent += `\n${role.name}\n`;
-                    textContent += "=" .repeat(30) + "\n";
-                    
-                    if (role.almanac) {
-                        const almanac = role.almanac;
-                        if (almanac.flavor) textContent += `Flavor:\n${almanac.flavor}\n\n`;
-                        if (almanac.overview) textContent += `Overview:\n${almanac.overview}\n\n`;
-                        if (almanac.examples) textContent += `Examples:\n${almanac.examples}\n\n`;
-                        if (almanac.howToRun) textContent += `How To Run:\n${almanac.howToRun}\n\n`;
-                        if (almanac.tip) textContent += `Tip:\n${almanac.tip}\n\n`;
-                    }
-                    
-                    textContent += "-" .repeat(50) + "\n";
-                });
-                
-                textContent += "\n";
-            });
-            
-            // 创建Blob对象
-            const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
-            
-            // 创建下载链接
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'Almanac_册子.txt';
-            document.body.appendChild(a);
-            
-            // 触发下载
-            a.click();
-            
-            // 清理
-            setTimeout(() => {
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            }, 100);
-            
-            // 显示下载成功消息
-            showDownloadSuccessMessage();
+        body {
+            font-family: 'Microsoft YaHei', 'SimSun', Arial, sans-serif;
+            line-height: 1.6;
+            color: #2d3748;
+            background-color: white;
+            padding: 0;
+            margin: 0;
         }
-        
-        // 显示下载成功消息
-        function showDownloadSuccessMessage() {
-            const message = document.createElement('div');
-            message.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: linear-gradient(135deg, #38a169 0%, #48bb78 100%);
-                color: white;
-                padding: 12px 20px;
-                border-radius: 8px;
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-                z-index: 10001;
-                font-size: 14px;
-                font-weight: 500;
-                animation: slideIn 0.3s ease-out;
-            `;
-            
-            // 添加动画
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes slideIn {
-                    from {
-                        transform: translateX(100%);
-                        opacity: 0;
-                    }
-                    to {
-                        transform: translateX(0);
-                        opacity: 1;
-                    }
-                }
-            `;
-            document.head.appendChild(style);
-            
-            message.textContent = 'Almanac册子已下载！';
-            document.body.appendChild(message);
-            
-            // 3秒后移除消息
-            setTimeout(() => {
-                message.style.animation = 'slideIn 0.3s ease-out reverse';
-                setTimeout(() => {
-                    document.body.removeChild(message);
-                    document.head.removeChild(style);
-                }, 300);
-            }, 3000);
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
         }
-        
-        // 复制Almanac内容到剪贴板
-        function copyAlmanacToClipboard(rolesWithAlmanac, teamNames) {
-            let textContent = "Almanac 册子\n\n";
-            
-            // 按角色类型分组
-            const rolesByTeam = {};
-            rolesWithAlmanac.forEach(role => {
-                if (!rolesByTeam[role.team]) {
-                    rolesByTeam[role.team] = [];
-                }
-                rolesByTeam[role.team].push(role);
-            });
-            
-            // 生成纯文本内容
-            Object.keys(rolesByTeam).forEach(team => {
-                const teamRole = rolesByTeam[team];
-                textContent += `${teamNames[team] || team}\n`;
-                textContent += "-" .repeat(50) + "\n";
-                
-                teamRole.forEach(role => {
-                    textContent += `\n${role.name}\n`;
-                    textContent += "=" .repeat(30) + "\n";
-                    
-                    if (role.almanac) {
-                        const almanac = role.almanac;
-                        if (almanac.flavor) textContent += `Flavor:\n${almanac.flavor}\n\n`;
-                        if (almanac.overview) textContent += `Overview:\n${almanac.overview}\n\n`;
-                        if (almanac.examples) textContent += `Examples:\n${almanac.examples}\n\n`;
-                        if (almanac.howToRun) textContent += `How To Run:\n${almanac.howToRun}\n\n`;
-                        if (almanac.tip) textContent += `Tip:\n${almanac.tip}\n\n`;
-                    }
-                    
-                    textContent += "-" .repeat(50) + "\n";
-                });
-                
-                textContent += "\n";
-            });
-            
-            // 复制到剪贴板
-            if (navigator.clipboard && window.isSecureContext) {
-                // 现代浏览器
-                navigator.clipboard.writeText(textContent).then(() => {
-                    showCopySuccessMessage();
-                }).catch(err => {
-                    console.error('无法复制内容:', err);
-                });
-            } else {
-                // 旧浏览器备用方法
-                const textArea = document.createElement('textarea');
-                textArea.value = textContent;
-                textArea.style.position = 'fixed';
-                textArea.style.left = '-999999px';
-                textArea.style.top = '-999999px';
-                document.body.appendChild(textArea);
-                textArea.focus();
-                textArea.select();
-                
-                try {
-                    document.execCommand('copy');
-                    showCopySuccessMessage();
-                } catch (err) {
-                    console.error('无法复制内容:', err);
-                } finally {
-                    document.body.removeChild(textArea);
-                }
+        h1 {
+            color: #6b46c1;
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 30px;
+            font-size: 28px;
+            border-bottom: 3px solid #6b46c1;
+            padding-bottom: 15px;
+        }
+        h2 {
+            color: #4a5568;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+            font-size: 22px;
+            page-break-after: avoid;
+        }
+        h3 {
+            color: #2d3748;
+            margin-bottom: 15px;
+            font-size: 18px;
+            page-break-after: avoid;
+        }
+        h4 {
+            color: #4a5568;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .role-section {
+            margin-bottom: 25px;
+            padding: 15px;
+            background-color: #f8fafc;
+            border-radius: 8px;
+            border-left: 4px solid #6b46c1;
+            page-break-inside: avoid;
+        }
+        .field-section {
+            margin-bottom: 12px;
+        }
+        p {
+            margin: 0;
+            line-height: 1.8;
+            font-size: 13px;
+            text-align: justify;
+        }
+        @media print {
+            body {
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+            }
+            .no-print {
+                display: none !important;
             }
         }
-        
-        // 显示复制成功消息
-        function showCopySuccessMessage() {
-            const message = document.createElement('div');
-            message.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: linear-gradient(135deg, #38a169 0%, #48bb78 100%);
-                color: white;
-                padding: 12px 20px;
-                border-radius: 8px;
-                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-                z-index: 10001;
-                font-size: 14px;
-                font-weight: 500;
-                animation: slideIn 0.3s ease-out;
-            `;
+    </style>
+</head>
+<body>
+    <div class="container">
+        ${almanacBookHTML.replace(/<div style="margin-top: 30px; text-align: right;">.*?<\/div>/, '')}
+    </div>
+    <div class="no-print" style="text-align: center; margin-top: 30px; padding: 20px;">
+        <p style="color: #666; font-size: 12px;">请按 Ctrl+P (或 Cmd+P) 打开打印对话框，选择"另存为PDF"即可下载</p>
+        <button onclick="window.print()" style="padding: 10px 20px; background: linear-gradient(135deg, #38a169 0%, #48bb78 100%); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px;">立即打印/保存PDF</button>
+    </div>
+    <script>
+        // 页面加载后自动打开打印对话框
+        window.onload = function() {
+            setTimeout(function() {
+                window.print();
+            }, 500);
+        };
+    <\/script>
+</body>
+</html>`;
+                
+                printWindow.document.write(printContent);
+                printWindow.document.close();
+            });
             
-            // 添加动画
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes slideIn {
-                    from {
-                        transform: translateX(100%);
-                        opacity: 0;
+            // 添加生成二维码按钮事件
+            document.getElementById('generate-qrcode').addEventListener('click', () => {
+                // 生成简易文本格式的册子内容
+                let textContent = '【Almanac 册子】\n\n';
+                
+                // 定义团队名称映射
+                const teamNames = {
+                    'townsfolk': '镇民',
+                    'outsider': '外来者',
+                    'minion': '爪牙',
+                    'demon': '恶魔',
+                    'traveller': '旅行者',
+                    'fabled': '传奇角色'
+                };
+                
+                // 按角色类型分组
+                const rolesByTeam = {};
+                rolesWithAlmanac.forEach(role => {
+                    if (!rolesByTeam[role.team]) {
+                        rolesByTeam[role.team] = [];
                     }
-                    to {
-                        transform: translateX(0);
-                        opacity: 1;
-                    }
-                }
-            `;
-            document.head.appendChild(style);
-            
-            message.textContent = 'Almanac内容已复制到剪贴板！';
-            document.body.appendChild(message);
-            
-            // 3秒后移除消息
-            setTimeout(() => {
-                message.style.animation = 'slideIn 0.3s ease-out reverse';
-                setTimeout(() => {
-                    document.body.removeChild(message);
-                    document.head.removeChild(style);
-                }, 300);
-            }, 3000);
+                    rolesByTeam[role.team].push(role);
+                });
+                
+                // 为每个团队生成文本内容
+                Object.keys(rolesByTeam).forEach(team => {
+                    const teamRole = rolesByTeam[team];
+                    textContent += `【${teamNames[team] || team}】\n\n`;
+                    
+                    teamRole.forEach(role => {
+                        textContent += `【${role.name}】\n`;
+                        
+                        if (role.almanac) {
+                            const almanac = role.almanac;
+                            if (almanac.flavor) textContent += `风味：${almanac.flavor}\n`;
+                            if (almanac.overview) textContent += `概述：${almanac.overview}\n`;
+                            if (almanac.examples) textContent += `示例：${almanac.examples}\n`;
+                            if (almanac.howToRun) textContent += `运行方式：${almanac.howToRun}\n`;
+                            if (almanac.tip) textContent += `提示：${almanac.tip}\n`;
+                        }
+                        
+                        textContent += '\n';
+                    });
+                });
+                
+                // 复制到剪贴板
+                navigator.clipboard.writeText(textContent).then(() => {
+                    alert('册子内容已复制到剪贴板！\n\n即将跳转到草料二维码网站，您可以直接粘贴内容生成二维码。');
+                    setTimeout(() => {
+                        window.open('https://cli.im/', '_blank');
+                    }, 1000);
+                }).catch(err => {
+                    console.error('复制失败:', err);
+                    alert('复制失败，请手动复制册子内容。');
+                });
+            });
         }
     </script>
 
