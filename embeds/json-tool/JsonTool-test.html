@@ -8786,7 +8786,7 @@
             try {
                 await new Promise((resolve, reject) => {
                     const script = document.createElement('script');
-                    script.src = 'data/uniqueRoles.js';
+                    script.src = '剧本JSON工具by黑心恰克_files/uniqueRoles.js';
                     script.onload = () => {
                         processUniqueRoles();
                         resolve();
@@ -10455,7 +10455,7 @@
         }
 
         function clearAllSelections() {
-            const allCheckboxes = document.querySelectorAll('.role-list input[type="checkbox"]');
+            const allCheckboxes = document.querySelectorAll('.role-item input[type="checkbox"]');
             allCheckboxes.forEach(cb => {
                 cb.checked = false;
             });
@@ -10912,7 +10912,9 @@
 
         // 选择剧本角色功能
         function selectScriptRoles(roleNamesJSON) {
-            const roleNames = JSON.parse(roleNamesJSON);
+            // 先将 &quot; 替换回双引号
+            const decodedJSON = roleNamesJSON.replace(/&quot;/g, '"');
+            const roleNames = JSON.parse(decodedJSON);
 
             if (!roleNames || roleNames.length === 0) {
                 alert('该剧本没有角色信息');
@@ -12185,11 +12187,12 @@
             });
 
             // 初始化Sortable.js
-            if (firstNightSortable) {
-                firstNightSortable.destroy();
-            }
+            if (typeof Sortable !== 'undefined') {
+                if (firstNightSortable) {
+                    firstNightSortable.destroy();
+                }
 
-            firstNightSortable = new Sortable(container, {
+                firstNightSortable = new Sortable(container, {
                 animation: 150,
                 ghostClass: 'sortable-ghost',
                 chosenClass: 'sortable-chosen',
@@ -12243,6 +12246,7 @@
                     window.buttonsBeforeDrag = null;
                 }
             });
+            }
 
         }
 
@@ -12283,11 +12287,12 @@
             });
 
             // 初始化Sortable.js
-            if (otherNightSortable) {
-                otherNightSortable.destroy();
-            }
+            if (typeof Sortable !== 'undefined') {
+                if (otherNightSortable) {
+                    otherNightSortable.destroy();
+                }
 
-            otherNightSortable = new Sortable(container, {
+                otherNightSortable = new Sortable(container, {
                 animation: 150,
                 ghostClass: 'sortable-ghost',
                 chosenClass: 'sortable-chosen',
@@ -12306,6 +12311,7 @@
                     window.originalIndex = null;
                 }
             });
+            }
 
         }
 
@@ -13787,7 +13793,7 @@
                     
                     roleContainers.forEach(containerId => {
                         const container = document.getElementById(containerId);
-                        if (container) {
+                        if (container && typeof Sortable !== 'undefined') {
                             const instance = new Sortable(container, {
                                 animation: 150,
                                 ghostClass: 'sortable-ghost',
@@ -13824,7 +13830,7 @@
 
                     // 阵营块拖拽
                     const teamBlocksContainer = document.getElementById('team-blocks-container');
-                    if (teamBlocksContainer) {
+                    if (teamBlocksContainer && typeof Sortable !== 'undefined') {
                         const instance = new Sortable(teamBlocksContainer, {
                             animation: 150,
                             ghostClass: 'team-block-ghost',
@@ -14810,19 +14816,19 @@
             // 定义需要加载的脚本文件列表
             const scriptsToLoad = [
                 {
-                    src: 'data/uniqueRoles.js?v=20260316',
+                    src: '剧本JSON工具by黑心恰克_files/uniqueRoles.js',
                     name: 'uniqueRoles'
                 },
                 {
-                    src: 'data/editionLib.js?v=20260316',
+                    src: '剧本JSON工具by黑心恰克_files/editionLib.js',
                     name: 'editionLib'
                 },
                 {
-                    src: 'data/botcscripts.js?v=20260316',
+                    src: '剧本JSON工具by黑心恰克_files/botcscripts.js',
                     name: 'botcscripts'
                 },
                 {
-                    src: 'data/botcscripts_partial.js?v=20260316',
+                    src: '剧本JSON工具by黑心恰克_files/botcscripts_partial.js',
                     name: 'botcscriptsPartial'
                 }
             ];
