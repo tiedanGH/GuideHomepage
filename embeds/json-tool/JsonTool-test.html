@@ -11111,6 +11111,9 @@
             selectedRoles = [];
             const checkedIds = new Set();
 
+            // 获取最新的角色列表
+            const allRoles = getAllRoles();
+
             document.querySelectorAll('.role-item input:checked').forEach(checkbox => {
                 const roleId = checkbox.value;
 
