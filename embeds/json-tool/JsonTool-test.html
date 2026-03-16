@@ -10928,12 +10928,14 @@
             const checkboxes = document.querySelectorAll('.role-item input[type="checkbox"]');
             let foundCount = 0;
             let notFoundRoles = [];
+            const checkedRoles = new Set();
 
             checkboxes.forEach(checkbox => {
                 const roleName = checkbox.parentElement.textContent.trim();
-                if (roleNames.includes(roleName)) {
+                if (roleNames.includes(roleName) && !checkedRoles.has(roleName)) {
                     checkbox.checked = true;
                     foundCount++;
+                    checkedRoles.add(roleName);
                 }
             });
 
