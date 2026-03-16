@@ -59169,5 +59169,331 @@ const uniqueRoles = [
     ],
     "remindersGlobal": [],
     "setup": false
+  },
+  {
+    "id": "sibu_button",
+    "name": "司簿",
+    "pinyin": "",
+    "pinyinsuoxie": "",
+    "scripts": [
+      "一夜鱼龙舞"
+    ],
+    "image": "https://www.bloodstar.xyz//p//comm503//extra-role//14_extrarole.png",
+    "ability": "在你的首个夜晚，你要选择一名玩家，你会得知该玩家及其相邻玩家的角色种类数量。",
+    "firstNight": 3070,
+    "otherNight": 0,
+    "team": "townsfolk",
+    "edition": "custom",
+    "flavor": "",
+    "jinxes": [],
+    "special": [],
+    "firstNightReminder": "",
+    "otherNightReminder": "",
+    "reminders": [
+      "廪赐"
+    ],
+    "remindersGlobal": [],
+    "setup": 0
+  },
+  {
+    "id": "wushiren_button",
+    "name": "舞狮人",
+    "pinyin": "",
+    "pinyinsuoxie": "",
+    "scripts": [
+      "一夜鱼龙舞"
+    ],
+    "image": "https://oss.gstonegames.com/data_file/clocktower/upload/202301/c_7613877694761_6041a632.jpg",
+    "ability": "每个夜晚，你会得知一个在场角色。每局游戏限一次，你得知的信息改为恶魔的伪装之一。",
+    "firstNight": 3090,
+    "otherNight": 150,
+    "team": "townsfolk",
+    "edition": "custom",
+    "flavor": "",
+    "jinxes": [],
+    "special": [],
+    "firstNightReminder": "唤醒舞狮人，对他展示一个角色标记。如果展示了恶魔的伪装，在舞狮人角色标记旁放置“限一次”角色标记。如果舞狮人有“限一次”角色标记，则无法对他展示恶魔的伪装作为正确信息。",
+    "otherNightReminder": "唤醒舞狮人，对他展示一个角色标记。如果展示了恶魔的伪装，在舞狮人角色标记旁放置“限一次”角色标记。如果舞狮人有“限一次”角色标记，则无法对他展示恶魔的伪装作为正确信息。",
+    "reminders": [
+      "限一次"
+    ],
+    "remindersGlobal": [],
+    "setup": 0
+  },
+  {
+    "id": "yushi",
+    "name": "御史",
+    "pinyin": "",
+    "pinyinsuoxie": "",
+    "scripts": [
+      "一夜鱼龙舞"
+    ],
+    "image": "https://www.bloodstar.xyz//p//comm503//extra-role//13_extrarole.png",
+    "ability": "每个夜晚*，你要选择一名玩家：你会得知该玩家与其邻座的存活玩家之一是否为同一阵营。",
+    "firstNight": 0,
+    "otherNight": 180,
+    "team": "townsfolk",
+    "edition": "custom",
+    "flavor": "",
+    "jinxes": [],
+    "special": [],
+    "firstNightReminder": "",
+    "otherNightReminder": "唤醒御史。让他选择一名玩家，对其点头或摇头示意。",
+    "reminders": [],
+    "remindersGlobal": [],
+    "setup": 0
+  },
+  {
+    "id": "wulongtou_button",
+    "name": "舞龙头",
+    "pinyin": "",
+    "pinyinsuoxie": "",
+    "scripts": [
+      "一夜鱼龙舞"
+    ],
+    "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/custom/d_5464670695861_6d8fec4c.jpg",
+    "ability": "每个夜晚，你会得知你和舞龙尾最近距离间存活的善良玩家数量（不含旅行者）。[离你最远的一名镇民是舞龙尾]",
+    "firstNight": 3080,
+    "otherNight": 140,
+    "team": "townsfolk",
+    "edition": "custom",
+    "flavor": "",
+    "jinxes": [],
+    "special": [],
+    "firstNightReminder": "",
+    "otherNightReminder": "",
+    "reminders": [],
+    "remindersGlobal": [],
+    "setup": 1
+  },
+  {
+    "id": "wulongwei_button",
+    "name": "舞龙尾",
+    "pinyin": "",
+    "pinyinsuoxie": "",
+    "scripts": [
+      "一夜鱼龙舞"
+    ],
+    "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/custom/d_3353870695861_ee9adf9e.jpg",
+    "ability": "你不知道你是舞龙尾，你以为你是其他镇民角色。如果你和舞龙头之间的其他玩家都已死亡，这些玩家变成舞龙身并复活，在此之前你只会死于处决。[+舞龙头]",
+    "firstNight": 0,
+    "otherNight": 0,
+    "team": "townsfolk",
+    "edition": "custom",
+    "flavor": "",
+    "jinxes": [],
+    "special": [],
+    "firstNightReminder": "",
+    "otherNightReminder": "",
+    "reminders": [],
+    "remindersGlobal": [
+      "舞龙尾"
+    ],
+    "setup": 1
+  },
+  {
+    "id": "9e0c7f67-4287-4c15-84be-941c11b39dda",
+    "name": "红颜",
+    "pinyin": "",
+    "pinyinsuoxie": "",
+    "scripts": [
+      "一夜鱼龙舞"
+    ],
+    "image": "https://www.bloodstar.xyz//p//comm503//extra-role//hongyan_extrarole.png",
+    "ability": "如果你死亡，邪恶玩家会得知一个关键词。首个说出该关键词的邪恶玩家会驳回当前所有提名并立即结束白天阶段（最后一天除外）。",
+    "firstNight": 0,
+    "otherNight": 130,
+    "team": "outsider",
+    "edition": "custom",
+    "flavor": "",
+    "jinxes": [],
+    "special": [],
+    "firstNightReminder": "",
+    "otherNightReminder": "",
+    "reminders": [
+      "祸水"
+    ],
+    "remindersGlobal": [],
+    "setup": 0
+  },
+  {
+    "id": "7c1f73f7-10d5-49ff-8c60-3828e2f3cbe9",
+    "name": "朱厌",
+    "pinyin": "",
+    "pinyinsuoxie": "",
+    "scripts": [
+      "一夜鱼龙舞"
+    ],
+    "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/custom/d_4240662507861_fab9e140.jpg",
+    "ability": "每局游戏限一次，在夜晚时，你可以选择当晚所有镇民玩家的能力都会产生错误信息。[+1 外来者]",
+    "firstNight": 3030,
+    "otherNight": 50,
+    "team": "minion",
+    "edition": "custom",
+    "flavor": "",
+    "jinxes": [],
+    "special": [],
+    "firstNightReminder": "",
+    "otherNightReminder": "",
+    "reminders": [
+      "失去能力",
+      "天下大乱"
+    ],
+    "remindersGlobal": [],
+    "setup": true
+  },
+  {
+    "id": "huodou",
+    "name": "祸斗",
+    "pinyin": "",
+    "pinyinsuoxie": "",
+    "scripts": [
+      "一夜鱼龙舞"
+    ],
+    "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/custom/d_1314991409271_8df88747.jpg",
+    "ability": "如果首个邪恶玩家死亡，与他邻近的善良玩家之一会被当作邪恶阵营，当晚你可以选择两名存活玩家交换角色，即使你已死亡。[-1 外来者]",
+    "firstNight": 0,
+    "otherNight": 30,
+    "team": "minion",
+    "edition": "custom",
+    "flavor": "",
+    "jinxes": [],
+    "special": [],
+    "firstNightReminder": "",
+    "otherNightReminder": "",
+    "reminders": [
+      "大祸临头",
+      "福祸相依"
+    ],
+    "remindersGlobal": [],
+    "setup": 1
+  },
+  {
+    "id": "danshutiequan",
+    "name": "契灵",
+    "pinyin": "",
+    "pinyinsuoxie": "",
+    "scripts": [
+      "一夜鱼龙舞"
+    ],
+    "image": "https://www.bloodstar.xyz/p/jlghx/qiling/newcharacter_qiling.png",
+    "ability": "每局游戏限一次，在夜晚时，你可以选择除你以外的两名玩家：如果第一名玩家存活，第二名玩家就不会死亡。",
+    "firstNight": 3040,
+    "otherNight": 60,
+    "team": "minion",
+    "edition": "custom",
+    "flavor": "",
+    "jinxes": [],
+    "special": [],
+    "firstNightReminder": "唤醒契灵，让其选择两名玩家，第一名玩家放置“契约”提示标记，第二名玩家放置“不会死亡”提示标记。",
+    "otherNightReminder": "唤醒契灵，让其选择两名玩家，第一名玩家放置“契约”提示标记，第二名玩家放置“不会死亡”提示标记。",
+    "reminders": [
+      "不会死亡",
+      "契约",
+      "限一次"
+    ],
+    "remindersGlobal": [],
+    "setup": 0
+  },
+  {
+    "id": "271b81b5-da94-4b65-acb8-352f0819de2b",
+    "name": "诡美人",
+    "pinyin": "",
+    "pinyinsuoxie": "",
+    "scripts": [
+      "一夜鱼龙舞"
+    ],
+    "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/custom/d_3110570695861_1f3119e7.jpg",
+    "ability": "每个夜晚*，你要选择一名玩家：他死亡。当你死于处决，如果你与存活外来者之间没有存活善良玩家（最后一天除外），他会变成邪恶的诡美人，但每局游戏仅能成功转化一次。[+1 外来者]",
+    "firstNight": 0,
+    "otherNight": 90,
+    "team": "demon",
+    "edition": "custom",
+    "flavor": "",
+    "jinxes": [],
+    "special": [],
+    "firstNightReminder": "",
+    "otherNightReminder": "",
+    "reminders": [
+      "仰慕者",
+      "死亡"
+    ],
+    "remindersGlobal": [],
+    "setup": 1
+  },
+  {
+    "id": "73513897-429a-43ce-9f0e-c69ccb82cc53",
+    "name": "冤",
+    "pinyin": "",
+    "pinyinsuoxie": "",
+    "scripts": [
+      "一夜鱼龙舞"
+    ],
+    "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/custom/d_8539280695861_536321d6.jpg",
+    "ability": "每个夜晚*，你要选择一名玩家:他死亡。如果你在被提名后公开声明我冤呐（最后一天除外），在你死于处决后私下选择一名给你投票的玩家，他会变成邪恶的冤，但每局游戏仅能成功转化一次。[-1外来者]",
+    "firstNight": 0,
+    "otherNight": 100,
+    "team": "demon",
+    "edition": "custom",
+    "flavor": "",
+    "jinxes": [],
+    "special": [],
+    "firstNightReminder": "",
+    "otherNightReminder": "",
+    "reminders": [
+      "死亡",
+      "冤呐"
+    ],
+    "remindersGlobal": [],
+    "setup": 1
+  },
+  {
+    "id": "7bc9637d-ddd9-4a84-83a7-2d01d354b85e",
+    "name": "凤",
+    "pinyin": "",
+    "pinyinsuoxie": "",
+    "scripts": [
+      "一夜鱼龙舞"
+    ],
+    "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/custom/d_8469358538861_a51cca41.jpg",
+    "ability": "每个夜晚*，你要选择一名玩家：他死亡。 当你死于处决（最后一天除外），存活的凰会变成邪恶的凤。［离你最远的一名镇民玩家同时是凰］",
+    "firstNight": 0,
+    "otherNight": 110,
+    "team": "demon",
+    "edition": "custom",
+    "flavor": "",
+    "jinxes": [],
+    "special": [],
+    "firstNightReminder": "",
+    "otherNightReminder": "",
+    "reminders": [
+      "死亡",
+      "凰"
+    ],
+    "remindersGlobal": [],
+    "setup": false
+  },
+  {
+    "id": "1cc4cf40-6bcd-44be-86b2-809a41b9279e",
+    "name": "舞龙身",
+    "pinyin": "",
+    "pinyinsuoxie": "",
+    "scripts": [
+      "一夜鱼龙舞"
+    ],
+    "image": "https://oss.gstonegames.com/data_file/clocktower/role_icon/custom/d_1234680695861_1a8706ca.jpg",
+    "ability": "你无法被流放。每个白天舞龙头可以向一名非旅行者玩家发起流放，此次流放仅舞龙能参与且半数以上舞龙同意即可流放成功。[不可选择]",
+    "firstNight": 0,
+    "otherNight": 0,
+    "team": "traveler",
+    "edition": "custom",
+    "flavor": "",
+    "jinxes": [],
+    "special": [],
+    "firstNightReminder": "",
+    "otherNightReminder": "",
+    "reminders": [],
+    "remindersGlobal": [],
+    "setup": 0
   }
-]
+];
