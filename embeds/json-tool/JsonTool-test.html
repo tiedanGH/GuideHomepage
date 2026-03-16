@@ -11135,24 +11135,10 @@
                         // 使用已更新的角色数据
                         selectedRoles.push(existingRole);
                     } else {
-                        // 使用基础数据
+                        // 使用基础数据，复制所有字段
                         selectedRoles.push({
-                            id: roleId,//+"custom",
-                            name: baseRole.name,
-                            image: baseRole.image,
-                            team: baseRole.team,
-                            edition: baseRole.edition,
-                            ability: baseRole.ability,
-                            flavor: baseRole.flavor,
-                            firstNight: baseRole.firstNight,
-                            firstNightReminder: baseRole.firstNightReminder,
-                            otherNight: baseRole.otherNight,
-                            otherNightReminder: baseRole.otherNightReminder,
-                            reminders: baseRole.reminders,
-                            remindersGlobal: baseRole.remindersGlobal,
-                            setup: baseRole.setup,
-                            jinxes: baseRole.jinxes,
-                            special: baseRole.special
+                            ...baseRole,
+                            id: roleId
                         });
                     }
                     checkedIds.add(roleId);
