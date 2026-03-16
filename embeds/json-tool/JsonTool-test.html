@@ -1611,6 +1611,7 @@
         <label><input type="checkbox" name="script" value="华灯初上" checked> 华灯初上</label>
         <label><input type="checkbox" name="script" value="山雨欲来" checked> 山雨欲来</label>
         <label><input type="checkbox" name="script" value="旧版角色" checked> 旧版角色</label>
+        <label><input type="checkbox" name="script" value="自制角色" unchecked> 自制角色</label>
         <label><input type="checkbox" name="script" value="传奇角色" unchecked> 传奇角色</label>
         <label><input type="checkbox" name="script" value="旅行者" unchecked> 旅行者</label>
     </div>
@@ -2119,10 +2120,6 @@
     <!-- 新增超链接 -->
     <a href="https://clocktower-wiki.gstonegames.com/index.php?title=%E8%A7%84%E5%88%99%E8%B0%83%E6%95%B4%E6%8F%90%E5%89%8D%E5%85%AC%E7%A4%BA" target="_blank" style="font-size: calc(100% + 4px); font-weight: bold;text-align: left;"">点击这里查看新、旧角色能力对比</a>
     <br>
-    <a href="javascript:void(0);" onclick="openOriginalScriptsWindow()" style="font-size: calc(100% + 4px); font-weight: bold;text-align: left;"">点击这里获取全原创角色剧本</a>
-    <br>
-    <a href="javascript:void(0);" onclick="openPartialScriptsWindow()" style="font-size: calc(100% + 4px); font-weight: bold;text-align: left; color: #28a745;"">点击这里获取部分原创角色剧本</a>
-    <br>
     <a href="https://jsontool.netlify.app/findediton" target="_blank" style="font-size: calc(100% + 4px); font-weight: bold;text-align: left;"">根据角色筛选剧本</a>
     <br>
 
@@ -2138,415 +2135,18 @@
         </div>
     </div>
 
-    <!-- 原创剧本窗口 -->
-    <div id="originalScriptsWindow" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 10000;">
-        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 1200px; height: 90%; max-height: 800px; background: white; border-radius: 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); overflow: hidden;">
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
-                <h2 style="margin: 0; font-size: 24px;">全原创角色剧本</h2>
-                <div style="display: flex; gap: 10px; align-items: center;">
-                    <input type="text" id="original-script-search" placeholder="搜索剧本名或作者" style="padding: 8px 12px; border: none; border-radius: 4px; font-size: 14px; width: 200px;">
-                    <button onclick="closeOriginalScriptsWindow()" style="background: white; color: #667eea; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center;">&times;</button>
-                </div>
-            </div>
-            <div style="padding: 20px; height: calc(100% - 80px); overflow-y: auto;">
-                <div style="text-align: center; margin-bottom: 30px;">
-                    <p style="font-size: 16px; color: #666;">点击下方剧本卡片，即可复制完整的JSON内容到剪贴板</p>
-                </div>
 
-                <div style="margin-bottom: 40px;">
-                    <h3 style="margin: 0 0 15px 0; color: #333; font-size: 20px; font-weight: bold; border-bottom: 2px solid #667eea; padding-bottom: 8px;">国内剧本</h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;" id="domesticScriptsGrid">
-                        <!-- 国内剧本将通过JavaScript动态添加 -->
-                    </div>
-                </div>
-
-                <div style="margin-bottom: 40px;">
-                    <h3 style="margin: 0 0 15px 0; color: #333; font-size: 20px; font-weight: bold; border-bottom: 2px solid #667eea; padding-bottom: 8px;">海外剧本</h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;" id="overseasScriptsGrid">
-                        <!-- 海外剧本将通过JavaScript动态添加 -->
-                    </div>
-                </div>
-
-                <div style="margin-bottom: 40px;">
-                    <h3 style="margin: 0 0 15px 0; color: #333; font-size: 20px; font-weight: bold; border-bottom: 2px solid #667eea; padding-bottom: 8px;">汀西维尔剧本</h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;" id="teenseyScriptsGrid">
-                        <!-- 汀西维尔剧本将通过JavaScript动态添加 -->
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 部分原创角色剧本窗口 -->
-    <div id="partialScriptsWindow" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 10000;">
-        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 1200px; height: 90%; max-height: 800px; background: white; border-radius: 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); overflow: hidden;">
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white;">
-                <h2 style="margin: 0; font-size: 24px;">部分原创角色剧本</h2>
-                <div style="display: flex; gap: 10px; align-items: center;">
-                    <input type="text" id="partial-script-search" placeholder="搜索剧本名或作者" style="padding: 8px 12px; border: none; border-radius: 4px; font-size: 14px; width: 200px;">
-                    <button onclick="closePartialScriptsWindow()" style="background: white; color: #28a745; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center;">&times;</button>
-                </div>
-            </div>
-            <div style="padding: 20px; height: calc(100% - 80px); overflow-y: auto;">
-                <div style="text-align: center; margin-bottom: 30px;">
-                    <p style="font-size: 16px; color: #666;">点击下方剧本卡片，即可复制完整的JSON内容到剪贴板</p>
-                </div>
-
-                <div style="margin-bottom: 40px;">
-                    <h3 style="margin: 0 0 15px 0; color: #333; font-size: 20px; font-weight: bold; border-bottom: 2px solid #28a745; padding-bottom: 8px;">不含私货剧本</h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;" id="partialWithoutPrivateGrid">
-                        <!-- 不含私货剧本将通过JavaScript动态添加 -->
-                    </div>
-                </div>
-
-                <div style="margin-bottom: 40px;">
-                    <h3 style="margin: 0 0 15px 0; color: #333; font-size: 20px; font-weight: bold; border-bottom: 2px solid #28a745; padding-bottom: 8px;">包含私货剧本</h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;" id="partialWithPrivateGrid">
-                        <!-- 包含私货剧本将通过JavaScript动态添加 -->
-                    </div>
-                </div>
-
-                <div style="margin-bottom: 40px;">
-                    <h3 style="margin: 0 0 15px 0; color: #333; font-size: 20px; font-weight: bold; border-bottom: 2px solid #28a745; padding-bottom: 8px;">汀西维尔剧本</h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;" id="partialTeenseyGrid">
-                        <!-- 汀西维尔剧本将通过JavaScript动态添加 -->
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <script>
         // 剧本数据（包含JSON内容）
 
 
-        // 部分原创角色剧本数据（包含JSON内容）
 
 
-        // 打开原创剧本窗口
-        function openOriginalScriptsWindow() {
-            document.getElementById('originalScriptsWindow').style.display = 'block';
-            renderScripts();
-            
-            // 添加搜索框事件监听器
-            const searchInput = document.getElementById('original-script-search');
-            searchInput.addEventListener('input', renderScripts);
-        }
 
-        // 关闭原创剧本窗口
-        function closeOriginalScriptsWindow() {
-            document.getElementById('originalScriptsWindow').style.display = 'none';
-        }
 
-        // 渲染剧本卡片
-        function renderScripts() {
-            const domesticGrid = document.getElementById('domesticScriptsGrid');
-            const overseasGrid = document.getElementById('overseasScriptsGrid');
-            const teenseyGrid = document.getElementById('teenseyScriptsGrid');
-            const searchInput = document.getElementById('original-script-search');
-            const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
 
-            // 清空网格
-            domesticGrid.innerHTML = '';
-            overseasGrid.innerHTML = '';
-            if (teenseyGrid) teenseyGrid.innerHTML = '';
 
-            // 过滤剧本
-            function filterScripts(scripts) {
-                if (!searchTerm) return scripts;
-                return scripts.filter(script => 
-                    script.name.toLowerCase().includes(searchTerm) || 
-                    script.author.toLowerCase().includes(searchTerm)
-                );
-            }
-
-            // 渲染国内剧本
-            const filteredDomestic = filterScripts(scriptsData.domestic);
-            filteredDomestic.forEach(script => {
-                const card = createScriptCard(script);
-                domesticGrid.appendChild(card);
-            });
-
-            // 渲染海外剧本
-            const filteredOverseas = filterScripts(scriptsData.overseas);
-            filteredOverseas.forEach(script => {
-                const card = createScriptCard(script);
-                overseasGrid.appendChild(card);
-            });
-
-            // 渲染汀西维尔剧本
-            if (scriptsData.teensey && teenseyGrid) {
-                const filteredTeensey = filterScripts(scriptsData.teensey);
-                filteredTeensey.forEach(script => {
-                    const card = createScriptCard(script);
-                    teenseyGrid.appendChild(card);
-                });
-            }
-        }
-
-        // 创建剧本卡片
-        function createScriptCard(script) {
-            const card = document.createElement('div');
-            card.style.cssText = `
-                background: white;
-                border-radius: 12px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-                overflow: hidden;
-                transition: transform 0.2s, box-shadow 0.2s;
-                cursor: pointer;
-                border: 1px solid #e0e0e0;
-            `;
-
-            // 鼠标悬停效果
-            card.addEventListener('mouseover', () => {
-                card.style.transform = 'translateY(-4px)';
-                card.style.boxShadow = '0 8px 24px rgba(0,0,0,0.15)';
-            });
-
-            card.addEventListener('mouseout', () => {
-                card.style.transform = 'translateY(0)';
-                card.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
-            });
-
-            // 卡片内容
-            let logoHtml = '';
-            if (script.logo) {
-                logoHtml = `
-                    <div style="height: 100px; background: #f5f5f5; display: flex; align-items: center; justify-content: center;">
-                        <img src="${script.logo}" alt="${script.name}" style="max-height: 80px; max-width: 180px; object-fit: contain;">
-                    </div>
-                `;
-            } else {
-                logoHtml = `
-                    <div style="height: 100px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center;">
-                        <h4 style="margin: 0; font-size: 16px; font-weight: bold; color: white; text-align: center; padding: 0 10px;">${script.name}</h4>
-                    </div>
-                `;
-            }
-
-            card.innerHTML = `
-                ${logoHtml}
-                <div style="padding: 15px;">
-                    <h4 style="margin: 0 0 8px 0; font-size: 16px; font-weight: bold; color: #333;">${script.name}</h4>
-                    <p style="margin: 0 0 12px 0; font-size: 14px; color: #666;">作者：${script.author}</p>
-                    <button class="copy-json-btn" style="
-                        width: 100%;
-                        padding: 8px 12px;
-                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                        color: white;
-                        border: none;
-                        border-radius: 6px;
-                        font-size: 14px;
-                        cursor: pointer;
-                        transition: background 0.2s;
-                    ">
-                        复制JSON
-                    </button>
-                </div>
-            `;
-
-            // 添加按钮点击事件
-            const copyBtn = card.querySelector('.copy-json-btn');
-            copyBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                copyScriptJson(script.name, script.json);
-            });
-
-            // 点击卡片也可以复制
-            card.addEventListener('click', (e) => {
-                if (!e.target.closest('button')) {
-                    copyScriptJson(script.name, script.json);
-                }
-            });
-
-            return card;
-        }
-
-        // 复制剧本JSON到剪贴板
-        function copyScriptJson(scriptName, json) {
-            navigator.clipboard.writeText(json).then(() => {
-                // 显示复制成功提示
-                const toast = document.createElement('div');
-                toast.style.cssText = `
-                    position: fixed;
-                    top: 20px;
-                    right: 20px;
-                    background: #4caf50;
-                    color: white;
-                    padding: 12px 20px;
-                    border-radius: 6px;
-                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-                    z-index: 99999;
-                    font-size: 14px;
-                    transition: transform 0.3s, opacity 0.3s;
-                    transform: translateX(100%);
-                    opacity: 0;
-                `;
-                toast.textContent = `${scriptName} JSON 已复制到剪贴板`;
-                document.body.appendChild(toast);
-
-                // 显示提示
-                setTimeout(() => {
-                    toast.style.transform = 'translateX(0)';
-                    toast.style.opacity = '1';
-                }, 100);
-
-                // 隐藏提示
-                setTimeout(() => {
-                    toast.style.transform = 'translateX(100%)';
-                    toast.style.opacity = '0';
-                    setTimeout(() => {
-                        document.body.removeChild(toast);
-                    }, 300);
-                }, 2000);
-            }).catch(err => {
-                console.error('复制失败:', err);
-                alert('复制失败，请手动复制');
-            });
-        }
-
-        // 打开部分原创角色剧本窗口
-        function openPartialScriptsWindow() {
-            document.getElementById('partialScriptsWindow').style.display = 'block';
-            renderPartialScripts();
-            
-            // 添加搜索框事件监听器
-            const searchInput = document.getElementById('partial-script-search');
-            searchInput.addEventListener('input', renderPartialScripts);
-        }
-
-        // 关闭部分原创角色剧本窗口
-        function closePartialScriptsWindow() {
-            document.getElementById('partialScriptsWindow').style.display = 'none';
-        }
-
-        // 渲染部分原创角色剧本卡片
-        function renderPartialScripts() {
-            const withoutPrivateGrid = document.getElementById('partialWithoutPrivateGrid');
-            const withPrivateGrid = document.getElementById('partialWithPrivateGrid');
-            const teenseyGrid = document.getElementById('partialTeenseyGrid');
-            const searchInput = document.getElementById('partial-script-search');
-            const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
-
-            // 清空网格
-            withoutPrivateGrid.innerHTML = '';
-            withPrivateGrid.innerHTML = '';
-            if (teenseyGrid) teenseyGrid.innerHTML = '';
-
-            // 过滤剧本
-            function filterScripts(scripts) {
-                if (!searchTerm) return scripts;
-                return scripts.filter(script => 
-                    script.name.toLowerCase().includes(searchTerm) || 
-                    script.author.toLowerCase().includes(searchTerm)
-                );
-            }
-
-            // 渲染不含私货剧本
-            if (partialScriptsData.withoutPrivate) {
-                const filteredWithoutPrivate = filterScripts(partialScriptsData.withoutPrivate);
-                filteredWithoutPrivate.forEach(script => {
-                    const card = createPartialScriptCard(script);
-                    withoutPrivateGrid.appendChild(card);
-                });
-            }
-
-            // 渲染包含私货剧本
-            if (partialScriptsData.withPrivate) {
-                const filteredWithPrivate = filterScripts(partialScriptsData.withPrivate);
-                filteredWithPrivate.forEach(script => {
-                    const card = createPartialScriptCard(script);
-                    withPrivateGrid.appendChild(card);
-                });
-            }
-
-            // 渲染汀西维尔剧本
-            if (partialScriptsData.teensey && teenseyGrid) {
-                const filteredTeensey = filterScripts(partialScriptsData.teensey);
-                filteredTeensey.forEach(script => {
-                    const card = createPartialScriptCard(script);
-                    teenseyGrid.appendChild(card);
-                });
-            }
-        }
-
-        // 创建部分原创角色剧本卡片
-        function createPartialScriptCard(script) {
-            const card = document.createElement('div');
-            card.style.cssText = `
-                background: white;
-                border-radius: 12px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-                overflow: hidden;
-                transition: transform 0.2s, box-shadow 0.2s;
-                cursor: pointer;
-                border: 1px solid #e0e0e0;
-            `;
-
-            // 鼠标悬停效果
-            card.addEventListener('mouseover', () => {
-                card.style.transform = 'translateY(-4px)';
-                card.style.boxShadow = '0 8px 24px rgba(0,0,0,0.15)';
-            });
-
-            card.addEventListener('mouseout', () => {
-                card.style.transform = 'translateY(0)';
-                card.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
-            });
-
-            // 卡片内容
-            let logoHtml = '';
-            if (script.logo) {
-                logoHtml = `
-                    <div style="height: 100px; background: #f5f5f5; display: flex; align-items: center; justify-content: center;">
-                        <img src="${script.logo}" alt="${script.name}" style="max-height: 80px; max-width: 180px; object-fit: contain;">
-                    </div>
-                `;
-            } else {
-                logoHtml = `
-                    <div style="height: 100px; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); display: flex; align-items: center; justify-content: center;">
-                        <h4 style="margin: 0; font-size: 16px; font-weight: bold; color: white; text-align: center; padding: 0 10px;">${script.name}</h4>
-                    </div>
-                `;
-            }
-
-            card.innerHTML = `
-                ${logoHtml}
-                <div style="padding: 15px;">
-                    <h4 style="margin: 0 0 8px 0; font-size: 16px; font-weight: bold; color: #333;">${script.name}</h4>
-                    <p style="margin: 0 0 12px 0; font-size: 14px; color: #666;">作者：${script.author}</p>
-                    <button class="copy-json-btn" style="
-                        width: 100%;
-                        padding: 8px 12px;
-                        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-                        color: white;
-                        border: none;
-                        border-radius: 6px;
-                        font-size: 14px;
-                        cursor: pointer;
-                        transition: background 0.2s;
-                    ">
-                        复制JSON
-                    </button>
-                </div>
-            `;
-
-            // 添加按钮点击事件
-            const copyBtn = card.querySelector('.copy-json-btn');
-            copyBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                copyScriptJson(script.name, script.json);
-            });
-
-            // 点击卡片也可以复制
-            card.addEventListener('click', (e) => {
-                if (!e.target.closest('button')) {
-                    copyScriptJson(script.name, script.json);
-                }
-            });
-
-            return card;
-        }
     </script>
 
 
@@ -8817,7 +8417,7 @@
                 {"role1":"茶艺师","role2":"魔像","rule":"满足条件可阻止魔像致死。"},
                 {"role1":"陌客","role2":"魔像","rule":"可被当恶魔，免魔像致死。"},
                 {"role1":"修补匠","role2":"魔像","rule":"可让修补匠适时死，模拟魔像。"},
-                {"role1":"女巫","role2":"魔像","rule":"健康清醒被诅咒的魔像提名非恶魔，魔像先触发（保两能力）；魔像提名女巫，二选一触发。"},
+                {"role1":"女巫","role2":"魔像","rule":"如果健康清醒且被女巫诅咒的魔像提名非恶魔玩家，说书人来决定谁的能力优先触发。但通常是让魔像先触发，这样可以保证两个角色的能力都能正常生效。如果魔像提名的是女巫，那么说书人就只能从其中选择一个能力来进行触发了（因为一个效果触发后导致一名玩家死亡，另一个效果就无法被触发了）"},
                 {"role1":"食人族","role2":"异端分子","rule":"异端分子被处决致游戏结束，食人族不获其能力。"},
                 {"role1":"将军","role2":"异端分子","rule":"将军信息需考虑异端分子；善良快处决恶魔但异端在场，显邪恶优势。"},
                 {"role1":"哲学家","role2":"异端分子","rule":"哲学家选异端分子后死，仍保能力（死后保留）；原异端分子恢复清醒，两异端能力生效。"},
@@ -8874,7 +8474,11 @@
                 {"role1":"食人族","role2":"国王","rule":"食人族在场时国王被处决，恶魔夜醒知食人族是国王。"},
                 {"role1":"侍女","role2":"国王","rule":"死亡玩家≥存活玩家时国王才醒，此前不被侍女探查；此后被探查。"},
                 {"role1":"哲学家","role2":"国王","rule":"获国王能力当晚，恶魔见国王标记，非哲学家/小精灵。"},
-                {"role1":"小精灵","role2":"国王","rule":"获国王能力当晚，恶魔见国王标记，非哲学家/小精灵。"}
+                {"role1":"小精灵","role2":"国王","rule":"获国王能力当晚，恶魔见国王标记，非哲学家/小精灵。"},
+                {"role1":"送葬者","role2":"陌客","rule":"如果回溯节点陌客中毒，送葬只能得知陌客；如果生效节点陌客中毒，陌客可以影响送葬者。"},
+                {"role1":"刺客","role2":"莽夫","rule":"刺客可以刺死莽夫，如果这么做了，数学家＋1。"},
+                {"role1":"方古","role2":"莽夫","rule":"方古选择莽夫玩家死亡，方古醉酒，莽夫入红，当夜没有因恶魔击杀而死亡的玩家。"},
+                {"role1":"方古","role2":"镇长","rule":"方古刀镇长，弹莽夫。方古死亡，莽夫变成新的方古。"},
             ]
         ;
         const originalInteractionsCount = interactions.length;
@@ -9142,7 +8746,73 @@
         ]
 
 
-        const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demonsRoles, ...fabledRoles, ...travellersRoles];
+        // 自制角色数组 - 从外部文件加载
+        let customRoles = [];
+
+        // 处理从 uniqueRoles.js 加载的角色数据
+        const processUniqueRoles = () => {
+            if (typeof uniqueRoles !== 'undefined' && Array.isArray(uniqueRoles)) {
+                // 为每个角色添加"自制角色"到 scripts 数组
+                customRoles = uniqueRoles.map(role => ({
+                    ...role,
+                    scripts: [...(role.scripts || []), '自制角色']
+                }));
+                console.log('成功加载自制角色:', customRoles.length);
+                return true;
+            }
+            return false;
+        };
+
+        // 尝试从本地存储加载自制角色
+        const loadCustomRoles = () => {
+            const stored = localStorage.getItem('customRoles');
+            if (stored) {
+                try {
+                    customRoles = JSON.parse(stored);
+                } catch (e) {
+                    console.log('从本地存储加载自制角色失败:', e);
+                }
+            }
+        };
+
+        // 从 uniqueRoles.js 文件加载自制角色
+        const loadUniqueRoles = async () => {
+            // 首先尝试使用已加载的 uniqueRoles 变量
+            if (processUniqueRoles()) {
+                return true;
+            }
+            
+            // 如果变量未定义，尝试动态加载脚本
+            try {
+                await new Promise((resolve, reject) => {
+                    const script = document.createElement('script');
+                    script.src = 'data/uniqueRoles.js';
+                    script.onload = () => {
+                        processUniqueRoles();
+                        resolve();
+                    };
+                    script.onerror = reject;
+                    document.head.appendChild(script);
+                });
+                return customRoles.length > 0;
+            } catch (e) {
+                console.log('从文件加载自制角色失败:', e);
+            }
+            
+            // 如果文件加载失败，尝试从本地存储加载
+            loadCustomRoles();
+            return customRoles.length > 0;
+        };
+
+        // 获取所有角色（包括自制角色）
+        const getAllRoles = () => {
+            return [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demonsRoles, ...fabledRoles, ...travellersRoles, ...customRoles];
+        };
+
+        // 初始加载
+        loadCustomRoles();
+
+        const allRoles = getAllRoles();
 
         //存储旧版角色ID的数组，用于判断是否是旧版角色
         const legacyRolesID = ['oldkingCustomVER', 'oldlil_monstaCustomVER', 'oldballoonistCustomVER', 'oldplague_doctorCustomVER', 'oldharpyCustomVER', 'oldlleechCustomVER', 'oldorgan_grinderCustomVER', 'oldacrobatCustomVER', 'oldfarmerCustomVER', 'oldalsaahirCustomVER', 'oldboomdandyCustomVER', 'oldlycanthropeCustomVER', 'oldriotCustomVER', 'oldalchemistCustomVER', 'oldal-hadikhiaCustomVER', 'oldpit-hagCustomVER']
@@ -9150,10 +8820,10 @@
 
         function populateNightRefSelects() {
             // 收集所有角色的firstNight信息
-            //const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demonsRoles, ...fabledRoles, ...travellersRoles];
+            const allRolesList = getAllRoles();
             const nightRefs = [];
 
-            allRoles.forEach(role => {
+            allRolesList.forEach(role => {
                 if (role.firstNight && role.firstNight > 0) {
                     nightRefs.push({
                         name: role.name,
@@ -9177,7 +8847,7 @@
             // 处理otherNight
             const otherNightRefs = [];
 
-            allRoles.forEach(role => {
+            allRolesList.forEach(role => {
                 if (role.otherNight && role.otherNight > 0) {
                     otherNightRefs.push({
                         name: role.name,
@@ -9214,7 +8884,7 @@
                 return;
             }
 
-            const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demonsRoles,...fabledRoles,...travellersRoles];
+            const allRoles = getAllRoles();
             const matchingRoles = allRoles.filter(role => {
                 //const id = role.id.toLowerCase();
                 const name = role.name.toLowerCase();
@@ -9276,7 +8946,7 @@
                     return;
                 }
 
-                const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demonsRoles,...fabledRoles,...travellersRoles];
+                const allRoles = getAllRoles();
                 const matchingRoles = allRoles.filter(role => {
                     const name = role.name.toLowerCase();
                     const pinyinsuoxie = role.pinyinsuoxie.toLowerCase();
@@ -10487,6 +10157,10 @@
                     const roleId = roleItem.querySelector('input[type="checkbox"]');
                     if (!roleId) return;
                     
+                    // 跳过自制角色（不显示在排除列表中）
+                    const roleScripts = roleItem.dataset.scripts ? roleItem.dataset.scripts.split(',') : [];
+                    if (roleScripts.includes('自制角色')) return;
+                    
                     // 获取角色名称 - 从label标签内获取文本
                     const labelElement = roleItem.querySelector('label');
                     if (!labelElement) return;
@@ -11174,15 +10848,16 @@
             // 检查数据是否已加载
             const editionLibData = typeof editionLib !== 'undefined' ? editionLib : [];
             const botcscriptsData = typeof botcscripts !== 'undefined' ? botcscripts : [];
+            const botcscriptsPartialData = typeof botcscriptsPartial !== 'undefined' ? botcscriptsPartial : [];
 
-            if (editionLibData.length === 0 && botcscriptsData.length === 0) {
+            if (editionLibData.length === 0 && botcscriptsData.length === 0 && botcscriptsPartialData.length === 0) {
                 resultDiv.innerHTML = '<div style="text-align: center; color: #ff6b6b;">剧本数据尚未加载完成，请稍后再试</div>';
                 countSpan.textContent = '';
                 return;
             }
 
-            // 合并两个数据源
-            const allScripts = [...editionLibData, ...botcscriptsData];
+            // 合并所有数据源
+            const allScripts = [...editionLibData, ...botcscriptsData, ...botcscriptsPartialData];
 
             // 过滤剧本
             const filteredScripts = allScripts.filter(script => {
@@ -11486,17 +11161,25 @@
         }
 
         // 初始化加载角色
-        window.onload = function() {
-            loadRoles(townsfolkRoles, 'townsfolk-columns');
-            loadRoles(outsidersRoles, 'outsiders-columns');
-            loadRoles(minionsRoles, 'minions-columns');
-            loadRoles(demonsRoles, 'demons-columns');
+        window.onload = async function() {
+            // 先加载自制角色
+            await loadUniqueRoles();
+            
+            // 根据 team 类型合并内置角色和自制角色
+            const allTownsfolk = [...townsfolkRoles, ...customRoles.filter(r => r.team === 'townsfolk')];
+            const allOutsiders = [...outsidersRoles, ...customRoles.filter(r => r.team === 'outsider')];
+            const allMinions = [...minionsRoles, ...customRoles.filter(r => r.team === 'minion')];
+            const allDemons = [...demonsRoles, ...customRoles.filter(r => r.team === 'demon')];
+            
+            // 加载所有角色
+            loadRoles(allTownsfolk, 'townsfolk-columns');
+            loadRoles(allOutsiders, 'outsiders-columns');
+            loadRoles(allMinions, 'minions-columns');
+            loadRoles(allDemons, 'demons-columns');
             loadRoles(fabledRoles, 'fabled-columns');
             loadRoles(travellersRoles, 'travellers-columns');
 
-
             // 为脚本选择添加事件监听器
-
             document.querySelectorAll('.script-selection input[type="checkbox"]').forEach(checkbox => {
                 checkbox.addEventListener('change', updateRoleVisibility);
             });
@@ -11512,6 +11195,7 @@
 
 
         function saveMetaInfo() {//待补充新增剧本信息
+            try {
             // 清空metaInfoJson对象
             //metaInfoJson = [];
             stateJson = [];
@@ -11520,16 +11204,26 @@
             // 获取所有meta信息并保存到metaInfoJson
             // 假设meta信息存储在具有特定类名的元素中
 
-            const editionName= document.getElementById('edition-name').value.trim();
-            const authorName = document.getElementById('author-name').value.trim();
-            const editionDescription = document.getElementById('edition-description').value.trim();
-            const editionLogo =document.getElementById('logo').value.trim();
-            const editionBackground = document.getElementById('background').value.trim();
-            const editionHideTitle = document.querySelector('input[name="hideTitle"]');
-            const hideTitleValue = editionHideTitle.checked ? true : false;
+            // 辅助函数：安全获取元素值
+            const getValue = (id) => {
+                const el = document.getElementById(id);
+                if (!el) {
+                    console.warn(`元素 #${id} 不存在`);
+                    return '';
+                }
+                return el.value.trim();
+            };
 
-            const editionAlmanac = document.getElementById('almanac').value.trim();
-            const editionBootleggerStr = document.getElementById('bootlegger').value.trim();
+            const editionName = getValue('edition-name');
+            const authorName = getValue('author-name');
+            const editionDescription = getValue('edition-description');
+            const editionLogo = getValue('logo');
+            const editionBackground = getValue('background');
+            const editionHideTitle = document.querySelector('input[name="hideTitle"]');
+            const hideTitleValue = editionHideTitle ? editionHideTitle.checked : false;
+
+            const editionAlmanac = getValue('qrcode-image-input');
+            const editionBootleggerStr = getValue('bootlegger');
             //将editionBootlegger字符串转换为列表
             const editionBootlegger = editionBootleggerStr.split(',');
             // 将editionBootlegger中的每个元素转换为trimmed
@@ -11545,9 +11239,9 @@
             const otherNightButtons = otherNightContainer ? otherNightContainer.querySelectorAll('.draggable-button') : [];
             const trimmedOtherNight = Array.from(otherNightButtons).map(btn => btn.getAttribute('data-role-id'));
 
+            // 剧本名称为空时也允许保存，只是给出提示
             if (!editionName) {
-                alert('剧本名必填项，请填写完整！');
-                return;
+                console.log('剧本名称为空，继续保存其他信息');
             }
 
 
@@ -11595,28 +11289,19 @@
             if (stateJson && stateJson.length > 0) metaInfoJson.state = stateJson;
             if (editionDescription && editionDescription !== "") metaInfoJson.description = editionDescription;
 
-
-
-            // 隐藏输入区域
-            toggleMetaInfoInput();
-
-            // 清空输入框
-            //document.getElementById('edition-name').value = ''; // 清空剧本名称
-            //document.getElementById('author-name').value = ''; // 清空作者名称
-            //document.getElementById('edition-description').value = ''; // 清空剧本描述
-            //document.getElementById('edition-image').value = ''; // 清空剧本图片
-            //清空初始stateName和stateDesc，删除后添加的stateName和stateDesc
-            //document.querySelectorAll('#state-container .state-input-group input[type="text"]').forEach(input => input.value = '');
-            //document.querySelectorAll('#state-container .state-input-group textarea').forEach(input => input.value = '');
-            //调用所有可见remove-state-btn按钮，删除所有自定义状态
-            //document.querySelectorAll('#state-container .remove-state-btn').forEach(btn => btn.click());
-            //stateInputGroups.forEach(group => group.remove());
-
             // 保存所有按钮上存储的新firstNight和otherNight值到角色数组
             saveNightValuesFromButtons();
 
             console.log('剧本信息已保存:', metaInfoJson);
-            //alert('剧本信息保存成功！');
+            alert('剧本信息保存成功！');
+
+            // 隐藏输入区域
+            toggleMetaInfoInput();
+
+            } catch (error) {
+                console.error('保存剧本信息时出错:', error);
+                alert('保存失败: ' + error.message);
+            }
         }
 
 
@@ -12266,30 +11951,35 @@
                 if (metaData.description && metaData.description !== "") metaInfoJson.description = metaData.description;
 
                 // 填充元数据表单
-                document.getElementById('edition-name').value = metaData.name || '';
-                document.getElementById('author-name').value = metaData.author || '';
-                document.getElementById('logo').value = metaData.logo || '';
-                document.querySelector('input[name="hideTitle"]').checked = metaData.hideTitle || false;
-                document.getElementById('background').value = metaData.background || '';
-                document.getElementById('almanac').value = metaData.almanac || '';
+                const editionNameElement = document.getElementById('edition-name');
+                if (editionNameElement) editionNameElement.value = metaData.name || '';
+                
+                const authorNameElement = document.getElementById('author-name');
+                if (authorNameElement) authorNameElement.value = metaData.author || '';
+                
+                const logoElement = document.getElementById('logo');
+                if (logoElement) logoElement.value = metaData.logo || '';
+                
+                const hideTitleElement = document.querySelector('input[name="hideTitle"]');
+                if (hideTitleElement) hideTitleElement.checked = metaData.hideTitle || false;
+                
+                const backgroundElement = document.getElementById('background');
+                if (backgroundElement) backgroundElement.value = metaData.background || '';
+                
+                const almanacElement = document.getElementById('almanac');
+                if (almanacElement) almanacElement.value = metaData.almanac || '';
 
                 //把meta.bootlegger数组转为字符串，并用逗号分隔
                 if(metaData.bootlegger){
                     const bootleggerString = metaData.bootlegger.join(', ');
-                    document.getElementById('bootlegger').value = bootleggerString;
+                    const bootleggerElement = document.getElementById('bootlegger');
+                    if (bootleggerElement) bootleggerElement.value = bootleggerString;
                 }
-                // if(metaData.firstNight){
-                // const firstNight = metaData.firstNight.join(', ');
-                // document.getElementById('edition-firstNight').value = firstNight;
-                // }
-
-                // if(metaData.otherNight){
-                // const otherNight = metaData.otherNight.join(', ');
-                // document.getElementById('edition-otherNight').value = otherNight;
-                // }
 
                 if(metaData.description){
-                    document.getElementById('edition-description').value = metaData.description || '';
+                    const descriptionElement = document.getElementById('edition-description');
+                    if (descriptionElement) descriptionElement.value = metaData.description || '';
+                    
                     // 处理状态信息
                     if (metaData.state) {
                         metaData.state.forEach(state => {
@@ -12301,9 +11991,13 @@
                                 // 自定义状态
                                 addStateInput();
                                 const stateGroups = document.querySelectorAll('.state-input-group');
-                                const lastGroup = stateGroups[stateGroups.length - 1];
-                                lastGroup.querySelector('input[type="text"]').value = state.stateName || '';
-                                lastGroup.querySelector('textarea').value = state.stateDesc || state.stateDescription || '';
+                                if (stateGroups.length > 0) {
+                                    const lastGroup = stateGroups[stateGroups.length - 1];
+                                    const stateNameInput = lastGroup.querySelector('input[type="text"]');
+                                    if (stateNameInput) stateNameInput.value = state.stateName || '';
+                                    const stateDescTextarea = lastGroup.querySelector('textarea');
+                                    if (stateDescTextarea) stateDescTextarea.value = state.stateDesc || state.stateDescription || '';
+                                }
                             }
                         });
                     }
@@ -12336,7 +12030,7 @@
                 //判断item的id是否在townsfolkRoles、outsidersRoles、minionsRoles、demonsRoles、fabledRoles、travellersRoles中
 
                 // 处理标准角色,如果角色id与官方角色id相同，则选中该角色，保存id
-                if (allRoles.some(r => r.id === item.id+"CustomVER")) {
+                if (getAllRoles().some(r => r.id === item.id+"CustomVER")) {
                     let idInMyJson = item.id+"CustomVER";
 
                     const checkbox = document.querySelector(`.role-item input[value="${idInMyJson}"]`);
@@ -12356,7 +12050,7 @@
 
 
                 // 处理标准角色,如果角色name与页面上已有的角色name相同，则选中该角色
-                else if (allRoles.some(r => r.name === item.name)) {
+                else if (getAllRoles().some(r => r.name === item.name)) {
                     console.log("nameCustomPath");
                     const checkbox = document.querySelector(`.role-item input[name="${item.name}"]`);
                     if (checkbox) checkbox.checked = true;
@@ -12384,25 +12078,27 @@
 
         function toggleJsonUpload() {
             const uploadArea = document.getElementById("json-upload-area");
-            uploadArea.style.display = uploadArea.style.display === "none" ? "block" : "none";
+            if (uploadArea) {
+                uploadArea.style.display = uploadArea.style.display === "none" ? "block" : "none";
+            }
         }
 
         function isTpiRole(roleId) {
             let result = false;
-            if(allRoles.find(r => r.id === roleId+"CustomVER"))
+            if(getAllRoles().find(r => r.id === roleId+"CustomVER"))
                 result=true;
             return result;
         }
 
         function isTpiCustomRole(roleId) {
             let result = false;
-            if(allRoles.find(r => r.id === roleId))
+            if(getAllRoles().find(r => r.id === roleId))
                 result=true;
             return result;
         }
 
         function getRoleJson(roleId) {
-            const baseRole = allRoles.find(r => r.id === roleId);
+            const baseRole = getAllRoles().find(r => r.id === roleId);
             if(!baseRole) return;
             let roleJson={
                 id: baseRole.id,//+"custom",
@@ -13252,7 +12948,7 @@
 
                 // 构建相克角色图片HTML - 小图标显示在角色名旁边
                 const jinxRoleImagesHtml = Array.from(jinxRoleNames).map(jinxRoleName => {
-                    const jinxRole = allRoles.find(r => r.name === jinxRoleName);
+                    const jinxRole = getAllRoles().find(r => r.name === jinxRoleName);
                     return jinxRole ? `
                         <img src="${jinxRole.image}" alt="${jinxRole.name}" style="width: ${jinxIconSize}px; height: ${jinxIconSize}px; object-fit: cover; border-radius: 2px; margin-left: 4px; border: 1px solid #ddd;">
                     ` : '';
@@ -15114,16 +14810,20 @@
             // 定义需要加载的脚本文件列表
             const scriptsToLoad = [
                 {
-                    src: 'data_files/editionLib.js',
+                    src: 'data/uniqueRoles.js?v=20260316',
+                    name: 'uniqueRoles'
+                },
+                {
+                    src: 'data/editionLib.js?v=20260316',
                     name: 'editionLib'
                 },
                 {
-                    src: 'data_files/scriptsData.js',
-                    name: 'scriptsData'
+                    src: 'data/botcscripts.js?v=20260316',
+                    name: 'botcscripts'
                 },
                 {
-                    src: 'data_files/partialScriptsData.js',
-                    name: 'partialScriptsData'
+                    src: 'data/botcscripts_partial.js?v=20260316',
+                    name: 'botcscriptsPartial'
                 }
             ];
 
