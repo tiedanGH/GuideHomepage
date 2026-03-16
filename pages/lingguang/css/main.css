@@ -103,6 +103,10 @@ body.initialized .category:not(.collapsed) .category-title::after {
     color: #e84393;
     border-color: #e84393;
 }
+.category-title.puzzle {
+    color: #5dade2;
+    border-color: #5dade2;
+}
 .category-title.text-adventure {
     color: #16a085;
     border-color: #16a085;
