@@ -770,6 +770,7 @@
             .main-layout {
                 padding: 10px;
                 gap: 10px;
+                flex-direction: column;
             }
 
             /* 顶部控制区调整 */
@@ -788,7 +789,19 @@
             .right-sidebar {
                 width: 100%;
                 min-width: 100%;
-                flex-direction: column;
+                flex-direction: column !important;
+                display: flex !important;
+            }
+            
+            .right-sidebar .sidebar-card {
+                flex: none !important;
+                width: 100% !important;
+            }
+            
+            .right-sidebar .action-buttons {
+                flex: none !important;
+                width: 100% !important;
+                margin-top: 16px !important;
             }
 
             /* 角色列新布局调整 */
@@ -806,12 +819,16 @@
             /* 动作按钮调整 */
             .action-buttons {
                 gap: 8px;
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
             }
 
             .action-buttons button {
-                padding: 12px 16px;
-                font-size: 14px;
+                padding: 10px 12px;
+                font-size: 12px;
                 margin: 0;
+                width: 100%;
+                box-sizing: border-box;
             }
 
             /* 控制面板卡片调整 */
@@ -2681,6 +2698,14 @@
                             <a href="javascript:void(0);" onclick="toggleRolePasteBox()" style="font-size: 14px; font-weight: bold; display: block; margin-bottom: 10px; color: #667eea;">筛选剧本后快速选择角色</a>
                             <div id="rolePasteBoxContainer" style="display: none; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background: rgb(244, 233, 216);">
                                 <p style="margin-bottom: 10px; color: #666; font-size: 14px;">请粘贴角色名称（用顿号分割），系统将自动选择这些角色：</p>
+                                <p style="margin-bottom: 10px; color: #666; font-size: 12px;">支持正则表达式搜索，例如：<code>^.*师$</code> 匹配所有以"师"结尾的角色</p>
+                                <div style="margin-bottom: 10px; padding: 10px; background: #f8f9fa; border-radius: 4px; font-size: 12px; color: #666;">
+                                    <strong>正则表达式示例：</strong><br>
+                                    <code>^.*师$</code> - 匹配所有以"师"结尾的角色（如：预言师、魔术师）<br>
+                                    <code>^[小大].*$</code> - 匹配所有以"小"或"大"开头的角色<br>
+                                    <code>.*[女男]$</code> - 匹配所有以"女"或"男"结尾的角色<br>
+                                    <code>^.{2,3}$</code> - 匹配所有2-3个字符的角色名称
+                                </div>
                                 <textarea id="rolePasteBox" style="width: 100%; height: 100px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; resize: vertical; font-family: Arial, sans-serif; font-size: 14px;"></textarea>
                                 <button onclick="selectRolesFromPasteBox()" style="margin-top: 10px; padding: 8px 16px; background: var(--primary-color); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">选择角色</button>
                                 <button onclick="clearRolePasteBox()" style="margin-top: 10px; margin-left: 10px; padding: 8px 16px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">清空</button>
@@ -3751,7 +3776,8 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
             const matchingRoles = allRoles.filter(role => {
                 if (type === 'ability') {
                     const ability = (role.ability || '').toLowerCase();
-                    return ability.includes(query);
+                    const keywords = query.split(' ').filter(word => word.trim() !== '');
+                    return keywords.every(keyword => ability.includes(keyword));
                 } else {
                     const name = role.name.toLowerCase();
                     const pinyinsuoxie = role.pinyinsuoxie.toLowerCase();
@@ -9941,7 +9967,6 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                 chosenClass: 'sortable-chosen',
                 dragClass: 'sortable-drag',
                 onStart: function(evt) {
-                    // 记录被拖拽的元素和原始位置
                     window.draggedElement = evt.item;
                     window.originalIndex = evt.oldIndex;
                     window.buttonsBeforeDrag = Array.from(container.children).map(btn => btn.cloneNode(true));
@@ -9950,40 +9975,16 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                     const draggedRoleId = evt.item.getAttribute('data-role-id');
                     const newIndex = evt.newIndex;
 
-                    // 检查是否拖拽了minioninfo或demoninfo
                     if (draggedRoleId === 'minioninfo' || draggedRoleId === 'demoninfo') {
-                        // 检查是否minioninfo被移动到demoninfo之后
-                        const buttons = Array.from(container.children);
-                        const minionIndex = buttons.findIndex(btn => btn.getAttribute('data-role-id') === 'minioninfo');
-                        const demonIndex = buttons.findIndex(btn => btn.getAttribute('data-role-id') === 'demoninfo');
-
-                        if (minionIndex > demonIndex) {
-                            // 恢复拖拽前状态
-                            container.innerHTML = '';
-                            window.buttonsBeforeDrag.forEach(btn => container.appendChild(btn));
-
-                            alert('爪牙信息不能在恶魔信息之后！已恢复到拖拽前状态。');
-                            window.draggedElement = null;
-                            window.originalIndex = null;
-                            window.buttonsBeforeDrag = null;
-                            return;
-                        }
-
-                        // 如果拖拽了minioninfo或demoninfo，修改其他受影响的值
                         updateAffectedValues(container, draggedRoleId, newIndex);
-                    } else {
-                        // 如果拖拽的是普通角色，按照标准算法计算被拖拽角色的新值
-                        // updateFirstNightValuesInButtons() 会在下面统一调用
                     }
 
                     updateFirstNightOrderFromButtons();
 
-                    // 只对普通角色调用值更新，避免重复调用
                     if (draggedRoleId !== 'minioninfo' && draggedRoleId !== 'demoninfo') {
                         updateFirstNightValuesInButtons();
                     }
 
-                    // 清除临时变量
                     window.draggedElement = null;
                     window.originalIndex = null;
                     window.buttonsBeforeDrag = null;
@@ -10028,13 +10029,9 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
             otherNightRoles.forEach(role => {
                 const button = document.createElement('div');
                 button.className = 'draggable-button';
-                if (role.id === 'exposure') {
-                    button.classList.add('non-draggable');
-                }
                 button.setAttribute('data-role-id', role.id);
                 button.innerHTML = `${role.name} (${role.otherNight})`;
 
-                // 添加点击事件
                 button.addEventListener('click', () => {
                     addRoleToOtherNightOrder(role.id);
                 });
@@ -10052,9 +10049,7 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                 ghostClass: 'sortable-ghost',
                 chosenClass: 'sortable-chosen',
                 dragClass: 'sortable-drag',
-                filter: '.non-draggable',
                 onStart: function(evt) {
-                    // 记录被拖拽的元素和原始位置
                     window.draggedElement = evt.item;
                     window.originalIndex = evt.oldIndex;
                 },
@@ -10062,7 +10057,6 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                     updateOtherNightOrderFromButtons();
                     updateOtherNightValuesInButtons();
 
-                    // 清除临时变量
                     window.draggedElement = null;
                     window.originalIndex = null;
                 }
@@ -10788,28 +10782,135 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
         // 角色粘贴和自动选择功能
         function selectRolesFromPasteBox() {
             const pasteBox = document.getElementById('rolePasteBox');
-            const roleNames = pasteBox.value.trim().split('、').map(name => name.trim()).filter(name => name);
+            let inputText = pasteBox.value.trim();
 
-            if (roleNames.length === 0) {
+            if (!inputText) {
                 alert('请先粘贴角色名称');
+                return;
+            }
+
+            // 提取角色名称或正则表达式的函数
+            function extractRoleNames(text) {
+                // 按行分割文本
+                const lines = text.split(/[\n\r]+/);
+                const roleNames = [];
+
+                lines.forEach(line => {
+                    const trimmedLine = line.trim();
+                    if (trimmedLine) {
+                        // 直接添加非空行作为搜索关键词（支持正则表达式）
+                        roleNames.push(trimmedLine);
+                    }
+                });
+
+                // 过滤空字符串并去重
+                return [...new Set(roleNames.filter(name => name))];
+            }
+
+            const searchKeywords = extractRoleNames(inputText);
+
+            if (searchKeywords.length === 0) {
+                alert('未识别到搜索关键词');
                 return;
             }
 
             // 遍历所有角色复选框（排除剧本选择等其他复选框）
             const checkboxes = document.querySelectorAll('.role-item input[type="checkbox"]');
             let foundCount = 0;
+            const foundRoles = new Set();
 
             checkboxes.forEach(checkbox => {
                 // 使用 name 属性或查找 .role-name 元素来获取角色名称
                 const roleName = checkbox.name || checkbox.parentElement.querySelector('.role-name')?.textContent.trim() || '';
-                if (roleNames.includes(roleName)) {
-                    checkbox.checked = true;
-                    // 确保角色项可见（移除hidden类）
-                    const roleItem = checkbox.closest('.role-item');
-                    if (roleItem) {
-                        roleItem.classList.remove('hidden');
+                
+                // 检查是否匹配角色名称（支持正则表达式）
+                for (const keyword of searchKeywords) {
+                    try {
+                        // 尝试将关键词作为正则表达式
+                        const regex = new RegExp(keyword, 'i');
+                        if (regex.test(roleName)) {
+                            if (!foundRoles.has(roleName)) {
+                                checkbox.checked = true;
+                                // 确保角色项可见（移除hidden类）
+                                const roleItem = checkbox.closest('.role-item');
+                                if (roleItem) {
+                                    roleItem.classList.remove('hidden');
+                                }
+                                foundCount++;
+                                foundRoles.add(roleName);
+                            }
+                            return;
+                        }
+                    } catch (e) {
+                        // 如果不是有效的正则表达式，使用普通字符串匹配
+                        if (roleName.includes(keyword)) {
+                            if (!foundRoles.has(roleName)) {
+                                checkbox.checked = true;
+                                // 确保角色项可见（移除hidden类）
+                                const roleItem = checkbox.closest('.role-item');
+                                if (roleItem) {
+                                    roleItem.classList.remove('hidden');
+                                }
+                                foundCount++;
+                                foundRoles.add(roleName);
+                            }
+                            return;
+                        }
                     }
-                    foundCount++;
+                }
+
+                // 尝试通过角色技能描述匹配
+                try {
+                    // 构建所有角色的完整列表
+                    const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demonsRoles, ...fabledRoles, ...travellersRoles];
+                    
+                    // 查找当前角色在角色列表中的信息
+                    const roleId = checkbox.name || checkbox.id;
+                    const roleInfo = allRoles.find(role => 
+                        role.id === roleId || 
+                        role.name === roleName
+                    );
+
+                    // 检查角色技能描述是否包含关键词
+                    if (roleInfo && roleInfo.ability) {
+                        const abilityLower = roleInfo.ability.toLowerCase();
+                        for (const keyword of searchKeywords) {
+                            try {
+                                // 尝试将关键词作为正则表达式
+                                const regex = new RegExp(keyword, 'i');
+                                if (regex.test(abilityLower)) {
+                                    if (!foundRoles.has(roleName)) {
+                                        checkbox.checked = true;
+                                        // 确保角色项可见（移除hidden类）
+                                        const roleItem = checkbox.closest('.role-item');
+                                        if (roleItem) {
+                                            roleItem.classList.remove('hidden');
+                                        }
+                                        foundCount++;
+                                        foundRoles.add(roleName);
+                                    }
+                                    return;
+                                }
+                            } catch (e) {
+                                // 如果不是有效的正则表达式，使用普通字符串匹配
+                                if (abilityLower.includes(keyword.toLowerCase())) {
+                                    if (!foundRoles.has(roleName)) {
+                                        checkbox.checked = true;
+                                        // 确保角色项可见（移除hidden类）
+                                        const roleItem = checkbox.closest('.role-item');
+                                        if (roleItem) {
+                                            roleItem.classList.remove('hidden');
+                                        }
+                                        foundCount++;
+                                        foundRoles.add(roleName);
+                                    }
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                } catch (e) {
+                    // 忽略错误，继续处理
                 }
             });
 
@@ -11745,7 +11846,7 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
     <!-- 移动端浮动操作按钮容器 -->
     <div id="mobile-fab-container" style="display: none;">
         <div id="fab-menu">
-            <button id="fab-generate-script" class="fab-button" onclick="generateScript(); toggleFabMenu();" style="background: #38a169;">
+            <button id="fab-generate-script" class="fab-button" onclick="generateScriptImageV2(); toggleFabMenu();" style="background: #38a169;">
                 <span>📄</span>
                 <span>生成剧本</span>
             </button>
@@ -11753,11 +11854,11 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                 <span>📋</span>
                 <span>生成细节</span>
             </button>
-            <button id="fab-generate-booklet" class="fab-button" onclick="generateBooklet(); toggleFabMenu();" style="background: #3182ce;">
+            <button id="fab-generate-booklet" class="fab-button" onclick="generateAlmanacBook(); toggleFabMenu();" style="background: #3182ce;">
                 <span>📖</span>
                 <span>生成册子</span>
             </button>
-            <button id="fab-clear-all" class="fab-button" onclick="clearAllRoles(); toggleFabMenu();" style="background: #e53e3e;">
+            <button id="fab-clear-all" class="fab-button" onclick="clearAllSelections(); toggleFabMenu();" style="background: #e53e3e;">
                 <span>🗑️</span>
                 <span>清空所有</span>
             </button>

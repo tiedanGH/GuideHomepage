@@ -467,14 +467,15 @@ async function generateScriptImageV2() {
                     overflow: auto;
                 `;
                 
-                // 获取背景设置
-                const customBgColor = document.getElementById('custom-bg-color')?.value || document.getElementById('custom-bg-color-text')?.value || 'rgb(246, 246, 244)';
-                const customBgImage = document.getElementById('custom-bg-image')?.value || '';
+                // 获取字号设置
+                const fontSizeInput = document.getElementById('font-size-setting');
+                const fontSize = fontSizeInput?.value || 'small';
+                const fontSizeMultiplier = fontSize === 'large' ? 1.2 : 1.0;
                 
                 // 创建剧本图容器 - 初始设置
                 const scriptPage = document.createElement('div');
                 scriptPage.style.cssText = `
-                    background: ${customBgColor};
+                    background: rgb(246, 246, 244);
                     width: 8.27in;
                     min-height: 11.69in;
                     padding: 0.3in;
@@ -485,23 +486,6 @@ async function generateScriptImageV2() {
                     flex-shrink: 0;
                     margin: auto;
                 `;
-                
-                // 如果有背景图，添加一个带透明度的伪元素
-                if (customBgImage) {
-                    const bgOverlay = document.createElement('div');
-                    bgOverlay.style.cssText = `
-                        position: absolute;
-                        top: 0;
-                        left: 0;
-                        width: 100%;
-                        height: 100%;
-                        background: url(${customBgImage}) center/cover;
-                        opacity: 0.3;
-                        pointer-events: none;
-                        z-index: 0;
-                    `;
-                    scriptPage.appendChild(bgOverlay);
-                }
                 
                 // 构建首夜顺序HTML（左侧垂直排列）
                 const firstNightHtml = allFirstNight.map(role => `
@@ -558,9 +542,9 @@ async function generateScriptImageV2() {
                             <img src="${role.image}" style="width: 60px; height: 60px; object-fit: cover; margin-right: 8px; flex-shrink: 0;">
                             <div style="flex: 1; min-width: 0;">
                                 <div style="display: flex; flex-direction: row; align-items: center; flex-wrap: wrap;">
-                                    <div style="font-weight: bold; font-size: 13px; color: ${color}; margin-bottom: 2px; padding-right: 5px;">${role.name}</div>
+                                    <div style="font-weight: bold; font-size: ${13 * fontSizeMultiplier}px; color: ${color}; margin-bottom: 2px; padding-right: 5px;">${role.name}</div>
                                 </div>
-                                <div style="font-size: 11px; line-height: 1.3; color: #333;">${role.ability || ''}</div>
+                                <div style="font-size: ${11 * fontSizeMultiplier}px; line-height: 1.3; color: #333;">${role.ability || ''}</div>
                                 ${jinxRulesHtml}
                             </div>
                         </div>
@@ -728,8 +712,8 @@ async function generateScriptImageV2() {
                         </div>
                         ` : ''}
                         
-                        <!-- 右下角注释 -->
-                        <div style="position: absolute; bottom: 5px; right: 10px; font-size: 10px; color: #333; font-weight: bold;">*指非首个夜晚</div>
+                        <!-- 底部注释 -->
+                        <div style="position: absolute; bottom: 5px; ${showStatusBar ? 'right: 10px;' : 'left: 50%; transform: translateX(-50%);'}; font-size: 10px; color: #333; font-weight: bold;">*指非首个夜晚</div>
                     </div>
                 `;
                 
@@ -1177,9 +1161,10 @@ async function generateJinxAndConfigImage() {
                     overflow-y: auto;
                 `;
                 
-                // 获取背景设置（与剧本图保持一致）
-                const detailBgColor = document.getElementById('custom-bg-color')?.value || document.getElementById('custom-bg-color-text')?.value || 'rgb(246, 246, 244)';
-                const detailBgImage = document.getElementById('custom-bg-image')?.value || '';
+                // 获取字号设置
+                const fontSizeInput = document.getElementById('font-size-setting');
+                const fontSize = fontSizeInput?.value || 'small';
+                const fontSizeMultiplier = fontSize === 'large' ? 1.2 : 1.0;
                 
                 // 创建打印页面容器 - 与剧本图保持一致的A4尺寸
                 const printPage = document.createElement('div');
@@ -1188,30 +1173,13 @@ async function generateJinxAndConfigImage() {
                     height: 11.69in;
                     padding: 0.3in;
                     margin: 0 auto;
-                    background: ${detailBgColor};
+                    background: rgb(246, 246, 244);
                     box-sizing: border-box;
                     position: relative;
                     overflow: visible;
                     font-family: 'Assistant', 'Microsoft YaHei', sans-serif;
                     flex-shrink: 0;
                 `;
-                
-                // 如果有背景图，添加一个带透明度的伪元素
-                if (detailBgImage) {
-                    const bgOverlay = document.createElement('div');
-                    bgOverlay.style.cssText = `
-                        position: absolute;
-                        top: 0;
-                        left: 0;
-                        width: 100%;
-                        height: 100%;
-                        background: url(${detailBgImage}) center/cover;
-                        opacity: 0.3;
-                        pointer-events: none;
-                        z-index: 0;
-                    `;
-                    printPage.appendChild(bgOverlay);
-                }
                 
                 // 固定A4尺寸，不需要动态调整
                 printPage.style.width = '8.27in';
@@ -1265,14 +1233,14 @@ async function generateJinxAndConfigImage() {
                 // 构建相克规则HTML（使用djinn图标）
                 const jinxHtml = jinxRules.length > 0 ? `
                     <div style="display: flex; flex-direction: row; position: relative; bottom: -10px; margin: -10px 0;">
-                        <img src="https://www.bloodstar.xyz/p/Haimian0421/image3/30_image3.png" height="60" style="object-fit: cover;">
+                        <img src="https://www.bloodstar.xyz/p/Haimian0421/image3/30_image3.png" height="${60 * fontSizeMultiplier}" style="object-fit: cover;">
                     </div>
                     ${jinxRules.map(rule => `
-                        <div style="display: flex; flex-direction: row; align-items: center; height: 50px; position: relative; bottom: 4px; margin: -5px 0 0 0;">
+                        <div style="display: flex; flex-direction: row; align-items: center; height: ${50 * fontSizeMultiplier}px; position: relative; bottom: 4px; margin: -5px 0 0 0;">
                             <b style="padding-right: 30px;"></b>
-                            <img src="${allRoles.find(r => r.name === rule.jinxRole1)?.image || ''}" style="float: left; height: 40px; position: relative; bottom: -10px; margin: 0 -5px 0 0;">
-                            <img src="${allRoles.find(r => r.name === rule.jinxRole2)?.image || ''}" style="float: left; height: 40px; position: relative; bottom: -10px; margin: 0 -5px 0 0;">
-                            <p style="font-family: 'Assistant', sans-serif; font-size: 3.4mm; padding-left: 10px; position: relative; bottom: -20px; margin: 0;">${rule.jinxRule}</p>
+                            <img src="${allRoles.find(r => r.name === rule.jinxRole1)?.image || ''}" style="float: left; height: ${40 * fontSizeMultiplier}px; position: relative; bottom: -10px; margin: 0 -5px 0 0;">
+                            <img src="${allRoles.find(r => r.name === rule.jinxRole2)?.image || ''}" style="float: left; height: ${40 * fontSizeMultiplier}px; position: relative; bottom: -10px; margin: 0 -5px 0 0;">
+                            <p style="font-family: 'Assistant', sans-serif; font-size: ${3.4 * fontSizeMultiplier}mm; padding-left: 10px; position: relative; bottom: -20px; margin: 0;">${rule.jinxRule}</p>
                         </div>
                     `).join('')}
                 ` : '';
@@ -1280,22 +1248,22 @@ async function generateJinxAndConfigImage() {
                 // 构建私货商人规则HTML
                 const bootleggerHtml = bootleggerRules.length > 0 ? `
                     <div style="display: flex; flex-direction: row; position: relative; bottom: -10px; margin: -10px 0;">
-                        <img src="https://www.bloodstar.xyz/p/Haimian0421/image3/38_image3.png" height="60" style="object-fit: cover;">
+                        <img src="https://www.bloodstar.xyz/p/Haimian0421/image3/38_image3.png" height="${60 * fontSizeMultiplier}" style="object-fit: cover;">
                     </div>
                     ${bootleggerRules.map(rule => `
                         <div style="display: flex; flex-direction: row; align-items: flex-start; margin: -20px 0 -15px 0;">
                             <b style="padding-right: 70px;"></b>
                             <p style="margin: 0; flex-shrink: 0;">⦁</p>
-                            <p style="font-family: 'Assistant', sans-serif; font-size: 3.4mm; padding-left: 10px; padding-top: 0px; margin: 0; flex: 1; word-wrap: break-word; line-height: 1.3;">${rule}</p>
+                            <p style="font-family: 'Assistant', sans-serif; font-size: ${3.4 * fontSizeMultiplier}mm; padding-left: 10px; padding-top: 0px; margin: 0; flex: 1; word-wrap: break-word; line-height: 1.3;">${rule}</p>
                         </div>
                     `).join('')}
                 ` : '';
                 
                 // 构建旅行者标题区域
                 const travellerHeaderHtml = travellerRoles.length > 0 ? `
-                    <div style="margin: 0 auto; width: 98%; height: 40px; position: relative; bottom: -10px; left: 15px;">
+                    <div style="margin: 0 auto; width: 98%; height: ${40 * fontSizeMultiplier}px; position: relative; bottom: -10px; left: 15px;">
                         <div style="background: black; width: 96%; height: 1px;"></div>
-                        <div style="font-family: 'Philo', serif; width: 140px; position: relative; top: -17px; right: 10px; font-size: 5mm; color: black; background-color: white; margin: 0 auto; display: flex; justify-content: center;">
+                        <div style="font-family: 'Philo', serif; width: ${140 * fontSizeMultiplier}px; position: relative; top: -17px; right: 10px; font-size: ${5 * fontSizeMultiplier}mm; color: black; background-color: white; margin: 0 auto; display: flex; justify-content: center;">
                             旅行者
                         </div>
                     </div>
@@ -1305,11 +1273,11 @@ async function generateJinxAndConfigImage() {
                 const travellerListHtml = travellerRoles.map(role => `
                     <div style="display: flex; flex-direction: row; position: relative; bottom: -10px; margin: -10px 0;">
                         <div style="float: left; align-items: center;">
-                            <img src="${role.image}" height="60" style="object-fit: cover;">
+                            <img src="${role.image}" height="${60 * fontSizeMultiplier}" style="object-fit: cover;">
                         </div>
-                        <div style="display: flex; flex-direction: column; justify-content: center; min-height: 60px;">
-                            <b style="font-family: 'Philo', serif; float: left; font-size: 4mm; position: relative; bottom: -5px; color: #500050;">${role.name}</b>
-                            <p style="font-family: 'Assistant', sans-serif; float: right; font-size: 3.4mm; line-height: 1.2; align-items: right; position: relative; bottom: -3px; margin: 0;">${role.ability || ''}</p>
+                        <div style="display: flex; flex-direction: column; justify-content: center; min-height: ${60 * fontSizeMultiplier}px;">
+                            <b style="font-family: 'Philo', serif; float: left; font-size: ${4 * fontSizeMultiplier}mm; position: relative; bottom: -5px; color: #500050;">${role.name}</b>
+                            <p style="font-family: 'Assistant', sans-serif; float: right; font-size: ${3.4 * fontSizeMultiplier}mm; line-height: 1.2; align-items: right; position: relative; bottom: -3px; margin: 0;">${role.ability || ''}</p>
                         </div>
                     </div>
                 `).join('');
@@ -1317,7 +1285,7 @@ async function generateJinxAndConfigImage() {
                 // 构建玩家数量表格HTML
                 const playerCountHtml = `
                     <div style="margin: 20px auto 0; text-align: center;">
-                        <img src="https://i.postimg.cc/021k6s9F/playercount.png" style="width: 620px;">
+                        <img src="https://i.postimg.cc/021k6s9F/playercount.png" style="width: ${620 * fontSizeMultiplier}px;">
                     </div>
                 `;
                 
@@ -1328,19 +1296,19 @@ async function generateJinxAndConfigImage() {
                 const demonRolesList = allRoles.filter(r => r.team === 'demon' || r.team === '恶魔');
                 
                 const charBottomHtml = `
-                    <div style="text-align: center; display: table; margin-left: auto; margin-right: auto; height: 36px; width: 612px; border: 4px solid rgba(201, 192, 184); margin-top: -2px; position: relative; z-index: 1;">
-                        <div style="display: flex; flex-direction: row; width: 604px; justify-content: center; align-items: center; padding: 4px 0;">
+                    <div style="text-align: center; display: table; margin-left: auto; margin-right: auto; height: ${36 * fontSizeMultiplier}px; width: ${612 * fontSizeMultiplier}px; border: ${4 * fontSizeMultiplier}px solid rgba(201, 192, 184); margin-top: -2px; position: relative; z-index: 1;">
+                        <div style="display: flex; flex-direction: row; width: ${604 * fontSizeMultiplier}px; justify-content: center; align-items: center; padding: ${4 * fontSizeMultiplier}px 0;">
                             ${townsfolkRolesList.map(role => `
-                                <img src="${role.image}" style="height: 29px; width: 29px; margin: 0px -5px 0px 0px; filter: grayscale(0%);">
+                                <img src="${role.image}" style="height: ${29 * fontSizeMultiplier}px; width: ${29 * fontSizeMultiplier}px; margin: 0px -5px 0px 0px; filter: grayscale(0%);">
                             `).join('')}
                             ${outsiderRolesList.map(role => `
-                                <img src="${role.image}" style="height: 29px; width: 29px; margin: 0px -5px 0px 0px; filter: grayscale(0%);">
+                                <img src="${role.image}" style="height: ${29 * fontSizeMultiplier}px; width: ${29 * fontSizeMultiplier}px; margin: 0px -5px 0px 0px; filter: grayscale(0%);">
                             `).join('')}
                             ${minionRolesList.map(role => `
-                                <img src="${role.image}" style="height: 29px; width: 29px; margin: 0px -5px 0px 0px; filter: grayscale(0%);">
+                                <img src="${role.image}" style="height: ${29 * fontSizeMultiplier}px; width: ${29 * fontSizeMultiplier}px; margin: 0px -5px 0px 0px; filter: grayscale(0%);">
                             `).join('')}
                             ${demonRolesList.map(role => `
-                                <img src="${role.image}" style="height: 29px; width: 29px; margin: 0px -5px 0px 0px; filter: grayscale(0%);">
+                                <img src="${role.image}" style="height: ${29 * fontSizeMultiplier}px; width: ${29 * fontSizeMultiplier}px; margin: 0px -5px 0px 0px; filter: grayscale(0%);">
                             `).join('')}
                         </div>
                     </div>
@@ -1351,7 +1319,7 @@ async function generateJinxAndConfigImage() {
                     <div style="display: flex; flex-direction: column; height: 100%; position: relative; max-width: 100%; box-sizing: border-box;">
                         <!-- 顶部区域：剧本标题 -->
                         <div style="display: flex; justify-content: center; margin-bottom: 20px; padding-top: 10px;">
-                            <div style="font-family: 'Philo', serif; font-size: 34px; text-align: center; color: #800000; font-weight: bold;">
+                            <div style="font-family: 'Philo', serif; font-size: ${34 * fontSizeMultiplier}px; text-align: center; color: #800000; font-weight: bold;">
                                 ${scriptName}
                             </div>
                         </div>
@@ -1359,9 +1327,9 @@ async function generateJinxAndConfigImage() {
                         <!-- 中间主体区域 -->
                         <div style="display: flex; flex: 1; position: relative; max-width: 100%; box-sizing: border-box; margin: 0 20px;">
                             <!-- 左侧首夜顺序 -->
-                            <div style="width: 40px; display: flex; flex-direction: column; align-items: center; padding-right: 5px;">
+                            <div style="width: ${40 * fontSizeMultiplier}px; display: flex; flex-direction: column; align-items: center; padding-right: 5px;">
                                 ${firstNightHtml}
-                                <div style="font-family: 'Philo', serif; font-size: 10px; padding: 5px 0; color: #333; font-weight: bold; line-height: 1.5; white-space: pre;">首<br>夜</div>
+                                <div style="font-family: 'Philo', serif; font-size: ${10 * fontSizeMultiplier}px; padding: 5px 0; color: #333; font-weight: bold; line-height: 1.5; white-space: pre;">首<br>夜</div>
                             </div>
                             
                             <!-- 左侧分割线（首夜） -->
@@ -1385,8 +1353,8 @@ async function generateJinxAndConfigImage() {
                                                     <div style="display: flex; align-items: flex-start;">
                                                         <img src="${role.image}" style="width: 60px; height: 60px; object-fit: cover; margin-right: 10px; flex-shrink: 0;">
                                                         <div style="flex: 1; min-width: 0;">
-                                                            <div style="font-weight: bold; font-size: 13px; color: #7a6550; margin-bottom: 2px;">${role.name}</div>
-                                                            <div style="font-size: 11px; line-height: 1.3; color: #333;">${role.ability || ''}</div>
+                                                            <div style="font-weight: bold; font-size: ${13 * fontSizeMultiplier}px; color: #7a6550; margin-bottom: 2px;">${role.name}</div>
+                                                            <div style="font-size: ${11 * fontSizeMultiplier}px; line-height: 1.3; color: #333;">${role.ability || ''}</div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1398,27 +1366,27 @@ async function generateJinxAndConfigImage() {
                                 <!-- 相克规则 -->
                                 ${jinxRules.length > 0 ? `
                                     <div style="margin-bottom: 20px;">
-                                        <div style="font-family: 'Philo', serif; font-size: 16px; font-weight: bold; color: #760A0D; padding-bottom: 3px; margin-bottom: 10px; display: flex; align-items: center;">
+                                        <div style="font-family: 'Philo', serif; font-size: ${16 * fontSizeMultiplier}px; font-weight: bold; color: #760A0D; padding-bottom: 3px; margin-bottom: 10px; display: flex; align-items: center;">
                                             <span>相克规则</span>
                                             <div style="flex: 1; height: 1px; background: #760A0D; margin-left: 10px;"></div>
                                         </div>
                                         <div style="padding: 10px;">
                                             <!-- 灯神图标和说明 -->
                                             <div style="display: flex; align-items: flex-start; margin-bottom: 15px; gap: 10px;">
-                                                <img src="https://www.bloodstar.xyz/p/Haimian0421/image3/30_image3.png" style="width: 60px; height: 60px; object-fit: cover; flex-shrink: 0;">
+                                                <img src="https://www.bloodstar.xyz/p/Haimian0421/image3/30_image3.png" style="width: ${60 * fontSizeMultiplier}px; height: ${60 * fontSizeMultiplier}px; object-fit: cover; flex-shrink: 0;">
                                                 <div style="flex: 1;">
-                                                    <div style="font-weight: bold; font-size: 14px; color: #760A0D; margin-bottom: 5px;">灯神</div>
-                                                    <div style="font-size: 11px; line-height: 1.4; color: #333;">使用灯神的相克规则。所有玩家都会知道其内容。</div>
+                                                    <div style="font-weight: bold; font-size: ${14 * fontSizeMultiplier}px; color: #760A0D; margin-bottom: 5px;">灯神</div>
+                                                    <div style="font-size: ${11 * fontSizeMultiplier}px; line-height: 1.4; color: #333;">使用灯神的相克规则。所有玩家都会知道其内容。</div>
                                                 </div>
                                             </div>
                                             <!-- 相克规则列表 -->
                                             ${jinxRules.map(rule => `
                                                 <div style="margin-bottom: 10px; display: flex; align-items: flex-start; gap: 10px;">
                                                     <div style="display: flex; flex-direction: row; gap: 5px; flex-shrink: 0;">
-                                                        <img src="${allRoles.find(r => r.name === rule.jinxRole1)?.image || ''}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 3px;">
-                                                        <img src="${allRoles.find(r => r.name === rule.jinxRole2)?.image || ''}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 3px;">
+                                                        <img src="${allRoles.find(r => r.name === rule.jinxRole1)?.image || ''}" style="width: ${40 * fontSizeMultiplier}px; height: ${40 * fontSizeMultiplier}px; object-fit: cover; border-radius: 3px;">
+                                                        <img src="${allRoles.find(r => r.name === rule.jinxRole2)?.image || ''}" style="width: ${40 * fontSizeMultiplier}px; height: ${40 * fontSizeMultiplier}px; object-fit: cover; border-radius: 3px;">
                                                     </div>
-                                                    <div style="flex: 1; font-size: 11px; line-height: 1.4; color: #333;">
+                                                    <div style="flex: 1; font-size: ${11 * fontSizeMultiplier}px; line-height: 1.4; color: #333;">
                                                         ${rule.jinxRule}
                                                     </div>
                                                 </div>
@@ -1430,22 +1398,22 @@ async function generateJinxAndConfigImage() {
                                 <!-- 私货商人 -->
                                 ${bootleggerRules.length > 0 ? `
                                     <div style="margin-bottom: 20px;">
-                                        <div style="font-family: 'Philo', serif; font-size: 16px; font-weight: bold; color: #760A0D; padding-bottom: 3px; margin-bottom: 10px; display: flex; align-items: center;">
+                                        <div style="font-family: 'Philo', serif; font-size: ${16 * fontSizeMultiplier}px; font-weight: bold; color: #760A0D; padding-bottom: 3px; margin-bottom: 10px; display: flex; align-items: center;">
                                             <span>私货商人</span>
                                             <div style="flex: 1; height: 1px; background: #760A0D; margin-left: 10px;"></div>
                                         </div>
                                         <div style="padding: 10px;">
                                             <!-- 私货商人图标和标题 -->
                                             <div style="display: flex; align-items: center; margin-bottom: 10px; gap: 10px;">
-                                                <img src="${fabledRoles.find(role => role.name.includes('私货商人'))?.image || 'https://www.bloodstar.xyz/p/Haimian0421/image3/38_image3.png'}" style="width: 40px; height: 40px; object-fit: cover; flex-shrink: 0;">
-                                                <div style="font-weight: bold; font-size: 14px; color: #760A0D;">剧本自制规则</div>
+                                                <img src="${fabledRoles.find(role => role.name.includes('私货商人'))?.image || 'https://www.bloodstar.xyz/p/Haimian0421/image3/38_image3.png'}" style="width: ${40 * fontSizeMultiplier}px; height: ${40 * fontSizeMultiplier}px; object-fit: cover; flex-shrink: 0;">
+                                                <div style="font-weight: bold; font-size: ${14 * fontSizeMultiplier}px; color: #760A0D;">剧本自制规则</div>
                                             </div>
                                             <!-- 私货商人规则列表 -->
                                             <div style="margin-left: 50px;">
                                                 ${bootleggerRules.map(rule => `
                                                     <div style="margin-bottom: 6px; display: flex; align-items: flex-start; gap: 8px;">
                                                         <div style="flex-shrink: 0; margin-top: 2px; font-weight: bold;">•</div>
-                                                        <div style="flex: 1; font-size: 11px; line-height: 1.4; color: #333;">
+                                                        <div style="flex: 1; font-size: ${11 * fontSizeMultiplier}px; line-height: 1.4; color: #333;">
                                                             ${rule}
                                                         </div>
                                                     </div>
@@ -1468,8 +1436,8 @@ async function generateJinxAndConfigImage() {
                                                     <div style="display: flex; align-items: flex-start;">
                                                         <img src="${role.image}" style="width: 60px; height: 60px; object-fit: cover; margin-right: 10px; flex-shrink: 0;">
                                                         <div style="flex: 1; min-width: 0;">
-                                                            <div style="font-weight: bold; font-size: 13px; color: #500050; margin-bottom: 2px;">${role.name}</div>
-                                                            <div style="font-size: 11px; line-height: 1.3; color: #333;">${role.ability || ''}</div>
+                                                            <div style="font-weight: bold; font-size: ${13 * fontSizeMultiplier}px; color: #500050; margin-bottom: 2px;">${role.name}</div>
+                                                            <div style="font-size: ${11 * fontSizeMultiplier}px; line-height: 1.3; color: #333;">${role.ability || ''}</div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1486,9 +1454,9 @@ async function generateJinxAndConfigImage() {
                             </div>
                             
                             <!-- 右侧其他夜顺序 -->
-                            <div style="width: 40px; display: flex; flex-direction: column-reverse; align-items: center; padding-left: 5px;">
+                            <div style="width: ${40 * fontSizeMultiplier}px; display: flex; flex-direction: column-reverse; align-items: center; padding-left: 5px;">
                                 ${otherNightHtml}
-                                <div style="font-family: 'Philo', serif; font-size: 10px; padding: 5px 0; color: #333; font-weight: bold; line-height: 1.5; white-space: pre; transform: rotate(180deg);">他<br>夜</div>
+                                <div style="font-family: 'Philo', serif; font-size: ${10 * fontSizeMultiplier}px; padding: 5px 0; color: #333; font-weight: bold; line-height: 1.5; white-space: pre; transform: rotate(180deg);">他<br>夜</div>
                             </div>
                         </div>
                         
@@ -1620,26 +1588,6 @@ function toggleScriptConfigModal() {
             modalContent.innerHTML = `
                 <h2 style="margin-top: 0; color: #6b46c1; margin-bottom: 24px;">🎨 剧本图设置</h2>
                 
-                <!-- 背景设置 -->
-                <div style="margin-bottom: 20px;">
-                    <h4 style="margin: 0 0 10px 0; color: var(--text-color); font-size: 14px; font-weight: bold;">背景设置</h4>
-                    <div style="display: flex; flex-direction: column; gap: 10px;">
-                        <div style="display: flex; gap: 10px; align-items: center;">
-                            <label style="width: 80px; font-size: 14px;">背景色:</label>
-                            <input type="color" id="modal-custom-bg-color" value="#f6f6f4" style="width: 60px; height: 40px; border: 1px solid var(--border-color); border-radius: 4px; cursor: pointer;">
-                            <input type="text" id="modal-custom-bg-color-text" value="rgb(246, 246, 244)" style="flex: 1; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px;" placeholder="例如: rgb(246, 246, 244)">
-                        </div>
-                        <div style="display: flex; gap: 10px; align-items: center;">
-                            <label style="width: 80px; font-size: 14px;">背景图:</label>
-                            <input type="text" id="modal-custom-bg-image" style="flex: 1; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px;" placeholder="背景图片URL，留空则仅使用背景色">
-                            <button type="button" onclick="document.getElementById('bg-image-upload').click()" style="padding: 8px 16px; background: #17a2b8; color: white; border: none; border-radius: 4px; font-size: 14px; cursor: pointer;">
-                                上传图片
-                            </button>
-                            <input type="file" id="bg-image-upload" accept="image/*" style="display: none;" onchange="handleBgImageUpload(this)">
-                        </div>
-                    </div>
-                </div>
-                
                 <!-- 显示选项 -->
                 <div style="margin-bottom: 20px;">
                     <h4 style="margin: 0 0 10px 0; color: var(--text-color); font-size: 14px; font-weight: bold;">显示选项</h4>
@@ -1663,6 +1611,21 @@ function toggleScriptConfigModal() {
                         <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
                             <input type="checkbox" id="modal-showJinxRules" checked style="width: 16px; height: 16px;">
                             <span>显示相克规则</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 字号设置 -->
+                <div style="margin-bottom: 20px;">
+                    <h4 style="margin: 0 0 10px 0; color: var(--text-color); font-size: 14px; font-weight: bold;">字号设置</h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                            <input type="radio" name="fontSize" value="small" checked style="width: 16px; height: 16px;">
+                            <span>小字号</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                            <input type="radio" name="fontSize" value="large" style="width: 16px; height: 16px;">
+                            <span>大字号</span>
                         </label>
                     </div>
                 </div>
@@ -1756,14 +1719,16 @@ function loadScriptConfigToModal() {
             if (showTravellersFabled) document.getElementById('modal-showTravellersFabled').checked = showTravellersFabled.checked;
             if (showJinxRules) document.getElementById('modal-showJinxRules').checked = showJinxRules.checked;
             
-            // 背景设置
-            const bgColor = document.getElementById('custom-bg-color');
-            const bgColorText = document.getElementById('custom-bg-color-text');
-            const bgImage = document.getElementById('custom-bg-image');
-            
-            if (bgColor) document.getElementById('modal-custom-bg-color').value = bgColor.value || '#f6f6f4';
-            if (bgColorText) document.getElementById('modal-custom-bg-color-text').value = bgColorText.value || 'rgb(246, 246, 244)';
-            if (bgImage) document.getElementById('modal-custom-bg-image').value = bgImage.value || '';
+            // 字号设置
+            const fontSizeInput = document.getElementById('font-size-setting');
+            const fontSizeRadios = document.querySelectorAll('input[name="fontSize"]');
+            fontSizeRadios.forEach(radio => {
+                if (fontSizeInput && fontSizeInput.value === radio.value) {
+                    radio.checked = true;
+                } else if (!fontSizeInput && radio.value === 'small') {
+                    radio.checked = true;
+                }
+            });
             
             // API设置
             const apiKey = document.getElementById('ai-api-key');
@@ -1868,14 +1833,24 @@ function saveScriptConfig() {
             if (showTravellersFabled) showTravellersFabled.checked = document.getElementById('modal-showTravellersFabled').checked;
             if (showJinxRules) showJinxRules.checked = document.getElementById('modal-showJinxRules').checked;
             
-            // 背景设置
-            const bgColor = document.getElementById('custom-bg-color');
-            const bgColorText = document.getElementById('custom-bg-color-text');
-            const bgImage = document.getElementById('custom-bg-image');
+            // 字号设置
+            const fontSizeRadios = document.querySelectorAll('input[name="fontSize"]');
+            let selectedFontSize = 'small';
+            fontSizeRadios.forEach(radio => {
+                if (radio.checked) {
+                    selectedFontSize = radio.value;
+                }
+            });
             
-            if (bgColor) bgColor.value = document.getElementById('modal-custom-bg-color').value;
-            if (bgColorText) bgColorText.value = document.getElementById('modal-custom-bg-color-text').value;
-            if (bgImage) bgImage.value = document.getElementById('modal-custom-bg-image').value;
+            // 保存字号设置到隐藏的input元素
+            let fontSizeInput = document.getElementById('font-size-setting');
+            if (!fontSizeInput) {
+                fontSizeInput = document.createElement('input');
+                fontSizeInput.type = 'hidden';
+                fontSizeInput.id = 'font-size-setting';
+                document.body.appendChild(fontSizeInput);
+            }
+            fontSizeInput.value = selectedFontSize;
             
             // API设置
             const apiKey = document.getElementById('ai-api-key');
