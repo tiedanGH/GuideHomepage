@@ -812,8 +812,26 @@
 
             /* 已选角色网格调整 */
             .selected-roles-grid {
-                grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+                grid-template-columns: repeat(2, 1fr);
                 gap: 8px;
+            }
+            
+            /* 已选角色卡片移动端调整 */
+            .selected-role-card {
+                padding: 8px;
+                font-size: 12px;
+            }
+            
+            .selected-role-card .role-name {
+                font-size: 12px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            
+            .selected-role-card img {
+                width: 32px;
+                height: 32px;
             }
 
             /* 动作按钮调整 */
@@ -840,6 +858,23 @@
             .control-section {
                 margin-bottom: 16px;
                 padding-bottom: 12px;
+            }
+            
+            /* 一键收缩按钮移动端调整 */
+            .control-section > div[style*="display: flex"] {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            
+            .control-section > div[style*="display: flex"] h3 {
+                flex: 1 1 100%;
+                margin-bottom: 8px;
+            }
+            
+            .collapse-all-btn {
+                padding: 6px 10px;
+                font-size: 11px;
+                white-space: nowrap;
             }
 
             /* 角色子分类调整 */
@@ -11837,6 +11872,8 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
         <input type="color" id="custom-outsider-color" value="#0d5c5c">
         <input type="text" id="custom-minion-name">
         <input type="color" id="custom-minion-color" value="#8b4513">
+        <input type="text" id="custom-demon-name">
+        <input type="color" id="custom-demon-color" value="#8b0000">
         <!-- 背景设置 -->
         <input type="color" id="custom-bg-color" value="#f6f6f4">
         <input type="text" id="custom-bg-color-text" value="rgb(246, 246, 244)">

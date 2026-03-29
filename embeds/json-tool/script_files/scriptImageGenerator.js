@@ -1,6 +1,17 @@
 // 剧本图生成工具函数
 // 此文件包含生成剧本图、细节图等功能
 
+// 辅助函数：将十六进制颜色转换为 rgba 格式
+function hexToRgba(hex, opacity) {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    if (result) {
+        const r = parseInt(result[1], 16);
+        const g = parseInt(result[2], 16);
+        const b = parseInt(result[3], 16);
+        return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+    }
+    return hex;
+}
 
 async function generateScriptImageV2() {
             try {
@@ -34,10 +45,10 @@ async function generateScriptImageV2() {
                 };
                 
                 const customTeamColors = {
-                    townsfolk: document.getElementById('custom-townsfolk-color')?.value || '#0b6aaf',
-                    outsider: document.getElementById('custom-outsider-color')?.value || '#0b6aaf',
-                    minion: document.getElementById('custom-minion-color')?.value || '#760A0D',
-                    demon: document.getElementById('custom-demon-color')?.value || '#760A0D'
+                    townsfolk: document.getElementById('custom-townsfolk-color')?.value || '#1e3a5f',
+                    outsider: document.getElementById('custom-outsider-color')?.value || '#0d5c5c',
+                    minion: document.getElementById('custom-minion-color')?.value || '#8b4513',
+                    demon: document.getElementById('custom-demon-color')?.value || '#8b0000'
                 };
                 
                 // 获取二维码图片
@@ -53,6 +64,11 @@ async function generateScriptImageV2() {
                 const showCustomRules = document.getElementById('showCustomRules')?.checked ?? false;
                 const showTravellersFabled = document.getElementById('showTravellersFabled')?.checked ?? true;
                 const showJinxRules = document.getElementById('showJinxRules')?.checked ?? true;
+                
+                // 获取背景颜色设置
+                const customBgColor = document.getElementById('bg-color-setting')?.value || '#f6f6f4';
+                const bgOpacity = parseInt(document.getElementById('bg-opacity-setting')?.value || '100') / 100;
+                
                 // 直接使用剧本信息中的状态设置来决定是否显示状态栏
                 // 1. 默认情况下：显示状态栏（中毒醉酒和疯狂）
                 // 2. 用户添加了自定义状态：显示自定义状态和勾选的中毒醉酒疯狂
@@ -475,7 +491,7 @@ async function generateScriptImageV2() {
                 // 创建剧本图容器 - 初始设置
                 const scriptPage = document.createElement('div');
                 scriptPage.style.cssText = `
-                    background: rgb(246, 246, 244);
+                    background: ${hexToRgba(customBgColor, bgOpacity)};
                     width: 8.27in;
                     min-height: 11.69in;
                     padding: 0.3in;
@@ -818,7 +834,7 @@ async function generateScriptImageV2() {
                             scale: 2,
                             useCORS: true,
                             allowTaint: true,
-                            backgroundColor: customBgColor
+                            backgroundColor: hexToRgba(customBgColor, bgOpacity)
                         }).then(function(canvas) {
                             // 恢复原始样式
                             scriptPage.style.maxHeight = originalMaxHeight;
@@ -826,10 +842,52 @@ async function generateScriptImageV2() {
                             scriptPage.style.width = originalWidth;
                             scriptPage.style.height = originalHeight;
                             
-                            const link = document.createElement('a');
-                            link.download = editionName + '_剧本图.png';
-                            link.href = canvas.toDataURL('image/png');
-                            link.click();
+                            // 使用更兼容移动端的下载方式
+                            const dataUrl = canvas.toDataURL('image/png');
+                            const filename = editionName + '_剧本图.png';
+                            
+                            // 检测是否为移动端
+                            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+                            
+                            if (isMobile) {
+                                // 移动端：在新窗口打开图片，让用户长按保存
+                                const newWindow = window.open();
+                                if (newWindow) {
+                                    newWindow.document.write('<html><head><title>' + filename + '</title></head><body style="margin:0;display:flex;justify-content:center;align-items:center;background:#f0f0f0;"><img src="' + dataUrl + '" style="max-width:100%;height:auto;" onclick="window.close()"></body></html>');
+                                    newWindow.document.close();
+                                    alert('图片已在新窗口打开，请长按图片保存到相册');
+                                } else {
+                                    // 如果弹窗被阻止，使用备用方案
+                                    const link = document.createElement('a');
+                                    link.download = filename;
+                                    link.href = dataUrl;
+                                    link.style.display = 'none';
+                                    document.body.appendChild(link);
+                                    link.click();
+                                    setTimeout(() => {
+                                        document.body.removeChild(link);
+                                    }, 100);
+                                }
+                            } else {
+                                // 桌面端：直接下载
+                                const link = document.createElement('a');
+                                link.download = filename;
+                                link.href = dataUrl;
+                                link.style.display = 'none';
+                                document.body.appendChild(link);
+                                link.click();
+                                setTimeout(() => {
+                                    document.body.removeChild(link);
+                                }, 100);
+                            }
+                        }).catch(function(error) {
+                            console.error('生成图片失败:', error);
+                            alert('生成图片失败，请重试');
+                            // 恢复原始样式
+                            scriptPage.style.maxHeight = originalMaxHeight;
+                            scriptPage.style.overflowY = originalOverflowY;
+                            scriptPage.style.width = originalWidth;
+                            scriptPage.style.height = originalHeight;
                         });
                     }, 100);
                 };
@@ -868,6 +926,15 @@ async function generateJinxAndConfigImage() {
             try {
                 // 获取剧本基本信息
                 const scriptName = metaInfoJson.name || '未知剧本';
+                
+                // 获取字号设置
+                const fontSizeInput = document.getElementById('font-size-setting');
+                const fontSize = fontSizeInput?.value || 'small';
+                const fontSizeMultiplier = fontSize === 'large' ? 1.2 : 1.0;
+                
+                // 获取背景颜色设置
+                const detailBgColor = document.getElementById('bg-color-setting')?.value || '#f6f6f4';
+                const detailBgOpacity = parseInt(document.getElementById('bg-opacity-setting')?.value || '100') / 100;
                 
                 // 获取当前选中的角色
                 const allRoles = [...getSelectedRoles(), ...dirRolesJson];
@@ -1161,11 +1228,6 @@ async function generateJinxAndConfigImage() {
                     overflow-y: auto;
                 `;
                 
-                // 获取字号设置
-                const fontSizeInput = document.getElementById('font-size-setting');
-                const fontSize = fontSizeInput?.value || 'small';
-                const fontSizeMultiplier = fontSize === 'large' ? 1.2 : 1.0;
-                
                 // 创建打印页面容器 - 与剧本图保持一致的A4尺寸
                 const printPage = document.createElement('div');
                 printPage.style.cssText = `
@@ -1173,7 +1235,7 @@ async function generateJinxAndConfigImage() {
                     height: 11.69in;
                     padding: 0.3in;
                     margin: 0 auto;
-                    background: rgb(246, 246, 244);
+                    background: ${hexToRgba(detailBgColor, detailBgOpacity)};
                     box-sizing: border-box;
                     position: relative;
                     overflow: visible;
@@ -1516,16 +1578,56 @@ async function generateJinxAndConfigImage() {
                         scale: 2,
                         useCORS: true,
                         allowTaint: true,
-                        backgroundColor: detailBgColor
+                        backgroundColor: hexToRgba(detailBgColor, detailBgOpacity)
                     }).then(function(canvas) {
                         // 恢复原始样式
                         printPage.style.width = originalWidth;
                         printPage.style.height = originalHeight;
                         
-                        const link = document.createElement('a');
-                        link.download = scriptName + '_细节图.png';
-                        link.href = canvas.toDataURL('image/png');
-                        link.click();
+                        // 使用更兼容移动端的下载方式
+                        const dataUrl = canvas.toDataURL('image/png');
+                        const filename = scriptName + '_细节图.png';
+                        
+                        // 检测是否为移动端
+                        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+                        
+                        if (isMobile) {
+                            // 移动端：在新窗口打开图片，让用户长按保存
+                            const newWindow = window.open();
+                            if (newWindow) {
+                                newWindow.document.write('<html><head><title>' + filename + '</title></head><body style="margin:0;display:flex;justify-content:center;align-items:center;background:#f0f0f0;"><img src="' + dataUrl + '" style="max-width:100%;height:auto;" onclick="window.close()"></body></html>');
+                                newWindow.document.close();
+                                alert('图片已在新窗口打开，请长按图片保存到相册');
+                            } else {
+                                // 如果弹窗被阻止，使用备用方案
+                                const link = document.createElement('a');
+                                link.download = filename;
+                                link.href = dataUrl;
+                                link.style.display = 'none';
+                                document.body.appendChild(link);
+                                link.click();
+                                setTimeout(() => {
+                                    document.body.removeChild(link);
+                                }, 100);
+                            }
+                        } else {
+                            // 桌面端：直接下载
+                            const link = document.createElement('a');
+                            link.download = filename;
+                            link.href = dataUrl;
+                            link.style.display = 'none';
+                            document.body.appendChild(link);
+                            link.click();
+                            setTimeout(() => {
+                                document.body.removeChild(link);
+                            }, 100);
+                        }
+                    }).catch(function(error) {
+                        console.error('生成图片失败:', error);
+                        alert('生成图片失败，请重试');
+                        // 恢复原始样式
+                        printPage.style.width = originalWidth;
+                        printPage.style.height = originalHeight;
                     });
                 };
                 buttonContainer.appendChild(downloadButton);
@@ -1630,6 +1732,20 @@ function toggleScriptConfigModal() {
                     </div>
                 </div>
 
+                <!-- 背景颜色设置 -->
+                <div style="margin-bottom: 20px;">
+                    <h4 style="margin: 0 0 10px 0; color: var(--text-color); font-size: 14px; font-weight: bold;">背景颜色</h4>
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                        <input type="color" id="modal-bg-color" value="#f6f6f4" style="width: 60px; height: 36px; border: 1px solid var(--border-color); border-radius: 4px; cursor: pointer;">
+                        <input type="text" id="modal-bg-color-text" value="#f6f6f4" style="flex: 1; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px;" placeholder="输入颜色值，如 #f6f6f4 或 rgb(246, 246, 244)">
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <label style="font-size: 14px; color: #666; min-width: 60px;">透明度:</label>
+                        <input type="range" id="modal-bg-opacity" min="0" max="100" value="100" style="flex: 1; cursor: pointer;">
+                        <span id="modal-bg-opacity-value" style="font-size: 14px; color: #666; min-width: 40px; text-align: right;">100%</span>
+                    </div>
+                </div>
+
                 <!-- 剧本标题图片 -->
                 <div style="margin-bottom: 20px;">
                     <h4 style="margin: 0 0 10px 0; color: var(--text-color); font-size: 14px; font-weight: bold;">剧本标题图片（选填）</h4>
@@ -1728,6 +1844,41 @@ function loadScriptConfigToModal() {
                 } else if (!fontSizeInput && radio.value === 'small') {
                     radio.checked = true;
                 }
+            });
+            
+            // 背景颜色设置
+            const bgColorInput = document.getElementById('bg-color-setting');
+            const modalBgColor = document.getElementById('modal-bg-color');
+            const modalBgColorText = document.getElementById('modal-bg-color-text');
+            if (bgColorInput && modalBgColor && modalBgColorText) {
+                modalBgColor.value = bgColorInput.value;
+                modalBgColorText.value = bgColorInput.value;
+            }
+            
+            // 透明度设置
+            const bgOpacityInput = document.getElementById('bg-opacity-setting');
+            const modalBgOpacity = document.getElementById('modal-bg-opacity');
+            const modalBgOpacityValue = document.getElementById('modal-bg-opacity-value');
+            if (modalBgOpacity && modalBgOpacityValue) {
+                const opacity = bgOpacityInput ? parseInt(bgOpacityInput.value) : 100;
+                modalBgOpacity.value = opacity;
+                modalBgOpacityValue.textContent = opacity + '%';
+            }
+            
+            // 颜色选择器和文本框联动
+            modalBgColor.addEventListener('input', function() {
+                modalBgColorText.value = this.value;
+            });
+            modalBgColorText.addEventListener('input', function() {
+                const colorValue = this.value.trim();
+                if (/^#[0-9A-Fa-f]{6}$/.test(colorValue)) {
+                    modalBgColor.value = colorValue;
+                }
+            });
+            
+            // 透明度滑块联动
+            modalBgOpacity.addEventListener('input', function() {
+                modalBgOpacityValue.textContent = this.value + '%';
             });
             
             // API设置
@@ -1851,6 +2002,32 @@ function saveScriptConfig() {
                 document.body.appendChild(fontSizeInput);
             }
             fontSizeInput.value = selectedFontSize;
+            
+            // 保存背景颜色设置到隐藏的input元素
+            let bgColorInput = document.getElementById('bg-color-setting');
+            if (!bgColorInput) {
+                bgColorInput = document.createElement('input');
+                bgColorInput.type = 'hidden';
+                bgColorInput.id = 'bg-color-setting';
+                document.body.appendChild(bgColorInput);
+            }
+            const modalBgColorText = document.getElementById('modal-bg-color-text');
+            if (modalBgColorText) {
+                bgColorInput.value = modalBgColorText.value.trim() || '#f6f6f4';
+            }
+            
+            // 保存透明度设置到隐藏的input元素
+            let bgOpacityInput = document.getElementById('bg-opacity-setting');
+            if (!bgOpacityInput) {
+                bgOpacityInput = document.createElement('input');
+                bgOpacityInput.type = 'hidden';
+                bgOpacityInput.id = 'bg-opacity-setting';
+                document.body.appendChild(bgOpacityInput);
+            }
+            const modalBgOpacity = document.getElementById('modal-bg-opacity');
+            if (modalBgOpacity) {
+                bgOpacityInput.value = modalBgOpacity.value;
+            }
             
             // API设置
             const apiKey = document.getElementById('ai-api-key');
