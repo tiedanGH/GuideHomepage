@@ -2732,7 +2732,7 @@
                             <h3>⚡ 快速选择</h3>
                             <a href="javascript:void(0);" onclick="toggleRolePasteBox()" style="font-size: 14px; font-weight: bold; display: block; margin-bottom: 10px; color: #667eea;">筛选剧本后快速选择角色</a>
                             <div id="rolePasteBoxContainer" style="display: none; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background: rgb(244, 233, 216);">
-                                <p style="margin-bottom: 10px; color: #666; font-size: 14px;">请粘贴角色名称（用顿号分割），系统将自动选择这些角色：</p>
+                                <p style="margin-bottom: 10px; color: #666; font-size: 14px;">请粘贴你图片识别的文字，系统将自动选择这些角色（偶有遗漏，但可以快速自己手动补充）：</p>
                                 <p style="margin-bottom: 10px; color: #666; font-size: 12px;">支持正则表达式搜索，例如：<code>^.*师$</code> 匹配所有以"师"结尾的角色</p>
                                 <div style="margin-bottom: 10px; padding: 10px; background: #f8f9fa; border-radius: 4px; font-size: 12px; color: #666;">
                                     <strong>正则表达式示例：</strong><br>
@@ -2741,7 +2741,12 @@
                                     <code>.*[女男]$</code> - 匹配所有以"女"或"男"结尾的角色<br>
                                     <code>^.{2,3}$</code> - 匹配所有2-3个字符的角色名称
                                 </div>
-                                <textarea id="rolePasteBox" style="width: 100%; height: 100px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; resize: vertical; font-family: Arial, sans-serif; font-size: 14px;"></textarea>
+                                <textarea id="rolePasteBox" style="width: 100%; height: 100px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; resize: vertical; font-family: Arial, sans-serif; font-size: 14px;" oninput="handleRoleBoxInput('rolePasteBox', 'roleSecondBox')"></textarea>
+                                
+                                <!-- 第二输入框：备选角色 -->
+                                <p style="margin-top: 15px; margin-bottom: 10px; color: #666; font-size: 14px;">或粘贴角色名称到此处（用顿号分割），系统将自动选择这些角色：</p>
+                                <textarea id="roleSecondBox" style="width: 100%; height: 80px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; resize: vertical; font-family: Arial, sans-serif; font-size: 14px;" placeholder="例如：洗衣妇、图书管理员、调查员" oninput="handleRoleBoxInput('roleSecondBox', 'rolePasteBox')"></textarea>
+                                
                                 <button onclick="selectRolesFromPasteBox()" style="margin-top: 10px; padding: 8px 16px; background: var(--primary-color); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">选择角色</button>
                                 <button onclick="clearRolePasteBox()" style="margin-top: 10px; margin-left: 10px; padding: 8px 16px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">清空</button>
                             </div>
@@ -10817,24 +10822,47 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
         // 角色粘贴和自动选择功能
         function selectRolesFromPasteBox() {
             const pasteBox = document.getElementById('rolePasteBox');
+            const secondBox = document.getElementById('roleSecondBox');
+            
+            // 优先使用第一个输入框，如果为空则使用第二个
             let inputText = pasteBox.value.trim();
+            let usedBox = 'first';
+            
+            if (!inputText && secondBox) {
+                inputText = secondBox.value.trim();
+                usedBox = 'second';
+            }
 
             if (!inputText) {
-                alert('请先粘贴角色名称');
+                alert('请先在上方输入框中粘贴角色名称');
                 return;
             }
 
             // 提取角色名称或正则表达式的函数
             function extractRoleNames(text) {
-                // 按行分割文本
+                // 先按行分割
                 const lines = text.split(/[\n\r]+/);
                 const roleNames = [];
 
                 lines.forEach(line => {
                     const trimmedLine = line.trim();
                     if (trimmedLine) {
-                        // 直接添加非空行作为搜索关键词（支持正则表达式）
-                        roleNames.push(trimmedLine);
+                        // 检查是否是正则表达式（包含特殊正则字符）
+                        const isRegex = /[\^$.*+?()|[\]{}\\]/.test(trimmedLine);
+                        
+                        if (isRegex) {
+                            // 如果是正则表达式，直接添加
+                            roleNames.push(trimmedLine);
+                        } else {
+                            // 如果不是正则表达式，按顿号分割
+                            const parts = trimmedLine.split(/[、,，]/);
+                            parts.forEach(part => {
+                                const trimmedPart = part.trim();
+                                if (trimmedPart) {
+                                    roleNames.push(trimmedPart);
+                                }
+                            });
+                        }
                     }
                 });
 
@@ -10860,37 +10888,42 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                 
                 // 检查是否匹配角色名称（支持正则表达式）
                 for (const keyword of searchKeywords) {
-                    try {
-                        // 尝试将关键词作为正则表达式
-                        const regex = new RegExp(keyword, 'i');
-                        if (regex.test(roleName)) {
-                            if (!foundRoles.has(roleName)) {
-                                checkbox.checked = true;
-                                // 确保角色项可见（移除hidden类）
-                                const roleItem = checkbox.closest('.role-item');
-                                if (roleItem) {
-                                    roleItem.classList.remove('hidden');
+                    // 首先检查关键词是否是正则表达式
+                    const isRegex = /[\^$.*+?()|[\]{}\\]/.test(keyword);
+                    
+                    if (isRegex) {
+                        try {
+                            // 如果是正则表达式，尝试匹配
+                            const regex = new RegExp(keyword, 'i');
+                            if (regex.test(roleName)) {
+                                if (!foundRoles.has(roleName)) {
+                                    checkbox.checked = true;
+                                    const roleItem = checkbox.closest('.role-item');
+                                    if (roleItem) {
+                                        roleItem.classList.remove('hidden');
+                                    }
+                                    foundCount++;
+                                    foundRoles.add(roleName);
                                 }
-                                foundCount++;
-                                foundRoles.add(roleName);
+                                return;
                             }
-                            return;
+                        } catch (e) {
+                            // 如果正则表达式无效，尝试普通匹配
                         }
-                    } catch (e) {
-                        // 如果不是有效的正则表达式，使用普通字符串匹配
-                        if (roleName.includes(keyword)) {
-                            if (!foundRoles.has(roleName)) {
-                                checkbox.checked = true;
-                                // 确保角色项可见（移除hidden类）
-                                const roleItem = checkbox.closest('.role-item');
-                                if (roleItem) {
-                                    roleItem.classList.remove('hidden');
-                                }
-                                foundCount++;
-                                foundRoles.add(roleName);
+                    }
+                    
+                    // 普通字符串匹配：先尝试精确匹配（不区分大小写），再尝试包含匹配
+                    if (roleName.toLowerCase() === keyword.toLowerCase() || roleName.includes(keyword)) {
+                        if (!foundRoles.has(roleName)) {
+                            checkbox.checked = true;
+                            const roleItem = checkbox.closest('.role-item');
+                            if (roleItem) {
+                                roleItem.classList.remove('hidden');
                             }
-                            return;
+                            foundCount++;
+                            foundRoles.add(roleName);
                         }
+                        return;
                     }
                 }
 
@@ -10956,9 +10989,40 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
             alert(`已自动选择 ${foundCount} 个角色`);
         }
 
+        // 处理角色输入框互斥逻辑
+        function handleRoleBoxInput(activeBoxId, disableBoxId) {
+            const activeBox = document.getElementById(activeBoxId);
+            const disableBox = document.getElementById(disableBoxId);
+            
+            if (activeBox && disableBox) {
+                if (activeBox.value.trim().length > 0) {
+                    disableBox.disabled = true;
+                    disableBox.style.backgroundColor = '#e9ecef';
+                    disableBox.style.cursor = 'not-allowed';
+                } else {
+                    disableBox.disabled = false;
+                    disableBox.style.backgroundColor = '';
+                    disableBox.style.cursor = '';
+                }
+            }
+        }
+
         // 清空角色粘贴框
         function clearRolePasteBox() {
             document.getElementById('rolePasteBox').value = '';
+            const secondBox = document.getElementById('roleSecondBox');
+            if (secondBox) {
+                secondBox.value = '';
+                secondBox.disabled = false;
+                secondBox.style.backgroundColor = '';
+                secondBox.style.cursor = '';
+            }
+            const firstBox = document.getElementById('rolePasteBox');
+            if (firstBox) {
+                firstBox.disabled = false;
+                firstBox.style.backgroundColor = '';
+                firstBox.style.cursor = '';
+            }
         }
 
         // 切换浮动操作按钮菜单
