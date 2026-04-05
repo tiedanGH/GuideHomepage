@@ -17,6 +17,25 @@ a {
     text-decoration: none;
 }
 
+/* 返回按钮 */
+.back-btn {
+    position: absolute;
+    top: 12px;
+    left: 14px;
+    padding: 6px 14px;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+.back-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    color: white;
+}
+
 /* 页面容器 */
 .container {
     max-width: 1500px;
@@ -25,6 +44,7 @@ a {
 
 /* 深色页眉 */
 .hero {
+    position: relative;
     background: linear-gradient(135deg, #1a1a40, #3a0ca3);
     color: #fff;
     text-align: center;
@@ -150,6 +170,13 @@ iframe {
 
 /* 响应式调整 */
 @media (max-width: 768px) {
+    .back-btn {
+        top: 8px;
+        left: 8px;
+        padding: 4px 10px;
+        font-size: 12px;
+    }
+
     .wrapper {
         padding: 8px;
     }
