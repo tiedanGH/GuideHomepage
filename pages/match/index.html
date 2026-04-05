@@ -1,128 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5">
-    <meta name="description" content="2026 Bot 全能游戏王比赛网站：包含比赛详细规则和赛况预览"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="比赛网站合集，查看进行中、筹备中和已归档的比赛和详情"/>
     <meta property="og:image" content="https://tiedan.site/assets/icons/favicon.png">
 
-    <title>2026 Bot 全能游戏王</title>
+    <title>赛事中心</title>
     <link rel="icon" href="/assets/icons/trophy.ico">
-    <link rel="apple-touch-icon" href="/assets/icons/favicon.png"/>
+    <link rel="apple-touch-icon" href="/pages/match/assets/img/apple-touch-icon.png"/>
 
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="assets/css/main.css"/>
+
+    <script src="assets/js/main.js" defer></script>
 </head>
 <body>
-<div class="container">
-    <header class="hero">
-        <h1>2026 Bot 全能游戏王（草案）</h1>
-        <p class="organizer">主办：铁蛋（2295824927）</p>
-    </header>
 
-    <section class="rule-section">
-        <h2>比赛公平性</h2>
-        <p>本比赛为单人赛，选手各自为战。</p>
-        <p>除[投标波卡]、[石榴石窃贼]外，游戏过程中严禁任何形式的私信交流。</p>
-        <p>比赛场游戏结束前，不得公开或分享任何bot私信信息。</p>
-        <p>禁止作弊、开小号等行为。</p>
-    </section>
+<a href="/" class="back-home">返回主页</a>
 
-    <section class="rule-section">
-        <h2>比赛奖励</h2>
-        <p>八强选手可以获得bot荣誉记录</p>
-        <p>积分或其他虚拟货币奖励待定</p>
-    </section>
+<h1>赛事中心</h1>
 
-    <section class="rule-section">
-        <h2>实时赛况</h2>
-        <p class="doc-link"><span class="highlight">【腾讯文档】2026 Bot 全能游戏王</span> <br>
-            <a href="https://docs.qq.com/sheet/DY0pBT1VvekRVYUVo?tab=BB08J2" target="_blank" rel="noopener noreferrer">https://docs.qq.com/sheet/DY0pBT1VvekRVYUVo?tab=BB08J2</a></p>
-        <details>
-            <summary style="cursor:pointer; font-weight:bold;">
-                【预览】点击此处在本页面快速查看腾讯文档表格
-            </summary>
-            <iframe src="https://docs.qq.com/sheet/DY0pBT1VvekRVYUVo?tab=BB08J2" title="腾讯文档实时赛况">
-                 你的浏览器不支持嵌入式框架。
-            </iframe>
-        </details>
-    </section>
-
-    <section class="rule-section">
-        <h2>报名阶段（截止时间：2026年暑假，时间待定）</h2>
-        <p>每人报名时提交一个擅长游戏（允许选择特殊类），抽签前不公布选择</p>
-        <div class="sub-block">
-            <p class="sub-title">新人特权：</p>
-            <p class="list-item">- 你提交的游戏可以指定具体的游戏配置，小组赛被抽到须按照指定配置进行游戏</p>
-            <p class="list-item">- 指定配置不能特意大幅延长单局时长、或强制降低参赛玩家游戏体验，主办方有权否决明显的不合理配置</p>
-            <p>新人报名需提供bot战绩，需满足总场次小于等于60场，且游玩计分游戏数量小于等于12，同时没有使用过“人生重来”指令（后台数据库可查）</p>
-        </div>
-    </section>
-
-    <section class="rule-section">
-        <h2>抽签阶段（报名结束第二天中午12:00）</h2>
-        <p>报名阶段结束后，公开比赛<b>“盲池”</b>：由没有任何人选择的游戏构成，但不包含特殊类</p>
-        <p><b>6 人一组随机抽签分组</b></p>
-        <p><b>每组共进行 5 轮比赛，3 轮候选游戏 + 2 轮盲池游戏</b></p>
-        <p>多人游戏需小组所有玩家共同参加，双人游戏则需要先抽取对战玩家。</p>
-        <p><span class="strong-label">候选抽取规则</span> 本组玩家所选游戏组成候选池。如果候选池中存在双人游戏，则1、2轮抽取多人游戏，第三轮抽取双人游戏（抽3次，保证所有双人游戏都被抽取）。当候选池多人游戏过少，前两轮也可能抽取双人游戏。详见 <a href="#pool">&lt;其他细节-候选池抽取细节&gt;</a>。</p>
-        <p><span class="strong-label">盲池抽取规则</span> 从所有未被选中的盲池游戏中随机抽取，将抽到的游戏被移除盲池。如果抽到双人游戏，则继续抽2个双人游戏，且每抽一个都需要移除。</p>
-        <p><span class="strong-label">轮空规则</span> 如果抽到的游戏无法满足组内人数要求，部分玩家可能被轮空，轮空玩家本轮零和得分记为 0</p>
-    </section>
-
-    <section class="rule-section">
-        <h2>小组赛（持续5-6周）</h2>
-        <p>小组赛采用<b>零和计分</b>。按照游戏终局个人得分计算零和得分。计分时所有多人游戏强制修正为 1 倍率，双人游戏为 2 倍率。</p>
-        <p><span class="strong-label">关于虞姬游戏特殊修改</span> [云顶之巢]将不计算淘汰名次，只看终局分数。虞姬游戏将使用程序手动计算零和得分。</p>
-        <p><b>比赛场房间不强制开倍率，最终得分以零和计分算法为准。</b>关于零和计分方法：详见 <a href="#zero">&lt;其他细节-零和计分方法&gt;</a></p>
-        <p>因为游戏为预先抽取，第一周可不进行约战，允许玩家深度研究游戏规则或互相练习。所有选手默认拥有相同的准备权利，比赛不限制信息获取，但不提供额外教学。</p>
-        <p>每轮比赛约战<b>最多一周时间</b>。</p>
-        <div class="sub-block">
-            <p class="sub-title">弃权规则：</p>
-            <p>如果玩家认为本轮游戏过于困难。玩家可在轮次开始前向其他所有组员申请弃权，并<b>提供具体的弃权原因</b>。需在本轮开始前通知组员和主办方。组员需以明确“同意/不同意”回复确认，若其他所有组员均同意，则本轮视为轮空零和得分为 0。</p>
-            <p>需注意：<b>选择此游戏的玩家拥有一票否决权，如果被一票否决/半数以上不同意，则弃权无效。继续弃权则自动获得本局游戏的最低分。</b>若弃权人数过多导致人数不足无法进行，视为所有没弃权的玩家自动获得本轮胜利。（零和得分按照 获胜玩家1、弃权玩家-1 手动计算）</p>
-        </div>
-        <p><span class="strong-label">晋级规则</span> 小组赛结束，每组只有前 2 位玩家可以晋级决赛。（若报名人数不足，可能会调整为前 3 位）</p>
-    </section>
-
-    <section class="rule-section">
-        <h2>决赛资格筛选（1周）</h2>
-        <p>如果晋级人数大于 8 人，需额外加赛</p>
-        <p>抽签分为 2 组，两组分别随机抽取盲池多人游戏，每组前 4 名晋级决赛</p>
-    </section>
-
-    <section class="rule-section">
-        <h2>决赛</h2>
-        <div class="sub-block">
-            <p class="sub-title">阶段一：八强阶段（共 3 场）</p>
-            <p>零和计分，双人游戏为2倍率。前四名晋级。</p>
-            <p class="list-item">- 8 人多人赛（从全部候选池中抽取，不包含特殊类）</p>
-            <p class="list-item">- 4 组双人赛（从全部候选池中抽取，不包含特殊类）</p>
-            <p class="list-item">- 8 人多人赛（盲池抽取多人游戏）</p>
-        </div>
-        <div class="sub-block">
-            <p class="sub-title">阶段二：决胜阶段（共 5 场）</p>
-            <p>零和计分，双人游戏为2倍率。冠军、亚军、季军、殿军。</p>
-            <p class="list-item">- BO3双人赛：从全部候选池抽取，不包含特殊类</p>
-            <p class="list-item">- 双人即时赛：开赛前从盲池抽取双人游戏，可查看规则，10分钟后开始对局</p>
-            <p class="list-item">- 多人即时赛：开赛前从盲池抽取4人游戏，可查看规则，10分钟后开始对局</p>
-        </div>
-        <p>如果 5 场结束后有玩家分数相同，则加赛一场“双人即时赛”，不计算零和分，仅用于决定最终名次。</p>
-    </section>
-
-    <section class="rule-section">
-        <h2>其他细节</h2>
-        <p><span class="strong-label">分组细节</span> 分组 6 人人数不足时：多 1 人补入一组 7人，多 2 人 2 组7人，多 3 人3组7人，多 4或5 人自成一组</p>
-
-        <p id="pool"><span class="strong-label">小组赛候选池抽取细节</span> </p>
-        <p class="list-item">- 候选池全是多人/双人游戏，前三轮随机抽取</p>
-        <p class="list-item">- 候选池只有 1 种多人游戏，第一轮直接选定此游戏，后两轮抽取双人游戏</p>
-        <p class="list-item">- 候选池有 2 种多人游戏，第一轮抽取多人游戏，后两轮抽取双人游戏</p>
-        <p class="list-item">- 候选池有 3 种及以上多人游戏，第一、二轮抽取多人游戏，第三轮抽取双人游戏</p>
-
-        <p><span class="strong-label">盲池抽取规则</span> 每次从盲池中抽到的游戏都会被移除盲池，决赛抽取也是使用削减过的盲池。当需要抽取多人/双人游戏但盲池中此类型已经耗尽，则从所有此类型游戏中随机抽取（候选池+盲池，但不包含特殊类）</p>
-
-        <p id="zero"><span class="strong-label">零和计分方法</span> 先计算所有玩家的平均得分，并以各玩家得分与平均分之间的差值作为零和分配依据。统计得分低于平均分的玩家及其与平均分的差值总和，作为需要被分担的负值；得分高于平均分的玩家，按照其高于平均分差值所占比例，对该负值进行等比例分担，最终保证全体玩家的零和得分之和为 0，结果保留两位小数。例如，玩家原始得分为 -5、0、1、4 时，对应的零和得分为 -20.00、0.00、4.00、16.00。</p>
-    </section>
+<div class="section">
+    <h2 class="section-title ongoing">🟢 进行中 🟢</h2>
+    <div class="button-grid">
+    </div>
 </div>
+
+<div class="section">
+    <h2 class="section-title preparing">🟡 筹备中 🟡</h2>
+    <div class="button-grid">
+        <a href="2026/bot-master/">2026 Bot 全能游戏王 <small class="tip">本站页面</small></a>
+    </div>
+</div>
+
+<div class="section">
+    <h2 class="section-title archived">⚪ 已结束 ⚪</h2>
+    <div class="button-grid">
+        <a href="https://jzj.sthnew.fun/">2025 jzj循环赛</a>
+    </div>
+</div>
+
 </body>
 </html>

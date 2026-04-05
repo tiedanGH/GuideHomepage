@@ -1,0 +1,167 @@
+body {
+    padding: 20px;
+    background-color: #f5f5f5;
+    overflow-y: scroll;
+    margin: 0;
+}
+a {
+    text-decoration: none;
+}
+
+/* 返回主页按钮 */
+.back-home {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    padding: 10px 18px;
+    background: linear-gradient(135deg, #1a1a40, #3a0ca3);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+.back-home:hover {
+    background: linear-gradient(135deg, #2a2a60, #5a1cd3);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* 标题样式 */
+h1 {
+    text-align: center;
+    margin: 0 0 30px;
+    font-size: 2.2rem;
+    background: linear-gradient(90deg, #6a11cb, #3a0ca3);
+    background-clip: text;
+    color: transparent;
+}
+
+/* 分类区块 */
+.section {
+    margin-bottom: 24px;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+.section-title {
+    max-width: 1200px;
+    margin: 0 auto 10px;
+    font-size: 20px;
+    font-weight: 600;
+    text-align: center;
+    box-sizing: border-box;
+}
+.section-title.ongoing {
+    color: #27ae60;
+}
+.section-title.preparing {
+    color: #e67e22;
+}
+.section-title.archived {
+    color: #7f8c8d;
+}
+
+/* 提示文字 */
+.empty-hint {
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+    color: #999;
+    font-size: 15px;
+    padding: 10px 0 0 0;
+}
+
+/* 按钮网格样式 */
+.button-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    max-width: 1300px;
+    margin: 0 auto;
+}
+.button-grid a {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 240px;
+    padding: 15px;
+    background: linear-gradient(135deg, #1a1a40, #3a0ca3);
+    color: white;
+    border-radius: 8px;
+    font-weight: 600;
+    text-align: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(58, 12, 163, 0.5);
+    font-size: 1.1rem;
+    box-sizing: border-box;
+}
+.button-grid a:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(90, 120, 255, 0.6);
+    filter: brightness(1.05);
+}
+
+.tip {
+    position: absolute;
+    right: 6px;
+    bottom: 2px;
+    font-size: 11px;
+    opacity: 0.8;
+    pointer-events: none;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    body {
+        padding: 5px;
+    }
+    .back-home {
+        top: 6px;
+        left: 6px;
+        padding: 6px 12px;
+        font-size: 14px;
+    }
+    h1 {
+        font-size: 1.8rem;
+    }
+    .section {
+        padding: 0 10px;
+        margin-bottom: 16px;
+    }
+    .section-title {
+        font-size: 18px;
+        margin-bottom: 8px;
+    }
+    .button-grid {
+        max-width: 100%;
+        gap: 10px;
+    }
+    .button-grid a {
+        width: calc(50% - 5px);
+        padding: 12px;
+        font-size: 1rem;
+    }
+    .empty-hint {
+        font-size: 14px;
+        padding: 15px 0;
+    }
+}
+@media (max-width: 480px) {
+    .section {
+        padding: 0 5px;
+    }
+    .button-grid {
+        gap: 8px;
+    }
+    .button-grid a {
+        width: 220px;
+        max-width: 100%;
+        font-size: 0.95rem;
+    }
+}
