@@ -79,6 +79,20 @@
     color: #ff4945;
 }
 
+/* AI对战平台按钮 */
+.button.agent-game {
+    background: linear-gradient(145deg, #1890ff, #0b6edc);
+    box-shadow: 0 4px 14px rgba(24, 144, 255, 0.4);
+    color: #ffffff;
+    border: none;
+    transition: all 0.25s ease;
+}
+.button.agent-game:hover {
+    background: linear-gradient(145deg, #40a9ff, #1677ff);
+    box-shadow: 0 6px 20px rgba(24, 144, 255, 0.6);
+    color: #ffffff;
+}
+
 /* 大杀四方按钮 */
 .button.killing {
     background: linear-gradient(90deg, #9b5cff, #e34173);
