@@ -89,7 +89,7 @@ h1 {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 240px;
+    width: 250px;
     padding: 15px;
     background: linear-gradient(135deg, #1a1a40, #3a0ca3);
     color: white;
@@ -107,10 +107,20 @@ h1 {
     filter: brightness(1.05);
 }
 
-.tip {
+.host {
     position: absolute;
     right: 6px;
     bottom: 2px;
+    font-size: 12px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 1px 4px;
+    border-radius: 4px;
+}
+.note {
+    position: absolute;
+
+    right: 6px;
+    top: 2px;
     font-size: 11px;
     opacity: 0.8;
     pointer-events: none;
@@ -144,8 +154,17 @@ h1 {
     }
     .button-grid a {
         width: calc(50% - 5px);
+        max-width: 240px;
         padding: 12px;
         font-size: 1rem;
+    }
+    .host {
+        font-size: 10px;
+        right: 2px;
+    }
+    .note {
+        font-size: 9px;
+        right: 4px;
     }
     .empty-hint {
         font-size: 14px;
