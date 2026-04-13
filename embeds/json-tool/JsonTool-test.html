@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
@@ -3611,7 +3611,7 @@
                         }
 
                         // 构建本地图片路径
-                        imagePath = `img/${imageName}`;
+                        imagePath = `images/${imageName}`;
                         isLocalFileImage = isLocalFile();
 
                         if (isLocalFileImage) {
@@ -10839,7 +10839,7 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
             }
 
             // 提取角色名称或正则表达式的函数
-            function extractRoleNames(text) {
+            function extractRoleNames(text, isSecondBox) {
                 // 先按行分割
                 const lines = text.split(/[\n\r]+/);
                 const roleNames = [];
@@ -10854,14 +10854,21 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                             // 如果是正则表达式，直接添加
                             roleNames.push(trimmedLine);
                         } else {
-                            // 如果不是正则表达式，按顿号分割
-                            const parts = trimmedLine.split(/[、,，]/);
-                            parts.forEach(part => {
-                                const trimmedPart = part.trim();
-                                if (trimmedPart) {
-                                    roleNames.push(trimmedPart);
+                            if (isSecondBox) {
+                                // 第二个框：按顿号、逗号等分割
+                                const parts = trimmedLine.split(/[、,，\s]+/);
+                                parts.forEach(part => {
+                                    const trimmedPart = part.trim();
+                                    if (trimmedPart) {
+                                        roleNames.push(trimmedPart);
+                                    }
+                                });
+                            } else {
+                                // 第一个框：只提取2~5字数的角色名（单独一行）
+                                if (trimmedLine.length >= 2 && trimmedLine.length <= 5) {
+                                    roleNames.push(trimmedLine);
                                 }
-                            });
+                            }
                         }
                     }
                 });
@@ -10870,7 +10877,7 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                 return [...new Set(roleNames.filter(name => name))];
             }
 
-            const searchKeywords = extractRoleNames(inputText);
+            const searchKeywords = extractRoleNames(inputText, usedBox === 'second');
 
             if (searchKeywords.length === 0) {
                 alert('未识别到搜索关键词');

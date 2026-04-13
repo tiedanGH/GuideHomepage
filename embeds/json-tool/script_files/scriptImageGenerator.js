@@ -13,6 +13,19 @@ function hexToRgba(hex, opacity) {
     return hex;
 }
 
+// 辅助函数：将DataURL转换为Blob对象
+function dataURLToBlob(dataUrl) {
+    const arr = dataUrl.split(',');
+    const mime = arr[0].match(/:(.*?);/)[1];
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new Blob([u8arr], { type: mime });
+}
+
 async function generateScriptImageV2() {
             try {
                 // 防止重复点击
@@ -849,24 +862,52 @@ async function generateScriptImageV2() {
                             // 检测是否为移动端
                             const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
                             
+                            // 优化移动端下载逻辑
                             if (isMobile) {
-                                // 移动端：在新窗口打开图片，让用户长按保存
-                                const newWindow = window.open();
-                                if (newWindow) {
-                                    newWindow.document.write('<html><head><title>' + filename + '</title></head><body style="margin:0;display:flex;justify-content:center;align-items:center;background:#f0f0f0;"><img src="' + dataUrl + '" style="max-width:100%;height:auto;" onclick="window.close()"></body></html>');
-                                    newWindow.document.close();
-                                    alert('图片已在新窗口打开，请长按图片保存到相册');
-                                } else {
-                                    // 如果弹窗被阻止，使用备用方案
+                                // 方案1：尝试使用Blob对象和download属性
+                                try {
+                                    const blob = dataURLToBlob(dataUrl);
+                                    const url = URL.createObjectURL(blob);
                                     const link = document.createElement('a');
+                                    link.href = url;
                                     link.download = filename;
-                                    link.href = dataUrl;
                                     link.style.display = 'none';
+                                    
+                                    // 添加到文档并触发点击
                                     document.body.appendChild(link);
-                                    link.click();
+                                    
+                                    // 移动端需要模拟真实点击
+                                    if (navigator.userAgent.match(/iPad|iPhone|iPod/)) {
+                                        // iOS设备特殊处理
+                                        const event = document.createEvent('MouseEvents');
+                                        event.initMouseEvent('click', true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
+                                        link.dispatchEvent(event);
+                                    } else {
+                                        // Android设备
+                                        link.click();
+                                    }
+                                    
                                     setTimeout(() => {
                                         document.body.removeChild(link);
+                                        URL.revokeObjectURL(url);
                                     }, 100);
+                                    
+                                    // 提示用户
+                                    setTimeout(() => {
+                                        alert('请在弹出的下载提示中选择保存图片');
+                                    }, 500);
+                                } catch (e) {
+                                    console.error('Blob下载失败:', e);
+                                    // 方案2：在新窗口打开图片，让用户长按保存
+                                    const newWindow = window.open();
+                                    if (newWindow) {
+                                        newWindow.document.write('<html><head><title>' + filename + '</title></head><body style="margin:0;display:flex;justify-content:center;align-items:center;background:#f0f0f0;"><img src="' + dataUrl + '" style="max-width:100%;height:auto;" onclick="window.close()"></body></html>');
+                                        newWindow.document.close();
+                                        alert('图片已在新窗口打开，请长按图片保存到相册');
+                                    } else {
+                                        // 方案3：显示错误提示
+                                        alert('无法自动下载图片，请截图保存');
+                                    }
                                 }
                             } else {
                                 // 桌面端：直接下载
@@ -1566,40 +1607,88 @@ async function generateJinxAndConfigImage() {
                     const originalWidth = printPage.style.width;
                     const originalHeight = printPage.style.height;
                     
-                    // 使用固定的A4尺寸
-                    const a4Width = 8.27 * 96; // 8.27英寸转换为像素（96dpi）
-                    const a4Height = 11.69 * 96; // 11.69英寸转换为像素（96dpi）
+                    // 临时移除高度限制，让内容完全显示
+                    printPage.style.height = 'auto';
                     
-                    // 设置容器尺寸为A4大小
-                    printPage.style.width = a4Width + 'px';
-                    printPage.style.height = a4Height + 'px';
-                    
-                    html2canvas(printPage, {
-                        scale: 2,
-                        useCORS: true,
-                        allowTaint: true,
-                        backgroundColor: hexToRgba(detailBgColor, detailBgOpacity)
-                    }).then(function(canvas) {
-                        // 恢复原始样式
-                        printPage.style.width = originalWidth;
-                        printPage.style.height = originalHeight;
+                    // 等待DOM更新后获取完整尺寸
+                    setTimeout(() => {
+                        // 获取内容的实际高度
+                        const fullHeight = printPage.scrollHeight;
+                        const a4Width = 8.27 * 96; // 8.27英寸转换为像素（96dpi）
                         
-                        // 使用更兼容移动端的下载方式
-                        const dataUrl = canvas.toDataURL('image/png');
-                        const filename = scriptName + '_细节图.png';
+                        // 设置容器尺寸，宽度固定为A4，高度根据内容调整
+                        printPage.style.width = a4Width + 'px';
+                        printPage.style.height = fullHeight + 'px';
                         
-                        // 检测是否为移动端
-                        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-                        
-                        if (isMobile) {
-                            // 移动端：在新窗口打开图片，让用户长按保存
-                            const newWindow = window.open();
-                            if (newWindow) {
-                                newWindow.document.write('<html><head><title>' + filename + '</title></head><body style="margin:0;display:flex;justify-content:center;align-items:center;background:#f0f0f0;"><img src="' + dataUrl + '" style="max-width:100%;height:auto;" onclick="window.close()"></body></html>');
-                                newWindow.document.close();
-                                alert('图片已在新窗口打开，请长按图片保存到相册');
+                        html2canvas(printPage, {
+                            scale: 2,
+                            useCORS: true,
+                            allowTaint: true,
+                            backgroundColor: hexToRgba(detailBgColor, detailBgOpacity),
+                            // 确保捕获整个内容
+                            windowWidth: a4Width,
+                            windowHeight: fullHeight
+                        }).then(function(canvas) {
+                            // 恢复原始样式
+                            printPage.style.width = originalWidth;
+                            printPage.style.height = originalHeight;
+                            
+                            // 使用更兼容移动端的下载方式
+                            const dataUrl = canvas.toDataURL('image/png');
+                            const filename = scriptName + '_细节图.png';
+                            
+                            // 检测是否为移动端
+                            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+                            
+                            // 优化移动端下载逻辑
+                            if (isMobile) {
+                                // 方案1：尝试使用Blob对象和download属性
+                                try {
+                                    const blob = dataURLToBlob(dataUrl);
+                                    const url = URL.createObjectURL(blob);
+                                    const link = document.createElement('a');
+                                    link.href = url;
+                                    link.download = filename;
+                                    link.style.display = 'none';
+                                    
+                                    // 添加到文档并触发点击
+                                    document.body.appendChild(link);
+                                    
+                                    // 移动端需要模拟真实点击
+                                    if (navigator.userAgent.match(/iPad|iPhone|iPod/)) {
+                                        // iOS设备特殊处理
+                                        const event = document.createEvent('MouseEvents');
+                                        event.initMouseEvent('click', true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
+                                        link.dispatchEvent(event);
+                                    } else {
+                                        // Android设备
+                                        link.click();
+                                    }
+                                    
+                                    setTimeout(() => {
+                                        document.body.removeChild(link);
+                                        URL.revokeObjectURL(url);
+                                    }, 100);
+                                    
+                                    // 提示用户
+                                    setTimeout(() => {
+                                        alert('请在弹出的下载提示中选择保存图片');
+                                    }, 500);
+                                } catch (e) {
+                                    console.error('Blob下载失败:', e);
+                                    // 方案2：在新窗口打开图片，让用户长按保存
+                                    const newWindow = window.open();
+                                    if (newWindow) {
+                                        newWindow.document.write('<html><head><title>' + filename + '</title></head><body style="margin:0;display:flex;justify-content:center;align-items:center;background:#f0f0f0;"><img src="' + dataUrl + '" style="max-width:100%;height:auto;" onclick="window.close()"></body></html>');
+                                        newWindow.document.close();
+                                        alert('图片已在新窗口打开，请长按图片保存到相册');
+                                    } else {
+                                        // 方案3：显示错误提示
+                                        alert('无法自动下载图片，请截图保存');
+                                    }
+                                }
                             } else {
-                                // 如果弹窗被阻止，使用备用方案
+                                // 桌面端：直接下载
                                 const link = document.createElement('a');
                                 link.download = filename;
                                 link.href = dataUrl;
@@ -1610,25 +1699,14 @@ async function generateJinxAndConfigImage() {
                                     document.body.removeChild(link);
                                 }, 100);
                             }
-                        } else {
-                            // 桌面端：直接下载
-                            const link = document.createElement('a');
-                            link.download = filename;
-                            link.href = dataUrl;
-                            link.style.display = 'none';
-                            document.body.appendChild(link);
-                            link.click();
-                            setTimeout(() => {
-                                document.body.removeChild(link);
-                            }, 100);
-                        }
-                    }).catch(function(error) {
-                        console.error('生成图片失败:', error);
-                        alert('生成图片失败，请重试');
-                        // 恢复原始样式
-                        printPage.style.width = originalWidth;
-                        printPage.style.height = originalHeight;
-                    });
+                        }).catch(function(error) {
+                            console.error('生成图片失败:', error);
+                            alert('生成图片失败，请重试');
+                            // 恢复原始样式
+                            printPage.style.width = originalWidth;
+                            printPage.style.height = originalHeight;
+                        });
+                    }, 100);
                 };
                 buttonContainer.appendChild(downloadButton);
                 
