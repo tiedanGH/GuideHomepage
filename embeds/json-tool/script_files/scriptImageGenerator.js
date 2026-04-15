@@ -26,6 +26,22 @@ function dataURLToBlob(dataUrl) {
     return new Blob([u8arr], { type: mime });
 }
 
+// 辅助函数：将URL转换为本地路径（用于生成剧本图）
+function convertToLocalPath(imageUrl) {
+    if (!imageUrl) return '';
+    // 如果是完整的URL，转换为本地路径
+    if (imageUrl.includes('https://oss.gstonegames.com/data_file/clocktower/web/icons/')) {
+        const fileName = imageUrl.split('/').pop();
+        return `images/${fileName}`;
+    }
+    // 如果是上传的图片URL，保持原样
+    if (imageUrl.includes('upload/')) {
+        return imageUrl;
+    }
+    // 其他情况保持原样
+    return imageUrl;
+}
+
 async function generateScriptImageV2() {
             try {
                 // 防止重复点击
@@ -149,12 +165,12 @@ async function generateScriptImageV2() {
                 
                 // 定义元信息角色映射
                 const metaRolesMap = {
-                    'minioninfo': { firstNight: 2000, name: '爪牙信息', image: 'https://www.bloodstar.xyz/p/Haimian0421/image4/1_image4.png' },
-                    'demoninfo': { firstNight: 3000, name: '恶魔信息', image: 'https://www.bloodstar.xyz/p/Haimian0421/image4/_image4.png' },
-                    'twilight': { firstNight: -100, otherNight: -100, name: '黄昏', image: 'https://www.bloodstar.xyz/p/Haimian0421/image4/2_image4.png' },
-                    'dawn': { firstNight: 12700, otherNight: 15000, name: '黎明', image: 'https://www.bloodstar.xyz/p/shifenfantuan/jiuban/newcharacter3_jiuban.png' },
-                    '黄昏': { firstNight: -100, otherNight: -100, name: '黄昏', image: 'https://www.bloodstar.xyz/p/Haimian0421/image4/2_image4.png' },
-                    '黎明': { firstNight: 12700, otherNight: 15000, name: '黎明', image: 'https://www.bloodstar.xyz/p/shifenfantuan/jiuban/newcharacter3_jiuban.png' }
+                    'minioninfo': { firstNight: 2000, name: '爪牙信息', image: 'https://i.postimg.cc/xjyVwRFr/180px-Mi.png' },
+                    'demoninfo': { firstNight: 3000, name: '恶魔信息', image: 'https://i.postimg.cc/8kbxKCjC/180px-Di.png' },
+                    'twilight': { firstNight: -100, otherNight: -100, name: '黄昏', image: 'https://i.postimg.cc/FFcwM1Lb/dusk-CLd-DXn-QC.jpg' },
+                    'dawn': { firstNight: 12700, otherNight: 15000, name: '黎明', image: 'https://i.postimg.cc/mr6CyQNY/dawn.jpg' },
+                    '黄昏': { firstNight: -100, otherNight: -100, name: '黄昏', image: 'https://i.postimg.cc/FFcwM1Lb/dusk-CLd-DXn-QC.jpg' },
+                    '黎明': { firstNight: 12700, otherNight: 15000, name: '黎明', image: 'https://i.postimg.cc/mr6CyQNY/dawn.jpg' }
                 };
                 
                 // 优先使用metaInfoJson中的夜间顺序
@@ -518,12 +534,12 @@ async function generateScriptImageV2() {
                 
                 // 构建首夜顺序HTML（左侧垂直排列）
                 const firstNightHtml = allFirstNight.map(role => `
-                    <img src="${role.image}" style="width: 45px; height: 45px; margin: -5px 0; object-fit: cover; display: block;">
+                    <img src="${convertToLocalPath(role.image)}" style="width: 45px; height: 45px; margin: -5px 0; object-fit: cover; display: block;">
                 `).join('');
                 
                 // 构建其他夜晚顺序HTML（右侧垂直排列）
                 const otherNightHtml = allOtherNight.map(role => `
-                    <img src="${role.image}" style="width: 45px; height: 45px; margin: -5px 0; object-fit: cover; display: block; transform: rotate(180deg);">
+                    <img src="${convertToLocalPath(role.image)}" style="width: 45px; height: 45px; margin: -5px 0; object-fit: cover; display: block; transform: rotate(180deg);">
                 `).join('');
                 
 
@@ -561,14 +577,14 @@ async function generateScriptImageV2() {
                             ${undisplayedJinxRules.map(rule => {
                                 const otherRoleName = rule.jinxRole1 === role.name ? rule.jinxRole2 : rule.jinxRole1;
                                 const otherRole = allRoles.find(r => r.name === otherRoleName);
-                                return `<div style="margin-bottom: 3px; display: flex; align-items: center; gap: 6px;">${otherRole ? `<img src="${otherRole.image}" style="width: 20px; height: 20px; object-fit: cover; border-radius: 3px; flex-shrink: 0;">` : ''} : ${rule.jinxRule}</div>`;
+                                return `<div style="margin-bottom: 3px; display: flex; align-items: center; gap: 6px;">${otherRole ? `<img src="${convertToLocalPath(otherRole.image)}" style="width: 20px; height: 20px; object-fit: cover; border-radius: 3px; flex-shrink: 0;">` : ''} : ${rule.jinxRule}</div>`;
                             }).join('')}
                         </div>
                     ` : '';
 
                     return `
                         <div style="display: flex; align-items: flex-start; margin-bottom: 8px; break-inside: avoid;">
-                            <img src="${role.image}" style="width: 60px; height: 60px; object-fit: cover; margin-right: 8px; flex-shrink: 0;">
+                            <img src="${convertToLocalPath(role.image)}" style="width: 60px; height: 60px; object-fit: cover; margin-right: 8px; flex-shrink: 0;">
                             <div style="flex: 1; min-width: 0;">
                                 <div style="display: flex; flex-direction: row; align-items: center; flex-wrap: wrap;">
                                     <div style="font-weight: bold; font-size: ${13 * fontSizeMultiplier}px; color: ${color}; margin-bottom: 2px; padding-right: 5px;">${role.name}</div>
@@ -647,10 +663,10 @@ async function generateScriptImageV2() {
                                 ${showTravellersFabled && (fabledRoles.length > 0 || travellerRoles.length > 0) ? `
                                     <div style="display: flex; flex-direction: column; align-items: center; flex-shrink: 0;">
                                         ${fabledRoles.map(role => `
-                                            <img src="${role.image}" style="width: 25px; height: 25px; object-fit: cover; margin: 1px 0;">
+                                            <img src="${convertToLocalPath(role.image)}" style="width: 25px; height: 25px; object-fit: cover; margin: 1px 0;">
                                         `).join('')}
                                         ${travellerRoles.map(role => `
-                                            <img src="${role.image}" style="width: 25px; height: 25px; object-fit: cover; margin: 1px 0;">
+                                            <img src="${convertToLocalPath(role.image)}" style="width: 25px; height: 25px; object-fit: cover; margin: 1px 0;">
                                         `).join('')}
                                     </div>
                                 ` : ''}
@@ -712,7 +728,7 @@ async function generateScriptImageV2() {
                                 ` : `
                                 <!-- 显示保存的状态 -->
                                 ${metaInfoJson.state.map(state => `
-                                    <div style="margin-bottom: 4px;"><b style="color: ${customTeamColors.demon};">${state.name}</b> - ${state.description}</div>
+                                    <div style="margin-bottom: 4px;"><b style="color: ${state.name === '疯狂' ? '#9932cc' : customTeamColors.demon};">${state.name}</b> - ${state.description}</div>
                                 `).join('')}
                                 `}
                             </div>
@@ -1116,10 +1132,10 @@ async function generateJinxAndConfigImage() {
                 
                 // 定义特殊角色映射
                 const specialRolesMap = {
-                    'twilight': { firstNight: 0, name: '黄昏', image: 'https://www.bloodstar.xyz/p/Haimian0421/image4/2_image4.png' },
-                    'minioninfo': { firstNight: 2000, name: '爪牙信息', image: 'https://www.bloodstar.xyz/p/Haimian0421/image4/1_image4.png' },
-                    'demoninfo': { firstNight: 3000, name: '恶魔信息', image: 'https://www.bloodstar.xyz/p/Haimian0421/image4/_image4.png' },
-                    'dawn': { firstNight: 9999, name: '黎明', image: 'https://www.bloodstar.xyz/p/shifenfantuan/jiuban/newcharacter3_jiuban.png' }
+                    'twilight': { firstNight: 0, name: '黄昏', image: 'https://i.postimg.cc/FFcwM1Lb/dusk-CLd-DXn-QC.jpg' },
+                    'minioninfo': { firstNight: 2000, name: '爪牙信息', image: 'https://i.postimg.cc/xjyVwRFr/180px-Mi.png' },
+                    'demoninfo': { firstNight: 3000, name: '恶魔信息', image: 'https://i.postimg.cc/8kbxKCjC/180px-Di.png' },
+                    'dawn': { firstNight: 9999, name: '黎明', image: 'https://i.postimg.cc/mr6CyQNY/dawn.jpg' }
                 };
                 
                 // 处理首夜顺序
@@ -1294,12 +1310,12 @@ async function generateJinxAndConfigImage() {
                 
                 // 构建首夜顺序HTML（左侧）
                 const firstNightHtml = allFirstNightRoles.map(role => `
-                    <img src="${role.image}" style="height: 40px; margin: -5px 0; padding: 0 2px; object-fit: cover; display: block;">
+                    <img src="${convertToLocalPath(role.image)}" style="height: 40px; margin: -5px 0; padding: 0 2px; object-fit: cover; display: block;">
                 `).join('');
                 
                 // 构建其他夜晚顺序HTML（右侧）
                 const otherNightHtml = allOtherNightRoles.map(role => `
-                    <img src="${role.image}" style="height: 40px; margin: -5px 0; padding: 0 2px; object-fit: cover; display: block; transform: rotate(180deg);">
+                    <img src="${convertToLocalPath(role.image)}" style="height: 40px; margin: -5px 0; padding: 0 2px; object-fit: cover; display: block; transform: rotate(180deg);">
                 `).join('');
                 
                 // 构建剧本标题（顶部居中）
@@ -1324,7 +1340,7 @@ async function generateJinxAndConfigImage() {
                 const fabledHtml = fabledRoles.map(role => `
                     <div style="display: flex; flex-direction: row; position: relative; bottom: -10px; margin: -10px 0;">
                         <div style="float: left; align-items: center;">
-                            <img src="${role.image}" height="60" style="object-fit: cover;">
+                            <img src="${convertToLocalPath(role.image)}" height="60" style="object-fit: cover;">
                         </div>
                         <div style="display: flex; flex-direction: column; justify-content: center; min-height: 60px;">
                             <b style="font-family: 'Philo', serif; float: left; font-size: 4mm; position: relative; bottom: -5px; color: #7a6550;">${role.name}</b>
@@ -1341,8 +1357,8 @@ async function generateJinxAndConfigImage() {
                     ${jinxRules.map(rule => `
                         <div style="display: flex; flex-direction: row; align-items: center; height: ${50 * fontSizeMultiplier}px; position: relative; bottom: 4px; margin: -5px 0 0 0;">
                             <b style="padding-right: 30px;"></b>
-                            <img src="${allRoles.find(r => r.name === rule.jinxRole1)?.image || ''}" style="float: left; height: ${40 * fontSizeMultiplier}px; position: relative; bottom: -10px; margin: 0 -5px 0 0;">
-                            <img src="${allRoles.find(r => r.name === rule.jinxRole2)?.image || ''}" style="float: left; height: ${40 * fontSizeMultiplier}px; position: relative; bottom: -10px; margin: 0 -5px 0 0;">
+                            <img src="${convertToLocalPath(allRoles.find(r => r.name === rule.jinxRole1)?.image || '')}" style="float: left; height: ${40 * fontSizeMultiplier}px; position: relative; bottom: -10px; margin: 0 -5px 0 0;">
+                            <img src="${convertToLocalPath(allRoles.find(r => r.name === rule.jinxRole2)?.image || '')}" style="float: left; height: ${40 * fontSizeMultiplier}px; position: relative; bottom: -10px; margin: 0 -5px 0 0;">
                             <p style="font-family: 'Assistant', sans-serif; font-size: ${3.4 * fontSizeMultiplier}mm; padding-left: 10px; position: relative; bottom: -20px; margin: 0;">${rule.jinxRule}</p>
                         </div>
                     `).join('')}
@@ -1376,7 +1392,7 @@ async function generateJinxAndConfigImage() {
                 const travellerListHtml = travellerRoles.map(role => `
                     <div style="display: flex; flex-direction: row; position: relative; bottom: -10px; margin: -10px 0;">
                         <div style="float: left; align-items: center;">
-                            <img src="${role.image}" height="${60 * fontSizeMultiplier}" style="object-fit: cover;">
+                            <img src="${convertToLocalPath(role.image)}" height="${60 * fontSizeMultiplier}" style="object-fit: cover;">
                         </div>
                         <div style="display: flex; flex-direction: column; justify-content: center; min-height: ${60 * fontSizeMultiplier}px;">
                             <b style="font-family: 'Philo', serif; float: left; font-size: ${4 * fontSizeMultiplier}mm; position: relative; bottom: -5px; color: #500050;">${role.name}</b>
@@ -1402,16 +1418,16 @@ async function generateJinxAndConfigImage() {
                     <div style="text-align: center; display: table; margin-left: auto; margin-right: auto; height: ${36 * fontSizeMultiplier}px; width: ${612 * fontSizeMultiplier}px; border: ${4 * fontSizeMultiplier}px solid rgba(201, 192, 184); margin-top: -2px; position: relative; z-index: 1;">
                         <div style="display: flex; flex-direction: row; width: ${604 * fontSizeMultiplier}px; justify-content: center; align-items: center; padding: ${4 * fontSizeMultiplier}px 0;">
                             ${townsfolkRolesList.map(role => `
-                                <img src="${role.image}" style="height: ${29 * fontSizeMultiplier}px; width: ${29 * fontSizeMultiplier}px; margin: 0px -5px 0px 0px; filter: grayscale(0%);">
+                                <img src="${convertToLocalPath(role.image)}" style="height: ${29 * fontSizeMultiplier}px; width: ${29 * fontSizeMultiplier}px; margin: 0px -5px 0px 0px; filter: grayscale(0%);">
                             `).join('')}
                             ${outsiderRolesList.map(role => `
-                                <img src="${role.image}" style="height: ${29 * fontSizeMultiplier}px; width: ${29 * fontSizeMultiplier}px; margin: 0px -5px 0px 0px; filter: grayscale(0%);">
+                                <img src="${convertToLocalPath(role.image)}" style="height: ${29 * fontSizeMultiplier}px; width: ${29 * fontSizeMultiplier}px; margin: 0px -5px 0px 0px; filter: grayscale(0%);">
                             `).join('')}
                             ${minionRolesList.map(role => `
-                                <img src="${role.image}" style="height: ${29 * fontSizeMultiplier}px; width: ${29 * fontSizeMultiplier}px; margin: 0px -5px 0px 0px; filter: grayscale(0%);">
+                                <img src="${convertToLocalPath(role.image)}" style="height: ${29 * fontSizeMultiplier}px; width: ${29 * fontSizeMultiplier}px; margin: 0px -5px 0px 0px; filter: grayscale(0%);">
                             `).join('')}
                             ${demonRolesList.map(role => `
-                                <img src="${role.image}" style="height: ${29 * fontSizeMultiplier}px; width: ${29 * fontSizeMultiplier}px; margin: 0px -5px 0px 0px; filter: grayscale(0%);">
+                                <img src="${convertToLocalPath(role.image)}" style="height: ${29 * fontSizeMultiplier}px; width: ${29 * fontSizeMultiplier}px; margin: 0px -5px 0px 0px; filter: grayscale(0%);">
                             `).join('')}
                         </div>
                     </div>
@@ -1454,7 +1470,7 @@ async function generateJinxAndConfigImage() {
                                             ${fabledRoles.map(role => `
                                                 <div style="flex: 0 1 calc(50% - 10px); min-width: 250px; max-width: calc(50% - 10px); box-sizing: border-box;">
                                                     <div style="display: flex; align-items: flex-start;">
-                                                        <img src="${role.image}" style="width: 60px; height: 60px; object-fit: cover; margin-right: 10px; flex-shrink: 0;">
+                                                        <img src="${convertToLocalPath(role.image)}" style="width: 60px; height: 60px; object-fit: cover; margin-right: 10px; flex-shrink: 0;">
                                                         <div style="flex: 1; min-width: 0;">
                                                             <div style="font-weight: bold; font-size: ${13 * fontSizeMultiplier}px; color: #7a6550; margin-bottom: 2px;">${role.name}</div>
                                                             <div style="font-size: ${11 * fontSizeMultiplier}px; line-height: 1.3; color: #333;">${role.ability || ''}</div>
@@ -1486,8 +1502,8 @@ async function generateJinxAndConfigImage() {
                                             ${jinxRules.map(rule => `
                                                 <div style="margin-bottom: 10px; display: flex; align-items: flex-start; gap: 10px;">
                                                     <div style="display: flex; flex-direction: row; gap: 5px; flex-shrink: 0;">
-                                                        <img src="${allRoles.find(r => r.name === rule.jinxRole1)?.image || ''}" style="width: ${40 * fontSizeMultiplier}px; height: ${40 * fontSizeMultiplier}px; object-fit: cover; border-radius: 3px;">
-                                                        <img src="${allRoles.find(r => r.name === rule.jinxRole2)?.image || ''}" style="width: ${40 * fontSizeMultiplier}px; height: ${40 * fontSizeMultiplier}px; object-fit: cover; border-radius: 3px;">
+                                                        <img src="${convertToLocalPath(allRoles.find(r => r.name === rule.jinxRole1)?.image || '')}" style="width: ${40 * fontSizeMultiplier}px; height: ${40 * fontSizeMultiplier}px; object-fit: cover; border-radius: 3px;">
+                                                        <img src="${convertToLocalPath(allRoles.find(r => r.name === rule.jinxRole2)?.image || '')}" style="width: ${40 * fontSizeMultiplier}px; height: ${40 * fontSizeMultiplier}px; object-fit: cover; border-radius: 3px;">
                                                     </div>
                                                     <div style="flex: 1; font-size: ${11 * fontSizeMultiplier}px; line-height: 1.4; color: #333;">
                                                         ${rule.jinxRule}
@@ -1537,7 +1553,7 @@ async function generateJinxAndConfigImage() {
                                             ${travellerRoles.map(role => `
                                                 <div style="flex: 0 1 calc(50% - 10px); min-width: 250px; max-width: calc(50% - 10px); box-sizing: border-box;">
                                                     <div style="display: flex; align-items: flex-start;">
-                                                        <img src="${role.image}" style="width: 60px; height: 60px; object-fit: cover; margin-right: 10px; flex-shrink: 0;">
+                                                        <img src="${convertToLocalPath(role.image)}" style="width: 60px; height: 60px; object-fit: cover; margin-right: 10px; flex-shrink: 0;">
                                                         <div style="flex: 1; min-width: 0;">
                                                             <div style="font-weight: bold; font-size: ${13 * fontSizeMultiplier}px; color: #500050; margin-bottom: 2px;">${role.name}</div>
                                                             <div style="font-size: ${11 * fontSizeMultiplier}px; line-height: 1.3; color: #333;">${role.ability || ''}</div>
@@ -1615,10 +1631,14 @@ async function generateJinxAndConfigImage() {
                         // 获取内容的实际高度
                         const fullHeight = printPage.scrollHeight;
                         const a4Width = 8.27 * 96; // 8.27英寸转换为像素（96dpi）
+                        const a4Height = a4Width * 1.414; // A4比例（297/210）
                         
-                        // 设置容器尺寸，宽度固定为A4，高度根据内容调整
+                        // 计算最终高度：取内容实际高度和A4比例高度的较大值
+                        const finalHeight = Math.max(fullHeight, a4Height);
+                        
+                        // 设置容器尺寸，宽度固定为A4，高度保持A4比例
                         printPage.style.width = a4Width + 'px';
-                        printPage.style.height = fullHeight + 'px';
+                        printPage.style.height = finalHeight + 'px';
                         
                         html2canvas(printPage, {
                             scale: 2,
@@ -1627,7 +1647,7 @@ async function generateJinxAndConfigImage() {
                             backgroundColor: hexToRgba(detailBgColor, detailBgOpacity),
                             // 确保捕获整个内容
                             windowWidth: a4Width,
-                            windowHeight: fullHeight
+                            windowHeight: finalHeight
                         }).then(function(canvas) {
                             // 恢复原始样式
                             printPage.style.width = originalWidth;
@@ -2024,7 +2044,7 @@ function loadScriptConfigToModal() {
                                     const isInTeam = team.roles && team.roles.some(r => r.id === role.id);
                                     return `
                                         <span style="display: inline-flex; align-items: center; gap: 5px; padding: 4px 8px; background: ${isInTeam ? 'rgba(107, 70, 193, 0.2)' : 'rgba(107, 70, 193, 0.1)'} ; border-radius: 4px; font-size: 12px; color: #6b46c1; cursor: ${isInTeam ? 'default' : 'pointer'} ; ${isInTeam ? 'opacity: 0.6;' : 'hover: background: rgba(107, 70, 193, 0.2);'}" ${!isInTeam ? `onclick="addRoleToCustomTeam(${index}, '${role.id}')"` : ''}>
-                                            <img src="${role.image}" style="width: 24px; height: 24px; object-fit: cover; border-radius: 3px;">
+                                            <img src="${convertToLocalPath(role.image)}" style="width: 24px; height: 24px; object-fit: cover; border-radius: 3px;">
                                             <span>${role.name}</span>
                                         </span>
                                     `;
@@ -2035,7 +2055,7 @@ function loadScriptConfigToModal() {
                         <div class="custom-team-roles-container" style="display: flex; flex-wrap: wrap; gap: 8px; padding: 10px; background: rgba(0,0,0,0.05); border-radius: 4px; min-height: 40px;">
                             ${team.roles && team.roles.length > 0 ? team.roles.map(role => `
                                 <span style="display: inline-flex; align-items: center; gap: 5px; padding: 4px 8px; background: rgba(107, 70, 193, 0.1); border-radius: 4px; font-size: 12px; color: #6b46c1;">
-                                    <img src="${role.image}" style="width: 24px; height: 24px; object-fit: cover; border-radius: 3px;">
+                                    <img src="${convertToLocalPath(role.image)}" style="width: 24px; height: 24px; object-fit: cover; border-radius: 3px;">
                                     <span>${role.name}</span>
                                     <button onclick="removeRoleFromCustomTeam(${index}, '${role.id}')" style="margin-left: 5px; padding: 2px 6px; background: #dc3545; color: white; border: none; border-radius: 3px; font-size: 10px; cursor: pointer;">×</button>
                                 </span>
@@ -2227,7 +2247,7 @@ function addCustomTeam() {
                                 }
                                 return selectedRoles.map(role => `
                                     <span style="display: inline-flex; align-items: center; gap: 5px; padding: 4px 8px; background: rgba(107, 70, 193, 0.1); border-radius: 4px; font-size: 12px; color: #6b46c1; cursor: pointer; hover: background: rgba(107, 70, 193, 0.2);" onclick="addRoleToCustomTeam(${newIndex}, '${role.id}')">
-                                        <img src="${role.image}" style="width: 24px; height: 24px; object-fit: cover; border-radius: 3px;">
+                                        <img src="${convertToLocalPath(role.image)}" style="width: 24px; height: 24px; object-fit: cover; border-radius: 3px;">
                                         <span>${role.name}</span>
                                     </span>
                                 `).join('');
@@ -2288,7 +2308,7 @@ function updateCustomTeamRolesContainers() {
                 if (team && team.roles && team.roles.length > 0) {
                     container.innerHTML = team.roles.map(role => `
                         <span style="display: inline-flex; align-items: center; gap: 5px; padding: 4px 8px; background: rgba(107, 70, 193, 0.1); border-radius: 4px; font-size: 12px; color: #6b46c1;">
-                            <img src="${role.image}" style="width: 24px; height: 24px; object-fit: cover; border-radius: 3px;">
+                            <img src="${convertToLocalPath(role.image)}" style="width: 24px; height: 24px; object-fit: cover; border-radius: 3px;">
                             <span>${role.name}</span>
                             <button onclick="removeRoleFromCustomTeam(${index}, '${role.id}')" style="margin-left: 5px; padding: 2px 6px; background: #dc3545; color: white; border: none; border-radius: 3px; font-size: 10px; cursor: pointer;">×</button>
                         </span>

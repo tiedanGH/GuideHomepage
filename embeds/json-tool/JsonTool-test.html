@@ -7892,7 +7892,7 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                                         </button>
                                     </div>
                                 </div>
-                                ${role.ability ? `<div class="selected-role-ability" onclick="toggleRoleSelection('${role.id}')">${role.ability}</div>` : ''}
+                                ${role.ability ? `<div class="selected-role-ability" onclick="toggleRoleSelection('${role.id}')">${highlightAbility(role.ability)}</div>` : ''}
                             </div>
                         `;
                     });
@@ -10072,10 +10072,18 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
             "ganshirenCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/ganshiren.png",
             "humeiniangCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/humeiniang.png",
             "jinweijunCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/jinweijun.png",
+            "oldmengpoCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/mengpo.png",
+            "mengpoCustomVER": "https://clocktower-wiki.gstonegames.com/images/thumb/e/e4/Mengpo.png/180px-Mengpo.png",
             "yanggurenCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/yangguren.png",
+            "oldgudiaoCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/gudiao.png",
             "gudiaoCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/gudiao.png",
-            "huapiCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/huapi.png",
-            
+            "oldhuapiCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/huapi.png",
+            "huapiCustomVER": "https://clocktower-wiki.gstonegames.com/images/thumb/5/59/Huapi.png/400px-Huapi.png",
+            "oldpit-hagCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/pit-hag.png",
+            "oldharpyCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/harpy.png",
+            "oldorgan_grinderCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/organ_grinder.png",
+            "oldboomdandyCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/boomdandy.png",
+         
             // 恶魔
             "impCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/imp.png",
             "zombuulCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/zombuul.png",
@@ -10088,6 +10096,7 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
             "vortoxCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/vortox.png",
             "ojoCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/ojo.png",
             "riotCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/riot.png",
+            "oldriotCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/riot.png",
             "lord_of_typhonCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/lord_of_typhon.png",
             "al_hadikhiaCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/al-hadikhia.png",
             "legionCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/legion.png",
@@ -10102,10 +10111,11 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
             "taowuCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/taowu.png",
             "baojunCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/baojun.png",
             "dianyuzhangCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/dianyuzhang.png",
-            "guhuoniaoCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/guhuoniao.png",
+            "guhuoniaoCustomVER": "https://clocktower-wiki.gstonegames.com/images/thumb/3/38/Guhuoniao.png/400px-Guhuoniao.png",
+            "oldguhuoniaoCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/guhuoniao.png",
             "jianningCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/jianning.png",
             "yanluoCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/yanluo.png",
-            
+            "oldlil_monstaCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/lil_monsta.png",
             // 旅行者
             "bureaucratCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/bureaucrat.png",
             "beggarCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/beggar.png",
@@ -11043,8 +11053,8 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                     ` : '';
                 }).join('');
 
-                // 处理技能描述（不使用高亮）
-                const highlightedAbility = role.ability;
+                // 处理技能描述（应用高亮）
+                const highlightedAbility = highlightAbility(role.ability);
 
                 // 完全按照 ScriptMaker-master 的 HTML 结构
                 // charImageContainer + chartextrow (charnamerow + charability)
