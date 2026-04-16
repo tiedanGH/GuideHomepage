@@ -165,12 +165,12 @@ async function generateScriptImageV2() {
                 
                 // 定义元信息角色映射
                 const metaRolesMap = {
-                    'minioninfo': { firstNight: 2000, name: '爪牙信息', image: 'https://i.postimg.cc/xjyVwRFr/180px-Mi.png' },
-                    'demoninfo': { firstNight: 3000, name: '恶魔信息', image: 'https://i.postimg.cc/8kbxKCjC/180px-Di.png' },
-                    'twilight': { firstNight: -100, otherNight: -100, name: '黄昏', image: 'https://i.postimg.cc/FFcwM1Lb/dusk-CLd-DXn-QC.jpg' },
-                    'dawn': { firstNight: 12700, otherNight: 15000, name: '黎明', image: 'https://i.postimg.cc/mr6CyQNY/dawn.jpg' },
-                    '黄昏': { firstNight: -100, otherNight: -100, name: '黄昏', image: 'https://i.postimg.cc/FFcwM1Lb/dusk-CLd-DXn-QC.jpg' },
-                    '黎明': { firstNight: 12700, otherNight: 15000, name: '黎明', image: 'https://i.postimg.cc/mr6CyQNY/dawn.jpg' }
+                    'minioninfo': { firstNight: 2000, name: '爪牙信息', image: 'images/180px-Mi.png' },
+                    'demoninfo': { firstNight: 3000, name: '恶魔信息', image: 'images/180px-Di.png' },
+                    'twilight': { firstNight: -100, otherNight: -100, name: '黄昏', image: 'images/dusk-CLd-DXn-QC.jpg' },
+                    'dawn': { firstNight: 12700, otherNight: 15000, name: '黎明', image: 'images/dawn.jpg' },
+                    '黄昏': { firstNight: -100, otherNight: -100, name: '黄昏', image: 'images/dusk-CLd-DXn-QC.jpg' },
+                    '黎明': { firstNight: 12700, otherNight: 15000, name: '黎明', image: 'images/dawn.jpg' }
                 };
                 
                 // 优先使用metaInfoJson中的夜间顺序
@@ -1132,10 +1132,10 @@ async function generateJinxAndConfigImage() {
                 
                 // 定义特殊角色映射
                 const specialRolesMap = {
-                    'twilight': { firstNight: 0, name: '黄昏', image: 'https://i.postimg.cc/FFcwM1Lb/dusk-CLd-DXn-QC.jpg' },
-                    'minioninfo': { firstNight: 2000, name: '爪牙信息', image: 'https://i.postimg.cc/xjyVwRFr/180px-Mi.png' },
-                    'demoninfo': { firstNight: 3000, name: '恶魔信息', image: 'https://i.postimg.cc/8kbxKCjC/180px-Di.png' },
-                    'dawn': { firstNight: 9999, name: '黎明', image: 'https://i.postimg.cc/mr6CyQNY/dawn.jpg' }
+                    'twilight': { firstNight: 0, name: '黄昏', image: 'images/dusk-CLd-DXn-QC.jpg' },
+                    'minioninfo': { firstNight: 2000, name: '爪牙信息', image: 'images/180px-Mi.png' },
+                    'demoninfo': { firstNight: 3000, name: '恶魔信息', image: 'images/180px-Di.png' },
+                    'dawn': { firstNight: 9999, name: '黎明', image: 'images/dawn.jpg' }
                 };
                 
                 // 处理首夜顺序
