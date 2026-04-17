@@ -167,10 +167,10 @@ async function generateScriptImageV2() {
                 const metaRolesMap = {
                     'minioninfo': { firstNight: 2000, name: '爪牙信息', image: 'images/180px-Mi.png' },
                     'demoninfo': { firstNight: 3000, name: '恶魔信息', image: 'images/180px-Di.png' },
-                    'twilight': { firstNight: -100, otherNight: -100, name: '黄昏', image: 'images/dusk-CLd-DXn-QC.jpg' },
-                    'dawn': { firstNight: 12700, otherNight: 15000, name: '黎明', image: 'images/dawn.jpg' },
-                    '黄昏': { firstNight: -100, otherNight: -100, name: '黄昏', image: 'images/dusk-CLd-DXn-QC.jpg' },
-                    '黎明': { firstNight: 12700, otherNight: 15000, name: '黎明', image: 'images/dawn.jpg' }
+                    'twilight': { firstNight: -100, otherNight: -100, name: '黄昏', image: 'images/dusk-CLd-DXn-QC.png' },
+                    'dawn': { firstNight: 12700, otherNight: 15000, name: '黎明', image: 'images/dawn.png' },
+                    '黄昏': { firstNight: -100, otherNight: -100, name: '黄昏', image: 'images/dusk-CLd-DXn-QC.png' },
+                    '黎明': { firstNight: 12700, otherNight: 15000, name: '黎明', image: 'images/dawn.png' }
                 };
                 
                 // 优先使用metaInfoJson中的夜间顺序
@@ -1198,30 +1198,30 @@ async function generateJinxAndConfigImage() {
                 if (metaInfoJson.firstNight && metaInfoJson.firstNight.length > 0 && metaInfoJson.firstNight[0] !== "") {
                     // 使用metaInfoJson中的顺序时，只添加黄昏和黎明
                     metaFirstNight = [
-                        { firstNight: -100, name: '黄昏', image: 'https://www.bloodstar.xyz/p/Haimian0421/image4/2_image4.png' },
-                        { firstNight: 12700, name: '黎明', image: 'https://www.bloodstar.xyz/p/shifenfantuan/jiuban/newcharacter3_jiuban.png' }
+                        { firstNight: -100, name: '黄昏', image: 'images/dusk-CLd-DXn-QC.png' },
+                        { firstNight: 12700, name: '黎明', image: 'images/dawn.png' }
                     ];
                 } else {
                     // 使用默认顺序时，添加所有元信息图标
                     metaFirstNight = [
-                        { firstNight: -100, name: '黄昏', image: 'https://www.bloodstar.xyz/p/Haimian0421/image4/2_image4.png' },
-                        { firstNight: 2000, name: '爪牙信息', image: 'https://www.bloodstar.xyz/p/Haimian0421/image4/1_image4.png' },
-                        { firstNight: 3000, name: '恶魔信息', image: 'https://www.bloodstar.xyz/p/Haimian0421/image4/_image4.png' },
-                        { firstNight: 12700, name: '黎明', image: 'https://www.bloodstar.xyz/p/shifenfantuan/jiuban/newcharacter3_jiuban.png' }
+                        { firstNight: -100, name: '黄昏', image: 'images/dusk-CLd-DXn-QC.png' },
+                        { firstNight: 2000, name: '爪牙信息', image: 'images/180px-Mi.png' },
+                        { firstNight: 3000, name: '恶魔信息', image: 'images/180px-Di.png' },
+                        { firstNight: 12700, name: '黎明', image: 'images/dawn.png' }
                     ];
                 }
                 
                 if (metaInfoJson.otherNight && metaInfoJson.otherNight.length > 0 && metaInfoJson.otherNight[0] !== "") {
                     // 使用metaInfoJson中的顺序时，只添加黄昏和黎明
                     metaOtherNight = [
-                        { otherNight: -100, name: '黄昏', image: 'https://www.bloodstar.xyz/p/Haimian0421/image4/2_image4.png' },
-                        { otherNight: 15000, name: '黎明', image: 'https://www.bloodstar.xyz/p/shifenfantuan/jiuban/newcharacter3_jiuban.png' }
+                        { otherNight: -100, name: '黄昏', image: 'images/dusk-CLd-DXn-QC.png' },
+                        { otherNight: 15000, name: '黎明', image: 'images/dawn.png' }
                     ];
                 } else {
                     // 使用默认顺序时，添加所有元信息图标
                     metaOtherNight = [
-                        { otherNight: -100, name: '黄昏', image: 'https://www.bloodstar.xyz/p/Haimian0421/image4/2_image4.png' },
-                        { otherNight: 15000, name: '黎明', image: 'https://www.bloodstar.xyz/p/shifenfantuan/jiuban/newcharacter3_jiuban.png' }
+                        { otherNight: -100, name: '黄昏', image: 'images/dusk-CLd-DXn-QC.png' },
+                        { otherNight: 15000, name: '黎明', image: 'images/dawn.png' }
                     ];
                 }
                 
@@ -1310,12 +1310,12 @@ async function generateJinxAndConfigImage() {
                 
                 // 构建首夜顺序HTML（左侧）
                 const firstNightHtml = allFirstNightRoles.map(role => `
-                    <img src="${convertToLocalPath(role.image)}" style="height: 40px; margin: -5px 0; padding: 0 2px; object-fit: cover; display: block;">
+                    <img src="${convertToLocalPath(role.image)}" style="width: 45px; height: 45px; margin: -5px 0; object-fit: cover; display: block;">
                 `).join('');
                 
                 // 构建其他夜晚顺序HTML（右侧）
                 const otherNightHtml = allOtherNightRoles.map(role => `
-                    <img src="${convertToLocalPath(role.image)}" style="height: 40px; margin: -5px 0; padding: 0 2px; object-fit: cover; display: block; transform: rotate(180deg);">
+                    <img src="${convertToLocalPath(role.image)}" style="width: 45px; height: 45px; margin: -5px 0; object-fit: cover; display: block; transform: rotate(180deg);">
                 `).join('');
                 
                 // 构建剧本标题（顶部居中）

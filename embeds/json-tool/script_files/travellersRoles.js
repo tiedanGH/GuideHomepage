@@ -405,7 +405,7 @@ const travellersRoles = [
                 "pinyin": "xiaojiang",
                 "pinyinsuoxie": "xj",
                 "image": "images/cacklejack.png",
-                "ability": "Each day, choose a player: a different player changes character tonight.（每个白天，你要选择一名玩家，当晚另一名玩家的角色会改变。）",
+                "ability": "每个白天，你要选择一名玩家，当晚另一名玩家的角色会改变。",
                 "scripts": ["旅行者"],
                 "firstNight": 0,
                 "otherNight": 118,

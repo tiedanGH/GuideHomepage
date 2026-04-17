@@ -2847,6 +2847,16 @@
                                 </div>
                             </div>
 
+                            <!-- 自制角色 -->
+                            <div class="role-subcategory" id="dir-roles-container" style="display: none;">
+                                <h4 class="category-title" onclick="toggleRoleCategory('dir')">
+                                    <span class="category-name">🎨 自制角色</span>
+                                    <span class="toggle-icon">▼</span>
+                                </h4>
+                                <div class="role-columns" id="dir-columns">
+                                </div>
+                            </div>
+
                             <!-- 随机选择工具 -->
                             <div class="random-selection-tool" style="background: var(--card-bg-color); padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-top: 20px;">
                                 <h2 style="color: #4667ae; margin-bottom: 15px;">随机选择工具</h2>
@@ -2878,9 +2888,9 @@
                         </div>
                     </div>
                 </div>
-
-
             </div>
+
+
         </div>
 
         <!-- 右侧栏 - 按钮操作区 -->
@@ -2930,9 +2940,21 @@
                 <button class="action-btn-warning" onclick="openRuleQueryModal()">🔍 规则查询</button>
                 <button class="action-btn-warning" onclick="toggleDirInput()">➕ 添加自制角色</button>
                 <button class="action-btn-warning" onclick="toggleMetaInfoInput()">📝 添加剧本信息</button>
-                <button class="action-btn-warning" onclick="toggleJinxEditor()">⚖️ 添加相克规则</button>
                 <button class="action-btn-primary" onclick="toggleScriptConfigModal()">🎨 剧本图设置</button>
                 <button class="action-btn-danger" onclick="clearAllSelections()" style="background: linear-gradient(135deg, #e53e3e 0%, #f56565 100%);">🗑️ 清空选择</button>
+
+                <!-- JSON编辑区 -->
+                <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-color);">
+                    <h3 style="margin: 0 0 12px 0; font-size: 14px; font-weight: 600; color: var(--text-color); display: flex; justify-content: space-between; align-items: center;">
+                        📄 JSON编辑 <button onclick="toggleJsonEditor()" style="background: none; border: none; cursor: pointer; font-size: 12px; color: var(--primary-color);">收起▲</button>
+                    </h3>
+                    <div id="json-editor-container">
+                        <textarea id="json-editor" style="width: 100%; min-height: 900px; max-height: 900px; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; font-family: 'Courier New', monospace; font-size: 12px; resize: vertical; box-sizing: border-box;" placeholder="生成的JSON将显示在这里，您可以手动修改..."></textarea>
+                        <div style="margin-top: 8px;">
+                            <button onclick="updateFromJsonEditor()" style="width: 100%; padding: 8px 12px; background: var(--primary-gradient); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600;">应用修改</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -2983,17 +3005,52 @@
             const jsonData = [];
             jsonData.push(metaInfoJson);
             
+            // 收集所有角色对象
+            const allRoles = [];
+            
             // 添加选中的官方角色
             selectedRoleIds.forEach(roleId => {
                 const role = getRoleJson(roleId);
                 if (role) {
+                    allRoles.push(role);
                     jsonData.push(role);
                 }
             });
             
             // 添加自制角色
             dirRolesJson.forEach(role => {
+                allRoles.push(role);
                 jsonData.push(role);
+            });
+            
+            // 添加相克规则
+            const selectedRoleNames = allRoles.map(role => role.name);
+            const selectedRoleMap = {};
+            allRoles.forEach(role => {
+                selectedRoleMap[role.name] = role;
+            });
+
+            const jinxData = (typeof window.jinxes !== 'undefined') ? window.jinxes : jinxes;
+            const relevantJinxes = jinxData.filter(jinx => {
+                return selectedRoleNames.includes(jinx.jinxRole1) && selectedRoleNames.includes(jinx.jinxRole2);
+            });
+
+            relevantJinxes.forEach(jinx => {
+                // 查找对应的角色对象
+                const role1 = selectedRoleMap[jinx.jinxRole1];
+                const role2 = selectedRoleMap[jinx.jinxRole2];
+                
+                if (role1 && role2) {
+                    const jinxMeta = {
+                        "id": `Jinx:${role1.id}&${role2.id}`,
+                        "image": role1.image || "",
+                        "name": `${jinx.jinxRole1}&${jinx.jinxRole2}`,
+                        "team": "a jinxed",
+                        "setup": false,
+                        "ability": jinx.jinxRule
+                    };
+                    jsonData.push(jinxMeta);
+                }
             });
             
             // 转换为JSON字符串
@@ -3057,17 +3114,52 @@
             const jsonData = [];
             jsonData.push(metaInfoJson);
             
+            // 收集所有角色对象
+            const allRoles = [];
+            
             // 添加选中的官方角色
             selectedRoleIds.forEach(roleId => {
                 const role = getRoleJson(roleId);
                 if (role) {
+                    allRoles.push(role);
                     jsonData.push(role);
                 }
             });
             
             // 添加自制角色
             dirRolesJson.forEach(role => {
+                allRoles.push(role);
                 jsonData.push(role);
+            });
+            
+            // 添加相克规则
+            const selectedRoleNames = allRoles.map(role => role.name);
+            const selectedRoleMap = {};
+            allRoles.forEach(role => {
+                selectedRoleMap[role.name] = role;
+            });
+
+            const jinxData = (typeof window.jinxes !== 'undefined') ? window.jinxes : jinxes;
+            const relevantJinxes = jinxData.filter(jinx => {
+                return selectedRoleNames.includes(jinx.jinxRole1) && selectedRoleNames.includes(jinx.jinxRole2);
+            });
+
+            relevantJinxes.forEach(jinx => {
+                // 查找对应的角色对象
+                const role1 = selectedRoleMap[jinx.jinxRole1];
+                const role2 = selectedRoleMap[jinx.jinxRole2];
+                
+                if (role1 && role2) {
+                    const jinxMeta = {
+                        "id": `Jinx:${role1.id}&${role2.id}`,
+                        "image": role1.image || "",
+                        "name": `${jinx.jinxRole1}&${jinx.jinxRole2}`,
+                        "team": "a jinxed",
+                        "setup": false,
+                        "ability": jinx.jinxRule
+                    };
+                    jsonData.push(jinxMeta);
+                }
             });
             
             // 转换为JSON字符串
@@ -3080,6 +3172,174 @@
                 console.error('复制失败:', err);
                 alert("复制失败，请手动复制！");
             });
+        }
+
+        // 更新JSON编辑器内容
+        function updateJsonEditor() {
+            const selectedRoleIds = [];
+            document.querySelectorAll('.role-item:not(.hidden) input[type="checkbox"]:checked').forEach(checkbox => {
+                selectedRoleIds.push(checkbox.value);
+            });
+            
+            if (selectedRoleIds.length === 0 && dirRolesJson.length === 0) {
+                document.getElementById('json-editor').value = '';
+                return;
+            }
+            
+            const metaInfoJson = {
+                "id": "_meta",
+                "name": "",
+                "author": "",
+                "logo": "",
+                "hideTitle": false,
+                "background": "https://botc.app/assets/background1-C0iW8pNy.webp",
+                "almanac": "",
+                "bootlegger": [""],
+                "firstNight": [""],
+                "otherNight": [""],
+                "a jinxed": "相克",
+                "a jinxedName": "相克",
+                "b jinxed": "相克",
+                "b jinxedName": "相克",
+                "state": [],
+                "description": ""
+            };
+            
+            const jsonData = [];
+            jsonData.push(metaInfoJson);
+            
+            // 收集所有角色对象
+            const allRoles = [];
+            
+            selectedRoleIds.forEach(roleId => {
+                const role = getRoleJson(roleId);
+                if (role) {
+                    allRoles.push(role);
+                    jsonData.push(role);
+                }
+            });
+            
+            dirRolesJson.forEach(role => {
+                allRoles.push(role);
+                jsonData.push(role);
+            });
+            
+            // 添加相克规则
+            const selectedRoleNames = allRoles.map(role => role.name);
+            const selectedRoleMap = {};
+            allRoles.forEach(role => {
+                selectedRoleMap[role.name] = role;
+            });
+
+            const jinxData = (typeof window.jinxes !== 'undefined') ? window.jinxes : jinxes;
+            const relevantJinxes = jinxData.filter(jinx => {
+                return selectedRoleNames.includes(jinx.jinxRole1) && selectedRoleNames.includes(jinx.jinxRole2);
+            });
+
+            relevantJinxes.forEach(jinx => {
+                // 查找对应的角色对象
+                const role1 = selectedRoleMap[jinx.jinxRole1];
+                const role2 = selectedRoleMap[jinx.jinxRole2];
+                
+                if (role1 && role2) {
+                    const jinxMeta = {
+                        "id": `Jinx:${role1.id}&${role2.id}`,
+                        "image": role1.image || "",
+                        "name": `${jinx.jinxRole1}&${jinx.jinxRole2}`,
+                        "team": "a jinxed",
+                        "setup": false,
+                        "ability": jinx.jinxRule
+                    };
+                    jsonData.push(jinxMeta);
+                }
+            });
+            
+            const jsonString = JSON.stringify(jsonData, null, 4);
+            document.getElementById('json-editor').value = jsonString;
+        }
+
+        // 从JSON编辑器应用修改
+        function updateFromJsonEditor() {
+            const jsonEditor = document.getElementById('json-editor');
+            try {
+                const jsonData = JSON.parse(jsonEditor.value);
+                
+                if (!Array.isArray(jsonData)) {
+                    alert('JSON格式错误：期望一个数组');
+                    return;
+                }
+                
+                const metaInfo = jsonData.find(item => item.id === '_meta');
+                const roles = jsonData.filter(item => item.id !== '_meta');
+                
+                // 更新选中的角色复选框
+                document.querySelectorAll('.role-item input[type="checkbox"]').forEach(checkbox => {
+                    checkbox.checked = roles.some(role => role.id === checkbox.value);
+                });
+                
+                // 更新自制角色
+                dirRolesJson = roles.filter(role => role.id && role.id.startsWith('custom-'));
+                
+                // 更新已选角色显示
+                updateSelectedRolesDisplay();
+                
+                // 如果有meta信息，更新剧本信息
+                if (metaInfo) {
+                    updateMetaInfoFromJson(metaInfo);
+                }
+                
+                alert('JSON修改已应用！');
+            } catch (e) {
+                alert('JSON格式错误：' + e.message);
+            }
+        }
+
+        // 从JSON更新剧本信息
+        function updateMetaInfoFromJson(metaInfo) {
+            const metaInfoDiv = document.getElementById('meta-info-display');
+            if (metaInfoDiv && metaInfo.name) {
+                metaInfoDiv.querySelector('.meta-info-name').textContent = metaInfo.name;
+            }
+        }
+
+        // 格式化JSON编辑器
+        function formatJsonEditor() {
+            const jsonEditor = document.getElementById('json-editor');
+            try {
+                const jsonData = JSON.parse(jsonEditor.value);
+                jsonEditor.value = JSON.stringify(jsonData, null, 4);
+            } catch (e) {
+                alert('JSON格式错误：' + e.message);
+            }
+        }
+
+        // 从JSON编辑器复制
+        function copyJsonFromEditor() {
+            const jsonEditor = document.getElementById('json-editor');
+            if (!jsonEditor.value.trim()) {
+                alert('JSON编辑器为空，请先生成JSON！');
+                return;
+            }
+            navigator.clipboard.writeText(jsonEditor.value).then(function() {
+                alert('JSON已复制到剪贴板！');
+            }).catch(function(err) {
+                console.error('复制失败:', err);
+                alert('复制失败，请手动复制！');
+            });
+        }
+
+        // 切换JSON编辑器显示
+        function toggleJsonEditor() {
+            const container = document.getElementById('json-editor-container');
+            const btn = container.previousElementSibling.querySelector('button');
+            if (container.style.display === 'none') {
+                container.style.display = 'block';
+                btn.textContent = '收起▲';
+                updateJsonEditor();
+            } else {
+                container.style.display = 'none';
+                btn.textContent = '展开▼';
+            }
         }
         
         // 复制JSON到剪贴板并生成URL
@@ -3120,17 +3380,52 @@
             const jsonData = [];
             jsonData.push(metaInfoJson);
             
+            // 收集所有角色对象
+            const allRoles = [];
+            
             // 添加选中的官方角色
             selectedRoleIds.forEach(roleId => {
                 const role = getRoleJson(roleId);
                 if (role) {
+                    allRoles.push(role);
                     jsonData.push(role);
                 }
             });
             
             // 添加自制角色
             dirRolesJson.forEach(role => {
+                allRoles.push(role);
                 jsonData.push(role);
+            });
+            
+            // 添加相克规则
+            const selectedRoleNames = allRoles.map(role => role.name);
+            const selectedRoleMap = {};
+            allRoles.forEach(role => {
+                selectedRoleMap[role.name] = role;
+            });
+
+            const jinxData = (typeof window.jinxes !== 'undefined') ? window.jinxes : jinxes;
+            const relevantJinxes = jinxData.filter(jinx => {
+                return selectedRoleNames.includes(jinx.jinxRole1) && selectedRoleNames.includes(jinx.jinxRole2);
+            });
+
+            relevantJinxes.forEach(jinx => {
+                // 查找对应的角色对象
+                const role1 = selectedRoleMap[jinx.jinxRole1];
+                const role2 = selectedRoleMap[jinx.jinxRole2];
+                
+                if (role1 && role2) {
+                    const jinxMeta = {
+                        "id": `Jinx:${role1.id}&${role2.id}`,
+                        "image": role1.image || "",
+                        "name": `${jinx.jinxRole1}&${jinx.jinxRole2}`,
+                        "team": "a jinxed",
+                        "setup": false,
+                        "ability": jinx.jinxRule
+                    };
+                    jsonData.push(jinxMeta);
+                }
             });
             
             // 转换为JSON字符串
@@ -3928,6 +4223,72 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
             updateRoleVisibility();
         }
 
+        // 动态加载自制角色
+        function loadDirRoles() {
+            // 获取自制角色容器
+            const dirColumns = document.getElementById('dir-columns');
+            const dirRolesContainer = document.getElementById('dir-roles-container');
+
+            if (!dirColumns) return;
+
+            // 如果没有自制角色，隐藏容器
+            if (!dirRolesJson || dirRolesJson.length === 0) {
+                if (dirRolesContainer) {
+                    dirRolesContainer.style.display = 'none';
+                }
+                return;
+            }
+
+            // 显示自制角色容器
+            if (dirRolesContainer) {
+                dirRolesContainer.style.display = 'block';
+            }
+
+            // 保存当前选中的角色ID
+            const checkedRoleIds = Array.from(dirColumns.querySelectorAll('input[type="checkbox"]:checked'))
+                .map(checkbox => checkbox.value);
+
+            dirColumns.innerHTML = ''; // 清空容器
+
+            // 创建单列
+            const column1 = document.createElement('div');
+            column1.className = 'role-column';
+
+            // 添加所有自制角色
+            for (let i = 0; i < dirRolesJson.length; i++) {
+                const role = dirRolesJson[i];
+                const div = document.createElement('div');
+                div.className = 'role-item';
+                div.dataset.scripts = role.scripts ? role.scripts.join(',') : '';
+                div.dataset.ability = role.ability || '';
+                div.dataset.team = role.team || '';
+
+                // 检查角色是否之前被选中
+                const isChecked = checkedRoleIds.includes(role.id);
+
+                // 构建角色项HTML
+                div.innerHTML = `
+                    <img src="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22%23f0f0f0%22/><text x=%2250%22 y=%2260%22 text-anchor=%22middle%22 font-size=%2230%22> ${role.name.charAt(0)} </text></svg>" data-src="${role.image || ''}" alt="${role.name}" class="role-item-img lazy-load" data-retry="0" data-max-retry="3">
+                    <div>
+                        <div>
+                            <label>
+                                <input type="checkbox" value="${role.id}" name="${role.name}" ${isChecked ? 'checked' : ''} onchange="updateSelectedRolesDisplay()">
+                                <span class="role-name">${role.name}</span>
+                            </label>
+                        </div>
+                        <div class="role-ability" style="font-size: 12px; color: #666; margin-top: 4px; display: none;">${role.ability || ''}</div>
+                    </div>
+                `;
+                column1.appendChild(div);
+            }
+
+            // 将列添加到容器
+            dirColumns.appendChild(column1);
+
+            // 初始更新角色可见性
+            updateRoleVisibility();
+        }
+
 
         // 更新角色可见性
         function updateRoleVisibility() {
@@ -3939,9 +4300,10 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                 const roleScripts = item.dataset.scripts ? item.dataset.scripts.split(',') : [];
                 const team = item.dataset.team;
                 
-                // 传奇角色和旅行者始终显示
+                // 传奇角色、旅行者和自制角色始终显示
                 const isFabledOrTraveller = team === 'fabled' || team === 'traveller' || team === '传奇角色' || team === '旅行者';
-                const shouldShow = isFabledOrTraveller || roleScripts.some(script => selectedScripts.includes(script));
+                const isCustomRole = item.closest('#dir-columns');
+                const shouldShow = isFabledOrTraveller || isCustomRole || roleScripts.some(script => selectedScripts.includes(script));
 
                 if (shouldShow) {
                     item.classList.remove('hidden');
@@ -4376,13 +4738,13 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
             
             // 添加到自制角色数组
             dirRolesJson.push(newRole);
-            
+
             // 关闭表单
             cancelAddRole();
-            
-            // 刷新角色列表
-            updateRoleVisibility();
-            
+
+            // 刷新自制角色列表
+            loadDirRoles();
+
             alert('自制角色添加成功！');
         }
         
@@ -5955,6 +6317,36 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
             // 添加剧本信息
             jsonData.push(metaInfoJson);
 
+            // 添加相克规则
+            const selectedRoleNames = editionRolesJson.map(role => role.name);
+            const selectedRoleMap = {};
+            editionRolesJson.forEach(role => {
+                selectedRoleMap[role.name] = role;
+            });
+
+            const jinxData = (typeof window.jinxes !== 'undefined') ? window.jinxes : jinxes;
+            const relevantJinxes = jinxData.filter(jinx => {
+                return selectedRoleNames.includes(jinx.jinxRole1) && selectedRoleNames.includes(jinx.jinxRole2);
+            });
+
+            relevantJinxes.forEach(jinx => {
+                // 查找对应的角色对象
+                const role1 = selectedRoleMap[jinx.jinxRole1];
+                const role2 = selectedRoleMap[jinx.jinxRole2];
+                
+                if (role1 && role2) {
+                    const jinxMeta = {
+                        "id": `Jinx:${role1.id}&${role2.id}`,
+                        "image": role1.image || "",
+                        "name": `${jinx.jinxRole1}&${jinx.jinxRole2}`,
+                        "team": "a jinxed",
+                        "setup": false,
+                        "ability": jinx.jinxRule
+                    };
+                    jsonData.push(jinxMeta);
+                }
+            });
+
             // 添加角色数据
             editionRolesJson.forEach(role => {
                 // 替换image字段为完整URL
@@ -6794,7 +7186,8 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
             );
 
             // 查询相克规则
-            const foundJinx = jinxes.find(jinx =>
+            const jinxData = (typeof window.jinxes !== 'undefined') ? window.jinxes : jinxes;
+            const foundJinx = jinxData.find(jinx =>
                 (jinx.jinxRole1 === role1 && jinx.jinxRole2 === role2) ||
                 (jinx.jinxRole1 === role2 && jinx.jinxRole2 === role1)
             );
@@ -6928,259 +7321,7 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
             });
         }
 
-        // 相克规则编辑器函数
-        function toggleJinxEditor() {
-            // 创建相克规则编辑器弹窗
-            const addForm = document.createElement('div');
-            addForm.id = 'add-jinx-form';
-            addForm.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0, 0, 0, 0.5);
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                z-index: 1000;
-            `;
-            
-            const formContent = document.createElement('div');
-            formContent.style.cssText = `
-                background: white;
-                padding: 24px;
-                border-radius: 16px;
-                width: 90%;
-                max-width: 800px;
-                max-height: 90vh;
-                overflow-y: auto;
-                box-shadow: var(--shadow-xl);
-            `;
-            
-            formContent.innerHTML = `
-                <h2 style="color: #e6d708; margin-bottom: 24px; text-align: center;">相克规则编辑器（非必要）</h2>
-                
-                <!-- 添加新相克规则的表单 -->
-                <div style="margin-bottom: 30px; padding: 20px; background: #f8f9fa; border-radius: 12px;">
-                    <h3 style="margin-top: 0; margin-bottom: 20px; color: #333;">添加新相克规则</h3>
-                    <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: flex-start; margin-bottom: 15px;">
-                        <div style="flex: 1; min-width: 200px; position: relative;">
-                            <h4 style="margin-bottom: 8px; color: var(--text-color); font-weight: 600;">角色1 <span style="color: red;">*</span></h4>
-                            <input type="text" id="new-jinx-role1" placeholder="中文名、拼音首字母搜角色..." style="width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: 12px; font-size: 16px; transition: all 0.3s ease;">
-                            <div id="jinx-role1-search-results" class="search-results-dropdown"></div>
-                        </div>
-                        <div style="flex: 1; min-width: 200px; position: relative;">
-                            <h4 style="margin-bottom: 8px; color: var(--text-color); font-weight: 600;">角色2 <span style="color: red;">*</span></h4>
-                            <input type="text" id="new-jinx-role2" placeholder="中文名、拼音首字母搜角色..." style="width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: 12px; font-size: 16px; transition: all 0.3s ease;">
-                            <div id="jinx-role2-search-results" class="search-results-dropdown"></div>
-                        </div>
-                    </div>
-                    <div style="margin-bottom: 15px;">
-                        <h4 style="margin-bottom: 8px; color: var(--text-color); font-weight: 600;">相克规则 <span style="color: red;">*</span></h4>
-                        <textarea id="new-jinx-rule" placeholder="输入相克规则描述" style="width: 100%; min-height: 100px; padding: 14px; border: 2px solid var(--border-color); border-radius: 12px; font-size: 16px; resize: vertical; transition: all 0.3s ease;"></textarea>
-                    </div>
-                    <button onclick="addJinxRule()" style="background: linear-gradient(135deg, #e6d708 0%, #ffeb3b 100%); color: #000; padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 600; transition: all 0.3s ease;">
-                        添加相克规则
-                    </button>
-                </div>
 
-                <!-- 现有相克规则列表 -->
-                <div>
-                    <h3 style="margin-top: 0; margin-bottom: 15px; color: #333;">现有相克规则（共 <span id="jinx-count">0</span> 条）</h3>
-                    <div id="jinx-list" style="max-height: 400px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 8px; padding: 15px;">
-                        <!-- 相克规则列表将动态生成 -->
-                    </div>
-                </div>
-                
-                <div class="button-container" style="display: flex; gap: 16px; margin-top: 30px;">
-                    <button onclick="cancelAddJinx()" style="flex: 1; padding: 14px 28px; font-size: 16px; font-weight: 600; border: none; border-radius: 16px; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: var(--shadow-md); margin-top: 0; background: linear-gradient(135deg, #718096 0%, #a0aec0 100%); color: white; position: relative; overflow: hidden;">关闭</button>
-                </div>
-            `;
-            
-            // 添加输入框聚焦效果
-            const inputs = formContent.querySelectorAll('input, textarea');
-            inputs.forEach(input => {
-                input.addEventListener('focus', function() {
-                    this.style.borderColor = 'var(--primary-color)';
-                    this.style.boxShadow = '0 0 0 3px rgba(107, 70, 193, 0.1)';
-                });
-                input.addEventListener('blur', function() {
-                    this.style.borderColor = 'var(--border-color)';
-                    this.style.boxShadow = 'none';
-                });
-            });
-            
-            // 设置相克规则编辑器搜索功能
-            setupJinxSearchInModal(formContent);
-            
-            // 更新相克规则列表
-            updateJinxListInModal(formContent);
-            
-            addForm.appendChild(formContent);
-            document.body.appendChild(addForm);
-        }
-
-        // 取消添加相克规则
-        function cancelAddJinx() {
-            const addForm = document.getElementById('add-jinx-form');
-            if (addForm) {
-                document.body.removeChild(addForm);
-            }
-        }
-
-        // 在模态框中设置相克规则编辑器角色搜索功能
-        function setupJinxSearchInModal(container) {
-            const role1Input = container.querySelector('#new-jinx-role1');
-            const role2Input = container.querySelector('#new-jinx-role2');
-            const role1Results = container.querySelector('#jinx-role1-search-results');
-            const role2Results = container.querySelector('#jinx-role2-search-results');
-
-            // 搜索函数
-            function searchRoles(input, resultsContainer) {
-                const query = input.value.trim().toLowerCase();
-                if (!query) {
-                    resultsContainer.style.display = 'none';
-                    return;
-                }
-
-                // 收集所有角色
-                const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demonsRoles, ...fabledRoles, ...travellersRoles];
-                
-                // 搜索匹配的角色
-                const matchedRoles = allRoles.filter(role => {
-                    const name = role.name.toLowerCase();
-                    return name.includes(query) || (role.pinyinsuoxie && role.pinyinsuoxie.toLowerCase().includes(query));
-                });
-
-                if (matchedRoles.length > 0) {
-                    resultsContainer.innerHTML = matchedRoles.map(role => `
-                        <div class="search-result-item" data-role="${role.name}">
-                            ${role.name}
-                        </div>
-                    `).join('');
-                    resultsContainer.style.display = 'block';
-
-                    // 添加点击事件
-                    resultsContainer.querySelectorAll('.search-result-item').forEach(item => {
-                        item.addEventListener('click', () => {
-                            input.value = item.dataset.role;
-                            resultsContainer.style.display = 'none';
-                        });
-                    });
-                } else {
-                    resultsContainer.style.display = 'none';
-                }
-            }
-
-            // 为两个输入框添加事件监听器
-            role1Input.addEventListener('input', () => searchRoles(role1Input, role1Results));
-            role2Input.addEventListener('input', () => searchRoles(role2Input, role2Results));
-
-            // 点击其他地方关闭搜索结果
-            document.addEventListener('click', (e) => {
-                if (!role1Input.contains(e.target) && !role1Results.contains(e.target)) {
-                    role1Results.style.display = 'none';
-                }
-                if (!role2Input.contains(e.target) && !role2Results.contains(e.target)) {
-                    role2Results.style.display = 'none';
-                }
-            });
-        }
-
-        // 在模态框中更新相克规则列表
-        function updateJinxListInModal(container) {
-            const jinxList = container.querySelector('#jinx-list');
-            const jinxCount = container.querySelector('#jinx-count');
-
-            jinxCount.textContent = jinxes.length;
-
-            if (jinxes.length === 0) {
-                jinxList.innerHTML = '<div style="text-align: center; color: #999; padding: 20px;">暂无相克规则</div>';
-                return;
-            }
-
-            jinxList.innerHTML = jinxes.map((jinx, index) => `
-                <div style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 12px;">
-                    <div style="font-weight: bold; margin-bottom: 8px;">${jinx.jinxRole1} ↔ ${jinx.jinxRole2}</div>
-                    <div style="font-size: 14px; color: #666; margin-bottom: 12px;">${jinx.jinxRule}</div>
-                    <button onclick="deleteJinxRule(${index})" style="background: #e53e3e; color: white; border: none; border-radius: 4px; padding: 6px 12px; font-size: 14px; cursor: pointer;">
-                        删除
-                    </button>
-                </div>
-            `).join('');
-        }
-
-        function addJinxRule() {
-            const role1 = document.getElementById('new-jinx-role1').value.trim();
-            const role2 = document.getElementById('new-jinx-role2').value.trim();
-            const rule = document.getElementById('new-jinx-rule').value.trim();
-
-            if (!role1 || !role2 || !rule) {
-                alert('请填写完整的相克规则信息');
-                return;
-            }
-
-            // 创建新的相克规则
-            const newJinx = {
-                jinxRole1: role1,
-                jinxRole2: role2,
-                jinxRule: rule
-            };
-
-            // 添加到相克规则数组
-            jinxes.push(newJinx);
-
-            // 更新弹窗中的相克规则列表
-            const addForm = document.getElementById('add-jinx-form');
-            if (addForm) {
-                updateJinxListInModal(addForm);
-            }
-
-            // 清空表单
-            document.getElementById('new-jinx-role1').value = '';
-            document.getElementById('new-jinx-role2').value = '';
-            document.getElementById('new-jinx-rule').value = '';
-
-            // 隐藏搜索结果
-            document.getElementById('jinx-role1-search-results').style.display = 'none';
-            document.getElementById('jinx-role2-search-results').style.display = 'none';
-
-            alert('相克规则添加成功！');
-        }
-
-        function updateJinxList() {
-            const jinxList = document.getElementById('jinx-list');
-            const jinxCount = document.getElementById('jinx-count');
-
-            jinxCount.textContent = jinxes.length;
-
-            if (jinxes.length === 0) {
-                jinxList.innerHTML = '<div style="text-align: center; color: #999; padding: 20px;">暂无相克规则</div>';
-                return;
-            }
-
-            jinxList.innerHTML = jinxes.map((jinx, index) => `
-                <div style="background: white; padding: 12px; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 10px;">
-                    <div style="font-weight: bold; margin-bottom: 5px;">${jinx.jinxRole1} ↔ ${jinx.jinxRole2}</div>
-                    <div style="font-size: 14px; color: #666; margin-bottom: 8px;">${jinx.jinxRule}</div>
-                    <button onclick="deleteJinxRule(${index})" style="background: #e53e3e; color: white; border: none; border-radius: 4px; padding: 4px 8px; font-size: 12px; cursor: pointer;">
-                        删除
-                    </button>
-                </div>
-            `).join('');
-        }
-
-        function deleteJinxRule(index) {
-            if (confirm('确定要删除这条相克规则吗？')) {
-                jinxes.splice(index, 1);
-                // 更新弹窗中的相克规则列表
-                const addForm = document.getElementById('add-jinx-form');
-                if (addForm) {
-                    updateJinxListInModal(addForm);
-                }
-            }
-        }
 
 
 
@@ -7493,11 +7634,6 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
             document.getElementById('random-minions').value = '4';
             document.getElementById('random-demons').value = '4';
 
-            // 清空自制角色
-            if (typeof dirRolesJson !== 'undefined') {
-                dirRolesJson = [];
-            }
-
             getSelectedRoles();
             updateSelectedRolesDisplay();
             updateSelectionCount();
@@ -7702,6 +7838,7 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
             loadRoles(demonsRoles, 'demons-columns');
             loadRoles(fabledRoles, 'fabled-columns');
             loadRoles(travellersRoles, 'travellers-columns');
+            loadDirRoles(); // 加载自制角色
 
             // 初始化选项卡
             initTabs();
@@ -7723,6 +7860,9 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
             if (generateBtn) {
                 generateBtn.parentNode.insertBefore(legacyNote, generateBtn);
             }
+            
+            // 初始化JSON编辑器
+            updateJsonEditor();
         };
 
         // 初始化已选角色实时更新
@@ -7808,38 +7948,7 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                 });
             });
 
-            // 添加dirRolesJson中的自制角色（从JSON导入的角色）
-            if (typeof dirRolesJson !== 'undefined' && dirRolesJson.length > 0) {
-                dirRolesJson.forEach(role => {
-                    // 检查是否已经在selectedRoles中（通过id）
-                    if (!selectedRoles.some(r => r.id === role.id)) {
-                        let category = '其他';
-                        const team = role.team || '';
-                        
-                        if (team === 'townsfolk' || team === '镇民') {
-                            category = '镇民';
-                        } else if (team === 'outsider' || team === '外来者') {
-                            category = '外来者';
-                        } else if (team === 'minion' || team === '爪牙') {
-                            category = '爪牙';
-                        } else if (team === 'demon' || team === '恶魔') {
-                            category = '恶魔';
-                        } else if (team === 'traveller' || team === '旅行者') {
-                            category = '旅行者';
-                        } else if (team === 'fabled' || team === '传奇') {
-                            category = '传奇';
-                        }
-                        
-                        selectedRoles.push({
-                            id: role.id,
-                            name: role.name,
-                            image: role.image || '',
-                            ability: role.ability || '',
-                            category: category
-                        });
-                    }
-                });
-            }
+            // 自制角色通过复选框勾选添加，不需要自动添加
 
             // 按类别分组（保持原有顺序）
             const rolesByCategory = {};
@@ -7912,6 +8021,9 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
             
             // 更新夜间顺序显示
             updateNightOrderDisplay(selectedRoles);
+            
+            // 更新JSON编辑器
+            updateJsonEditor();
         }
         
         // 初始化拖拽功能
@@ -7989,7 +8101,8 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
             const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demonsRoles, ...fabledRoles, ...travellersRoles];
             
             // 筛选出与已选角色相关的相克规则
-            const relevantJinxes = jinxes.filter(jinx => {
+            const jinxData = (typeof window.jinxes !== 'undefined') ? window.jinxes : jinxes;
+            const relevantJinxes = jinxData.filter(jinx => {
                 return selectedRoleNames.includes(jinx.jinxRole1) && selectedRoleNames.includes(jinx.jinxRole2);
             });
             
@@ -8230,6 +8343,8 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                 {"image": "Fangshi.png", "name": "方士", "description": "在对应数字的夜晚，唤醒方士，向他展示对应数量在场的角色标记。"},
                 {"image": "Shiguan.png", "name": "史官", "description": "如果白天有玩家死于处决，唤醒史官。对他用手势比划存活的镇民玩家的数量。"},
                 {"image": "Zhifu.png", "name": "知府", "description": "唤醒知府，以点头或摇头告知他今天白天和当晚是否有非镇民且非旅行者的玩家死亡。"},
+                {"image": "cannibal.png", "name": "食人族", "description": "根据具体能力决定是否需要唤醒食人族、唤醒后让他做出什么操作或得知什么信息。"},
+                {"image": "amnesiac.png", "name": "失忆者", "description": "根据具体能力决定是否需要唤醒失忆者、唤醒后让他做出什么操作或得知什么信息。"},
                 {"image": "Chambermaid.png", "name": "侍女", "description": "唤醒侍女，让她选择两名除自己以外的存活玩家。用手势比划数字来告知她这些玩家中因自己能力而唤醒的玩家数量。"},
                 {"image": "Yinluren.png", "name": "引路人", "description": "唤醒引路人，让他选择一至三名玩家，以点头或摇头告知他选择的玩家中是否有玩家在当晚被邪恶玩家的能力选择或影响过。"},
                 {"image": "Mathematician.png", "name": "数学家", "description": "唤醒数学家，用手势比划数字来告诉他今天有多少玩家的能力未正常生效。"},
@@ -9955,15 +10070,18 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
             "preacherCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/preacher.png",
             "village_idiotCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/village_idiot.png",
             "engineerCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/engineer.png",
-            "princessCustomVER": "https://oss.gstonegames.com/data_file/clocktower/upload/202506/c_6411087360571_5b26738b.jpg",
+            "princessCustomVER": "https://clocktower-wiki.gstonegames.com/images/thumb/f/f2/Princess.png/400px-Princess.png",
             "nobleCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/noble.png",
+            "oldkingCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/king.png",
             "kingCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/king.png",
             "generalCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/general.png",
             "alchemistCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/alchemist.png",
             "magicianCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/magician.png",
             "farmerCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/farmer.png",
+            "oldfarmerCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/farmer.png",
             "high_priestessCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/high_priestess.png",
             "balloonistCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/balloonist.png",
+            "oldballoonistCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/balloonist.png",
             "knightCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/knight.png",
             "bounty_hunterCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/bounty_hunter.png",
             "amnesiacCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/amnesiac.png",
@@ -10003,14 +10121,25 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
             "ranfangfangzhuCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/ranfangfangzhu.png",
             "shiguanCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/shiguan.png",
             "tixingguanCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/tixingguan.png",
-            "xunchaCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/xuncha.png",
+            "xunchaCustomVER": "https://clocktower-wiki.gstonegames.com/images/thumb/c/cf/Xuncha.png/400px-Xuncha.png",
             "yanshiCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/yanshi.png",
             "yishiCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/yishi.png",
             "yinlurenCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/yinluren.png",
             "yongjiangCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/yongjiang.png",
             "zhenCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/zhen.png",
             "zhifuCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/zhifu.png",
-            
+            "oldkingCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/king.png",
+            "oldalsaahirCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/alsaahir.png",
+            "oldlycanthropeCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/lycanthrope.png",
+            "oldalchemistCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/alchemist.png",
+            "oldbingbiCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/bingbi.png",
+            "oldyongjiangCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/yongjiang.png",
+            "oldzhifuCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/zhifu.png",
+            "oldyanshiCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/yanshi.png",
+            "oldlimaoCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/limao.png",
+            "oldshiguanCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/shiguan.png",
+            "oldxunchaCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/xuncha.png",
+            "xizi_newCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/xizi.png",
             // 外来者
             "butlerCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/butler.png",
             "drunkCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/drunk.png",
@@ -10040,8 +10169,9 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
             "jiubaoCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/jiubao.png",
             "rulianshiCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/rulianshi.png",
             "shutongCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/shutong.png",
-            "hermitCustomVER": "https://oss.gstonegames.com/data_file/clocktower/upload/202506/c_6131437679471_8c370f0a.",
-            
+            "hermitCustomVER": "https://oss.gstonegames.com/data_file/clocktower/upload/202506/c_6131437679471_8c370f0a.jpg",
+            "oldplague_doctorCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/plague_doctor.png",
+            "oldacrobatCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/acrobat.png",
             // 爪牙
             "poisonerCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/poisoner.png",
             "spyCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/spy.png",
@@ -10054,7 +10184,7 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
             "evil_twinCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/evil_twin.png",
             "witchCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/witch.png",
             "cerenovusCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/cerenovus.png",
-            "pit_hagCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/pit-hag.png",
+            "pit-hagCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/pit-hag.png",
             "goblinCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/goblin.png",
             "widowCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/widow.png",
             "organ_grinderCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/organ_grinder.png",
@@ -10072,7 +10202,7 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
             "ganshirenCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/ganshiren.png",
             "humeiniangCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/humeiniang.png",
             "jinweijunCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/jinweijun.png",
-            "oldmengpoCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/mengpo.png",
+            "oldmengpoCustomVER": "https://oss.gstonegames.com/data_file/clocktower/upload/202404/c_1302942943171_588f083d.jpg",
             "mengpoCustomVER": "https://clocktower-wiki.gstonegames.com/images/thumb/e/e4/Mengpo.png/180px-Mengpo.png",
             "yanggurenCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/yangguren.png",
             "oldgudiaoCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/gudiao.png",
@@ -10083,7 +10213,9 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
             "oldharpyCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/harpy.png",
             "oldorgan_grinderCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/organ_grinder.png",
             "oldboomdandyCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/boomdandy.png",
-         
+            "wraithCustomVER": "https://clocktower-wiki.gstonegames.com/images/thumb/7/7c/Wraith.png/400px-Wraith.png",
+            "jinweijun2CustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/jinweijun.png",
+            "niangjiushiCustomVER": "https://oss.gstonegames.com/data_file/clocktower/upload/202301/c_3356597694761_0a4b67e6.jpg",
             // 恶魔
             "impCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/imp.png",
             "zombuulCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/zombuul.png",
@@ -10098,11 +10230,13 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
             "riotCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/riot.png",
             "oldriotCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/riot.png",
             "lord_of_typhonCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/lord_of_typhon.png",
-            "al_hadikhiaCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/al-hadikhia.png",
+            "al-hadikhiaCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/al-hadikhia.png",
+            "oldal-hadikhiaCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/al-hadikhia.png",
             "legionCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/legion.png",
             "kazaliCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/kazali.png",
             "leviathanCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/leviathan.png",
             "lleechCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/lleech.png",
+            "oldlleechCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/lleech.png",
             "lil_monstaCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/lil_monsta.png",
             "yaggababbleCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/yaggababble.png",
             "hundunCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/hundun.png",
@@ -10168,6 +10302,7 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
             "zenomancerCustomVER": "https://wiki.bloodontheclocktower.com/images/4/44/Icon_zenomancer.png",
             "torCustomVER": "https://oss.gstonegames.com/data_file/clocktower/upload/202511/c_6713628082671_9a910c33.jpg",
             "gardenerCustomVER": "https://oss.gstonegames.com/data_file/clocktower/upload/202511/c_1795247082671_39af8d57.jpg"
+            
         };
 
         function getRoleJson(roleId) {
@@ -11766,7 +11901,8 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
             );
 
             // 查询相克规则
-            const foundJinx = jinxes.find(jinx =>
+            const jinxData = (typeof window.jinxes !== 'undefined') ? window.jinxes : jinxes;
+            const foundJinx = jinxData.find(jinx =>
                 (jinx.jinxRole1 === role1 && jinx.jinxRole2 === role2) ||
                 (jinx.jinxRole1 === role2 && jinx.jinxRole2 === role1)
             );
