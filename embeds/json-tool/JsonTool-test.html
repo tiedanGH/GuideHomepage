@@ -2928,6 +2928,15 @@
                 </div>
             </div>
 
+            <!-- 移动端悬浮按钮栏 -->
+            <div class="mobile-floating-buttons" style="display: none; position: fixed; right: 20px; top: 50%; transform: translateY(-50%); z-index: 10000; flex-direction: column; gap: 10px; background: rgba(255, 255, 255, 0.95); padding: 10px; border-radius: 25px; box-shadow: 0 2px 15px rgba(0, 0, 0, 0.2);">
+                <button class="floating-btn" onclick="saveJson()" title="保存JSON">💾</button>
+                <button class="floating-btn" onclick="copyJson()" title="复制JSON">📋</button>
+                <button class="floating-btn" onclick="generateScriptImageV2()" title="生成剧本图">🖼️</button>
+                <button class="floating-btn" onclick="toggleDirInput()" title="添加自制角色">➕</button>
+                <button class="floating-btn" onclick="clearAllSelections()" title="清空选择" style="background: linear-gradient(135deg, #e53e3e 0%, #f56565 100%);">🗑️</button>
+            </div>
+
             <div class="sidebar-card action-buttons">
                 <button class="action-btn-info" onclick="loadJsonFile()">📁 导入JSON</button>
                 <button class="action-btn-info" onclick="pasteJson()">📋 粘贴JSON</button>
@@ -2956,6 +2965,49 @@
                     </div>
                 </div>
             </div>
+
+            <style>
+                .floating-btn {
+                    width: 50px;
+                    height: 50px;
+                    border-radius: 50%;
+                    border: none;
+                    font-size: 20px;
+                    cursor: pointer;
+                    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+                    background: linear-gradient(135deg, #6b46c1 0%, #805ad5 100%);
+                    color: white;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    transition: all 0.3s ease;
+                }
+                
+                .floating-btn:hover {
+                    transform: scale(1.1);
+                    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+                }
+                
+                @media (max-width: 768px) {
+                    .mobile-floating-buttons {
+                        display: flex;
+                    }
+                    
+                    .action-buttons {
+                        display: none;
+                    }
+                }
+                
+                @media (min-width: 769px) {
+                    .mobile-floating-buttons {
+                        display: none;
+                    }
+                    
+                    .action-buttons {
+                        display: block;
+                    }
+                }
+            </style>
         </div>
     </div>
 
@@ -8034,6 +8086,11 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
             let touchStartY = 0;
             let touchOffsetX = 0;
             let touchOffsetY = 0;
+            let longPressTimer = null;
+            let isLongPress = false;
+            let originalParent = null;
+            let originalNextSibling = null;
+            const LONG_PRESS_DELAY = 300;
             
             cards.forEach(card => {
                 // 拖动开始
@@ -8092,25 +8149,39 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                 // 触摸开始
                 card.addEventListener('touchstart', function(e) {
                     e.preventDefault();
-                    draggedCard = this;
+                    isLongPress = false;
                     const touch = e.touches[0];
                     touchStartX = touch.clientX;
                     touchStartY = touch.clientY;
                     const rect = this.getBoundingClientRect();
                     touchOffsetX = touchStartX - rect.left;
                     touchOffsetY = touchStartY - rect.top;
-                    this.style.opacity = '0.5';
-                    this.style.position = 'absolute';
-                    this.style.zIndex = '1000';
-                    this.style.left = rect.left + 'px';
-                    this.style.top = rect.top + 'px';
-                    this.style.width = rect.width + 'px';
-                    document.body.appendChild(this);
+                    
+                    // 保存原始位置信息
+                    originalParent = this.parentNode;
+                    originalNextSibling = this.nextSibling;
+                    
+                    // 长按计时器
+                    longPressTimer = setTimeout(() => {
+                        isLongPress = true;
+                        draggedCard = this;
+                        this.style.opacity = '0.5';
+                        this.style.position = 'absolute';
+                        this.style.zIndex = '1000';
+                        this.style.left = rect.left + 'px';
+                        this.style.top = rect.top + 'px';
+                        this.style.width = rect.width + 'px';
+                        document.body.appendChild(this);
+                    }, LONG_PRESS_DELAY);
                 });
                 
                 // 触摸移动
                 card.addEventListener('touchmove', function(e) {
                     e.preventDefault();
+                    if (longPressTimer) {
+                        clearTimeout(longPressTimer);
+                        longPressTimer = null;
+                    }
                     if (draggedCard) {
                         const touch = e.touches[0];
                         draggedCard.style.left = (touch.clientX - touchOffsetX) + 'px';
@@ -8135,6 +8206,11 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                 // 触摸结束
                 card.addEventListener('touchend', function(e) {
                     e.preventDefault();
+                    if (longPressTimer) {
+                        clearTimeout(longPressTimer);
+                        longPressTimer = null;
+                    }
+                    
                     if (draggedCard) {
                         // 找到当前触摸位置下的卡片
                         const touch = e.changedTouches[0];
@@ -8178,17 +8254,16 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                                 }
                             } else {
                                 // 如果类别不同，将卡片放回原来的位置
-                                const originalContainer = document.querySelector(`.selected-roles-container [data-category="${draggedCategory}"]`).parentNode;
-                                originalContainer.appendChild(draggedCard);
+                                originalParent.insertBefore(draggedCard, originalNextSibling);
                             }
                         } else {
                             // 如果没有找到目标卡片，将卡片放回原来的位置
-                            const draggedCategory = draggedCard.dataset.category;
-                            const originalContainer = document.querySelector(`.selected-roles-container [data-category="${draggedCategory}"]`).parentNode;
-                            originalContainer.appendChild(draggedCard);
+                            originalParent.insertBefore(draggedCard, originalNextSibling);
                         }
                         
                         draggedCard = null;
+                        originalParent = null;
+                        originalNextSibling = null;
                     }
                 });
             });
