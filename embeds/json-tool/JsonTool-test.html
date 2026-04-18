@@ -4846,10 +4846,38 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                 name: roleName,
                 ability: ability,
                 team: standardTeam,
-                image: image,
                 flavor: flavor,
                 setup: setup
             };
+            
+            // 设置默认图片
+            if (image && image.trim() !== '') {
+                newRole.image = image;
+            } else {
+                // 根据阵营设置默认图片
+                switch (standardTeam) {
+                    case 'townsfolk':
+                        newRole.image = 'images/townfolk.png';
+                        break;
+                    case 'outsider':
+                        newRole.image = 'images/outsider.png';
+                        break;
+                    case 'minion':
+                        newRole.image = 'images/minion.png';
+                        break;
+                    case 'demon':
+                        newRole.image = 'images/demon.png';
+                        break;
+                    case 'traveller':
+                        newRole.image = 'images/traveller.png';
+                        break;
+                    case 'fabled':
+                        newRole.image = 'images/fabled.png';
+                        break;
+                    default:
+                        newRole.image = 'images/townfolk.png';
+                }
+            }
             
             // 添加可选字段
             if (firstNight) newRole.firstNight = parseInt(firstNight);
@@ -6421,35 +6449,6 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
             // 处理选中的角色
             editionRolesJson = [...selectedRoles, ...dirRolesJson];
             const jsonData = [];
-
-            // 检查是否有用户勾选了失忆者
-            const hasAmnesiac = selectedRoles.some(role => role.id === 'amnesiacCustomVER' || role.name === '失忆者');
-            if (hasAmnesiac) {
-                // 创建失忆者*角色
-                const amnesiacStar = {
-                    "id": "amnesiacCustomVER*",
-                    "name": "失忆者*",
-                    "pinyin": "shiyizhe",
-                    "pinyinsuoxie": "syz",
-                    "scripts": [],
-                    "image": "https://www.bloodstar.xyz/p/shifenfantuan/anliu/56_anliu.png",
-                    "ability": "你不知道你的能力是什么。每个白天你可以找说书人猜测一次，你会得知你的猜测有多准确。",
-                    "firstNight": 299,
-                    "otherNight": 15000,
-                    "team": "townsfolk",
-                    "edition": "custom",
-                    "flavor": "等下，你说了啥？谁？哦，没事了。等下，你说了啥？",
-                    "jinxes": [],
-                    "special": [],
-                    "firstNightReminder": "决定失忆者的能力，并根据具体能力决定是否需要唤醒失忆者、何时唤醒、唤醒后让他做出什么操作或得知什么信息。",
-                    "otherNightReminder": "如果失忆者的能力会让他在今晚醒来：唤醒他并执行其能力。",
-                    "reminders": ["？"],
-                    "remindersGlobal": ["完美"],
-                    "setup": false
-                };
-                // 添加失忆者*角色到editionRolesJson
-                editionRolesJson.push(amnesiacStar);
-            }
 
             // 添加剧本信息
             jsonData.push(metaInfoJson);
@@ -8936,7 +8935,7 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                 relevantNightOrders["首个夜晚"].push({
                     name: "黄昏",
                     description: "游戏开始，所有玩家闭眼",
-                    image: "https://www.bloodstar.xyz/p/Haimian0421/image4/2_image4.png"
+                    image: "images/dusk-CLd-DXn-QC.png"
                 });
                 
                 // 使用剧本信息中的首夜顺序
@@ -8957,14 +8956,14 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                     relevantNightOrders["首个夜晚"].push({
                         name: "爪牙信息",
                         description: "爪牙们互相确认身份",
-                        image: "https://www.bloodstar.xyz/p/Haimian0421/image4/1_image4.png"
+                        image: "images/180px-Mi.png"
                     });
                 }
                 if (!relevantNightOrders["首个夜晚"].some(item => item.name === "恶魔信息")) {
                     relevantNightOrders["首个夜晚"].push({
                         name: "恶魔信息",
                         description: "恶魔确认身份并了解爪牙",
-                        image: "https://www.bloodstar.xyz/p/Haimian0421/image4/_image4.png"
+                        image: "images/180px-Di.png"
                     });
                 }
                 
@@ -8972,7 +8971,7 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                 relevantNightOrders["首个夜晚"].push({
                     name: "黎明",
                     description: "所有玩家睁眼，进入白天",
-                    image: "https://www.bloodstar.xyz/p/shifenfantuan/jiuban/newcharacter3_jiuban.png"
+                    image: "images/dawn.png"
                 });
             } else {
                 // 使用默认的夜间顺序数据
@@ -9004,22 +9003,22 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                     if (item.name === "黄昏") {
                         return {
                             ...item,
-                            image: "https://www.bloodstar.xyz/p/Haimian0421/image4/2_image4.png"
+                            image: "images/dusk-CLd-DXn-QC.png"
                         };
                     } else if (item.name === "爪牙信息") {
                         return {
                             ...item,
-                            image: "https://www.bloodstar.xyz/p/Haimian0421/image4/1_image4.png"
+                            image: "images/180px-Mi.png"
                         };
                     } else if (item.name === "恶魔信息") {
                         return {
                             ...item,
-                            image: "https://www.bloodstar.xyz/p/Haimian0421/image4/_image4.png"
+                            image: "images/180px-Di.png"
                         };
                     } else if (item.name === "黎明") {
                         return {
                             ...item,
-                            image: "https://www.bloodstar.xyz/p/shifenfantuan/jiuban/newcharacter3_jiuban.png"
+                            image: "images/dawn.png"
                         };
                     }
                     // 尝试从角色数据中获取image字段
@@ -9048,7 +9047,7 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                 relevantNightOrders["其他夜晚"].push({
                     name: "黄昏",
                     description: "所有玩家闭眼",
-                    image: "https://www.bloodstar.xyz/p/Haimian0421/image4/2_image4.png"
+                    image: "images/dusk-CLd-DXn-QC.png"
                 });
                 
                 // 先收集所有角色
@@ -9100,7 +9099,7 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                 relevantNightOrders["其他夜晚"].push({
                     name: "黎明",
                     description: "所有玩家睁眼，进入白天",
-                    image: "https://www.bloodstar.xyz/p/shifenfantuan/jiuban/newcharacter3_jiuban.png"
+                    image: "images/dawn.png"
                 });
             } else {
                 // 使用默认的夜间顺序数据
@@ -9131,22 +9130,22 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                     if (item.name === "黄昏") {
                         return {
                             ...item,
-                            image: "https://www.bloodstar.xyz/p/Haimian0421/image4/2_image4.png"
+                            image: "images/dusk-CLd-DXn-QC.png"
                         };
                     } else if (item.name === "爪牙信息") {
                         return {
                             ...item,
-                            image: "https://www.bloodstar.xyz/p/Haimian0421/image4/1_image4.png"
+                            image: "images/180px-Mi.png"
                         };
                     } else if (item.name === "恶魔信息") {
                         return {
                             ...item,
-                            image: "https://www.bloodstar.xyz/p/Haimian0421/image4/_image4.png"
+                            image: "images/180px-Di.png"
                         };
                     } else if (item.name === "黎明") {
                         return {
                             ...item,
-                            image: "https://www.bloodstar.xyz/p/shifenfantuan/jiuban/newcharacter3_jiuban.png"
+                            image: "images/dawn.png"
                         };
                     }
                     // 尝试从角色数据中获取image字段
@@ -10563,6 +10562,7 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
             "hermitCustomVER": "https://oss.gstonegames.com/data_file/clocktower/upload/202506/c_6131437679471_8c370f0a.jpg",
             "oldplague_doctorCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/plague_doctor.png",
             "oldacrobatCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/acrobat.png",
+            "nichenCustomVER": "https://clocktower-wiki.gstonegames.com/images/thumb/5/51/Nichen.png/400px-Nichen.png",
             // 爪牙
             "poisonerCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/poisoner.png",
             "spyCustomVER": "https://oss.gstonegames.com/data_file/clocktower/web/icons/spy.png",
