@@ -849,6 +849,30 @@
                 box-sizing: border-box;
             }
 
+            /* 移动端适配 */
+            @media (max-width: 768px) {
+                .main-container {
+                    flex-direction: column;
+                }
+                
+                .right-sidebar {
+                    order: 2;
+                    width: 100%;
+                    margin-top: 20px;
+                }
+                
+                .action-buttons {
+                    margin-bottom: 20px;
+                    grid-template-columns: repeat(4, 1fr);
+                    gap: 8px;
+                }
+                
+                .action-buttons button {
+                    font-size: 11px;
+                    padding: 8px 10px;
+                }
+            }
+
             /* 控制面板卡片调整 */
             .control-panel-card {
                 padding: 16px;
@@ -2915,17 +2939,6 @@
                     </div>
                 </div>
 
-                <!-- 夜间顺序展示区 - 在相克规则下方 -->
-                <div class="night-order-section" style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border-color);">
-                    <h3 style="margin: 0 0 12px 0; font-size: 14px; font-weight: 600; color: var(--text-color); display: flex; justify-content: space-between; align-items: center;">
-                        🌙 夜间顺序 <span class="selected-count" id="night-order-count-display">0</span>
-                    </h3>
-                    <div id="night-order-display">
-                        <div style="text-align: center; color: #999; padding: 20px;">
-                            暂无夜间顺序
-                        </div>
-                    </div>
-                </div>
             </div>
 
             <div class="sidebar-card action-buttons">
@@ -2934,6 +2947,7 @@
                 <button class="action-btn-success" onclick="saveJson()">💾 保存JSON</button>
                 <button class="action-btn-success" onclick="copyJson()">📋 复制JSON</button>
                 <button class="action-btn-warning" onclick="copyJsonToClipboard()">🔗 复制URL</button>
+                <button class="action-btn-danger" onclick="resetData()">🗑️ 重置数据</button>
                 <button class="action-btn-info" onclick="generateAlmanacBook()">📖 生成册子</button>
                 <button class="action-btn-info" onclick="generateScriptImageV2()">🖼️ 生成剧本图</button>
                 <button class="action-btn-info" onclick="generateJinxAndConfigImage()">📊 生成细节图</button>
@@ -2941,8 +2955,9 @@
                 <button class="action-btn-warning" onclick="toggleDirInput()">➕ 添加自制角色</button>
                 <button class="action-btn-warning" onclick="toggleMetaInfoInput()">📝 添加剧本信息</button>
                 <button class="action-btn-primary" onclick="toggleScriptConfigModal()">🎨 剧本图设置</button>
-                <button class="action-btn-danger" onclick="clearAllSelections()" style="background: linear-gradient(135deg, #e53e3e 0%, #f56565 100%);">🗑️ 清空选择</button>
+            </div>
 
+            <div class="sidebar-card">
                 <!-- JSON编辑区 -->
                 <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-color);">
                     <h3 style="margin: 0 0 12px 0; font-size: 14px; font-weight: 600; color: var(--text-color); display: flex; justify-content: space-between; align-items: center;">
@@ -2952,6 +2967,18 @@
                         <textarea id="json-editor" style="width: 100%; min-height: 900px; max-height: 900px; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; font-family: 'Courier New', monospace; font-size: 12px; resize: vertical; box-sizing: border-box;" placeholder="生成的JSON将显示在这里，您可以手动修改..."></textarea>
                         <div style="margin-top: 8px;">
                             <button onclick="updateFromJsonEditor()" style="width: 100%; padding: 8px 12px; background: var(--primary-gradient); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600;">应用修改</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 夜间顺序展示区 - 在相克规则下方 -->
+                <div class="night-order-section" style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border-color);">
+                    <h3 style="margin: 0 0 12px 0; font-size: 14px; font-weight: 600; color: var(--text-color); display: flex; justify-content: space-between; align-items: center;">
+                        🌙 夜间顺序 <span class="selected-count" id="night-order-count-display">0</span>
+                    </h3>
+                    <div id="night-order-display">
+                        <div style="text-align: center; color: #999; padding: 20px;">
+                            暂无夜间顺序
                         </div>
                     </div>
                 </div>
@@ -3732,6 +3759,116 @@
         }
 
         // 页面加载完成后检查访问协议
+        // 从localStorage恢复数据
+        function loadFromLocalStorage() {
+            try {
+                // 恢复已选角色
+                const savedSelectedRoles = localStorage.getItem('selectedRoles');
+                if (savedSelectedRoles) {
+                    selectedRoles = JSON.parse(savedSelectedRoles);
+                }
+
+                // 恢复自制角色
+                const savedDirRolesJson = localStorage.getItem('dirRolesJson');
+                if (savedDirRolesJson) {
+                    dirRolesJson = JSON.parse(savedDirRolesJson);
+                }
+
+                // 恢复角色排序信息
+                const savedRoleOrder = localStorage.getItem('roleOrder');
+                if (savedRoleOrder) {
+                    roleOrder = JSON.parse(savedRoleOrder);
+                }
+
+                // 恢复元信息
+                const savedMetaInfoJson = localStorage.getItem('metaInfoJson');
+                if (savedMetaInfoJson) {
+                    metaInfoJson = JSON.parse(savedMetaInfoJson);
+                }
+
+                // 恢复剧本图设置
+                const savedShowNightOrder = localStorage.getItem('showNightOrder');
+                if (savedShowNightOrder) {
+                    const checkbox = document.getElementById('showNightOrder');
+                    if (checkbox) checkbox.checked = savedShowNightOrder === 'true';
+                }
+
+                const savedShowConfigTable = localStorage.getItem('showConfigTable');
+                if (savedShowConfigTable) {
+                    const checkbox = document.getElementById('showConfigTable');
+                    if (checkbox) checkbox.checked = savedShowConfigTable === 'true';
+                }
+
+                const savedShowCustomRules = localStorage.getItem('showCustomRules');
+                if (savedShowCustomRules) {
+                    const checkbox = document.getElementById('showCustomRules');
+                    if (checkbox) checkbox.checked = savedShowCustomRules === 'true';
+                }
+
+                const savedShowTravellersFabled = localStorage.getItem('showTravellersFabled');
+                if (savedShowTravellersFabled) {
+                    const checkbox = document.getElementById('showTravellersFabled');
+                    if (checkbox) checkbox.checked = savedShowTravellersFabled === 'true';
+                }
+
+                const savedShowJinxRules = localStorage.getItem('showJinxRules');
+                if (savedShowJinxRules) {
+                    const checkbox = document.getElementById('showJinxRules');
+                    if (checkbox) checkbox.checked = savedShowJinxRules === 'true';
+                }
+
+                const savedHorizontalLayout = localStorage.getItem('horizontalLayout');
+                if (savedHorizontalLayout) {
+                    const checkbox = document.getElementById('horizontalLayout');
+                    if (checkbox) checkbox.checked = savedHorizontalLayout === 'true';
+                }
+
+                console.log('数据已从本地存储恢复');
+            } catch (error) {
+                console.error('恢复数据失败:', error);
+            }
+        }
+
+        // 保存数据到localStorage
+        function saveToLocalStorage() {
+            try {
+                // 保存已选角色
+                localStorage.setItem('selectedRoles', JSON.stringify(selectedRoles));
+
+                // 保存自制角色
+                localStorage.setItem('dirRolesJson', JSON.stringify(dirRolesJson));
+
+                // 保存角色排序信息
+                localStorage.setItem('roleOrder', JSON.stringify(roleOrder));
+
+                // 保存元信息
+                localStorage.setItem('metaInfoJson', JSON.stringify(metaInfoJson));
+
+                // 保存剧本图设置
+                const showNightOrder = document.getElementById('showNightOrder');
+                if (showNightOrder) localStorage.setItem('showNightOrder', showNightOrder.checked);
+
+                const showConfigTable = document.getElementById('showConfigTable');
+                if (showConfigTable) localStorage.setItem('showConfigTable', showConfigTable.checked);
+
+                const showCustomRules = document.getElementById('showCustomRules');
+                if (showCustomRules) localStorage.setItem('showCustomRules', showCustomRules.checked);
+
+                const showTravellersFabled = document.getElementById('showTravellersFabled');
+                if (showTravellersFabled) localStorage.setItem('showTravellersFabled', showTravellersFabled.checked);
+
+                const showJinxRules = document.getElementById('showJinxRules');
+                if (showJinxRules) localStorage.setItem('showJinxRules', showJinxRules.checked);
+
+                const horizontalLayout = document.getElementById('horizontalLayout');
+                if (horizontalLayout) localStorage.setItem('horizontalLayout', horizontalLayout.checked);
+
+                console.log('数据已保存到本地存储');
+            } catch (error) {
+                console.error('保存数据失败:', error);
+            }
+        }
+
         window.addEventListener('DOMContentLoaded', function() {
             if (isLocalFile()) {
                 // 不显示本地文件模式警告信息
@@ -3741,12 +3878,32 @@
                 }
             }
 
+            // 从本地存储恢复数据
+            loadFromLocalStorage();
+
             // 解析URL中的Almanac数据
             parseAlmanacFromUrl();
 
             // 配置表和剧本自制规则选项
             const showConfigTableCheckbox = document.getElementById('showConfigTable');
             const showCustomRulesCheckbox = document.getElementById('showCustomRules');
+            
+            // 为设置项添加change事件监听器
+            const settingCheckboxes = [
+                'showNightOrder',
+                'showConfigTable',
+                'showCustomRules',
+                'showTravellersFabled',
+                'showJinxRules',
+                'horizontalLayout'
+            ];
+            
+            settingCheckboxes.forEach(id => {
+                const checkbox = document.getElementById(id);
+                if (checkbox) {
+                    checkbox.addEventListener('change', saveToLocalStorage);
+                }
+            });
 
             // 初始化自定义阵营角色选择区域
             // 延迟初始化，等待其他脚本加载完成
@@ -3967,6 +4124,9 @@
 
         // 存储选中的官方角色数据
         let selectedRoles = [];
+
+        // 存储角色排序信息（按类别）
+        let roleOrder = {};
 
         // 存储用户创建的自制角色数据
         let dirRolesJson = [];
@@ -4738,6 +4898,9 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
             
             // 添加到自制角色数组
             dirRolesJson.push(newRole);
+
+            // 保存数据到本地存储
+            saveToLocalStorage();
 
             // 关闭表单
             cancelAddRole();
@@ -6392,12 +6555,15 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
 
         // 复制JSON到剪贴板并提供跳转选项
         function copyJson() {
-            // 生成JSON数据
-            const jsonData = generateJsonData();
-            if (!jsonData) return;
-
-            // 转换为 JSON 字符串
-            const jsonString = JSON.stringify(jsonData, null, 4);
+            // 从JSON编辑器获取内容
+            const jsonEditor = document.getElementById('json-editor');
+            const jsonString = jsonEditor.value.trim();
+            
+            // 检查内容是否为空
+            if (!jsonString) {
+                alert("JSON编辑器为空，请先生成JSON！");
+                return;
+            }
 
             // 复制到剪贴板
             navigator.clipboard.writeText(jsonString).then(function() {
@@ -6414,6 +6580,77 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                 console.error('复制失败:', err);
                 alert("复制失败，请手动复制！");
             });
+        }
+
+        // 重置所有数据
+        function resetData() {
+            if (confirm('确定要重置所有数据吗？此操作不可撤销！')) {
+                // 清除已选角色
+                selectedRoles = [];
+                
+                // 清除自制角色
+                dirRolesJson = [];
+                
+                // 重置角色排序
+                roleOrder = {};
+                
+                // 重置元信息
+                metaInfoJson = {
+                    "id": "_meta",
+                    "name": "",
+                    "author": "",
+                    "logo": "",
+                    "hideTitle": false,
+                    "background": "https://botc.app/assets/background1-C0iW8pNy.webp",
+                    "almanac": "",
+                    "bootlegger": [""],
+                    "firstNight": [""],
+                    "otherNight": [""],
+                    "a jinxed": "相克",
+                    "a jinxedName": "相克",
+                    "b jinxed": "相克",
+                    "b jinxedName": "相克",
+                    "state": [],
+                    "description": ""
+                };
+                
+                // 重置剧本图设置
+                const settingCheckboxes = [
+                    { id: 'showNightOrder', value: true },
+                    { id: 'showConfigTable', value: true },
+                    { id: 'showCustomRules', value: false },
+                    { id: 'showTravellersFabled', value: true },
+                    { id: 'showJinxRules', value: true },
+                    { id: 'horizontalLayout', value: false }
+                ];
+                
+                settingCheckboxes.forEach(item => {
+                    const checkbox = document.getElementById(item.id);
+                    if (checkbox) {
+                        checkbox.checked = item.value;
+                    }
+                });
+                
+                // 清除本地存储
+                localStorage.clear();
+                
+                // 重置角色选择状态
+                document.querySelectorAll('.role-item input[type="checkbox"]').forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+                
+                // 更新界面显示
+                updateSelectedRolesDisplay();
+                loadDirRoles();
+                
+                // 清空JSON编辑器
+                const jsonEditor = document.getElementById('json-editor');
+                if (jsonEditor) {
+                    jsonEditor.value = '';
+                }
+                
+                showNotification('✅ 数据已重置！');
+            }
         }
 
         // 复制JSON到剪贴板（备用函数）
@@ -7001,6 +7238,9 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                 
                 // 更新已选角色显示
                 updateSelectedRolesDisplay();
+                
+                // 保存数据到本地存储
+                saveToLocalStorage();
                 
                 alert('角色修改成功！');
             } else {
@@ -7611,35 +7851,7 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
             }
         }
 
-        function clearAllSelections() {
-            const allCheckboxes = document.querySelectorAll('.role-columns input[type="checkbox"]');
-            allCheckboxes.forEach(cb => {
-                cb.checked = false;
-            });
 
-            // 清空排除和固定角色状态
-            excludedRoles.clear();
-            pinnedRoles.clear();
-            
-            // 重置所有排除和固定按钮的状态
-            document.querySelectorAll('.exclude-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            document.querySelectorAll('.pin-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-
-            document.getElementById('random-townsfolk').value = '13';
-            document.getElementById('random-outsiders').value = '4';
-            document.getElementById('random-minions').value = '4';
-            document.getElementById('random-demons').value = '4';
-
-            getSelectedRoles();
-            updateSelectedRolesDisplay();
-            updateSelectionCount();
-            updateFirstNightButtons();
-            updateOtherNightButtons();
-        }
 
 
 
@@ -7958,6 +8170,26 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                 }
                 rolesByCategory[role.category].push(role);
             });
+            
+            // 根据保存的排序信息排序角色
+            Object.keys(rolesByCategory).forEach(category => {
+                if (roleOrder[category]) {
+                    const orderedRoles = [];
+                    roleOrder[category].forEach(roleId => {
+                        const role = rolesByCategory[category].find(r => r.id === roleId);
+                        if (role) {
+                            orderedRoles.push(role);
+                        }
+                    });
+                    // 处理新添加的角色（不在排序列表中的）
+                    rolesByCategory[category].forEach(role => {
+                        if (!roleOrder[category].includes(role.id)) {
+                            orderedRoles.push(role);
+                        }
+                    });
+                    rolesByCategory[category] = orderedRoles;
+                }
+            });
 
             // 更新计数
             countElement.textContent = selectedRoles.length;
@@ -8024,10 +8256,23 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
             
             // 更新JSON编辑器
             updateJsonEditor();
+            
+            // 保存数据到本地存储
+            saveToLocalStorage();
         }
         
         // 初始化拖拽功能
+        // 检测是否为移动设备
+        function isMobileDevice() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        }
+
         function initDragAndDrop() {
+            // 移动设备禁止拖拽
+            if (isMobileDevice()) {
+                return;
+            }
+            
             const cards = document.querySelectorAll('.selected-role-card');
             let draggedCard = null;
             
@@ -8081,6 +8326,14 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                             } else {
                                 this.parentNode.insertBefore(draggedCard, this);
                             }
+                            
+                            // 保存排序信息
+                            const sortedCategoryCards = document.querySelectorAll(`.selected-role-card[data-category="${draggedCategory}"]`);
+                            const sortedRoleIds = Array.from(sortedCategoryCards).map(card => card.dataset.roleId);
+                            roleOrder[draggedCategory] = sortedRoleIds;
+                            
+                            // 保存数据到本地存储
+                            saveToLocalStorage();
                         }
                     }
                 });
@@ -8877,6 +9130,7 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
             if (checkbox) {
                 checkbox.checked = false;
                 updateSelectedRolesDisplay();
+                saveToLocalStorage();
                 return;
             }
             
@@ -8886,6 +9140,7 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                 if (roleIndex !== -1) {
                     dirRolesJson.splice(roleIndex, 1);
                     updateSelectedRolesDisplay();
+                    saveToLocalStorage();
                 }
             }
         }
@@ -12340,6 +12595,7 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
         <input type="checkbox" id="showCustomRules">
         <input type="checkbox" id="showTravellersFabled" checked>
         <input type="checkbox" id="showJinxRules" checked>
+        <input type="checkbox" id="horizontalLayout">
         <input type="password" id="ai-api-key">
         <input type="text" id="ai-model-endpoint">
         <input type="text" id="custom-townsfolk-name">
