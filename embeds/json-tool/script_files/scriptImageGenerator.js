@@ -493,6 +493,132 @@ async function generateScriptImageV2() {
                     }
                 });
                 
+                // 应用SAO排序规则到每个阵营的角色
+                const applySAOSort = (roles) => {
+                    // SAO排序规则 - 能力描述分组排序
+                    const abilityGroupOrder = [
+                        { pattern: /^在你的首个夜晚，你会得知/, priority: 1 },
+                        { pattern: /^You start knowing/, priority: 1 },
+                        { pattern: /^在夜晚时|^在夜晚/, priority: 2 },
+                        { pattern: /^At night/, priority: 2 },
+                        { pattern: /^每个黄昏\*/, priority: 3 },
+                        { pattern: /^Each dusk\*/, priority: 3 },
+                        { pattern: /^每个夜晚(?!\*)/, priority: 4 },
+                        { pattern: /^Each night(?!\*)/, priority: 4 },
+                        { pattern: /^每个夜晚\*/, priority: 5 },
+                        { pattern: /^Each night\*/, priority: 5 },
+                        { pattern: /^每个白天/, priority: 6 },
+                        { pattern: /^Each day/, priority: 6 },
+                        { pattern: /^每局游戏限一次，在夜晚时/, priority: 7 },
+                        { pattern: /^Once per game, at night(?!\*)/, priority: 7 },
+                        { pattern: /^每局游戏限一次，在夜晚时\*/, priority: 8 },
+                        { pattern: /^Once per game, at night\*/, priority: 8 },
+                        { pattern: /^每局游戏限一次，在白天时/, priority: 9 },
+                        { pattern: /^Once per game, during the day/, priority: 9 },
+                        { pattern: /^每局游戏限一次/, priority: 10 },
+                        { pattern: /^Once per game/, priority: 10 },
+                        { pattern: /^在你的首个夜晚/, priority: 11 },
+                        { pattern: /^On your 1st night/, priority: 11 },
+                        { pattern: /^在你的首个白天/, priority: 12 },
+                        { pattern: /^On your 1st day/, priority: 12 },
+                        { pattern: /^你认为/, priority: 13 },
+                        { pattern: /^You think/, priority: 13 },
+                        { pattern: /^你是/, priority: 14 },
+                        { pattern: /^You are/, priority: 14 },
+                        { pattern: /^你拥有/, priority: 15 },
+                        { pattern: /^You have/, priority: 15 },
+                        { pattern: /^你不知道/, priority: 16 },
+                        { pattern: /^You do not know/, priority: 16 },
+                        { pattern: /^你可能/, priority: 17 },
+                        { pattern: /^You might|^You may/, priority: 17 },
+                        { pattern: /^你 /, priority: 18 },
+                        { pattern: /^You /, priority: 18 },
+                        { pattern: /^当你死亡时/, priority: 19 },
+                        { pattern: /^When you die/, priority: 19 },
+                        { pattern: /^当你得知你死亡时/, priority: 20 },
+                        { pattern: /^When you learn that you died/, priority: 20 },
+                        { pattern: /^当 /, priority: 21 },
+                        { pattern: /^When /, priority: 21 },
+                        { pattern: /^如果你死亡/, priority: 22 },
+                        { pattern: /^If you die/, priority: 22 },
+                        { pattern: /^如果你死亡/, priority: 23 },
+                        { pattern: /^If you died/, priority: 23 },
+                        { pattern: /^如果你 "疯狂" 地/, priority: 24 },
+                        { pattern: /^If you are "mad"/, priority: 24 },
+                        { pattern: /^如果你 /, priority: 25 },
+                        { pattern: /^If you /, priority: 25 },
+                        { pattern: /^如果恶魔死亡/, priority: 26 },
+                        { pattern: /^If the Demon dies/, priority: 26 },
+                        { pattern: /^如果恶魔杀死了/, priority: 27 },
+                        { pattern: /^If the Demon kills/, priority: 27 },
+                        { pattern: /^如果恶魔/, priority: 28 },
+                        { pattern: /^If the Demon/, priority: 28 },
+                        { pattern: /^如果… 都/, priority: 29 },
+                        { pattern: /^If both/, priority: 29 },
+                        { pattern: /^如果大于等于五名玩家存活时/, priority: 30 },
+                        { pattern: /^If there are 5 or more players alive/, priority: 30 },
+                        { pattern: /^如果/, priority: 31 },
+                        { pattern: /^If/, priority: 31 },
+                        { pattern: /^所有玩家都/, priority: 32 },
+                        { pattern: /^All players/, priority: 32 },
+                        { pattern: /^所有/, priority: 33 },
+                        { pattern: /^All/, priority: 33 },
+                        { pattern: /^当… 首次/, priority: 34 },
+                        { pattern: /^The 1st time/, priority: 34 },
+                        { pattern: /^-/, priority: 35 },
+                        { pattern: /^The/, priority: 35 },
+                        { pattern: /^善良/, priority: 36 },
+                        { pattern: /^Good/, priority: 36 },
+                        { pattern: /^邪恶/, priority: 37 },
+                        { pattern: /^Evil/, priority: 37 },
+                        { pattern: /^玩家/, priority: 38 },
+                        { pattern: /^Players/, priority: 38 },
+                        { pattern: /^爪牙/, priority: 39 },
+                        { pattern: /^Minions/, priority: 39 }
+                    ];
+
+                    // 查找能力描述对应的优先级
+                    function getPriority(ability) {
+                        if (!ability) return 999;
+                        for (const item of abilityGroupOrder) {
+                            if (item.pattern.test(ability)) {
+                                return item.priority;
+                            }
+                        }
+                        return 999;
+                    }
+
+                    // 排序角色
+                    return roles.sort((a, b) => {
+                        // 比较两个角色的优先级
+                        const priorityA = getPriority(a.ability);
+                        const priorityB = getPriority(b.ability);
+
+                        if (priorityA !== priorityB) {
+                            return priorityA - priorityB;
+                        }
+
+                        // 如果优先级相同，按能力文本长度排序
+                        if (a.ability.length !== b.ability.length) {
+                            return a.ability.length - b.ability.length;
+                        }
+
+                        // 如果能力文本长度相同，按角色名字数排序
+                        if (a.name.length !== b.name.length) {
+                            return a.name.length - b.name.length;
+                        }
+
+                        // 如果都相同，按角色名字母顺序排序
+                        return a.name.localeCompare(b.name);
+                    });
+                };
+                
+                // 对每个阵营应用SAO排序
+                const sortedTownsfolkRoles = applySAOSort(townsfolkRoles);
+                const sortedOutsiderRoles = applySAOSort(outsiderRoles);
+                const sortedMinionRoles = applySAOSort(minionRoles);
+                const sortedDemonRoles = applySAOSort(demonRoles);
+                
                 // 创建预览容器
                 const previewContainer = document.createElement('div');
                 previewContainer.id = 'script-image-preview-v2';
@@ -599,18 +725,33 @@ async function generateScriptImageV2() {
                 // 构建阵营区域HTML
                 const createTeamSection = (title, roles, color = '#0b6aaf') => {
                     if (roles.length === 0) return '';
+                    
+                    // 竖向排列：先填满第一列，再填满第二列
+                    const midIndex = Math.ceil(roles.length / 2);
+                    const leftColumn = roles.slice(0, midIndex);
+                    const rightColumn = roles.slice(midIndex);
+                    
                     return `
                         <div style="margin-bottom: 15px; max-width: 100%;">
                             <div style="font-family: 'Philo', serif; font-size: 16px; font-weight: bold; color: ${color}; padding-bottom: 3px; margin-bottom: 8px; display: flex; align-items: center; max-width: 100%;">
                                 <span>${title}</span>
                                 <div style="flex: 1; height: 1px; background: ${color}; margin-left: 10px;"></div>
                             </div>
-                            <div style="display: flex; flex-wrap: wrap; gap: 10px; max-width: 100%; box-sizing: border-box;">
-                                ${roles.map(role => `
-                                    <div style="flex: 0 1 calc(50% - 10px); min-width: 250px; max-width: calc(50% - 10px); box-sizing: border-box;">
-                                        ${createRoleCard(role, color)}
-                                    </div>
-                                `).join('')}
+                            <div style="display: flex; gap: 10px; max-width: 100%; box-sizing: border-box;">
+                                <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+                                    ${leftColumn.map(role => `
+                                        <div style="box-sizing: border-box;">
+                                            ${createRoleCard(role, color)}
+                                        </div>
+                                    `).join('')}
+                                </div>
+                                <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+                                    ${rightColumn.map(role => `
+                                        <div style="box-sizing: border-box;">
+                                            ${createRoleCard(role, color)}
+                                        </div>
+                                    `).join('')}
+                                </div>
                             </div>
                         </div>
                     `;
@@ -691,10 +832,10 @@ async function generateScriptImageV2() {
                             
                             <!-- 中间角色列表 -->
                             <div style="flex: 1; padding: 0 5px; max-width: 100%; box-sizing: border-box;">
-                                ${createTeamSection(customTeamNames.townsfolk, townsfolkRoles, customTeamColors.townsfolk)}
-                                ${createTeamSection(customTeamNames.outsider, outsiderRoles, customTeamColors.outsider)}
-                                ${createTeamSection(customTeamNames.minion, minionRoles, customTeamColors.minion)}
-                                ${createTeamSection(customTeamNames.demon, demonRoles, customTeamColors.demon)}
+                                ${createTeamSection(customTeamNames.townsfolk, sortedTownsfolkRoles, customTeamColors.townsfolk)}
+                                ${createTeamSection(customTeamNames.outsider, sortedOutsiderRoles, customTeamColors.outsider)}
+                                ${createTeamSection(customTeamNames.minion, sortedMinionRoles, customTeamColors.minion)}
+                                ${createTeamSection(customTeamNames.demon, sortedDemonRoles, customTeamColors.demon)}
                                 ${validCustomTeams.map(team => createTeamSection(team.name, team.roles, team.color)).join('')}
                             </div>
                             
@@ -1926,6 +2067,7 @@ function loadScriptConfigToModal() {
             const showCustomRules = document.getElementById('showCustomRules');
             const showTravellersFabled = document.getElementById('showTravellersFabled');
             const showJinxRules = document.getElementById('showJinxRules');
+            const horizontalLayout = document.getElementById('horizontalLayout');
             
             if (showNightOrder) document.getElementById('modal-showNightOrder').checked = showNightOrder.checked;
             if (showConfigTable) document.getElementById('modal-showConfigTable').checked = showConfigTable.checked;
@@ -2075,6 +2217,7 @@ function saveScriptConfig() {
             const showCustomRules = document.getElementById('showCustomRules');
             const showTravellersFabled = document.getElementById('showTravellersFabled');
             const showJinxRules = document.getElementById('showJinxRules');
+            const horizontalLayout = document.getElementById('horizontalLayout');
             
             if (showNightOrder) showNightOrder.checked = document.getElementById('modal-showNightOrder').checked;
             if (showConfigTable) showConfigTable.checked = document.getElementById('modal-showConfigTable').checked;

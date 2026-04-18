@@ -849,30 +849,6 @@
                 box-sizing: border-box;
             }
 
-            /* 移动端适配 */
-            @media (max-width: 768px) {
-                .main-container {
-                    flex-direction: column;
-                }
-                
-                .right-sidebar {
-                    order: 2;
-                    width: 100%;
-                    margin-top: 20px;
-                }
-                
-                .action-buttons {
-                    margin-bottom: 20px;
-                    grid-template-columns: repeat(4, 1fr);
-                    gap: 8px;
-                }
-                
-                .action-buttons button {
-                    font-size: 11px;
-                    padding: 8px 10px;
-                }
-            }
-
             /* 控制面板卡片调整 */
             .control-panel-card {
                 padding: 16px;
@@ -2938,7 +2914,18 @@
                         </div>
                     </div>
                 </div>
-
+                
+                <!-- 夜间顺序展示区 - 在相克规则下方 -->
+                <div class="night-order-section" style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border-color);">
+                    <h3 style="margin: 0 0 12px 0; font-size: 14px; font-weight: 600; color: var(--text-color); display: flex; justify-content: space-between; align-items: center;">
+                        🌙 夜间顺序 <span class="selected-count" id="night-order-count-display">0</span>
+                    </h3>
+                    <div id="night-order-display">
+                        <div style="text-align: center; color: #999; padding: 20px;">
+                            暂无夜间顺序
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="sidebar-card action-buttons">
@@ -2955,9 +2942,8 @@
                 <button class="action-btn-warning" onclick="toggleDirInput()">➕ 添加自制角色</button>
                 <button class="action-btn-warning" onclick="toggleMetaInfoInput()">📝 添加剧本信息</button>
                 <button class="action-btn-primary" onclick="toggleScriptConfigModal()">🎨 剧本图设置</button>
-            </div>
 
-            <div class="sidebar-card">
+
                 <!-- JSON编辑区 -->
                 <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border-color);">
                     <h3 style="margin: 0 0 12px 0; font-size: 14px; font-weight: 600; color: var(--text-color); display: flex; justify-content: space-between; align-items: center;">
@@ -2967,18 +2953,6 @@
                         <textarea id="json-editor" style="width: 100%; min-height: 900px; max-height: 900px; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; font-family: 'Courier New', monospace; font-size: 12px; resize: vertical; box-sizing: border-box;" placeholder="生成的JSON将显示在这里，您可以手动修改..."></textarea>
                         <div style="margin-top: 8px;">
                             <button onclick="updateFromJsonEditor()" style="width: 100%; padding: 8px 12px; background: var(--primary-gradient); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600;">应用修改</button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 夜间顺序展示区 - 在相克规则下方 -->
-                <div class="night-order-section" style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border-color);">
-                    <h3 style="margin: 0 0 12px 0; font-size: 14px; font-weight: 600; color: var(--text-color); display: flex; justify-content: space-between; align-items: center;">
-                        🌙 夜间顺序 <span class="selected-count" id="night-order-count-display">0</span>
-                    </h3>
-                    <div id="night-order-display">
-                        <div style="text-align: center; color: #999; padding: 20px;">
-                            暂无夜间顺序
                         </div>
                     </div>
                 </div>
@@ -4275,7 +4249,7 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                     return keywords.every(keyword => ability.includes(keyword));
                 } else {
                     const name = role.name.toLowerCase();
-                    const pinyinsuoxie = role.pinyinsuoxie.toLowerCase();
+                    const pinyinsuoxie = role.pinyinsuoxie ? role.pinyinsuoxie.toLowerCase() : '';
                     return name.includes(query) || pinyinsuoxie.includes(query);
                 }
             });
@@ -8124,7 +8098,7 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
 
             // 获取所有选中的角色
             const selectedCheckboxes = document.querySelectorAll('.role-item input[type="checkbox"]:checked');
-            const selectedRoles = [];
+            let selectedRoles = [];
             
             selectedCheckboxes.forEach(checkbox => {
                 const roleItem = checkbox.closest('.role-item');
@@ -8160,7 +8134,34 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                 });
             });
 
-            // 自制角色通过复选框勾选添加，不需要自动添加
+            // 添加自定义角色
+            dirRolesJson.forEach(role => {
+                // 从角色数据中获取团队信息
+                let category = '其他';
+                const team = role.team || '';
+                
+                if (team === 'townsfolk' || team === '镇民') {
+                    category = '镇民';
+                } else if (team === 'outsider' || team === '外来者') {
+                    category = '外来者';
+                } else if (team === 'minion' || team === '爪牙') {
+                    category = '爪牙';
+                } else if (team === 'demon' || team === '恶魔') {
+                    category = '恶魔';
+                } else if (team === 'traveller' || team === '旅行者') {
+                    category = '旅行者';
+                } else if (team === 'fabled' || team === '传奇') {
+                    category = '传奇';
+                }
+                
+                selectedRoles.push({
+                    id: role.id,
+                    name: role.name,
+                    image: role.image || '',
+                    ability: role.ability || '',
+                    category: category
+                });
+            });
 
             // 按类别分组（保持原有顺序）
             const rolesByCategory = {};
@@ -8188,6 +8189,119 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                         }
                     });
                     rolesByCategory[category] = orderedRoles;
+                } else {
+                    // 如果没有排序信息，按照能力描述排序
+                    rolesByCategory[category].sort((a, b) => {
+                        // 能力描述分组排序规则
+                        const abilityGroupOrder = [
+                            { pattern: /^在你的首个夜晚，你会得知/, priority: 1 },
+                            { pattern: /^You start knowing/, priority: 1 },
+                            { pattern: /^在夜晚时|^在夜晚/, priority: 2 },
+                            { pattern: /^At night/, priority: 2 },
+                            { pattern: /^每个黄昏/, priority: 3 },
+                            { pattern: /^Each dusk/, priority: 3 },
+                            { pattern: /^每个夜晚\*/, priority: 5 },
+                            { pattern: /^Each night\*/, priority: 5 },
+                            { pattern: /^每个夜晚/, priority: 4 },
+                            { pattern: /^Each night(?!\*)/, priority: 4 },
+                            { pattern: /^每个白天/, priority: 6 },
+                            { pattern: /^Each day/, priority: 6 },
+                            { pattern: /^游戏开始时/, priority: 7 },
+                            { pattern: /^When the game begins/, priority: 7 },
+                            { pattern: /^如果你被处决/, priority: 8 },
+                            { pattern: /^If you are executed/, priority: 8 },
+                            { pattern: /^当你被处决时/, priority: 9 },
+                            { pattern: /^When you are executed/, priority: 9 },
+                            { pattern: /^在你的首个白天/, priority: 10 },
+                            { pattern: /^On your first day/, priority: 10 },
+                            { pattern: /^在你的首个夜晚/, priority: 11 },
+                            { pattern: /^On your first night/, priority: 11 },
+                            { pattern: /^在你的首个白天或夜晚/, priority: 12 },
+                            { pattern: /^On your first day or night/, priority: 12 },
+                            { pattern: /^你认为/, priority: 13 },
+                            { pattern: /^You think/, priority: 13 },
+                            { pattern: /^你是/, priority: 14 },
+                            { pattern: /^You are/, priority: 14 },
+                            { pattern: /^你拥有/, priority: 15 },
+                            { pattern: /^You have/, priority: 15 },
+                            { pattern: /^你知道/, priority: 16 },
+                            { pattern: /^You know/, priority: 16 },
+                            { pattern: /^你可以/, priority: 17 },
+                            { pattern: /^You may/, priority: 17 },
+                            { pattern: /^你必须/, priority: 18 },
+                            { pattern: /^You must/, priority: 18 },
+                            { pattern: /^当你死亡时/, priority: 19 },
+                            { pattern: /^When you die/, priority: 19 },
+                            { pattern: /^如果/, priority: 20 },
+                            { pattern: /^If/, priority: 20 },
+                            { pattern: /^当/, priority: 21 },
+                            { pattern: /^When/, priority: 21 },
+                            { pattern: /^每当/, priority: 22 },
+                            { pattern: /^Whenever/, priority: 22 },
+                            { pattern: /^作为/, priority: 23 },
+                            { pattern: /^As/, priority: 23 },
+                            { pattern: /^白天开始时/, priority: 24 },
+                            { pattern: /^At the start of day/, priority: 24 },
+                            { pattern: /^夜晚开始时/, priority: 25 },
+                            { pattern: /^At the start of night/, priority: 25 },
+                            { pattern: /^白天结束时/, priority: 26 },
+                            { pattern: /^At the end of day/, priority: 26 },
+                            { pattern: /^镇民/, priority: 27 },
+                            { pattern: /^Townsfolk/, priority: 27 },
+                            { pattern: /^外来者/, priority: 28 },
+                            { pattern: /^Outsider/, priority: 28 },
+                            { pattern: /^爪牙/, priority: 29 },
+                            { pattern: /^Minion/, priority: 29 },
+                            { pattern: /^恶魔/, priority: 30 },
+                            { pattern: /^Demon/, priority: 30 },
+                            { pattern: /^旅行者/, priority: 31 },
+                            { pattern: /^Traveller/, priority: 31 },
+                            { pattern: /^传奇/, priority: 32 },
+                            { pattern: /^Fabled/, priority: 32 },
+                            { pattern: /^你的能力/, priority: 33 },
+                            { pattern: /^Your ability/, priority: 33 },
+                            { pattern: /^此角色/, priority: 34 },
+                            { pattern: /^This character/, priority: 34 },
+                            { pattern: /^说书人/, priority: 35 },
+                            { pattern: /^Storyteller/, priority: 35 },
+                            { pattern: /^玩家/, priority: 36 },
+                            { pattern: /^Players/, priority: 36 },
+                            { pattern: /^游戏/, priority: 37 },
+                            { pattern: /^Game/, priority: 37 }
+                        ];
+
+                        // 查找能力描述对应的优先级
+                        function getPriority(ability) {
+                            if (!ability) return 999;
+                            for (const item of abilityGroupOrder) {
+                                if (item.pattern.test(ability)) {
+                                    return item.priority;
+                                }
+                            }
+                            return 999;
+                        }
+
+                        // 比较两个角色的优先级
+                        const priorityA = getPriority(a.ability);
+                        const priorityB = getPriority(b.ability);
+
+                        if (priorityA !== priorityB) {
+                            return priorityA - priorityB;
+                        }
+
+                        // 如果优先级相同，按能力文本长度排序
+                        if (a.ability.length !== b.ability.length) {
+                            return a.ability.length - b.ability.length;
+                        }
+
+                        // 如果能力文本长度相同，按角色名字数排序
+                        if (a.name.length !== b.name.length) {
+                            return a.name.length - b.name.length;
+                        }
+
+                        // 如果都相同，按角色名字母顺序排序
+                        return a.name.localeCompare(b.name);
+                    });
                 }
             });
 
@@ -8199,6 +8313,7 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                 displayContainer.innerHTML = '<div style="text-align: center; color: #999; grid-column: 1/-1; padding: 20px;">暂无已选角色</div>';
             } else {
                 let html = '';
+                let globalIndex = 0;
                 
                 // 按类别生成HTML
                 Object.keys(rolesByCategory).forEach(category => {
@@ -8211,32 +8326,46 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                         </div>
                     `;
                     
-                    // 添加该类别的角色
-                    roles.forEach((role, index) => {
-                        html += `
-                            <div class="selected-role-card" title="点击取消选择" draggable="true" data-role-id="${role.id}" data-category="${category}" data-index="${index}">
-                                <div class="selected-role-header">
-                                    <img src="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22%23f0f0f0%22/><text x=%2250%22 y=%2260%22 text-anchor=%22middle%22 font-size=%2230%22> ${role.name.charAt(0)} </text></svg>" data-src="${role.image}" alt="${role.name}" class="lazy-load" data-retry="0" data-max-retry="3" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
-                                    <span class="selected-role-name" onclick="toggleRoleSelection('${role.id}')">${role.name}</span>
-                                    <div class="selected-role-actions">
-                                        <button type="button" class="role-action-btn edit-btn" onclick="editRole('${role.id}')" title="修改角色">
-                                            <span style="font-size: 16px; font-weight: bold;">✏️</span>
-                                        </button>
-                                        <button type="button" class="role-action-btn copy-btn" onclick="copyRoleAbility('${role.ability}', '${role.name}', '${role.image}')" title="复制角色信息">
-                                            <span style="font-size: 16px; font-weight: bold;">📋</span>
-                                        </button>
-                                        <button type="button" class="role-action-btn pin-btn ${pinnedRoles.has(role.id) ? 'active' : ''}" onclick="togglePinRole('${role.id}')" title="固定此角色">
-                                            <span style="font-size: 16px; font-weight: bold;">🔒</span>
-                                        </button>
-                                        <button type="button" class="role-action-btn exclude-btn ${excludedRoles.has(role.id) ? 'active' : ''}" onclick="toggleExcludeRole('${role.id}')" title="排除此角色">
-                                            <span style="font-size: 16px; font-weight: bold;">🚫</span>
-                                        </button>
+                    // 按列排列角色（先上到下，再左到右）
+                    const columnCount = 2;
+                    const rowCount = Math.ceil(roles.length / columnCount);
+                    
+                    // 按列优先顺序生成HTML，实现真正的垂直排列
+                    // 先填满第一列，再填满第二列
+                    for (let col = 0; col < columnCount; col++) {
+                        for (let row = 0; row < rowCount; row++) {
+                            // 计算索引：col * rowCount + row
+                            // 这样会先填充第一列的所有行，再填充第二列
+                            const index = col * rowCount + row;
+                            if (index < roles.length) {
+                                const role = roles[index];
+                                html += `
+                                    <div class="selected-role-card" title="点击取消选择" draggable="true" data-role-id="${role.id}" data-category="${category}" data-index="${globalIndex}">
+                                        <div class="selected-role-header">
+                                            <img src="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22%23f0f0f0%22/><text x=%2250%22 y=%2260%22 text-anchor=%22middle%22 font-size=%2230%22> ${role.name.charAt(0)} </text></svg>" data-src="${role.image}" alt="${role.name}" class="lazy-load" data-retry="0" data-max-retry="3" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                                            <span class="selected-role-name" onclick="toggleRoleSelection('${role.id}')">${role.name}</span>
+                                            <div class="selected-role-actions">
+                                                <button type="button" class="role-action-btn edit-btn" onclick="editRole('${role.id}')" title="修改角色">
+                                                    <span style="font-size: 16px; font-weight: bold;">✏️</span>
+                                                </button>
+                                                <button type="button" class="role-action-btn copy-btn" onclick="copyRoleAbility('${role.ability}', '${role.name}', '${role.image}')" title="复制角色信息">
+                                                    <span style="font-size: 16px; font-weight: bold;">📋</span>
+                                                </button>
+                                                <button type="button" class="role-action-btn pin-btn ${pinnedRoles.has(role.id) ? 'active' : ''}" onclick="togglePinRole('${role.id}')" title="固定此角色">
+                                                    <span style="font-size: 16px; font-weight: bold;">🔒</span>
+                                                </button>
+                                                <button type="button" class="role-action-btn exclude-btn ${excludedRoles.has(role.id) ? 'active' : ''}" onclick="toggleExcludeRole('${role.id}')" title="排除此角色">
+                                                    <span style="font-size: 16px; font-weight: bold;">🚫</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        ${role.ability ? `<div class="selected-role-ability" onclick="toggleRoleSelection('${role.id}')">${highlightAbility(role.ability)}</div>` : ''}
                                     </div>
-                                </div>
-                                ${role.ability ? `<div class="selected-role-ability" onclick="toggleRoleSelection('${role.id}')">${highlightAbility(role.ability)}</div>` : ''}
-                            </div>
-                        `;
-                    });
+                                `;
+                                globalIndex++;
+                            }
+                        }
+                    }
                 });
                 
                 displayContainer.innerHTML = html;
@@ -8246,6 +8375,19 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                 
                 // 初始化拖拽功能
                 initDragAndDrop();
+                
+                // 将排序后的角色重新组合成selectedRoles（按rolesByCategory的顺序）
+                const sortedSelectedRoles = [];
+                Object.keys(rolesByCategory).forEach(category => {
+                    rolesByCategory[category].forEach(role => {
+                        // 查找完整的角色信息
+                        const fullRole = selectedRoles.find(r => r.id === role.id);
+                        if (fullRole) {
+                            sortedSelectedRoles.push(fullRole);
+                        }
+                    });
+                });
+                selectedRoles = sortedSelectedRoles;
             }
             
             // 更新相克规则显示
@@ -8257,22 +8399,15 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
             // 更新JSON编辑器
             updateJsonEditor();
             
+            // 更新全局selectedRoles变量
+            window.selectedRoles = selectedRoles;
+            
             // 保存数据到本地存储
             saveToLocalStorage();
         }
         
         // 初始化拖拽功能
-        // 检测是否为移动设备
-        function isMobileDevice() {
-            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-        }
-
         function initDragAndDrop() {
-            // 移动设备禁止拖拽
-            if (isMobileDevice()) {
-                return;
-            }
-            
             const cards = document.querySelectorAll('.selected-role-card');
             let draggedCard = null;
             
@@ -10239,9 +10374,10 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                 // 处理自定义角色
                 else{
                     console.log("dirRolesPath");
-                    // 只添加到dirRolesJson中，不添加到selectedRoles中
-                    // 这样不在角色数据库里的角色就不会被选择
+                    // 添加到dirRolesJson中，同时也添加到selectedRoles中
+                    // 这样自定义角色也能显示在已选角色中
                     dirRolesJson.push(item);
+                    selectedRoles.push(item);
                 }
             });
 
@@ -11591,60 +11727,6 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                         }
                         return;
                     }
-                }
-
-                // 尝试通过角色技能描述匹配
-                try {
-                    // 构建所有角色的完整列表
-                    const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demonsRoles, ...fabledRoles, ...travellersRoles];
-                    
-                    // 查找当前角色在角色列表中的信息
-                    const roleId = checkbox.name || checkbox.id;
-                    const roleInfo = allRoles.find(role => 
-                        role.id === roleId || 
-                        role.name === roleName
-                    );
-
-                    // 检查角色技能描述是否包含关键词
-                    if (roleInfo && roleInfo.ability) {
-                        const abilityLower = roleInfo.ability.toLowerCase();
-                        for (const keyword of searchKeywords) {
-                            try {
-                                // 尝试将关键词作为正则表达式
-                                const regex = new RegExp(keyword, 'i');
-                                if (regex.test(abilityLower)) {
-                                    if (!foundRoles.has(roleName)) {
-                                        checkbox.checked = true;
-                                        // 确保角色项可见（移除hidden类）
-                                        const roleItem = checkbox.closest('.role-item');
-                                        if (roleItem) {
-                                            roleItem.classList.remove('hidden');
-                                        }
-                                        foundCount++;
-                                        foundRoles.add(roleName);
-                                    }
-                                    return;
-                                }
-                            } catch (e) {
-                                // 如果不是有效的正则表达式，使用普通字符串匹配
-                                if (abilityLower.includes(keyword.toLowerCase())) {
-                                    if (!foundRoles.has(roleName)) {
-                                        checkbox.checked = true;
-                                        // 确保角色项可见（移除hidden类）
-                                        const roleItem = checkbox.closest('.role-item');
-                                        if (roleItem) {
-                                            roleItem.classList.remove('hidden');
-                                        }
-                                        foundCount++;
-                                        foundRoles.add(roleName);
-                                    }
-                                    return;
-                                }
-                            }
-                        }
-                    }
-                } catch (e) {
-                    // 忽略错误，继续处理
                 }
             });
 
