@@ -93,6 +93,7 @@ async function generateScriptImageV2() {
                 const showCustomRules = document.getElementById('showCustomRules')?.checked ?? false;
                 const showTravellersFabled = document.getElementById('showTravellersFabled')?.checked ?? true;
                 const showJinxRules = document.getElementById('showJinxRules')?.checked ?? true;
+                const reverseOtherNight = document.getElementById('reverseOtherNight')?.checked ?? false;
                 
                 // 获取背景颜色设置
                 const customBgColor = document.getElementById('bg-color-setting')?.value || '#f6f6f4';
@@ -339,7 +340,7 @@ async function generateScriptImageV2() {
                         allOtherNight = [...otherNightRoles, ...metaOtherNight].sort((a, b) => {
                             const orderA = a.otherNight || 0;
                             const orderB = b.otherNight || 0;
-                            return orderA - orderB; // 从小到大排序
+                            return orderA - orderB;
                         });
                         console.log('默认其他夜晚顺序:', allOtherNight.map(item => item.name));
                     }
@@ -367,7 +368,7 @@ async function generateScriptImageV2() {
                     allOtherNight = [...otherNightRoles, ...metaOtherNight].sort((a, b) => {
                         const orderA = a.otherNight || 0;
                         const orderB = b.otherNight || 0;
-                        return orderA - orderB; // 从小到大排序
+                        return orderA - orderB;
                     });
                     console.log('默认其他夜晚顺序:', allOtherNight.map(item => item.name));
                 }
@@ -539,7 +540,7 @@ async function generateScriptImageV2() {
                 
                 // 构建其他夜晚顺序HTML（右侧垂直排列）
                 const otherNightHtml = allOtherNight.map(role => `
-                    <img src="${convertToLocalPath(role.image)}" style="width: 45px; height: 45px; margin: -5px 0; object-fit: cover; display: block; transform: rotate(180deg);">
+                    <img src="${convertToLocalPath(role.image)}" style="width: 45px; height: 45px; margin: -5px 0; object-fit: cover; display: block;${!reverseOtherNight ? '' : ' transform: rotate(180deg);'}">
                 `).join('');
                 
 
@@ -745,7 +746,7 @@ async function generateScriptImageV2() {
                             </div>
                             
                             <!-- 右侧其他夜顺序 -->
-                            <div style="width: 25px; display: flex; flex-direction: column-reverse; align-items: center; padding-left: 2px;">
+                            <div style="width: 25px; display: flex; flex-direction: ${!reverseOtherNight ? 'column' : 'column-reverse'}; align-items: center; padding-left: 2px;">
                                 ${otherNightHtml}
                             </div>
                             ` : ''}
@@ -1030,6 +1031,9 @@ async function generateJinxAndConfigImage() {
                 // 获取背景颜色设置
                 const detailBgColor = document.getElementById('bg-color-setting')?.value || '#f6f6f4';
                 const detailBgOpacity = parseInt(document.getElementById('bg-opacity-setting')?.value || '100') / 100;
+                
+                // 获取其他夜晚顺序倒序设置
+                const reverseOtherNight = document.getElementById('reverseOtherNight')?.checked ?? false;
                 
                 // 获取当前选中的角色
                 const allRoles = [...getSelectedRoles(), ...dirRolesJson];
@@ -1611,9 +1615,9 @@ async function generateJinxAndConfigImage() {
                             </div>
                             
                             <!-- 右侧其他夜顺序 -->
-                            <div style="width: ${40 * fontSizeMultiplier}px; display: flex; flex-direction: column-reverse; align-items: center; padding-left: 5px;">
+                            <div style="width: ${40 * fontSizeMultiplier}px; display: flex; flex-direction: ${!reverseOtherNight ? 'column' : 'column-reverse'}; align-items: center; padding-left: 5px;">
                                 ${otherNightHtml}
-                                <div style="font-family: 'Philo', serif; font-size: ${10 * fontSizeMultiplier}px; padding: 5px 0; color: #333; font-weight: bold; line-height: 1.5; white-space: pre; transform: rotate(180deg);">他<br>夜</div>
+                                <div style="font-family: 'Philo', serif; font-size: ${10 * fontSizeMultiplier}px; padding: 5px 0; color: #333; font-weight: bold; line-height: 1.5; white-space: pre;${!reverseOtherNight ? '' : ' transform: rotate(180deg);'}">他<br>夜</div>
                             </div>
                         </div>
                         
@@ -1854,6 +1858,10 @@ function toggleScriptConfigModal() {
                             <input type="checkbox" id="modal-horizontalLayout" style="width: 16px; height: 16px;">
                             <span>角色横向排列</span>
                         </label>
+                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                            <input type="checkbox" id="modal-reverseOtherNight" checked style="width: 16px; height: 16px;">
+                            <span>其他夜晚顺序倒序（默认）</span>
+                        </label>
                     </div>
                 </div>
 
@@ -1969,6 +1977,7 @@ function loadScriptConfigToModal() {
             const showTravellersFabled = document.getElementById('showTravellersFabled');
             const showJinxRules = document.getElementById('showJinxRules');
             const horizontalLayout = document.getElementById('horizontalLayout');
+            const reverseOtherNight = document.getElementById('reverseOtherNight');
             
             if (showNightOrder) document.getElementById('modal-showNightOrder').checked = showNightOrder.checked;
             if (showConfigTable) document.getElementById('modal-showConfigTable').checked = showConfigTable.checked;
@@ -1976,6 +1985,7 @@ function loadScriptConfigToModal() {
             if (showTravellersFabled) document.getElementById('modal-showTravellersFabled').checked = showTravellersFabled.checked;
             if (showJinxRules) document.getElementById('modal-showJinxRules').checked = showJinxRules.checked;
             if (horizontalLayout) document.getElementById('modal-horizontalLayout').checked = horizontalLayout.checked;
+            if (reverseOtherNight) document.getElementById('modal-reverseOtherNight').checked = reverseOtherNight.checked;
             
             // 字号设置
             const fontSizeInput = document.getElementById('font-size-setting');
@@ -2120,6 +2130,7 @@ function saveScriptConfig() {
             const showTravellersFabled = document.getElementById('showTravellersFabled');
             const showJinxRules = document.getElementById('showJinxRules');
             const horizontalLayout = document.getElementById('horizontalLayout');
+            const reverseOtherNight = document.getElementById('reverseOtherNight');
             
             if (showNightOrder) showNightOrder.checked = document.getElementById('modal-showNightOrder').checked;
             if (showConfigTable) showConfigTable.checked = document.getElementById('modal-showConfigTable').checked;
@@ -2127,6 +2138,7 @@ function saveScriptConfig() {
             if (showTravellersFabled) showTravellersFabled.checked = document.getElementById('modal-showTravellersFabled').checked;
             if (showJinxRules) showJinxRules.checked = document.getElementById('modal-showJinxRules').checked;
             if (horizontalLayout) horizontalLayout.checked = document.getElementById('modal-horizontalLayout').checked;
+            if (reverseOtherNight) reverseOtherNight.checked = document.getElementById('modal-reverseOtherNight').checked;
             
             // 字号设置
             const fontSizeRadios = document.querySelectorAll('input[name="fontSize"]');

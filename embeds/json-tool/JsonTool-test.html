@@ -341,8 +341,8 @@
 
         /* 角色列布局容器 */
         .role-columns {
-            display: flex;                                    /* flex布局 */
-            flex-direction: column;                            /* 改为单列 */
+            display: grid;                                    /* grid布局 */
+            grid-template-columns: repeat(2, 1fr);            /* 两列 */
             gap: 10px;                                        /* 间距 */
             width: 100%;                                       /* 宽度100% */
         }
@@ -350,18 +350,17 @@
         /* 单个角色列 */
         .role-column {
             width: 100%;                                      /* 宽度100% */
-            min-width: 100%;                                  /* 最小宽度100% */
         }
 
         /* 角色项样式 */
         .role-item {
-            margin-bottom: 12px;                              /* 下外边距 - 增大 */
+            margin-bottom: 6px;                               /* 下外边距 - 减小 */
             display: flex;                                    /* flex布局 */
             align-items: center;                               /* 垂直居中 */
-            gap: 12px;                                        /* 元素间距 - 增大 */
+            gap: 8px;                                         /* 元素间距 - 减小 */
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* 更平滑的过渡 */
-            padding: 12px;                                    /* 内边距 - 增大 */
-            border-radius: 12px;                               /* 圆角 - 增大 */
+            padding: 8px 10px;                                 /* 内边距 - 减小 */
+            border-radius: 8px;                                /* 圆角 - 减小 */
             border: 1px solid var(--border-color);            /* 边框 */
             background: var(--card-bg-color);                /* 背景色 */
             box-shadow: var(--shadow-sm);                       /* 小阴影 */
@@ -382,7 +381,7 @@
 
         /* 角色项悬停效果 */
         .role-item:hover {
-            transform: translateX(6px) scale(1.02);           /* 悬停时向右移动并轻微放大 */
+            transform: translateX(3px) scale(1.01);           /* 悬停时向右移动并轻微放大 - 减小效果 */
             background-color: var(--hover-color);             /* 悬停背景色 */
             box-shadow: var(--shadow-md);                       /* 增强阴影 */
             border-color: var(--primary-color);               /* 边框变为主色调 */
@@ -391,15 +390,22 @@
         /* 选中的角色项悬停效果 */
         .role-item:has(input[type="checkbox"]:checked):hover {
             background: linear-gradient(135deg, #553c9a 0%, #805ad5 100%); /* 深紫色渐变 */
-            transform: translateX(6px) scale(1.02);
+            transform: translateX(3px) scale(1.01);           /* 减小效果 */
         }
 
         /* 角色图片样式 */
         .role-item-img {
-            max-width: 60px;                                  /* 最大宽度 - 增大 */
-            max-height: 60px;                                 /* 最大高度 - 增大 */
-            border-radius: 8px;                                /* 圆角 - 增大 */
+            max-width: 40px;                                  /* 最大宽度 - 减小 */
+            max-height: 40px;                                 /* 最大高度 - 减小 */
+            border-radius: 6px;                                /* 圆角 - 减小 */
             box-shadow: var(--shadow-sm);                       /* 小阴影 */
+        }
+        
+        /* 角色名称样式 */
+        .role-name {
+            font-size: 14px;                                   /* 字体大小 - 适中 */
+            font-weight: 500;                                  /* 字体粗细 */
+            margin-right: 8px;                                 /* 右边距 */
         }
         
         /* 角色操作按钮样式 */
@@ -585,6 +591,11 @@
         /* ============================================ 响应式设计 ============================================ */
         /* 手机屏幕适配 */
         @media (max-width: 768px) {
+            /* 角色列移动端单列显示 */
+            .role-columns {
+                grid-template-columns: 1fr;
+            }
+
             /* 容器样式调整 */
             .container {
                 padding: 12px;
@@ -2379,7 +2390,7 @@
 
         .selected-roles-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: 1fr;
             gap: 12px;
         }
         
@@ -3797,6 +3808,12 @@
                     if (checkbox) checkbox.checked = savedHorizontalLayout === 'true';
                 }
 
+                const savedReverseOtherNight = localStorage.getItem('reverseOtherNight');
+                if (savedReverseOtherNight) {
+                    const checkbox = document.getElementById('reverseOtherNight');
+                    if (checkbox) checkbox.checked = savedReverseOtherNight === 'true';
+                }
+
                 console.log('数据已从本地存储恢复');
             } catch (error) {
                 console.error('恢复数据失败:', error);
@@ -3837,6 +3854,9 @@
                 const horizontalLayout = document.getElementById('horizontalLayout');
                 if (horizontalLayout) localStorage.setItem('horizontalLayout', horizontalLayout.checked);
 
+                const reverseOtherNight = document.getElementById('reverseOtherNight');
+                if (reverseOtherNight) localStorage.setItem('reverseOtherNight', reverseOtherNight.checked);
+
                 console.log('数据已保存到本地存储');
             } catch (error) {
                 console.error('保存数据失败:', error);
@@ -3869,7 +3889,8 @@
                 'showCustomRules',
                 'showTravellersFabled',
                 'showJinxRules',
-                'horizontalLayout'
+                'horizontalLayout',
+                'reverseOtherNight'
             ];
             
             settingCheckboxes.forEach(id => {
@@ -4309,8 +4330,6 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
         function loadRoles(roles, containerId) {
             // 获取角色列容器
             const roleColumns = document.getElementById(containerId);
-            console.log(roles);
-            console.log(roleColumns);
             
             // 保存当前选中的角色ID
             const checkedRoleIds = Array.from(roleColumns.querySelectorAll('input[type="checkbox"]:checked'))
@@ -4318,11 +4337,17 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
             
             roleColumns.innerHTML = ''; // 清空容器
 
-            // 创建单列
+            // 创建两列
             const column1 = document.createElement('div');
             column1.className = 'role-column';
+            
+            const column2 = document.createElement('div');
+            column2.className = 'role-column';
 
-            // 添加所有角色到单列
+            // 计算每列的角色数量
+            const midPoint = Math.ceil(roles.length / 2);
+
+            // 添加角色到两列
             for (let i = 0; i < roles.length; i++) {
                 const role = roles[i];
                 const div = document.createElement('div');
@@ -4334,9 +4359,8 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                 // 检查角色是否之前被选中
                 const isChecked = checkedRoleIds.includes(role.id);
                 
-                // 构建角色项HTML，包含图片和正确的结构
+                // 构建角色项HTML，移除图片
                 div.innerHTML = `
-                    <img src="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22%23f0f0f0%22/><text x=%2250%22 y=%2260%22 text-anchor=%22middle%22 font-size=%2230%22> ${role.name.charAt(0)} </text></svg>" data-src="${role.image || ''}" alt="${role.name}" class="role-item-img lazy-load" data-retry="0" data-max-retry="3">
                     <div>
                         <div>
                             <label>
@@ -4347,11 +4371,18 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                         <div class="role-ability" style="font-size: 12px; color: #666; margin-top: 4px; display: none;">${role.ability || ''}</div>
                     </div>
                 `;
-                column1.appendChild(div);
+                
+                // 根据索引分配到不同的列
+                if (i < midPoint) {
+                    column1.appendChild(div);
+                } else {
+                    column2.appendChild(div);
+                }
             }
 
             // 将列添加到容器
             roleColumns.appendChild(column1);
+            roleColumns.appendChild(column2);
 
             // 初始更新角色可见性
             updateRoleVisibility();
@@ -4384,9 +4415,15 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
 
             dirColumns.innerHTML = ''; // 清空容器
 
-            // 创建单列
+            // 创建两列
             const column1 = document.createElement('div');
             column1.className = 'role-column';
+            
+            const column2 = document.createElement('div');
+            column2.className = 'role-column';
+
+            // 计算每列的角色数量
+            const midPoint = Math.ceil(dirRolesJson.length / 2);
 
             // 添加所有自制角色
             for (let i = 0; i < dirRolesJson.length; i++) {
@@ -4400,9 +4437,8 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                 // 检查角色是否之前被选中
                 const isChecked = checkedRoleIds.includes(role.id);
 
-                // 构建角色项HTML
+                // 构建角色项HTML，移除图片
                 div.innerHTML = `
-                    <img src="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22%23f0f0f0%22/><text x=%2250%22 y=%2260%22 text-anchor=%22middle%22 font-size=%2230%22> ${role.name.charAt(0)} </text></svg>" data-src="${role.image || ''}" alt="${role.name}" class="role-item-img lazy-load" data-retry="0" data-max-retry="3">
                     <div>
                         <div>
                             <label>
@@ -4413,11 +4449,18 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                         <div class="role-ability" style="font-size: 12px; color: #666; margin-top: 4px; display: none;">${role.ability || ''}</div>
                     </div>
                 `;
-                column1.appendChild(div);
+                
+                // 根据索引分配到不同的列
+                if (i < midPoint) {
+                    column1.appendChild(div);
+                } else {
+                    column2.appendChild(div);
+                }
             }
 
             // 将列添加到容器
             dirColumns.appendChild(column1);
+            dirColumns.appendChild(column2);
 
             // 初始更新角色可见性
             updateRoleVisibility();
@@ -4863,7 +4906,7 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                         newRole.image = 'images/outsider.png';
                         break;
                     case 'minion':
-                        newRole.image = 'images/minion.png';
+                        newRole.image = 'images/minions.png';
                         break;
                     case 'demon':
                         newRole.image = 'images/demon.png';
@@ -6594,7 +6637,8 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                     { id: 'showCustomRules', value: false },
                     { id: 'showTravellersFabled', value: true },
                     { id: 'showJinxRules', value: true },
-                    { id: 'horizontalLayout', value: false }
+                    { id: 'horizontalLayout', value: false },
+                    { id: 'reverseOtherNight', value: true }
                 ];
                 
                 settingCheckboxes.forEach(item => {
@@ -8191,115 +8235,36 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                 } else {
                     // 如果没有排序信息，按照能力描述排序
                     rolesByCategory[category].sort((a, b) => {
-                        // 能力描述分组排序规则
-                        const abilityGroupOrder = [
-                            { pattern: /^在你的首个夜晚，你会得知/, priority: 1 },
-                            { pattern: /^You start knowing/, priority: 1 },
-                            { pattern: /^在夜晚时|^在夜晚/, priority: 2 },
-                            { pattern: /^At night/, priority: 2 },
-                            { pattern: /^每个黄昏/, priority: 3 },
-                            { pattern: /^Each dusk/, priority: 3 },
-                            { pattern: /^每个夜晚\*/, priority: 5 },
-                            { pattern: /^Each night\*/, priority: 5 },
-                            { pattern: /^每个夜晚/, priority: 4 },
-                            { pattern: /^Each night(?!\*)/, priority: 4 },
-                            { pattern: /^每个白天/, priority: 6 },
-                            { pattern: /^Each day/, priority: 6 },
-                            { pattern: /^游戏开始时/, priority: 7 },
-                            { pattern: /^When the game begins/, priority: 7 },
-                            { pattern: /^如果你被处决/, priority: 8 },
-                            { pattern: /^If you are executed/, priority: 8 },
-                            { pattern: /^当你被处决时/, priority: 9 },
-                            { pattern: /^When you are executed/, priority: 9 },
-                            { pattern: /^在你的首个白天/, priority: 10 },
-                            { pattern: /^On your first day/, priority: 10 },
-                            { pattern: /^在你的首个夜晚/, priority: 11 },
-                            { pattern: /^On your first night/, priority: 11 },
-                            { pattern: /^在你的首个白天或夜晚/, priority: 12 },
-                            { pattern: /^On your first day or night/, priority: 12 },
-                            { pattern: /^你认为/, priority: 13 },
-                            { pattern: /^You think/, priority: 13 },
-                            { pattern: /^你是/, priority: 14 },
-                            { pattern: /^You are/, priority: 14 },
-                            { pattern: /^你拥有/, priority: 15 },
-                            { pattern: /^You have/, priority: 15 },
-                            { pattern: /^你知道/, priority: 16 },
-                            { pattern: /^You know/, priority: 16 },
-                            { pattern: /^你可以/, priority: 17 },
-                            { pattern: /^You may/, priority: 17 },
-                            { pattern: /^你必须/, priority: 18 },
-                            { pattern: /^You must/, priority: 18 },
-                            { pattern: /^当你死亡时/, priority: 19 },
-                            { pattern: /^When you die/, priority: 19 },
-                            { pattern: /^如果/, priority: 20 },
-                            { pattern: /^If/, priority: 20 },
-                            { pattern: /^当/, priority: 21 },
-                            { pattern: /^When/, priority: 21 },
-                            { pattern: /^每当/, priority: 22 },
-                            { pattern: /^Whenever/, priority: 22 },
-                            { pattern: /^作为/, priority: 23 },
-                            { pattern: /^As/, priority: 23 },
-                            { pattern: /^白天开始时/, priority: 24 },
-                            { pattern: /^At the start of day/, priority: 24 },
-                            { pattern: /^夜晚开始时/, priority: 25 },
-                            { pattern: /^At the start of night/, priority: 25 },
-                            { pattern: /^白天结束时/, priority: 26 },
-                            { pattern: /^At the end of day/, priority: 26 },
-                            { pattern: /^镇民/, priority: 27 },
-                            { pattern: /^Townsfolk/, priority: 27 },
-                            { pattern: /^外来者/, priority: 28 },
-                            { pattern: /^Outsider/, priority: 28 },
-                            { pattern: /^爪牙/, priority: 29 },
-                            { pattern: /^Minion/, priority: 29 },
-                            { pattern: /^恶魔/, priority: 30 },
-                            { pattern: /^Demon/, priority: 30 },
-                            { pattern: /^旅行者/, priority: 31 },
-                            { pattern: /^Traveller/, priority: 31 },
-                            { pattern: /^传奇/, priority: 32 },
-                            { pattern: /^Fabled/, priority: 32 },
-                            { pattern: /^你的能力/, priority: 33 },
-                            { pattern: /^Your ability/, priority: 33 },
-                            { pattern: /^此角色/, priority: 34 },
-                            { pattern: /^This character/, priority: 34 },
-                            { pattern: /^说书人/, priority: 35 },
-                            { pattern: /^Storyteller/, priority: 35 },
-                            { pattern: /^玩家/, priority: 36 },
-                            { pattern: /^Players/, priority: 36 },
-                            { pattern: /^游戏/, priority: 37 },
-                            { pattern: /^Game/, priority: 37 }
-                        ];
-
-                        // 查找能力描述对应的优先级
-                        function getPriority(ability) {
-                            if (!ability) return 999;
-                            for (const item of abilityGroupOrder) {
-                                if (item.pattern.test(ability)) {
-                                    return item.priority;
-                                }
-                            }
-                            return 999;
-                        }
-
-                        // 比较两个角色的优先级
-                        const priorityA = getPriority(a.ability);
-                        const priorityB = getPriority(b.ability);
-
+                        // 使用全局的 abilityGroupOrder 和 getAbilityPriority 函数
+                        const abilityA = a.ability || '';
+                        const abilityB = b.ability || '';
+                        
+                        // 1. 首先按能力描述分组排序
+                        const priorityA = getAbilityPriority(abilityA);
+                        const priorityB = getAbilityPriority(abilityB);
+                        
                         if (priorityA !== priorityB) {
                             return priorityA - priorityB;
                         }
-
-                        // 如果优先级相同，按能力文本长度排序
-                        if (a.ability.length !== b.ability.length) {
-                            return a.ability.length - b.ability.length;
+                        
+                        // 2. 同组内按能力文本长度排序（字符数少的在前）
+                        const lenA = abilityA.length;
+                        const lenB = abilityB.length;
+                        
+                        if (lenA !== lenB) {
+                            return lenA - lenB;
                         }
-
-                        // 如果能力文本长度相同，按角色名字数排序
-                        if (a.name.length !== b.name.length) {
-                            return a.name.length - b.name.length;
+                        
+                        // 3. 如果能力文本长度相同，按角色名字数排序
+                        const nameA = a.name || '';
+                        const nameB = b.name || '';
+                        
+                        if (nameA.length !== nameB.length) {
+                            return nameA.length - nameB.length;
                         }
-
-                        // 如果都相同，按角色名字母顺序排序
-                        return a.name.localeCompare(b.name);
+                        
+                        // 4. 如果都相同，按字母顺序排序
+                        return nameA.localeCompare(nameB);
                     });
                 }
             });
@@ -8325,46 +8290,36 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                         </div>
                     `;
                     
-                    // 按列排列角色（先上到下，再左到右）
-                    const columnCount = 2;
-                    const rowCount = Math.ceil(roles.length / columnCount);
-                    
-                    // 按列优先顺序生成HTML，实现真正的垂直排列
-                    // 先填满第一列，再填满第二列
-                    for (let col = 0; col < columnCount; col++) {
-                        for (let row = 0; row < rowCount; row++) {
-                            // 计算索引：col * rowCount + row
-                            // 这样会先填充第一列的所有行，再填充第二列
-                            const index = col * rowCount + row;
-                            if (index < roles.length) {
-                                const role = roles[index];
-                                html += `
-                                    <div class="selected-role-card" title="点击取消选择" draggable="true" data-role-id="${role.id}" data-category="${category}" data-index="${globalIndex}">
-                                        <div class="selected-role-header">
-                                            <img src="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22%23f0f0f0%22/><text x=%2250%22 y=%2260%22 text-anchor=%22middle%22 font-size=%2230%22> ${role.name.charAt(0)} </text></svg>" data-src="${role.image}" alt="${role.name}" class="lazy-load" data-retry="0" data-max-retry="3" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
-                                            <span class="selected-role-name" onclick="toggleRoleSelection('${role.id}')">${role.name}</span>
-                                            <div class="selected-role-actions">
-                                                <button type="button" class="role-action-btn edit-btn" onclick="editRole('${role.id}')" title="修改角色">
-                                                    <span style="font-size: 16px; font-weight: bold;">✏️</span>
-                                                </button>
-                                                <button type="button" class="role-action-btn copy-btn" onclick="copyRoleAbility('${role.ability}', '${role.name}', '${role.image}')" title="复制角色信息">
-                                                    <span style="font-size: 16px; font-weight: bold;">📋</span>
-                                                </button>
-                                                <button type="button" class="role-action-btn pin-btn ${pinnedRoles.has(role.id) ? 'active' : ''}" onclick="togglePinRole('${role.id}')" title="固定此角色">
-                                                    <span style="font-size: 16px; font-weight: bold;">🔒</span>
-                                                </button>
-                                                <button type="button" class="role-action-btn exclude-btn ${excludedRoles.has(role.id) ? 'active' : ''}" onclick="toggleExcludeRole('${role.id}')" title="排除此角色">
-                                                    <span style="font-size: 16px; font-weight: bold;">🚫</span>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        ${role.ability ? `<div class="selected-role-ability" onclick="toggleRoleSelection('${role.id}')">${highlightAbility(role.ability)}</div>` : ''}
+                    // 纵向排列角色（每个角色占一行）
+                    roles.forEach((role, index) => {
+                        html += `
+                            <div class="selected-role-card" title="点击取消选择，拖动排序" draggable="true" data-role-id="${role.id}" data-category="${category}" data-index="${globalIndex}" style="user-select: none;">
+                                <div class="selected-role-header" style="display: flex; align-items: center;">
+                                    <div class="drag-handle" style="cursor: move; user-select: none; margin-right: 10px; display: flex; align-items: center; padding: 2px 4px; border-radius: 4px; transition: background-color 0.2s;">
+                                        <span style="font-size: 14px; color: #999; opacity: 0.7;">⋮⋮</span>
                                     </div>
-                                `;
-                                globalIndex++;
-                            }
-                        }
-                    }
+                                    <img src="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22%23f0f0f0%22/><text x=%2250%22 y=%2260%22 text-anchor=%22middle%22 font-size=%2230%22> ${role.name.charAt(0)} </text></svg>" data-src="${role.image}" alt="${role.name}" class="lazy-load" data-retry="0" data-max-retry="3" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex-shrink: 0;">
+                                    <span class="selected-role-name" onclick="toggleRoleSelection('${role.id}')" style="flex-grow: 1; margin: 0 10px;">${role.name}</span>
+                                    <div class="selected-role-actions" style="flex-shrink: 0;">
+                                        <button type="button" class="role-action-btn edit-btn" onclick="editRole('${role.id}')" title="修改角色" style="margin: 0 2px;">
+                                            <span style="font-size: 16px; font-weight: bold;">✏️</span>
+                                        </button>
+                                        <button type="button" class="role-action-btn copy-btn" onclick="copyRoleAbility('${role.ability}', '${role.name}', '${role.image}')" title="复制角色信息" style="margin: 0 2px;">
+                                            <span style="font-size: 16px; font-weight: bold;">📋</span>
+                                        </button>
+                                        <button type="button" class="role-action-btn pin-btn ${pinnedRoles.has(role.id) ? 'active' : ''}" onclick="togglePinRole('${role.id}')" title="固定此角色" style="margin: 0 2px;">
+                                            <span style="font-size: 16px; font-weight: bold;">🔒</span>
+                                        </button>
+                                        <button type="button" class="role-action-btn exclude-btn ${excludedRoles.has(role.id) ? 'active' : ''}" onclick="toggleExcludeRole('${role.id}')" title="排除此角色" style="margin: 0 2px;">
+                                            <span style="font-size: 16px; font-weight: bold;">🚫</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                ${role.ability ? `<div class="selected-role-ability" onclick="toggleRoleSelection('${role.id}')" style="margin-left: 60px; padding: 8px 0;">${highlightAbility(role.ability)}</div>` : ''}
+                            </div>
+                        `;
+                        globalIndex++;
+                    });
                 });
                 
                 displayContainer.innerHTML = html;
@@ -8409,8 +8364,13 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
         function initDragAndDrop() {
             const cards = document.querySelectorAll('.selected-role-card');
             let draggedCard = null;
+            let touchStartY = 0;
+            let touchStartTime = 0;
             
             cards.forEach(card => {
+                // 获取拖拽手柄
+                const dragHandle = card.querySelector('.drag-handle');
+                
                 // 拖动开始
                 card.addEventListener('dragstart', function(e) {
                     draggedCard = this;
@@ -8420,6 +8380,7 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                 // 拖动结束
                 card.addEventListener('dragend', function() {
                     this.style.opacity = '1';
+                    this.style.border = 'none';
                     draggedCard = null;
                 });
                 
@@ -8440,35 +8401,75 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                     this.style.border = 'none';
                     
                     if (draggedCard !== this) {
-                        // 获取两个卡片的类别和索引
                         const draggedCategory = draggedCard.dataset.category;
                         const targetCategory = this.dataset.category;
                         
-                        // 只有同类别内的卡片可以拖拽排序
                         if (draggedCategory === targetCategory) {
-                            // 获取所有同类别卡片
-                            const categoryCards = document.querySelectorAll(`.selected-role-card[data-category="${draggedCategory}"]`);
-                            const cardsArray = Array.from(categoryCards);
+                            const parent = draggedCard.parentNode;
+                            const draggedNext = draggedCard.nextSibling;
+                            const thisNext = this.nextSibling;
                             
-                            // 找到拖动卡片和目标卡片的位置
-                            const draggedIndex = cardsArray.indexOf(draggedCard);
-                            const targetIndex = cardsArray.indexOf(this);
-                            
-                            // 调整卡片顺序
-                            if (draggedIndex < targetIndex) {
-                                this.parentNode.insertBefore(draggedCard, this.nextSibling);
+                            if (draggedCard.nextSibling === this) {
+                                parent.insertBefore(draggedCard, this);
+                            } else if (this.nextSibling === draggedCard) {
+                                parent.insertBefore(this, draggedCard);
                             } else {
-                                this.parentNode.insertBefore(draggedCard, this);
+                                parent.insertBefore(draggedCard, thisNext);
+                                parent.insertBefore(this, draggedNext);
                             }
                             
-                            // 保存排序信息
-                            const sortedCategoryCards = document.querySelectorAll(`.selected-role-card[data-category="${draggedCategory}"]`);
+                            const sortedCategoryCards = parent.querySelectorAll('.selected-role-card');
                             const sortedRoleIds = Array.from(sortedCategoryCards).map(card => card.dataset.roleId);
                             roleOrder[draggedCategory] = sortedRoleIds;
                             
-                            // 保存数据到本地存储
                             saveToLocalStorage();
                         }
+                    }
+                });
+                
+                // 触摸事件支持（移动端）
+                if (dragHandle) {
+                    dragHandle.addEventListener('touchstart', function(e) {
+                        touchStartY = e.touches[0].clientY;
+                        touchStartTime = Date.now();
+                        e.stopPropagation();
+                    });
+                    
+                    dragHandle.addEventListener('touchmove', function(e) {
+                        const touchY = e.touches[0].clientY;
+                        const timeElapsed = Date.now() - touchStartTime;
+                        
+                        // 只有在长按且有一定位移时才触发拖拽
+                        if (timeElapsed > 200 && Math.abs(touchY - touchStartY) > 10) {
+                            e.stopPropagation();
+                        }
+                    });
+                    
+                    dragHandle.addEventListener('touchend', function(e) {
+                        const timeElapsed = Date.now() - touchStartTime;
+                        if (timeElapsed < 200) {
+                            // 短按不触发拖拽
+                            e.stopPropagation();
+                        }
+                    });
+                }
+                
+                // 鼠标悬停效果
+                if (dragHandle) {
+                    dragHandle.addEventListener('mouseover', function() {
+                        this.style.backgroundColor = '#f0f0f0';
+                    });
+                    
+                    dragHandle.addEventListener('mouseout', function() {
+                        this.style.backgroundColor = 'transparent';
+                    });
+                }
+                
+                // 防止卡片点击与拖拽冲突
+                card.addEventListener('click', function(e) {
+                    // 如果点击的是拖拽手柄，不触发取消选择
+                    if (e.target.closest('.drag-handle')) {
+                        e.stopPropagation();
                     }
                 });
             });
@@ -12470,6 +12471,9 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                 transition: transform 0.2s, box-shadow 0.2s;
                 cursor: pointer;
                 border: 1px solid #e0e0e0;
+                min-height: 180px;
+                display: flex;
+                flex-direction: column;
             `;
 
             // 鼠标悬停效果
@@ -12487,8 +12491,8 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
             let logoHtml = '';
             if (script.logo) {
                 logoHtml = `
-                    <div style="height: 100px; background: #f5f5f5; display: flex; align-items: center; justify-content: center;">
-                        <img src="${script.logo}" alt="${script.name}" style="max-height: 80px; max-width: 180px; object-fit: contain;">
+                    <div style="height: 90px; background: #f5f5f5; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        <img src="${script.logo}" alt="${script.name}" style="max-height: 70px; max-width: 160px; object-fit: contain;">
                     </div>
                 `;
             }
@@ -12509,11 +12513,11 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
 
             card.innerHTML = `
                 ${logoHtml}
-                <div style="padding: 15px;">
-                    <h3 style="margin: 0 0 8px 0; font-size: 16px; font-weight: bold; color: #333;">${script.name}</h3>
-                    <p style="margin: 0 0 10px 0; font-size: 14px; color: #666;">作者: ${script.author}</p>
-                    <p style="margin: 0 0 15px 0; font-size: 13px; color: #999; line-height: 1.4;">${description || ''}</p>
-                    <button style="width: 100%; padding: 8px; background: #667eea; color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer;">
+                <div style="padding: 12px; flex-grow: 1; display: flex; flex-direction: column;">
+                    <h3 style="margin: 0 0 6px 0; font-size: 15px; font-weight: bold; color: #333;">${script.name}</h3>
+                    <p style="margin: 0 0 8px 0; font-size: 13px; color: #666;">作者: ${script.author}</p>
+                    ${description ? `<p style="margin: 0 0 12px 0; font-size: 12px; color: #999; line-height: 1.3; flex-grow: 1;">${description}</p>` : ''}
+                    <button style="width: 100%; padding: 8px; background: #667eea; color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; margin-top: auto;">
                         复制JSON
                     </button>
                 </div>
@@ -12539,6 +12543,9 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                 transition: transform 0.2s, box-shadow 0.2s;
                 cursor: pointer;
                 border: 1px solid #e0e0e0;
+                min-height: 180px;
+                display: flex;
+                flex-direction: column;
             `;
 
             // 鼠标悬停效果
@@ -12556,8 +12563,8 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
             let logoHtml = '';
             if (script.logo) {
                 logoHtml = `
-                    <div style="height: 100px; background: #f5f5f5; display: flex; align-items: center; justify-content: center;">
-                        <img src="${script.logo}" alt="${script.name}" style="max-height: 80px; max-width: 180px; object-fit: contain;">
+                    <div style="height: 90px; background: #f5f5f5; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        <img src="${script.logo}" alt="${script.name}" style="max-height: 70px; max-width: 160px; object-fit: contain;">
                     </div>
                 `;
             }
@@ -12578,11 +12585,11 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
 
             card.innerHTML = `
                 ${logoHtml}
-                <div style="padding: 15px;">
-                    <h3 style="margin: 0 0 8px 0; font-size: 16px; font-weight: bold; color: #333;">${script.name}</h3>
-                    <p style="margin: 0 0 10px 0; font-size: 14px; color: #666;">作者: ${script.author}</p>
-                    <p style="margin: 0 0 15px 0; font-size: 13px; color: #999; line-height: 1.4;">${description || ''}</p>
-                    <button style="width: 100%; padding: 8px; background: #28a745; color: white; border: none; border-radius: 6px; font-size: 14px; font-weight: 500; cursor: pointer;">
+                <div style="padding: 12px; flex-grow: 1; display: flex; flex-direction: column;">
+                    <h3 style="margin: 0 0 6px 0; font-size: 15px; font-weight: bold; color: #333;">${script.name}</h3>
+                    <p style="margin: 0 0 8px 0; font-size: 13px; color: #666;">作者: ${script.author}</p>
+                    ${description ? `<p style="margin: 0 0 12px 0; font-size: 12px; color: #999; line-height: 1.3; flex-grow: 1;">${description}</p>` : ''}
+                    <button style="width: 100%; padding: 8px; background: #28a745; color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; margin-top: auto;">
                         复制JSON
                     </button>
                 </div>
@@ -12678,6 +12685,7 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
         <input type="checkbox" id="showTravellersFabled" checked>
         <input type="checkbox" id="showJinxRules" checked>
         <input type="checkbox" id="horizontalLayout">
+        <input type="checkbox" id="reverseOtherNight">
         <input type="password" id="ai-api-key">
         <input type="text" id="ai-model-endpoint">
         <input type="text" id="custom-townsfolk-name">
@@ -12724,36 +12732,36 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
 
     <!-- 原创剧本窗口 -->
     <div id="originalScriptsWindow" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 10000;">
-        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 1200px; height: 90%; max-height: 800px; background: white; border-radius: 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); overflow: hidden;">
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
-                <h2 style="margin: 0; font-size: 24px;">全原创角色剧本</h2>
-                <div style="display: flex; gap: 10px; align-items: center;">
-                    <input type="text" id="original-script-search" placeholder="搜索剧本名或作者" style="padding: 8px 12px; border: none; border-radius: 4px; font-size: 14px; width: 200px;" oninput="renderScripts()">
+        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: white; border-radius: 0; box-shadow: none; overflow: hidden;">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; flex-wrap: wrap; gap: 10px;">
+                <h2 style="margin: 0; font-size: 20px;">全原创角色剧本</h2>
+                <div style="display: flex; gap: 10px; align-items: center; flex-grow: 1; min-width: 250px;">
+                    <input type="text" id="original-script-search" placeholder="搜索剧本名或作者" style="padding: 8px 12px; border: none; border-radius: 4px; font-size: 14px; flex-grow: 1; min-width: 0;" oninput="renderScripts()">
                     <button onclick="closeOriginalScriptsWindow()" style="background: white; color: #667eea; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center;">&times;</button>
                 </div>
             </div>
-            <div style="padding: 20px; height: calc(100% - 80px); overflow-y: auto;">
-                <div style="text-align: center; margin-bottom: 30px;">
-                    <p style="font-size: 16px; color: #666;">点击下方剧本卡片，即可复制完整的JSON内容到剪贴板</p>
+            <div style="padding: 15px; height: calc(100% - 80px); overflow-y: auto;">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <p style="font-size: 14px; color: #666;">点击下方剧本卡片，即可复制完整的JSON内容到剪贴板</p>
                 </div>
 
-                <div style="margin-bottom: 40px;">
-                    <h3 style="margin: 0 0 15px 0; color: #333; font-size: 20px; font-weight: bold; border-bottom: 2px solid #667eea; padding-bottom: 8px;">国内剧本</h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;" id="domesticScriptsGrid">
+                <div style="margin-bottom: 30px;">
+                    <h3 style="margin: 0 0 15px 0; color: #333; font-size: 18px; font-weight: bold; border-bottom: 2px solid #667eea; padding-bottom: 8px;">国内剧本</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px;" id="domesticScriptsGrid">
                         <!-- 国内剧本将通过JavaScript动态添加 -->
                     </div>
                 </div>
 
-                <div style="margin-bottom: 40px;">
-                    <h3 style="margin: 0 0 15px 0; color: #333; font-size: 20px; font-weight: bold; border-bottom: 2px solid #667eea; padding-bottom: 8px;">海外剧本</h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;" id="overseasScriptsGrid">
+                <div style="margin-bottom: 30px;">
+                    <h3 style="margin: 0 0 15px 0; color: #333; font-size: 18px; font-weight: bold; border-bottom: 2px solid #667eea; padding-bottom: 8px;">海外剧本</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px;" id="overseasScriptsGrid">
                         <!-- 海外剧本将通过JavaScript动态添加 -->
                     </div>
                 </div>
 
-                <div style="margin-bottom: 40px;">
-                    <h3 style="margin: 0 0 15px 0; color: #333; font-size: 20px; font-weight: bold; border-bottom: 2px solid #667eea; padding-bottom: 8px;">汀西维尔剧本</h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;" id="teenseyScriptsGrid">
+                <div style="margin-bottom: 30px;">
+                    <h3 style="margin: 0 0 15px 0; color: #333; font-size: 18px; font-weight: bold; border-bottom: 2px solid #667eea; padding-bottom: 8px;">汀西维尔剧本</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px;" id="teenseyScriptsGrid">
                         <!-- 汀西维尔剧本将通过JavaScript动态添加 -->
                     </div>
                 </div>
@@ -12763,36 +12771,36 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
 
     <!-- 部分原创角色剧本窗口 -->
     <div id="partialScriptsWindow" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 10000;">
-        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 1200px; height: 90%; max-height: 800px; background: white; border-radius: 15px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); overflow: hidden;">
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white;">
-                <h2 style="margin: 0; font-size: 24px;">部分原创角色剧本</h2>
-                <div style="display: flex; gap: 10px; align-items: center;">
-                    <input type="text" id="partial-script-search" placeholder="搜索剧本名或作者" style="padding: 8px 12px; border: none; border-radius: 4px; font-size: 14px; width: 200px;" oninput="renderPartialScripts()">
+        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: white; border-radius: 0; box-shadow: none; overflow: hidden;">
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; flex-wrap: wrap; gap: 10px;">
+                <h2 style="margin: 0; font-size: 20px;">部分原创角色剧本</h2>
+                <div style="display: flex; gap: 10px; align-items: center; flex-grow: 1; min-width: 250px;">
+                    <input type="text" id="partial-script-search" placeholder="搜索剧本名或作者" style="padding: 8px 12px; border: none; border-radius: 4px; font-size: 14px; flex-grow: 1; min-width: 0;" oninput="renderPartialScripts()">
                     <button onclick="closePartialScriptsWindow()" style="background: white; color: #28a745; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center;">&times;</button>
                 </div>
             </div>
-            <div style="padding: 20px; height: calc(100% - 80px); overflow-y: auto;">
-                <div style="text-align: center; margin-bottom: 30px;">
-                    <p style="font-size: 16px; color: #666;">点击下方剧本卡片，即可复制完整的JSON内容到剪贴板</p>
+            <div style="padding: 15px; height: calc(100% - 80px); overflow-y: auto;">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <p style="font-size: 14px; color: #666;">点击下方剧本卡片，即可复制完整的JSON内容到剪贴板</p>
                 </div>
 
-                <div style="margin-bottom: 40px;">
-                    <h3 style="margin: 0 0 15px 0; color: #333; font-size: 20px; font-weight: bold; border-bottom: 2px solid #28a745; padding-bottom: 8px;">不含私货剧本</h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;" id="partialWithoutPrivateGrid">
+                <div style="margin-bottom: 30px;">
+                    <h3 style="margin: 0 0 15px 0; color: #333; font-size: 18px; font-weight: bold; border-bottom: 2px solid #28a745; padding-bottom: 8px;">不含私货剧本</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px;" id="partialWithoutPrivateGrid">
                         <!-- 不含私货剧本将通过JavaScript动态添加 -->
                     </div>
                 </div>
 
-                <div style="margin-bottom: 40px;">
-                    <h3 style="margin: 0 0 15px 0; color: #333; font-size: 20px; font-weight: bold; border-bottom: 2px solid #28a745; padding-bottom: 8px;">包含私货剧本</h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;" id="partialWithPrivateGrid">
+                <div style="margin-bottom: 30px;">
+                    <h3 style="margin: 0 0 15px 0; color: #333; font-size: 18px; font-weight: bold; border-bottom: 2px solid #28a745; padding-bottom: 8px;">包含私货剧本</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px;" id="partialWithPrivateGrid">
                         <!-- 包含私货剧本将通过JavaScript动态添加 -->
                     </div>
                 </div>
 
-                <div style="margin-bottom: 40px;">
-                    <h3 style="margin: 0 0 15px 0; color: #333; font-size: 20px; font-weight: bold; border-bottom: 2px solid #28a745; padding-bottom: 8px;">汀西维尔剧本</h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;" id="partialTeenseyGrid">
+                <div style="margin-bottom: 30px;">
+                    <h3 style="margin: 0 0 15px 0; color: #333; font-size: 18px; font-weight: bold; border-bottom: 2px solid #28a745; padding-bottom: 8px;">汀西维尔剧本</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px;" id="partialTeenseyGrid">
                         <!-- 汀西维尔剧本将通过JavaScript动态添加 -->
                     </div>
                 </div>
