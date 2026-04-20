@@ -154,6 +154,29 @@ async function generateScriptImageV2() {
                     });
                 }
                 
+                // 检查是否存在用户在JSON编辑器中添加的相克规则（存储在dirRolesJson中）
+                if (typeof dirRolesJson !== 'undefined') {
+                    dirRolesJson.forEach(item => {
+                        // 检查是否是相克规则项（通过team字段或id后缀判断）
+                        if ((item.team === 'a jinxed' || item.team === '相克') && item.name && item.ability) {
+                            // 尝试从名称中提取两个角色名称
+                            const nameParts = item.name.split(' & ');
+                            if (nameParts.length === 2) {
+                                const jinxRole1 = nameParts[0];
+                                const jinxRole2 = nameParts[1];
+                                if (roleNames.includes(jinxRole1) && roleNames.includes(jinxRole2)) {
+                                    const jinxRule = {
+                                        jinxRole1: jinxRole1,
+                                        jinxRole2: jinxRole2,
+                                        jinxRule: item.ability
+                                    };
+                                    jinxRules.push(jinxRule);
+                                }
+                            }
+                        }
+                    });
+                }
+                
                 console.log('剧本图V2生成 - 匹配的相克规则数量:', jinxRules.length);
                 console.log('剧本图V2生成 - 匹配的相克规则:', jinxRules);
                 

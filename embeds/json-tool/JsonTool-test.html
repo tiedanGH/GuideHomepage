@@ -366,6 +366,19 @@
             box-shadow: var(--shadow-sm);                       /* 小阴影 */
         }
 
+        /* 移动端角色项调整 */
+        @media (max-width: 768px) {
+            .role-item {
+                padding: 12px 16px;
+                margin-bottom: 8px;
+                font-size: 14px;
+            }
+            
+            .role-item .role-name {
+                font-size: 14px;
+            }
+        }
+
         /* 选中的角色项样式 */
         .role-item input[type="checkbox"]:checked + label,
         .role-item input[type="checkbox"]:checked {
@@ -594,6 +607,13 @@
             /* 角色列移动端单列显示 */
             .role-columns {
                 grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            /* 角色列新布局移动端调整 */
+            .role-columns-new {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                gap: 10px;
             }
 
             /* 容器样式调整 */
@@ -1008,10 +1028,12 @@
         /* 移动端浮动操作按钮样式 */
         #mobile-fab-container {
             position: fixed;
-            bottom: 20px;
+            bottom: env(safe-area-inset-bottom, 20px);
             right: 20px;
-            z-index: 1000;
+            z-index: 9999;
             display: none;
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
         }
 
         #fab-menu {
@@ -2087,9 +2109,11 @@
 
             #mobile-fab-container {
                 position: fixed;
-                bottom: 20px;
+                bottom: env(safe-area-inset-bottom, 20px);
                 right: 20px;
-                z-index: 1000;
+                z-index: 9999;
+                -webkit-transform: translateZ(0);
+                transform: translateZ(0);
             }
 
             #fab-menu {
@@ -3231,40 +3255,14 @@
                 }
             });
             
-            dirRolesJson.forEach(role => {
-                allRoles.push(role);
-                jsonData.push(role);
+            // 添加所有自定义项（包括用户手动添加的相克规则和Json By信息）
+            dirRolesJson.forEach(item => {
+                allRoles.push(item);
+                jsonData.push(item);
             });
             
-            // 添加相克规则
-            const selectedRoleNames = allRoles.map(role => role.name);
-            const selectedRoleMap = {};
-            allRoles.forEach(role => {
-                selectedRoleMap[role.name] = role;
-            });
-
-            const jinxData = (typeof window.jinxes !== 'undefined') ? window.jinxes : jinxes;
-            const relevantJinxes = jinxData.filter(jinx => {
-                return selectedRoleNames.includes(jinx.jinxRole1) && selectedRoleNames.includes(jinx.jinxRole2);
-            });
-
-            relevantJinxes.forEach(jinx => {
-                // 查找对应的角色对象
-                const role1 = selectedRoleMap[jinx.jinxRole1];
-                const role2 = selectedRoleMap[jinx.jinxRole2];
-                
-                if (role1 && role2) {
-                    const jinxMeta = {
-                        "id": `Jinx:${role1.id}&${role2.id}`,
-                        "image": role1.image || "",
-                        "name": `${jinx.jinxRole1}&${jinx.jinxRole2}`,
-                        "team": "a jinxed",
-                        "setup": false,
-                        "ability": jinx.jinxRule
-                    };
-                    jsonData.push(jinxMeta);
-                }
-            });
+            // 自动生成的相克规则会被用户手动添加的规则覆盖，所以这里不再自动生成
+            // 这样可以保留用户手动添加的相克规则
             
             const jsonString = JSON.stringify(jsonData, null, 4);
             document.getElementById('json-editor').value = jsonString;
@@ -3282,15 +3280,24 @@
                 }
                 
                 const metaInfo = jsonData.find(item => item.id === '_meta');
-                const roles = jsonData.filter(item => item.id !== '_meta');
+                const standardRoles = jsonData.filter(item => item.id !== '_meta' && !item.id.startsWith('custom-') && !item.id.endsWith('_meta') && item.id !== 'Json By');
+                const customRoles = jsonData.filter(item => item.id && item.id.startsWith('custom-'));
+                const jinxRules = jsonData.filter(item => item.id && item.id.endsWith('_meta'));
+                const jsonByInfo = jsonData.find(item => item.id === 'Json By');
+                
+                // 保存所有自定义项
+                const allCustomItems = [...customRoles, ...jinxRules];
+                if (jsonByInfo) {
+                    allCustomItems.push(jsonByInfo);
+                }
                 
                 // 更新选中的角色复选框
                 document.querySelectorAll('.role-item input[type="checkbox"]').forEach(checkbox => {
-                    checkbox.checked = roles.some(role => role.id === checkbox.value);
+                    checkbox.checked = standardRoles.some(role => role.id === checkbox.value);
                 });
                 
                 // 更新自制角色
-                dirRolesJson = roles.filter(role => role.id && role.id.startsWith('custom-'));
+                dirRolesJson = allCustomItems;
                 
                 // 更新已选角色显示
                 updateSelectedRolesDisplay();
@@ -3347,7 +3354,11 @@
             if (container.style.display === 'none') {
                 container.style.display = 'block';
                 btn.textContent = '收起▲';
-                updateJsonEditor();
+                // 只有当编辑器为空时才更新，避免覆盖用户修改
+                const jsonEditor = document.getElementById('json-editor');
+                if (!jsonEditor.value.trim()) {
+                    updateJsonEditor();
+                }
             } else {
                 container.style.display = 'none';
                 btn.textContent = '展开▼';
@@ -4337,52 +4348,92 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
             
             roleColumns.innerHTML = ''; // 清空容器
 
-            // 创建两列
-            const column1 = document.createElement('div');
-            column1.className = 'role-column';
-            
-            const column2 = document.createElement('div');
-            column2.className = 'role-column';
+            // 检查是否是移动端
+            const isMobile = window.innerWidth <= 768;
 
-            // 计算每列的角色数量
-            const midPoint = Math.ceil(roles.length / 2);
+            if (isMobile) {
+                // 移动端使用单列布局
+                const column = document.createElement('div');
+                column.className = 'role-column';
 
-            // 添加角色到两列
-            for (let i = 0; i < roles.length; i++) {
-                const role = roles[i];
-                const div = document.createElement('div');
-                div.className = 'role-item';
-                div.dataset.scripts = role.scripts ? role.scripts.join(',') : '';
-                div.dataset.ability = role.ability || '';
-                div.dataset.team = role.team || '';
-                
-                // 检查角色是否之前被选中
-                const isChecked = checkedRoleIds.includes(role.id);
-                
-                // 构建角色项HTML，移除图片
-                div.innerHTML = `
-                    <div>
+                // 添加角色到单列
+                roles.forEach(role => {
+                    const div = document.createElement('div');
+                    div.className = 'role-item';
+                    div.dataset.scripts = role.scripts ? role.scripts.join(',') : '';
+                    div.dataset.ability = role.ability || '';
+                    div.dataset.team = role.team || '';
+                    
+                    // 检查角色是否之前被选中
+                    const isChecked = checkedRoleIds.includes(role.id);
+                    
+                    // 构建角色项HTML，移除图片
+                    div.innerHTML = `
                         <div>
-                            <label>
-                                <input type="checkbox" value="${role.id}" name="${role.name}" ${isChecked ? 'checked' : ''} onchange="updateSelectedRolesDisplay()"> 
-                                <span class="role-name">${role.name}</span>
-                            </label>
+                            <div>
+                                <label>
+                                    <input type="checkbox" value="${role.id}" name="${role.name}" ${isChecked ? 'checked' : ''} onchange="updateSelectedRolesDisplay()"> 
+                                    <span class="role-name">${role.name}</span>
+                                </label>
+                            </div>
+                            <div class="role-ability" style="font-size: 12px; color: #666; margin-top: 4px; display: none;">${role.ability || ''}</div>
                         </div>
-                        <div class="role-ability" style="font-size: 12px; color: #666; margin-top: 4px; display: none;">${role.ability || ''}</div>
-                    </div>
-                `;
-                
-                // 根据索引分配到不同的列
-                if (i < midPoint) {
-                    column1.appendChild(div);
-                } else {
-                    column2.appendChild(div);
-                }
-            }
+                    `;
+                    
+                    column.appendChild(div);
+                });
 
-            // 将列添加到容器
-            roleColumns.appendChild(column1);
-            roleColumns.appendChild(column2);
+                // 将列添加到容器
+                roleColumns.appendChild(column);
+            } else {
+                // 桌面端使用两列布局
+                // 创建两列
+                const column1 = document.createElement('div');
+                column1.className = 'role-column';
+                
+                const column2 = document.createElement('div');
+                column2.className = 'role-column';
+
+                // 计算每列的角色数量
+                const midPoint = Math.ceil(roles.length / 2);
+
+                // 添加角色到两列
+                for (let i = 0; i < roles.length; i++) {
+                    const role = roles[i];
+                    const div = document.createElement('div');
+                    div.className = 'role-item';
+                    div.dataset.scripts = role.scripts ? role.scripts.join(',') : '';
+                    div.dataset.ability = role.ability || '';
+                    div.dataset.team = role.team || '';
+                    
+                    // 检查角色是否之前被选中
+                    const isChecked = checkedRoleIds.includes(role.id);
+                    
+                    // 构建角色项HTML，移除图片
+                    div.innerHTML = `
+                        <div>
+                            <div>
+                                <label>
+                                    <input type="checkbox" value="${role.id}" name="${role.name}" ${isChecked ? 'checked' : ''} onchange="updateSelectedRolesDisplay()"> 
+                                    <span class="role-name">${role.name}</span>
+                                </label>
+                            </div>
+                            <div class="role-ability" style="font-size: 12px; color: #666; margin-top: 4px; display: none;">${role.ability || ''}</div>
+                        </div>
+                    `;
+                    
+                    // 根据索引分配到不同的列
+                    if (i < midPoint) {
+                        column1.appendChild(div);
+                    } else {
+                        column2.appendChild(div);
+                    }
+                }
+
+                // 将列添加到容器
+                roleColumns.appendChild(column1);
+                roleColumns.appendChild(column2);
+            }
 
             // 初始更新角色可见性
             updateRoleVisibility();
