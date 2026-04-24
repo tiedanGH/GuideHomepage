@@ -343,7 +343,7 @@
         .role-columns {
             display: grid;                                    /* grid布局 */
             grid-template-columns: repeat(2, 1fr);            /* 两列 */
-            gap: 8px;                                         /* 间距 */
+            gap: 10px;                                        /* 间距 */
             width: 100%;                                       /* 宽度100% */
         }
 
@@ -366,50 +366,17 @@
             box-shadow: var(--shadow-sm);                       /* 小阴影 */
         }
 
-        /* 角色图片样式 */
-        .role-item-img {
-            max-width: 40px;                                  /* 最大宽度 - 减小 */
-            max-height: 40px;                                 /* 最大高度 - 减小 */
-            border-radius: 6px;                                /* 圆角 - 减小 */
-            box-shadow: var(--shadow-sm);                       /* 小阴影 */
-        }
-        
-        /* 角色名称样式 */
-        .role-name {
-            font-size: 14px;                                   /* 字体大小 - 适中 */
-            font-weight: 500;                                  /* 字体粗细 */
-            margin-right: 8px;                                 /* 右边距 */
-        }
-
         /* 移动端角色项调整 */
         @media (max-width: 768px) {
-            .role-columns {
-                grid-template-columns: 1fr;                   /* 移动端单列显示 */
-                gap: 8px;                                     /* 间距调整 */
-            }
-            
             .role-item {
-                padding: 20px;                                /* 增加内边距，拉长显示 */
-                margin-bottom: 12px;                           /* 增加间距 */
-                font-size: 18px;                               /* 增大字体 */
-                flex-direction: row;
-                align-items: center;
-                min-height: 80px;                             /* 确保足够的高度 */
-                border-radius: 16px;                           /* 增大圆角 */
-                width: 100%;                                   /* 确保占满整行 */
-                box-sizing: border-box;                        /* 确保内边距不影响宽度 */
+                padding: 14px 18px;
+                margin-bottom: 10px;
+                font-size: 15px;
+                border-radius: 12px;
             }
             
             .role-item .role-name {
-                font-size: 18px;                               /* 增大字体 */
-                flex: 1;
-                margin-left: 12px;
-                font-weight: 600;                              /* 加粗字体 */
-            }
-            
-            .role-item input[type="checkbox"] {
-                width: 24px;                                   /* 增大复选框 */
-                height: 24px;
+                font-size: 15px;
             }
         }
 
@@ -539,12 +506,12 @@
         /* 移动端触摸优化 */
         @media (max-width: 768px) {
             button {
-                padding: 18px 24px;                           /* 增加内边距 */
-                font-size: 16px;                              /* 增大字体 */
-                margin-top: 16px;                             /* 上外边距 */
+                padding: 16px 20px;                           /* 内边距 */
+                font-size: 14px;                              /* 字体大小 */
+                margin-top: 12px;                             /* 上外边距 */
                 width: 100%;                                   /* 宽度 */
                 box-sizing: border-box;                        /* 盒模型 */
-                min-height: 60px;                              /* 增大最小高度，确保足够的点击区域 */
+                min-height: 52px;                              /* 最小高度，确保足够的点击区域 */
             }
 
             /* 增大输入框点击区域 */
@@ -553,28 +520,28 @@
             input[type="color"],
             select,
             textarea {
-                padding: 16px 20px;                           /* 增加内边距 */
-                font-size: 16px;                              /* 增大字体 */
-                border-radius: 12px;                            /* 增大圆角边框 */
+                padding: 12px 16px;                           /* 内边距 */
+                font-size: 14px;                              /* 字体大小 */
+                border-radius: 8px;                            /* 圆角边框 */
                 border: 1px solid var(--border-color);         /* 边框 */
                 width: 100%;                                   /* 宽度 */
                 box-sizing: border-box;                        /* 盒模型 */
                 touch-action: manipulation;                    /* 触摸优化 */
-                min-height: 56px;                              /* 增大最小高度，确保足够的点击区域 */
+                min-height: 44px;                              /* 最小高度，确保足够的点击区域 */
             }
 
             /* 增大复选框和单选框点击区域 */
             input[type="checkbox"],
             input[type="radio"] {
-                width: 24px;                                   /* 增大宽度 */
-                height: 24px;                                  /* 增大高度 */
+                width: 20px;                                   /* 宽度 */
+                height: 20px;                                  /* 高度 */
                 cursor: pointer;                               /* 鼠标指针 */
             }
 
             /* 增大标签点击区域 */
             label {
                 display: inline-block;                         /* 行内块元素 */
-                padding: 12px 16px;                             /* 增加内边距 */
+                padding: 8px 12px;                             /* 内边距 */
                 cursor: pointer;                               /* 鼠标指针 */
                 user-select: none;                             /* 禁止文本选择 */
             }
@@ -584,8 +551,7 @@
             .role-item-new {
                 cursor: pointer;                               /* 鼠标指针 */
                 user-select: none;                             /* 禁止文本选择 */
-                padding: 20px;                                 /* 增加内边距 */
-                min-height: 80px;                              /* 增大最小高度 */
+                padding: 12px;                                 /* 内边距 */
             }
 
             /* 增大剧本卡片点击区域 */
@@ -593,15 +559,13 @@
             #overseasScriptsGrid > div {
                 cursor: pointer;                               /* 鼠标指针 */
                 user-select: none;                             /* 禁止文本选择 */
-                padding: 16px;                                 /* 增加内边距 */
-                min-height: 100px;                              /* 增大最小高度 */
+                padding: 12px;                                 /* 内边距 */
             }
 
             /* 增大角色操作按钮点击区域 */
             .role-action-btn {
-                padding: 12px 16px;                             /* 增加内边距 */
-                min-height: 48px;                              /* 增大最小高度，确保足够的点击区域 */
-                font-size: 14px;                               /* 增大字体 */
+                padding: 8px 12px;                             /* 内边距 */
+                min-height: 36px;                              /* 最小高度，确保足够的点击区域 */
             }
         }
 
@@ -644,72 +608,78 @@
             /* 角色列移动端单列显示 */
             .role-columns {
                 grid-template-columns: 1fr;
-                gap: 12px;
+                gap: 10px;
+            }
+
+            /* 角色列新布局移动端调整 */
+            .role-columns-new {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                gap: 10px;
             }
 
             /* 容器样式调整 */
             .container {
-                padding: 16px;
+                padding: 12px;
                 max-width: 100%;
             }
 
             /* 页头样式调整 */
             .header {
-                padding: 20px 16px;
+                padding: 16px 12px;
             }
 
             .header h1 {
-                font-size: 1.8em;
+                font-size: 1.5em;
             }
 
             .header h4 {
-                font-size: 1em;
+                font-size: 0.85em;
             }
 
             /* 剧本选择区域调整 */
             .script-selection {
-                padding: 16px;
-                gap: 10px;
+                padding: 12px;
+                gap: 8px;
                 flex-direction: column;
             }
 
             .script-selection label {
                 margin-right: 0;
-                font-size: 16px;
-                padding: 12px 16px;
-                border-radius: 12px;
+                font-size: 14px;
+                padding: 8px 12px;
+                border-radius: 8px;
                 background: #f8f9fa;
-                margin-bottom: 6px;
+                margin-bottom: 4px;
             }
 
             /* 搜索框调整 */
             #search-role-input {
-                padding: 16px;
-                font-size: 16px;
-                border-radius: 12px;
+                padding: 12px;
+                font-size: 14px;
+                border-radius: 8px;
                 width: 100%;
                 box-sizing: border-box;
             }
 
             /* 搜索结果下拉框调整 */
             #search-results {
-                width: calc(100% - 32px);
-                left: 16px;
-                border-radius: 12px;
+                width: calc(100% - 24px);
+                left: 12px;
+                border-radius: 8px;
                 z-index: 1000;
             }
 
             /* 角色列表调整 */
             .role-list {
-                padding: 16px;
-                max-height: 400px;
-                border-radius: 16px;
+                padding: 12px;
+                max-height: 300px;
+                border-radius: 12px;
             }
 
             /* 角色列调整 - 手机端只显示一列 */
             .role-columns {
                 flex-direction: column;
-                gap: 12px;
+                gap: 10px;
             }
 
             .role-column {
@@ -718,11 +688,16 @@
 
             /* 角色项调整 */
             .role-item {
-                padding: 20px;
-                gap: 12px;
-                border-radius: 16px;
-                flex-wrap: nowrap;
-                min-height: 80px;
+                padding: 10px;
+                gap: 8px;
+                border-radius: 8px;
+                flex-wrap: wrap;
+            }
+
+            .role-item-img {
+                max-width: 40px;
+                max-height: 40px;
+                border-radius: 6px;
             }
 
             /* 按钮调整 */
@@ -736,32 +711,104 @@
             .save-meta-info-button,
             .add-state-btn,
             .violet-button {
-                padding: 16px 24px;
-                font-size: 16px;
-                margin-top: 16px;
+                padding: 12px 20px;
+                font-size: 14px;
+                margin-top: 12px;
                 width: 100%;
                 box-sizing: border-box;
-                border-radius: 16px;
+                border-radius: 12px;
             }
 
             /* 选择信息调整 */
             .selection-info {
-                padding: 16px;
-                font-size: 16px;
-                border-radius: 16px;
+                padding: 12px;
+                font-size: 14px;
+                border-radius: 12px;
+            }
+
+            /* 角色卡片调整 */
+            .role-card {
+                padding: 12px;
+                margin: 4px;
+                max-width: 100%;
+                box-sizing: border-box;
+                border-radius: 12px;
+            }
+
+            /* 随机选择工具调整 */
+            .random-select-panel {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+
+            .random-select-panel label {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .random-select-panel input {
+                width: 60px;
+                padding: 6px;
+            }
+
+            /* 原创剧本窗口调整 */
+            #originalScriptsWindow {
+                width: 100%;
+                height: 100%;
+            }
+
+            #originalScriptsWindow > div {
+                width: 95%;
+                height: 95%;
+                max-width: none;
+                max-height: none;
+            }
+
+            /* 搜索框调整 */
+            #original-script-search,
+            #partial-script-search {
+                width: 100%;
+                max-width: 100%;
+                padding: 12px;
+                font-size: 14px;
+            }
+
+            /* 剧本卡片网格调整 */
+            #domesticScriptsGrid,
+            #overseasScriptsGrid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                gap: 10px;
+            }
+
+            /* 剧本卡片调整 */
+            #domesticScriptsGrid > div,
+            #overseasScriptsGrid > div {
+                padding: 8px;
+            }
+
+            #domesticScriptsGrid h4,
+            #overseasScriptsGrid h4 {
+                font-size: 12px;
+            }
+
+            #domesticScriptsGrid p,
+            #overseasScriptsGrid p {
+                font-size: 10px;
             }
 
             /* 主布局调整 */
             .main-layout {
-                padding: 16px;
-                gap: 16px;
+                padding: 10px;
+                gap: 10px;
                 flex-direction: column;
             }
 
             /* 顶部控制区调整 */
             .top-controls {
                 flex-direction: column;
-                gap: 16px;
+                gap: 10px;
             }
 
             /* 左侧栏调整 */
@@ -789,16 +836,46 @@
                 margin-top: 16px !important;
             }
 
+            /* 角色列新布局调整 */
+            .role-columns-new {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            /* 已选角色网格调整 */
+            .right-sidebar .selected-roles-grid {
+                grid-template-columns: 1fr !important;
+                gap: 8px !important;
+            }
+            
+            /* 已选角色卡片移动端调整 */
+            .selected-role-card {
+                padding: 8px;
+                font-size: 12px;
+            }
+            
+            .selected-role-card .role-name {
+                font-size: 12px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            
+            .selected-role-card img {
+                width: 32px;
+                height: 32px;
+            }
+
             /* 动作按钮调整 */
             .action-buttons {
-                gap: 12px;
+                gap: 8px;
                 display: grid;
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(2, 1fr);
             }
 
             .action-buttons button {
-                padding: 16px 20px;
-                font-size: 16px;
+                padding: 10px 12px;
+                font-size: 12px;
                 margin: 0;
                 width: 100%;
                 box-sizing: border-box;
@@ -806,42 +883,56 @@
 
             /* 控制面板卡片调整 */
             .control-panel-card {
-                padding: 20px;
+                padding: 16px;
             }
 
             /* 控制区域调整 */
             .control-section {
-                margin-bottom: 20px;
-                padding-bottom: 16px;
+                margin-bottom: 16px;
+                padding-bottom: 12px;
             }
             
             /* 一键收缩按钮移动端调整 */
             .control-section > div[style*="display: flex"] {
                 flex-wrap: wrap;
-                gap: 12px;
+                gap: 8px;
             }
             
             .control-section > div[style*="display: flex"] h3 {
                 flex: 1 1 100%;
-                margin-bottom: 12px;
-                font-size: 16px;
+                margin-bottom: 8px;
             }
             
             .collapse-all-btn {
-                padding: 10px 16px;
-                font-size: 14px;
+                padding: 6px 10px;
+                font-size: 11px;
                 white-space: nowrap;
             }
 
             /* 角色子分类调整 */
             .role-subcategory {
-                margin-bottom: 24px;
-                padding-bottom: 20px;
+                margin-bottom: 20px;
+                padding-bottom: 16px;
             }
 
             /* 分类标题调整 */
             .category-title {
-                padding: 12px 16px;
+                padding: 8px 10px;
+            }
+
+            /* 角色项新样式调整 */
+            .role-item-new {
+                padding: 8px;
+                gap: 8px;
+            }
+
+            .role-item-new img {
+                width: 32px;
+                height: 32px;
+            }
+
+            .role-item-new .role-name {
+                font-size: 12px;
             }
 
             /* 移动端浮动操作按钮显示 */
@@ -856,7 +947,7 @@
 
             /* 底部留白，避免FAB遮挡内容 */
             body {
-                padding-bottom: 100px;
+                padding-bottom: 80px;
             }
         }
 
@@ -1963,7 +2054,7 @@
             }
 
             .role-columns {
-                grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+                grid-template-columns: 1fr;
                 gap: 8px;
             }
 
