@@ -549,12 +549,12 @@ async function generateScriptImageV2() {
                 const scriptPage = document.createElement('div');
                 scriptPage.style.cssText = `
                     background: ${hexToRgba(customBgColor, bgOpacity)};
-                    width: ${isMobile ? 'calc(100vw - 20px)' : '8.27in'};
-                    min-height: ${isMobile ? 'auto' : '11.69in'};
+                    width: ${isMobile ? '520px' : '8.27in'};
+                    height: ${isMobile ? '870px' : '11.69in'};
                     padding: ${isMobile ? '10px' : '0.3in'};
                     box-sizing: border-box;
                     position: relative;
-                    overflow: visible;
+                    overflow: auto;
                     font-family: 'Assistant', 'Microsoft YaHei', sans-serif;
                     flex-shrink: 0;
                     margin: ${isMobile ? '0' : 'auto'};
@@ -1372,14 +1372,14 @@ async function generateJinxAndConfigImage() {
                 // 创建打印页面容器 - 与剧本图保持一致的A4尺寸
                 const printPage = document.createElement('div');
                 printPage.style.cssText = `
-                    width: ${isMobile ? 'calc(100vw - 20px)' : '8.27in'};
-                    min-height: ${isMobile ? 'auto' : '11.69in'};
+                    width: ${isMobile ? '520px' : '8.27in'};
+                    height: ${isMobile ? '870px' : '11.69in'};
                     padding: ${isMobile ? '10px' : '0.3in'};
                     margin: ${isMobile ? '0' : '0 auto'};
                     background: ${hexToRgba(detailBgColor, detailBgOpacity)};
                     box-sizing: border-box;
                     position: relative;
-                    overflow: visible;
+                    overflow: auto;
                     font-family: 'Assistant', 'Microsoft YaHei', sans-serif;
                     flex-shrink: 0;
                 `;
@@ -1501,7 +1501,7 @@ async function generateJinxAndConfigImage() {
                 const demonRolesList = allRoles.filter(r => r.team === 'demon' || r.team === '恶魔');
                 
                 const charBottomHtml = `
-                    <div style="text-align: center; display: table; margin-left: auto; margin-right: auto; max-width: 100%; width: ${isMobile ? '100%' : 612 * fontSizeMultiplier}px; border: ${4 * fontSizeMultiplier}px solid rgba(201, 192, 184); margin-top: -2px; position: relative; z-index: 1; box-sizing: border-box;">
+                    <div style="text-align: center; display: table; margin-left: auto; margin-right: auto; max-width: 100%; width: ${isMobile ? '100%' : 620 * fontSizeMultiplier}px; border: ${4 * fontSizeMultiplier}px solid rgba(201, 192, 184); margin-top: -2px; position: relative; z-index: 1; box-sizing: border-box;">
                         <div style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; align-items: center; padding: ${4 * fontSizeMultiplier}px 0; box-sizing: border-box; overflow: hidden;">
                             ${townsfolkRolesList.map(role => `
                                 <img src="${convertToLocalPath(role.image)}" style="height: ${29 * fontSizeMultiplier}px; width: ${29 * fontSizeMultiplier}px; margin: 0px -5px 0px 0px; filter: grayscale(0%); flex-shrink: 0;">
