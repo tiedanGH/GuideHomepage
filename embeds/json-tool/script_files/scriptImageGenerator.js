@@ -517,6 +517,9 @@ async function generateScriptImageV2() {
                     }
                 });
                 
+                // 检测是否为移动端
+                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+                
                 // 创建预览容器
                 const previewContainer = document.createElement('div');
                 previewContainer.id = 'script-image-preview-v2';
@@ -528,10 +531,11 @@ async function generateScriptImageV2() {
                     height: 100%;
                     background: rgba(0, 0, 0, 0.85);
                     display: flex;
-                    justify-content: center;
+                    flex-direction: column;
+                    justify-content: flex-start;
                     align-items: center;
                     z-index: 10000;
-                    padding: 20px;
+                    padding: ${isMobile ? '10px' : '20px'};
                     box-sizing: border-box;
                     overflow: auto;
                 `;
@@ -545,15 +549,15 @@ async function generateScriptImageV2() {
                 const scriptPage = document.createElement('div');
                 scriptPage.style.cssText = `
                     background: ${hexToRgba(customBgColor, bgOpacity)};
-                    width: 8.27in;
-                    min-height: 11.69in;
-                    padding: 0.3in;
+                    width: ${isMobile ? 'calc(100vw - 20px)' : '8.27in'};
+                    min-height: ${isMobile ? 'auto' : '11.69in'};
+                    padding: ${isMobile ? '10px' : '0.3in'};
                     box-sizing: border-box;
                     position: relative;
                     overflow: visible;
                     font-family: 'Assistant', 'Microsoft YaHei', sans-serif;
                     flex-shrink: 0;
-                    margin: auto;
+                    margin: ${isMobile ? '0' : 'auto'};
                 `;
                 
                 // 构建首夜顺序HTML（左侧垂直排列）
@@ -859,33 +863,38 @@ async function generateScriptImageV2() {
                     scriptPage.style.overflowY = originalOverflowY;
                 }, 100);
                 
-                // 添加页面到预览容器
-                previewContainer.appendChild(scriptPage);
-                
                 // 创建按钮容器
                 const buttonContainer = document.createElement('div');
                 buttonContainer.style.cssText = `
-                    position: absolute;
-                    top: 20px;
+                    position: ${isMobile ? 'sticky' : 'absolute'};
+                    top: ${isMobile ? '0' : '20px'};
                     left: 50%;
                     transform: translateX(-50%);
                     display: flex;
-                    gap: 12px;
+                    gap: ${isMobile ? '10px' : '12px'};
                     z-index: 10001;
+                    padding: ${isMobile ? '10px 0' : '0'};
+                    background: ${isMobile ? 'rgba(0,0,0,0.3)' : 'transparent'};
+                    width: ${isMobile ? '100%' : 'auto'};
+                    justify-content: center;
+                    flex-shrink: 0;
                 `;
                 
                 // 下载按钮
                 const downloadButton = document.createElement('button');
                 downloadButton.innerHTML = '下载图片';
                 downloadButton.style.cssText = `
-                    padding: 10px 20px;
+                    padding: ${isMobile ? '15px 25px' : '10px 20px'};
                     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                     color: white;
                     border: none;
-                    border-radius: 8px;
+                    border-radius: ${isMobile ? '12px' : '8px'};
                     cursor: pointer;
-                    font-size: 14px;
+                    font-size: ${isMobile ? '16px' : '14px'};
                     font-weight: 500;
+                    min-height: ${isMobile ? '50px' : 'auto'};
+                    min-width: ${isMobile ? '120px' : 'auto'};
+                    touch-action: manipulation;
                 `;
                 downloadButton.onclick = function() {
                     // 保存原始样式
@@ -1016,21 +1025,26 @@ async function generateScriptImageV2() {
                 const closeButton = document.createElement('button');
                 closeButton.innerHTML = '关闭';
                 closeButton.style.cssText = `
-                    padding: 10px 20px;
+                    padding: ${isMobile ? '15px 25px' : '10px 20px'};
                     background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
                     color: white;
                     border: none;
-                    border-radius: 8px;
+                    border-radius: ${isMobile ? '12px' : '8px'};
                     cursor: pointer;
-                    font-size: 14px;
+                    font-size: ${isMobile ? '16px' : '14px'};
                     font-weight: 500;
+                    min-height: ${isMobile ? '50px' : 'auto'};
+                    min-width: ${isMobile ? '120px' : 'auto'};
+                    touch-action: manipulation;
                 `;
                 closeButton.onclick = function() {
                     document.body.removeChild(previewContainer);
                 };
                 buttonContainer.appendChild(closeButton);
                 
+                // 先添加按钮容器，再添加剧本图页面，让按钮显示在上方
                 previewContainer.appendChild(buttonContainer);
+                previewContainer.appendChild(scriptPage);
                 document.body.appendChild(previewContainer);
                 
             } catch (error) {
@@ -1331,6 +1345,9 @@ async function generateJinxAndConfigImage() {
                 firstNightRoles = firstNightRoles.filter(role => role && role.firstNight !== undefined).sort((a, b) => a.firstNight - b.firstNight);
                 otherNightRoles = otherNightRoles.filter(role => role && role.otherNight !== undefined).sort((a, b) => a.otherNight - b.otherNight);
                 
+                // 检测是否为移动端
+                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+                
                 // 创建预览容器
                 const previewContainer = document.createElement('div');
                 previewContainer.id = 'detail-image-preview';
@@ -1342,21 +1359,22 @@ async function generateJinxAndConfigImage() {
                     height: 100%;
                     background: rgba(0, 0, 0, 0.85);
                     display: flex;
-                    justify-content: center;
-                    align-items: flex-start;
+                    flex-direction: column;
+                    justify-content: flex-start;
+                    align-items: center;
                     z-index: 10000;
-                    padding: 20px;
+                    padding: ${isMobile ? '10px' : '20px'};
                     box-sizing: border-box;
-                    overflow-y: auto;
+                    overflow: auto;
                 `;
                 
                 // 创建打印页面容器 - 与剧本图保持一致的A4尺寸
                 const printPage = document.createElement('div');
                 printPage.style.cssText = `
-                    width: 8.27in;
-                    height: 11.69in;
-                    padding: 0.3in;
-                    margin: 0 auto;
+                    width: ${isMobile ? 'calc(100vw - 20px)' : '8.27in'};
+                    min-height: ${isMobile ? 'auto' : '11.69in'};
+                    padding: ${isMobile ? '10px' : '0.3in'};
+                    margin: ${isMobile ? '0' : '0 auto'};
                     background: ${hexToRgba(detailBgColor, detailBgOpacity)};
                     box-sizing: border-box;
                     position: relative;
@@ -1365,9 +1383,11 @@ async function generateJinxAndConfigImage() {
                     flex-shrink: 0;
                 `;
                 
-                // 固定A4尺寸，不需要动态调整
-                printPage.style.width = '8.27in';
-                printPage.style.height = '11.69in';
+                // 固定A4尺寸，移动端不需要
+                if (!isMobile) {
+                    printPage.style.width = '8.27in';
+                    printPage.style.height = '11.69in';
+                }
                 
                 // 直接使用已经处理好的夜间顺序
                 const allFirstNightRoles = firstNightRoles;
@@ -1468,8 +1488,8 @@ async function generateJinxAndConfigImage() {
                 
                 // 构建玩家数量表格HTML
                 const playerCountHtml = `
-                    <div style="margin: 20px auto 0; text-align: center;">
-                        <img src="https://i.postimg.cc/021k6s9F/playercount.png" style="width: ${620 * fontSizeMultiplier}px;">
+                    <div style="margin: 20px auto 0; text-align: center; max-width: 100%;">
+                        <img src="https://i.postimg.cc/021k6s9F/playercount.png" style="width: ${isMobile ? '100%' : 620 * fontSizeMultiplier}px; max-width: 100%; height: auto;">
                     </div>
                 `;
                 
@@ -1480,19 +1500,19 @@ async function generateJinxAndConfigImage() {
                 const demonRolesList = allRoles.filter(r => r.team === 'demon' || r.team === '恶魔');
                 
                 const charBottomHtml = `
-                    <div style="text-align: center; display: table; margin-left: auto; margin-right: auto; height: ${36 * fontSizeMultiplier}px; width: ${612 * fontSizeMultiplier}px; border: ${4 * fontSizeMultiplier}px solid rgba(201, 192, 184); margin-top: -2px; position: relative; z-index: 1;">
-                        <div style="display: flex; flex-direction: row; width: ${604 * fontSizeMultiplier}px; justify-content: center; align-items: center; padding: ${4 * fontSizeMultiplier}px 0;">
+                    <div style="text-align: center; display: table; margin-left: auto; margin-right: auto; max-width: 100%; width: ${isMobile ? '100%' : 612 * fontSizeMultiplier}px; border: ${4 * fontSizeMultiplier}px solid rgba(201, 192, 184); margin-top: -2px; position: relative; z-index: 1; box-sizing: border-box;">
+                        <div style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; align-items: center; padding: ${4 * fontSizeMultiplier}px 0; box-sizing: border-box; overflow: hidden;">
                             ${townsfolkRolesList.map(role => `
-                                <img src="${convertToLocalPath(role.image)}" style="height: ${29 * fontSizeMultiplier}px; width: ${29 * fontSizeMultiplier}px; margin: 0px -5px 0px 0px; filter: grayscale(0%);">
+                                <img src="${convertToLocalPath(role.image)}" style="height: ${29 * fontSizeMultiplier}px; width: ${29 * fontSizeMultiplier}px; margin: 0px -5px 0px 0px; filter: grayscale(0%); flex-shrink: 0;">
                             `).join('')}
                             ${outsiderRolesList.map(role => `
-                                <img src="${convertToLocalPath(role.image)}" style="height: ${29 * fontSizeMultiplier}px; width: ${29 * fontSizeMultiplier}px; margin: 0px -5px 0px 0px; filter: grayscale(0%);">
+                                <img src="${convertToLocalPath(role.image)}" style="height: ${29 * fontSizeMultiplier}px; width: ${29 * fontSizeMultiplier}px; margin: 0px -5px 0px 0px; filter: grayscale(0%); flex-shrink: 0;">
                             `).join('')}
                             ${minionRolesList.map(role => `
-                                <img src="${convertToLocalPath(role.image)}" style="height: ${29 * fontSizeMultiplier}px; width: ${29 * fontSizeMultiplier}px; margin: 0px -5px 0px 0px; filter: grayscale(0%);">
+                                <img src="${convertToLocalPath(role.image)}" style="height: ${29 * fontSizeMultiplier}px; width: ${29 * fontSizeMultiplier}px; margin: 0px -5px 0px 0px; filter: grayscale(0%); flex-shrink: 0;">
                             `).join('')}
                             ${demonRolesList.map(role => `
-                                <img src="${convertToLocalPath(role.image)}" style="height: ${29 * fontSizeMultiplier}px; width: ${29 * fontSizeMultiplier}px; margin: 0px -5px 0px 0px; filter: grayscale(0%);">
+                                <img src="${convertToLocalPath(role.image)}" style="height: ${29 * fontSizeMultiplier}px; width: ${29 * fontSizeMultiplier}px; margin: 0px -5px 0px 0px; filter: grayscale(0%); flex-shrink: 0;">
                             `).join('')}
                         </div>
                     </div>
@@ -1509,9 +1529,9 @@ async function generateJinxAndConfigImage() {
                         </div>
                         
                         <!-- 中间主体区域 -->
-                        <div style="display: flex; flex: 1; position: relative; max-width: 100%; box-sizing: border-box; margin: 0 20px;">
+                        <div style="display: flex; flex: 1; position: relative; max-width: 100%; box-sizing: border-box; margin: 0 ${isMobile ? '10px' : '20px'};">
                             <!-- 左侧首夜顺序 -->
-                            <div style="width: ${40 * fontSizeMultiplier}px; display: flex; flex-direction: column; align-items: center; padding-right: 5px;">
+                            <div style="width: ${isMobile ? 20 * fontSizeMultiplier : 40 * fontSizeMultiplier}px; display: flex; flex-direction: column; align-items: center; padding-right: 5px;">
                                 ${firstNightHtml}
                                 <div style="font-family: 'Philo', serif; font-size: ${10 * fontSizeMultiplier}px; padding: 5px 0; color: #333; font-weight: bold; line-height: 1.5; white-space: pre;">首<br>夜</div>
                             </div>
@@ -1533,9 +1553,9 @@ async function generateJinxAndConfigImage() {
                                         </div>
                                         <div style="display: flex; flex-wrap: wrap; gap: 10px;">
                                             ${fabledRoles.map(role => `
-                                                <div style="flex: 0 1 calc(50% - 10px); min-width: 250px; max-width: calc(50% - 10px); box-sizing: border-box;">
+                                                <div style="flex: 0 1 ${isMobile ? '100%' : 'calc(50% - 10px)'} ; min-width: ${isMobile ? '100%' : '250px'}; max-width: 100%; box-sizing: border-box;">
                                                     <div style="display: flex; align-items: flex-start;">
-                                                        <img src="${convertToLocalPath(role.image)}" style="width: 60px; height: 60px; object-fit: cover; margin-right: 10px; flex-shrink: 0;">
+                                                        <img src="${convertToLocalPath(role.image)}" style="width: ${isMobile ? 50 : 60}px; height: ${isMobile ? 50 : 60}px; object-fit: cover; margin-right: 10px; flex-shrink: 0;">
                                                         <div style="flex: 1; min-width: 0;">
                                                             <div style="font-weight: bold; font-size: ${13 * fontSizeMultiplier}px; color: #7a6550; margin-bottom: 2px;">${role.name}</div>
                                                             <div style="font-size: ${11 * fontSizeMultiplier}px; line-height: 1.3; color: #333;">${role.ability || ''}</div>
@@ -1557,7 +1577,7 @@ async function generateJinxAndConfigImage() {
                                         <div style="padding: 10px;">
                                             <!-- 灯神图标和说明 -->
                                             <div style="display: flex; align-items: flex-start; margin-bottom: 15px; gap: 10px;">
-                                                <img src="images/djinn.png" style="width: ${60 * fontSizeMultiplier}px; height: ${60 * fontSizeMultiplier}px; object-fit: cover; flex-shrink: 0;">
+                                                <img src="images/djinn.png" style="width: ${isMobile ? 50 * fontSizeMultiplier : 60 * fontSizeMultiplier}px; height: ${isMobile ? 50 * fontSizeMultiplier : 60 * fontSizeMultiplier}px; object-fit: cover; flex-shrink: 0;">
                                                 <div style="flex: 1;">
                                                     <div style="font-weight: bold; font-size: ${14 * fontSizeMultiplier}px; color: #760A0D; margin-bottom: 5px;">灯神</div>
                                                     <div style="font-size: ${11 * fontSizeMultiplier}px; line-height: 1.4; color: #333;">使用灯神的相克规则。所有玩家都会知道其内容。</div>
@@ -1567,8 +1587,8 @@ async function generateJinxAndConfigImage() {
                                             ${jinxRules.map(rule => `
                                                 <div style="margin-bottom: 10px; display: flex; align-items: flex-start; gap: 10px;">
                                                     <div style="display: flex; flex-direction: row; gap: 5px; flex-shrink: 0;">
-                                                        <img src="${convertToLocalPath(allRoles.find(r => r.name === rule.jinxRole1)?.image || '')}" style="width: ${40 * fontSizeMultiplier}px; height: ${40 * fontSizeMultiplier}px; object-fit: cover; border-radius: 3px;">
-                                                        <img src="${convertToLocalPath(allRoles.find(r => r.name === rule.jinxRole2)?.image || '')}" style="width: ${40 * fontSizeMultiplier}px; height: ${40 * fontSizeMultiplier}px; object-fit: cover; border-radius: 3px;">
+                                                        <img src="${convertToLocalPath(allRoles.find(r => r.name === rule.jinxRole1)?.image || '')}" style="width: ${isMobile ? 30 * fontSizeMultiplier : 40 * fontSizeMultiplier}px; height: ${isMobile ? 30 * fontSizeMultiplier : 40 * fontSizeMultiplier}px; object-fit: cover; border-radius: 3px;">
+                                                        <img src="${convertToLocalPath(allRoles.find(r => r.name === rule.jinxRole2)?.image || '')}" style="width: ${isMobile ? 30 * fontSizeMultiplier : 40 * fontSizeMultiplier}px; height: ${isMobile ? 30 * fontSizeMultiplier : 40 * fontSizeMultiplier}px; object-fit: cover; border-radius: 3px;">
                                                     </div>
                                                     <div style="flex: 1; font-size: ${11 * fontSizeMultiplier}px; line-height: 1.4; color: #333;">
                                                         ${rule.jinxRule}
@@ -1589,11 +1609,11 @@ async function generateJinxAndConfigImage() {
                                         <div style="padding: 10px;">
                                             <!-- 私货商人图标和标题 -->
                                             <div style="display: flex; align-items: center; margin-bottom: 10px; gap: 10px;">
-                                                <img src="${fabledRoles.find(role => role.name.includes('私货商人'))?.image || 'images/Bootlegger.png'}" style="width: ${40 * fontSizeMultiplier}px; height: ${40 * fontSizeMultiplier}px; object-fit: cover; flex-shrink: 0;">
+                                                <img src="${fabledRoles.find(role => role.name.includes('私货商人'))?.image || 'images/Bootlegger.png'}" style="width: ${isMobile ? 30 * fontSizeMultiplier : 40 * fontSizeMultiplier}px; height: ${isMobile ? 30 * fontSizeMultiplier : 40 * fontSizeMultiplier}px; object-fit: cover; flex-shrink: 0;">
                                                 <div style="font-weight: bold; font-size: ${14 * fontSizeMultiplier}px; color: #760A0D;">剧本自制规则</div>
                                             </div>
                                             <!-- 私货商人规则列表 -->
-                                            <div style="margin-left: 50px;">
+                                            <div style="margin-left: ${isMobile ? 40 : 50}px;">
                                                 ${bootleggerRules.map(rule => `
                                                     <div style="margin-bottom: 6px; display: flex; align-items: flex-start; gap: 8px;">
                                                         <div style="flex-shrink: 0; margin-top: 2px; font-weight: bold;">•</div>
@@ -1616,9 +1636,9 @@ async function generateJinxAndConfigImage() {
                                         </div>
                                         <div style="display: flex; flex-wrap: wrap; gap: 10px;">
                                             ${travellerRoles.map(role => `
-                                                <div style="flex: 0 1 calc(50% - 10px); min-width: 250px; max-width: calc(50% - 10px); box-sizing: border-box;">
+                                                <div style="flex: 0 1 ${isMobile ? '100%' : 'calc(50% - 10px)'} ; min-width: ${isMobile ? '100%' : '250px'}; max-width: 100%; box-sizing: border-box;">
                                                     <div style="display: flex; align-items: flex-start;">
-                                                        <img src="${convertToLocalPath(role.image)}" style="width: 60px; height: 60px; object-fit: cover; margin-right: 10px; flex-shrink: 0;">
+                                                        <img src="${convertToLocalPath(role.image)}" style="width: ${isMobile ? 50 : 60}px; height: ${isMobile ? 50 : 60}px; object-fit: cover; margin-right: 10px; flex-shrink: 0;">
                                                         <div style="flex: 1; min-width: 0;">
                                                             <div style="font-weight: bold; font-size: ${13 * fontSizeMultiplier}px; color: #500050; margin-bottom: 2px;">${role.name}</div>
                                                             <div style="font-size: ${11 * fontSizeMultiplier}px; line-height: 1.3; color: #333;">${role.ability || ''}</div>
@@ -1638,7 +1658,7 @@ async function generateJinxAndConfigImage() {
                             </div>
                             
                             <!-- 右侧其他夜顺序 -->
-                            <div style="width: ${40 * fontSizeMultiplier}px; display: flex; flex-direction: ${!reverseOtherNight ? 'column' : 'column-reverse'}; align-items: center; padding-left: 5px;">
+                            <div style="width: ${isMobile ? 20 * fontSizeMultiplier : 40 * fontSizeMultiplier}px; display: flex; flex-direction: ${!reverseOtherNight ? 'column' : 'column-reverse'}; align-items: center; padding-left: 5px;">
                                 ${otherNightHtml}
                                 <div style="font-family: 'Philo', serif; font-size: ${10 * fontSizeMultiplier}px; padding: 5px 0; color: #333; font-weight: bold; line-height: 1.5; white-space: pre;${!reverseOtherNight ? '' : ' transform: rotate(180deg);'}">他<br>夜</div>
                             </div>
@@ -1655,33 +1675,38 @@ async function generateJinxAndConfigImage() {
                     </div>
                 `;
                 
-                // 添加打印页面到预览容器
-                previewContainer.appendChild(printPage);
-                
                 // 创建按钮容器
                 const buttonContainer = document.createElement('div');
                 buttonContainer.style.cssText = `
-                    position: absolute;
-                    top: 20px;
+                    position: ${isMobile ? 'sticky' : 'absolute'};
+                    top: ${isMobile ? '0' : '20px'};
                     left: 50%;
                     transform: translateX(-50%);
                     display: flex;
-                    gap: 12px;
+                    gap: ${isMobile ? '10px' : '12px'};
                     z-index: 10001;
+                    padding: ${isMobile ? '10px 0' : '0'};
+                    background: ${isMobile ? 'rgba(0,0,0,0.3)' : 'transparent'};
+                    width: ${isMobile ? '100%' : 'auto'};
+                    justify-content: center;
+                    flex-shrink: 0;
                 `;
                 
                 // 下载按钮
                 const downloadButton = document.createElement('button');
                 downloadButton.innerHTML = '下载图片';
                 downloadButton.style.cssText = `
-                    padding: 10px 20px;
+                    padding: ${isMobile ? '15px 25px' : '10px 20px'};
                     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                     color: white;
                     border: none;
-                    border-radius: 8px;
+                    border-radius: ${isMobile ? '12px' : '8px'};
                     cursor: pointer;
-                    font-size: 14px;
+                    font-size: ${isMobile ? '16px' : '14px'};
                     font-weight: 500;
+                    min-height: ${isMobile ? '50px' : 'auto'};
+                    min-width: ${isMobile ? '120px' : 'auto'};
+                    touch-action: manipulation;
                 `;
                 downloadButton.onclick = function() {
                     // 保存原始样式
@@ -1799,21 +1824,26 @@ async function generateJinxAndConfigImage() {
                 const closeButton = document.createElement('button');
                 closeButton.innerHTML = '关闭';
                 closeButton.style.cssText = `
-                    padding: 10px 20px;
+                    padding: ${isMobile ? '15px 25px' : '10px 20px'};
                     background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
                     color: white;
                     border: none;
-                    border-radius: 8px;
+                    border-radius: ${isMobile ? '12px' : '8px'};
                     cursor: pointer;
-                    font-size: 14px;
+                    font-size: ${isMobile ? '16px' : '14px'};
                     font-weight: 500;
+                    min-height: ${isMobile ? '50px' : 'auto'};
+                    min-width: ${isMobile ? '120px' : 'auto'};
+                    touch-action: manipulation;
                 `;
                 closeButton.onclick = function() {
                     document.body.removeChild(previewContainer);
                 };
                 buttonContainer.appendChild(closeButton);
                 
+                // 先添加按钮容器，再添加剧本图页面，让按钮显示在上方
                 previewContainer.appendChild(buttonContainer);
+                previewContainer.appendChild(printPage);
                 document.body.appendChild(previewContainer);
                 
             } catch (error) {

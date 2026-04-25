@@ -742,6 +742,12 @@
                 gap: 8px;
             }
 
+            /* 随机选择工具与已选角色窗口宽度一致 */
+            .random-selection-tool {
+                padding: 16px !important;
+                border-radius: 12px !important;
+            }
+
             .random-select-panel label {
                 display: flex;
                 justify-content: space-between;
@@ -1029,7 +1035,7 @@
         /* 移动端浮动操作按钮样式 */
         #mobile-fab-container {
             position: fixed;
-            bottom: env(safe-area-inset-bottom, 20px);
+            bottom: env(safe-area-inset-bottom, 40px);
             right: 20px;
             z-index: 9999;
             display: none;
@@ -2066,6 +2072,14 @@
             .role-button img {
                 width: 50px;
                 height: 50px;
+            }
+
+            .drag-handle {
+                display: none;
+            }
+
+            .selected-role-ability {
+                margin-left: 0 !important;
             }
 
             #search-role-input {
@@ -12771,7 +12785,7 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
             </button>
             <button id="fab-clear-all" class="fab-button" onclick="clearAllSelections(); toggleFabMenu();" style="background: #e53e3e;">
                 <span>🗑️</span>
-                <span>清空所有</span>
+                <span>重置数据</span>
             </button>
         </div>
         <button id="main-fab" onclick="toggleFabMenu()" style="width: 56px; height: 56px; border-radius: 50%; border: none; color: white; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2); transition: transform 0.2s, box-shadow 0.2s; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #6b46c1 0%, #805ad5 100%);">
