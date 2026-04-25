@@ -863,19 +863,20 @@ async function generateScriptImageV2() {
                     scriptPage.style.overflowY = originalOverflowY;
                 }, 100);
                 
-                // 创建按钮容器
+                // 创建按钮容器 - 悬浮在屏幕正中
                 const buttonContainer = document.createElement('div');
                 buttonContainer.style.cssText = `
-                    position: ${isMobile ? 'sticky' : 'absolute'};
-                    top: ${isMobile ? '0' : '20px'};
+                    position: fixed;
+                    top: 50%;
                     left: 50%;
-                    transform: translateX(-50%);
+                    transform: translate(-50%, -50%);
                     display: flex;
-                    gap: ${isMobile ? '10px' : '12px'};
+                    gap: 12px;
                     z-index: 10001;
-                    padding: ${isMobile ? '10px 0' : '0'};
-                    background: ${isMobile ? 'rgba(0,0,0,0.3)' : 'transparent'};
-                    width: ${isMobile ? '100%' : 'auto'};
+                    padding: 15px 20px;
+                    background: rgba(255, 255, 255, 0.95);
+                    border-radius: 12px;
+                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
                     justify-content: center;
                     flex-shrink: 0;
                 `;
@@ -1675,19 +1676,20 @@ async function generateJinxAndConfigImage() {
                     </div>
                 `;
                 
-                // 创建按钮容器
+                // 创建按钮容器 - 悬浮在屏幕正中
                 const buttonContainer = document.createElement('div');
                 buttonContainer.style.cssText = `
-                    position: ${isMobile ? 'sticky' : 'absolute'};
-                    top: ${isMobile ? '0' : '20px'};
+                    position: fixed;
+                    top: 50%;
                     left: 50%;
-                    transform: translateX(-50%);
+                    transform: translate(-50%, -50%);
                     display: flex;
-                    gap: ${isMobile ? '10px' : '12px'};
+                    gap: 12px;
                     z-index: 10001;
-                    padding: ${isMobile ? '10px 0' : '0'};
-                    background: ${isMobile ? 'rgba(0,0,0,0.3)' : 'transparent'};
-                    width: ${isMobile ? '100%' : 'auto'};
+                    padding: 15px 20px;
+                    background: rgba(255, 255, 255, 0.95);
+                    border-radius: 12px;
+                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
                     justify-content: center;
                     flex-shrink: 0;
                 `;
