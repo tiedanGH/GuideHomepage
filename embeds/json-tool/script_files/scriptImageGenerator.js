@@ -837,26 +837,33 @@ async function generateScriptImageV2() {
                     scriptPage.style.maxHeight = 'none';
                     scriptPage.style.overflowY = 'visible';
                     
-                    const fullHeight = scriptPage.scrollHeight;
-                    const fullWidth = scriptPage.scrollWidth;
-                    
-                    // 纵向A4比例: 宽:高 = 1 : sqrt(2) ≈ 1 : 1.414
-                    const a4Ratio = Math.sqrt(2);
-                    
-                    // 根据内容高度计算宽度，保持A4比例
-                    let finalHeight = fullHeight;
-                    let finalWidth = fullHeight / a4Ratio;
-                    
-                    // 确保宽度足够容纳内容
-                    if (finalWidth < fullWidth) {
-                        // 如果计算出的宽度不够，以内容宽度为基准重新计算高度
-                        finalWidth = fullWidth;
-                        finalHeight = fullWidth * a4Ratio;
+                    // 移动端保持固定尺寸 520x870px
+                    if (isMobile) {
+                        scriptPage.style.width = '520px';
+                        scriptPage.style.height = '870px';
+                    } else {
+                        // 桌面端根据内容计算尺寸，保持A4比例
+                        const fullHeight = scriptPage.scrollHeight;
+                        const fullWidth = scriptPage.scrollWidth;
+                        
+                        // 纵向A4比例: 宽:高 = 1 : sqrt(2) ≈ 1 : 1.414
+                        const a4Ratio = Math.sqrt(2);
+                        
+                        // 根据内容高度计算宽度，保持A4比例
+                        let finalHeight = fullHeight;
+                        let finalWidth = fullHeight / a4Ratio;
+                        
+                        // 确保宽度足够容纳内容
+                        if (finalWidth < fullWidth) {
+                            // 如果计算出的宽度不够，以内容宽度为基准重新计算高度
+                            finalWidth = fullWidth;
+                            finalHeight = fullWidth * a4Ratio;
+                        }
+                        
+                        // 设置容器尺寸
+                        scriptPage.style.width = finalWidth + 'px';
+                        scriptPage.style.height = finalHeight + 'px';
                     }
-                    
-                    // 设置容器尺寸
-                    scriptPage.style.width = finalWidth + 'px';
-                    scriptPage.style.height = finalHeight + 'px';
                     
                     // 恢复原始样式
                     scriptPage.style.maxHeight = originalMaxHeight;
