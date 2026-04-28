@@ -1195,13 +1195,13 @@ async function generateScriptImageV2() {
                     setTimeout(() => {
                         // 获取实际内容尺寸
                         const fullHeight = scriptPage.scrollHeight;
-                        const fullWidth = scriptPage.scrollWidth;
+                        const clientWidth = scriptPage.clientWidth;
                         
                         // 纵向A4比例: 宽:高 = 1 : sqrt(2) ≈ 1 : 1.414
                         const a4Ratio = Math.sqrt(2);
                         
-                        // 根据内容宽度计算最小高度，保持A4比例
-                        const minHeightForA4 = fullWidth * a4Ratio;
+                        // 根据容器宽度计算最小高度，保持A4比例
+                        const minHeightForA4 = clientWidth * a4Ratio;
                         
                         // 最终高度取实际内容高度和A4最小高度的较大值
                         const finalHeight = Math.max(fullHeight, minHeightForA4);
@@ -1213,8 +1213,7 @@ async function generateScriptImageV2() {
                             scale: 2,
                             useCORS: true,
                             allowTaint: true,
-                            backgroundColor: hexToRgba(customBgColor, bgOpacity),
-                            height: finalHeight
+                            backgroundColor: hexToRgba(customBgColor, bgOpacity)
                         }).then(function(canvas) {
                             // 恢复原始样式
                             scriptPage.style.maxHeight = originalMaxHeight;
