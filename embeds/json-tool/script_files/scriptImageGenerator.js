@@ -1198,19 +1198,19 @@ async function generateScriptImageV2() {
                         // 获取实际内容高度（转换为英寸）
                         const fullHeightInch = scriptPage.scrollHeight / 96;
                         
-                        // 竖向A4尺寸（8.27英寸 × 11.69英寸）
-                        const a4WidthInch = 8.27;
-                        const a4HeightInch = 11.69;
+                        // 竖向A4比例: 宽:高 = 1 : sqrt(2) ≈ 1 : 1.414
+                        const a4Ratio = Math.sqrt(2);
                         
-                        // 计算最终高度：取内容实际高度和A4高度的较大值，确保竖向A4比例
-                        const finalHeightInch = Math.max(fullHeightInch, a4HeightInch);
+                        // 根据内容高度计算宽度，保持A4比例
+                        const finalWidthInch = fullHeightInch / a4Ratio;
+                        const finalHeightInch = fullHeightInch;
                         
-                        // 设置容器尺寸为竖向A4（使用英寸单位保持一致）
-                        scriptPage.style.width = a4WidthInch + 'in';
+                        // 设置容器尺寸（根据内容高度自动调整宽度，保持A4比例）
+                        scriptPage.style.width = finalWidthInch + 'in';
                         scriptPage.style.height = finalHeightInch + 'in';
                         
                         // 转换为像素用于html2canvas
-                        const a4WidthPx = a4WidthInch * 96;
+                        const finalWidthPx = finalWidthInch * 96;
                         const finalHeightPx = finalHeightInch * 96;
                         
                         html2canvas(scriptPage, {
@@ -1218,7 +1218,7 @@ async function generateScriptImageV2() {
                             useCORS: true,
                             allowTaint: true,
                             backgroundColor: hexToRgba(customBgColor, bgOpacity),
-                            windowWidth: a4WidthPx,
+                            windowWidth: finalWidthPx,
                             windowHeight: finalHeightPx
                         }).then(function(canvas) {
                             // 恢复原始样式
