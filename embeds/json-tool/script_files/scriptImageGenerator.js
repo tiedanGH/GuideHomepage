@@ -1195,32 +1195,27 @@ async function generateScriptImageV2() {
                     
                     // 等待DOM更新后获取完整尺寸
                     setTimeout(() => {
+                        // 获取实际内容高度
                         const fullHeight = scriptPage.scrollHeight;
-                        const fullWidth = scriptPage.scrollWidth;
                         
-                        // 纵向A4比例: 宽:高 = 1 : sqrt(2) ≈ 1 : 1.414
-                        const a4Ratio = Math.sqrt(2);
+                        // 竖向A4尺寸（8.27英寸 × 11.69英寸，96dpi）
+                        const a4Width = 8.27 * 96;
+                        const a4Height = 11.69 * 96;
                         
-                        // 根据内容高度计算宽度，保持A4比例
-                        let finalHeight = fullHeight;
-                        let finalWidth = fullHeight / a4Ratio;
+                        // 计算最终高度：取内容实际高度和A4高度的较大值，确保竖向A4比例
+                        const finalHeight = Math.max(fullHeight, a4Height);
                         
-                        // 确保宽度足够容纳内容
-                        if (finalWidth < fullWidth) {
-                            // 如果计算出的宽度不够，以内容宽度为基准重新计算高度
-                            finalWidth = fullWidth;
-                            finalHeight = fullWidth * a4Ratio;
-                        }
-                        
-                        // 设置容器尺寸
-                        scriptPage.style.width = finalWidth + 'px';
+                        // 设置容器尺寸为竖向A4
+                        scriptPage.style.width = a4Width + 'px';
                         scriptPage.style.height = finalHeight + 'px';
                         
                         html2canvas(scriptPage, {
                             scale: 2,
                             useCORS: true,
                             allowTaint: true,
-                            backgroundColor: hexToRgba(customBgColor, bgOpacity)
+                            backgroundColor: hexToRgba(customBgColor, bgOpacity),
+                            windowWidth: a4Width,
+                            windowHeight: finalHeight
                         }).then(function(canvas) {
                             // 恢复原始样式
                             scriptPage.style.maxHeight = originalMaxHeight;
