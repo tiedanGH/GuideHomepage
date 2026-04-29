@@ -636,8 +636,8 @@ async function generateScriptImageV2() {
                         // 横向排列（wrap方式）
                         return `
                             <div style="margin-bottom: 15px; max-width: 100%;">
-                                <div style="font-family: 'Philo', serif; font-size: 16px; font-weight: bold; color: ${color}; padding-bottom: 3px; margin-bottom: 8px; display: flex; align-items: flex-start; max-width: 100%;">
-                                <div style="writing-mode: vertical-rl; text-orientation: mixed; line-height: 1.8;">${title}</div>
+                                <div style="font-family: 'Philo', serif; font-size: 16px; font-weight: bold; color: ${color}; padding-bottom: 3px; margin-bottom: 8px; display: flex; align-items: center; max-width: 100%;">
+                                <div>${title}</div>
                                 <div style="flex: 1; height: 1px; background: ${color}; margin-left: 10px;"></div>
                             </div>
                                 <div style="display: flex; flex-wrap: wrap; gap: 10px; max-width: 100%; box-sizing: border-box;">
@@ -657,8 +657,8 @@ async function generateScriptImageV2() {
                         
                         return `
                             <div style="margin-bottom: 15px; max-width: 100%;">
-                                <div style="font-family: 'Philo', serif; font-size: 16px; font-weight: bold; color: ${color}; padding-bottom: 3px; margin-bottom: 8px; display: flex; align-items: flex-start; max-width: 100%;">
-                                <div style="writing-mode: vertical-rl; text-orientation: mixed; line-height: 1.8;">${title}</div>
+                                <div style="font-family: 'Philo', serif; font-size: 16px; font-weight: bold; color: ${color}; padding-bottom: 3px; margin-bottom: 8px; display: flex; align-items: center; max-width: 100%;">
+                                <div>${title}</div>
                                 <div style="flex: 1; height: 1px; background: ${color}; margin-left: 10px;"></div>
                             </div>
                                 <div style="display: flex; gap: 10px; max-width: 100%; box-sizing: border-box;">
