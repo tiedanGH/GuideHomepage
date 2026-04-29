@@ -1186,27 +1186,34 @@ async function generateScriptImageV2() {
                     // 保存原始样式
                     const originalMaxHeight = scriptPage.style.maxHeight;
                     const originalOverflowY = scriptPage.style.overflowY;
+                    const originalWidth = scriptPage.style.width;
+                    const originalHeight = scriptPage.style.height;
+                    
                     // 临时移除max-height和overflow限制以获取完整内容
                     scriptPage.style.maxHeight = 'none';
                     scriptPage.style.overflowY = 'visible';
-                    scriptPage.style.height = 'auto';
                     
                     // 等待DOM更新后获取完整尺寸
                     setTimeout(() => {
-                        // 获取实际内容尺寸
                         const fullHeight = scriptPage.scrollHeight;
-                        const clientWidth = scriptPage.clientWidth;
+                        const fullWidth = scriptPage.scrollWidth;
                         
                         // 纵向A4比例: 宽:高 = 1 : sqrt(2) ≈ 1 : 1.414
                         const a4Ratio = Math.sqrt(2);
                         
-                        // 根据容器宽度计算最小高度，保持A4比例
-                        const minHeightForA4 = clientWidth * a4Ratio;
+                        // 根据内容高度计算宽度，保持A4比例
+                        let finalHeight = fullHeight;
+                        let finalWidth = fullHeight / a4Ratio;
                         
-                        // 最终高度取实际内容高度和A4最小高度的较大值
-                        const finalHeight = Math.max(fullHeight, minHeightForA4);
+                        // 确保宽度足够容纳内容
+                        if (finalWidth < fullWidth) {
+                            // 如果计算出的宽度不够，以内容宽度为基准重新计算高度
+                            finalWidth = fullWidth;
+                            finalHeight = fullWidth * a4Ratio;
+                        }
                         
-                        // 设置容器高度
+                        // 设置容器尺寸
+                        scriptPage.style.width = finalWidth + 'px';
                         scriptPage.style.height = finalHeight + 'px';
                         
                         html2canvas(scriptPage, {
@@ -1218,6 +1225,8 @@ async function generateScriptImageV2() {
                             // 恢复原始样式
                             scriptPage.style.maxHeight = originalMaxHeight;
                             scriptPage.style.overflowY = originalOverflowY;
+                            scriptPage.style.width = originalWidth;
+                            scriptPage.style.height = originalHeight;
                             
                             // 使用更兼容移动端的下载方式
                             const dataUrl = canvas.toDataURL('image/png');
