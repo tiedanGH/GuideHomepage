@@ -1190,6 +1190,7 @@ async function generateScriptImageV2() {
                                     </div>
                                 </div>
 
+                                ${showNightOrder ? `
                                 <!-- 右侧：夜间行动顺序 -->
                                 <div style="width: 70px; display: flex; flex-direction: column; align-items: center; background: rgba(255,255,255,0.6); padding: 10px 4px; border-left: 2px solid #d4c1a4; flex-shrink: 0;">
                                     <div style="color: #4a3728; font-size: 14px; font-weight: bold; margin-bottom: 10px; text-align: center; line-height: 1.3; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: 2px;">夜间顺序</div>
@@ -1212,6 +1213,7 @@ async function generateScriptImageV2() {
                                     </div>
                                     <div style="margin-top: 10px; font-size: 9px; color: #8b7355; text-align: center; writing-mode: vertical-rl; letter-spacing: 1px;">*代表非首夜</div>
                                 </div>
+                                ` : ''}
                             </div>
 
                             <!-- 自制规则 -->
