@@ -83,6 +83,9 @@ async function generateScriptImageV2() {
                 // 获取二维码图片
                 const qrcodeImage = metaInfoJson.almanac || document.getElementById('qrcode-image-input')?.value?.trim() || '';
                 
+                // 获取玩家数量配置图片（方案一使用）
+                const configImage = document.getElementById('config-image-input')?.value?.trim() || 'https://i.postimg.cc/021k6s9F/playercount.png';
+                
                 // 获取剧本自制规则
                 const bootleggerRulesArray = Array.isArray(metaInfoJson.bootlegger) ? metaInfoJson.bootlegger : (metaInfoJson.bootlegger ? [metaInfoJson.bootlegger] : []);
                 const bootleggerRules = bootleggerRulesArray.join('\n');
@@ -535,10 +538,10 @@ async function generateScriptImageV2() {
                     background: rgba(0, 0, 0, 0.85);
                     display: flex;
                     flex-direction: column;
-                    justify-content: flex-start;
+                    justify-content: center;
                     align-items: center;
                     z-index: 10000;
-                    padding: ${isMobile ? '10px' : '20px'};
+                    padding: 20px;
                     box-sizing: border-box;
                     overflow: auto;
                 `;
@@ -552,7 +555,7 @@ async function generateScriptImageV2() {
                 const scriptPage = document.createElement('div');
                 scriptPage.style.cssText = `
                     background: ${hexToRgba(customBgColor, bgOpacity)};
-                    width: ${isMobile ? '520px' : '8.27in'};
+                    width: ${isMobile ? '520px' : '1240px'};
                     padding: ${isMobile ? '10px' : '0.3in'};
                     box-sizing: border-box;
                     position: relative;
@@ -684,7 +687,92 @@ async function generateScriptImageV2() {
                 
                 // 构建玩家数量表格
                 const playerCountTable = `
-                    <img src="https://i.postimg.cc/021k6s9F/playercount.png" style="width: 100%; object-fit: contain;">
+                    <div style="font-size: 11px; border-collapse: collapse; width: 100%;">
+                        <div style="display: flex; background: #5c4033; color: white; font-weight: bold;">
+                            <div style="width: 50px; padding: 4px 6px; text-align: center; border: 1px solid #3d2817;">玩家</div>
+                            <div style="flex: 1; padding: 4px 6px; text-align: center; border: 1px solid #3d2817;">5</div>
+                            <div style="flex: 1; padding: 4px 6px; text-align: center; border: 1px solid #3d2817;">6</div>
+                            <div style="flex: 1; padding: 4px 6px; text-align: center; border: 1px solid #3d2817;">7</div>
+                            <div style="flex: 1; padding: 4px 6px; text-align: center; border: 1px solid #3d2817;">8</div>
+                            <div style="flex: 1; padding: 4px 6px; text-align: center; border: 1px solid #3d2817;">9</div>
+                            <div style="flex: 1; padding: 4px 6px; text-align: center; border: 1px solid #3d2817;">10</div>
+                            <div style="flex: 1; padding: 4px 6px; text-align: center; border: 1px solid #3d2817;">11</div>
+                            <div style="flex: 1; padding: 4px 6px; text-align: center; border: 1px solid #3d2817;">12</div>
+                            <div style="flex: 1; padding: 4px 6px; text-align: center; border: 1px solid #3d2817;">13</div>
+                            <div style="flex: 1; padding: 4px 6px; text-align: center; border: 1px solid #3d2817;">14</div>
+                            <div style="flex: 1; padding: 4px 6px; text-align: center; border: 1px solid #3d2817;">15</div>
+                        </div>
+                        <div style="display: flex; background: white;">
+                            <div style="width: 50px; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0; color: #8b0000; font-weight: bold;">镇民</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">3</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">3</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">5</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">5</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">5</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">7</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">7</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">7</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">9</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">9</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">9</div>
+                        </div>
+                        <div style="display: flex; background: #f5f0e6;">
+                            <div style="width: 50px; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0; color: #0d5c5c; font-weight: bold;">外来者</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">0</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">1</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">0</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">1</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">2</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">0</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">1</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">2</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">0</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">1</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">2</div>
+                        </div>
+                        <div style="display: flex; background: white;">
+                            <div style="width: 50px; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0; color: #8b4513; font-weight: bold;">爪牙</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">1</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">1</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">1</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">1</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">1</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">2</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">2</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">2</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">3</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">3</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">3</div>
+                        </div>
+                        <div style="display: flex; background: #f5f0e6;">
+                            <div style="width: 50px; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0; color: #8b4513; font-weight: bold;">小恶魔</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">0</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">0</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">0</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">0</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">0</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">0</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">0</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">0</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">0</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">0</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">0</div>
+                        </div>
+                        <div style="display: flex; background: white;">
+                            <div style="width: 50px; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0; color: #8b0000; font-weight: bold;">恶魔</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">1</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">1</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">1</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">1</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">1</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">1</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">1</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">1</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">1</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">1</div>
+                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">1</div>
+                        </div>
+                    </div>
                 `;
                 
                 // 构建标题区域HTML
@@ -720,11 +808,11 @@ async function generateScriptImageV2() {
                             <div style="text-align: center; color: #b8860b; font-size: 10px; margin-top: 3px; font-weight: bold;">扫码查看运作</div>
                         </div>
                     ` : ''}
-                    <!-- 右侧：玩家数量表格和传奇角色/旅行者 -->
+                    <!-- 右侧：玩家数量配置图片和传奇角色/旅行者 -->
                     <div style="display: flex; gap: 10px; margin-right: 0; flex-shrink: 0;">
                         ${showConfigTable ? `
                         <div style="width: 300px; flex-shrink: 0;">
-                            ${playerCountTable}
+                            ${configImage ? `<img src="${configImage}" alt="玩家数量配置" style="width: 100%; height: auto; object-fit: contain;">` : playerCountTable}
                         </div>
                         ` : ''}
                         ${showTravellersFabled && (fabledRoles.length > 0 || travellerRoles.length > 0) ? `
@@ -864,10 +952,10 @@ async function generateScriptImageV2() {
                 const nightOrderCombined = combinedOrder.map(item => {
                     const info = nightOrderMap.get(item.name);
                     return `
-                        <div style="display: flex; align-items: center; gap: 4px; margin: 2px 0;">
-                            <span style="font-size: 11px; color: #8b0000; width: 16px; text-align: right;">${info.firstNight || ''}</span>
-                            <img src="${convertToLocalPath(item.image)}" style="width: 40px; height: 40px; object-fit: cover;">
-                            <span style="font-size: 11px; color: #8b0000; width: 16px; text-align: left;">${info.otherNight || ''}</span>
+                        <div style="display: flex; align-items: center; gap: 2px; margin: 1px 0;">
+                            <span style="font-size: 10px; color: #8b0000; width: 12px; text-align: right;">${info.firstNight || ''}</span>
+                            <img src="${convertToLocalPath(item.image)}" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #e0e0e0;">
+                            <span style="font-size: 10px; color: #8b0000; width: 12px; text-align: left;">${info.otherNight || ''}</span>
                         </div>
                     `;
                 }).join('');
@@ -896,231 +984,252 @@ async function generateScriptImageV2() {
                 const highlightedDemon = demonRoles.map(r => ({...r, ability: highlightAbility(r.ability)}));
                 const highlightedCustomTeams = validCustomTeams.map(t => ({...t, roles: t.roles.map(r => ({...r, ability: highlightAbility(r.ability)}))}));
                 
+                // 方案二角色列表布局函数
+                const createRoleGrid = (roles, nameColor = '#333') => {
+                    if (roles.length === 0) return '';
+                    
+                    const horizontalLayout = document.getElementById('horizontalLayout');
+                    const useHorizontalLayout = horizontalLayout && horizontalLayout.checked;
+                    
+                    // 生成单个角色卡片HTML
+                    const createRoleCard = (role) => `
+                        <div style="display: flex; gap: 10px; padding: 8px; align-items: flex-start; background: rgba(255,255,255,0.95); border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border-bottom: 1px solid #e8e0d5;">
+                            <div style="width: 70px; height: 70px; flex-shrink: 0; overflow: hidden;">
+                                <img src="${convertToLocalPath(role.image)}" alt="${role.name}" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                            </div>
+                            <div style="flex: 1; min-width: 0;">
+                                <div style="font-size: 16px; font-weight: bold; color: ${nameColor}; margin-bottom: 2px; font-family: 'SimSun', '宋体', serif;">${role.name}</div>
+                                <div style="font-size: 12px; color: #4a3728; line-height: 1.4;">${role.ability || ''}</div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    if (useHorizontalLayout) {
+                        // 横向排列：两列Grid布局，同时填充
+                        return `
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 12px; padding: 8px;">
+                                ${roles.map(createRoleCard).join('')}
+                            </div>
+                        `;
+                    } else {
+                        // 竖向排列（默认）：先填满第一列，再填满第二列
+                        const midIndex = Math.ceil(roles.length / 2);
+                        const leftColumn = roles.slice(0, midIndex);
+                        const rightColumn = roles.slice(midIndex);
+                        
+                        return `
+                            <div style="display: flex; gap: 12px; padding: 8px;">
+                                <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+                                    ${leftColumn.map(createRoleCard).join('')}
+                                </div>
+                                <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+                                    ${rightColumn.map(createRoleCard).join('')}
+                                </div>
+                            </div>
+                        `;
+                    }
+                };
+                
                 let scriptHtml = '';
                 if (scriptLayout === 'scheme2') {
-                    // 方案二：阵营标签在左侧，角色卡片在中间，夜间顺序在右侧
+                    // 方案二：参考产品布局 - 左侧角色区域，右侧夜间顺序
                     scriptHtml = `
-                        <div style="background: ${customBgColor}; display: block; overflow: hidden;">
-                            <!-- 顶部区域：标题 -->
-                            <div style="margin-bottom: 15px;">
-                                <div style="font-family: 'Philo', serif; font-size: 20px; color: #8b0000; font-weight: bold;">
-                                    ${editionName}
-                                </div>
-                                ${authorName ? `
-                                    <div style="font-family: 'Philo', serif; font-size: 12px; color: #666; margin-top: 2px;">
-                                        ${authorName}
-                                    </div>
-                                ` : ''}
-                            </div>
+                        <div style="width: 1240px; height: 1754px; background: ${hexToRgba(customBgColor, bgOpacity)}; padding: 25px; box-sizing: border-box; font-family: 'Microsoft YaHei', 'SimSun', sans-serif; position: relative;">
+                            <!-- 装饰性边框 - 复古风格 -->
+                            <div style="position: absolute; top: 15px; left: 15px; right: 15px; bottom: 15px; border: 3px double #b8a88a; pointer-events: none; box-shadow: inset 0 0 20px rgba(184, 168, 138, 0.3);"></div>
                             
-                            <!-- 中间主体区域 -->
-                            <div style="display: flex; gap: 10px;">
-                                <!-- 左侧：角色和状态 -->
-                                <div style="flex: 1;">
-                                    <!-- 镇民 -->
-                                <div style="display: flex;">
-                                    <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; background: #1e3a5f; padding: 12px 6px; min-height: 100px; min-width: 30px; flex-shrink: 0;">
-                                        <span style="font-family: 'Philo', serif; font-size: 16px; color: white; font-weight: bold; writing-mode: vertical-rl; text-orientation: mixed; letter-spacing: 2px;">镇民</span>
-                                    </div>
-                                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 6px 10px; border-left: 3px solid #1e3a5f;">
-                                            ${highlightedTownsfolk.map(role => `
-                                                <div style="background: white; padding: 12px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                                                    <div style="display: flex; gap: 12px;">
-                                                        <img src="${convertToLocalPath(role.image)}" style="width: 65px; height: 65px; object-fit: cover; flex-shrink: 0;">
-                                                        <div style="flex: 1; min-width: 0;">
-                                                            <div style="font-weight: bold; font-size: 15px; color: #333; margin-bottom: 3px;">${role.name}</div>
-                                                            <div style="font-size: 13px; color: #666; line-height: 1.4;">${role.ability || ''}</div>
+                            <!-- 角落装饰 -->
+                            <div style="position: absolute; top: 10px; left: 10px; width: 30px; height: 30px; border-top: 3px solid #8b7355; border-left: 3px solid #8b7355; pointer-events: none;"></div>
+                            <div style="position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; border-top: 3px solid #8b7355; border-right: 3px solid #8b7355; pointer-events: none;"></div>
+                            <div style="position: absolute; bottom: 10px; left: 10px; width: 30px; height: 30px; border-bottom: 3px solid #8b7355; border-left: 3px solid #8b7355; pointer-events: none;"></div>
+                            <div style="position: absolute; bottom: 10px; right: 10px; width: 30px; height: 30px; border-bottom: 3px solid #8b7355; border-right: 3px solid #8b7355; pointer-events: none;"></div>
+
+                            <!-- 主内容区域 -->
+                            <div style="display: flex; gap: 12px; position: relative; z-index: 1;">
+                                <!-- 左侧：角色列表 -->
+                                <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+                                    <!-- 镇民区域（包含标题、作者、旅行者/传奇、二维码、配置表） -->
+                                    <div style="display: flex;">
+                                        <div style="width: 40px; background: linear-gradient(180deg, ${customTeamColors.townsfolk} 0%, ${hexToRgba(customTeamColors.townsfolk, 0.8)} 100%); display: flex; align-items: center; justify-content: center; border-radius: 6px 0 0 6px; flex-shrink: 0;">
+                                            <span style="writing-mode: vertical-rl; text-orientation: upright; color: white; font-size: 22px; font-weight: bold; letter-spacing: 6px;">${customTeamNames.townsfolk}</span>
+                                        </div>
+                                        <div style="flex: 1; display: flex; flex-direction: column; background: rgba(255,255,255,0.7); border-radius: 0 6px 6px 0;">
+                                            <!-- 剧本标题、作者、旅行者/传奇和配置表 -->
+                                            <div style="display: flex; gap: 20px; padding: 10px; border-bottom: 2px solid #c9b896;">
+                                                <!-- 左侧：标题和旅行者/传奇 -->
+                                                <div style="display: flex; flex-direction: column; justify-content: center; flex-shrink: 0;">
+                                                    <!-- 旅行者和传奇角色图标 -->
+                                                    ${showTravellersFabled && (travellerRoles.length > 0 || fabledRoles.length > 0) ? `
+                                                        <div style="display: flex; justify-content: flex-start; gap: 10px; margin-bottom: 8px;">
+                                                            ${travellerRoles.length > 0 ? `
+                                                                <div style="display: flex; gap: 5px;">
+                                                                    ${travellerRoles.map(role => `
+                                                                        <img src="${convertToLocalPath(role.image)}" alt="${role.name}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 3px; box-shadow: 0 1px 3px rgba(0,0,0,0.15);">
+                                                                    `).join('')}
+                                                                </div>
+                                                            ` : ''}
+                                                            ${fabledRoles.length > 0 ? `
+                                                                <div style="display: flex; gap: 5px;">
+                                                                    ${fabledRoles.map(role => `
+                                                                        <img src="${convertToLocalPath(role.image)}" alt="${role.name}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 3px; box-shadow: 0 1px 3px rgba(0,0,0,0.15);">
+                                                                    `).join('')}
+                                                                </div>
+                                                            ` : ''}
                                                         </div>
-                                                    </div>
+                                                    ` : ''}
+                                                    <h1 style="font-size: 32px; margin: 0 0 4px 0; color: #1e3a5f; font-weight: bold; font-family: 'SimSun', '宋体', serif; letter-spacing: 2px; white-space: nowrap;">${editionName}</h1>
+                                                    <div style="font-size: 12px; color: #6b5a45; font-style: italic; white-space: nowrap;">${authorName ? `剧本作者：${authorName}` : ''}</div>
                                                 </div>
-                                            `).join('')}
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- 外来者 -->
-                                    <div style="display: flex; margin-top: 8px;">
-                                        <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; background: #0d5c5c; padding: 12px 6px; min-height: 100px; min-width: 30px; flex-shrink: 0;">
-                                            <span style="font-family: 'Philo', serif; font-size: 16px; color: white; font-weight: bold; writing-mode: vertical-rl; text-orientation: mixed; letter-spacing: 2px;">外来者</span>
-                                        </div>
-                                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 6px 10px; border-left: 3px solid #0d5c5c;">
-                                            ${highlightedOutsider.map(role => `
-                                                <div style="background: white; padding: 12px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                                                    <div style="display: flex; gap: 12px;">
-                                                        <img src="${convertToLocalPath(role.image)}" style="width: 65px; height: 65px; object-fit: cover; flex-shrink: 0;">
-                                                        <div style="flex: 1; min-width: 0;">
-                                                            <div style="font-weight: bold; font-size: 15px; color: #333; margin-bottom: 3px;">${role.name}</div>
-                                                            <div style="font-size: 13px; color: #666; line-height: 1.4;">${role.ability || ''}</div>
-                                                        </div>
-                                                    </div>
+                                                <!-- 右侧：玩家数量配置表 -->
+                                                ${showConfigTable ? `
+                                                <div style="flex: 1; background: white; border-radius: 4px; overflow: hidden; border: 1px solid #c9b896;">
+                                                    ${playerCountTable}
                                                 </div>
-                                            `).join('')}
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- 爪牙 -->
-                                    <div style="display: flex; margin-top: 8px;">
-                                        <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; background: #8b4513; padding: 12px 6px; min-height: 100px; min-width: 30px; flex-shrink: 0;">
-                                            <span style="font-family: 'Philo', serif; font-size: 16px; color: white; font-weight: bold; writing-mode: vertical-rl; text-orientation: mixed; letter-spacing: 2px;">爪牙</span>
-                                        </div>
-                                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 6px 10px; border-left: 3px solid #8b4513;">
-                                            ${highlightedMinion.map(role => `
-                                                <div style="background: white; padding: 12px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                                                    <div style="display: flex; gap: 12px;">
-                                                        <img src="${convertToLocalPath(role.image)}" style="width: 65px; height: 65px; object-fit: cover; flex-shrink: 0;">
-                                                        <div style="flex: 1; min-width: 0;">
-                                                            <div style="font-weight: bold; font-size: 15px; color: #333; margin-bottom: 3px;">${role.name}</div>
-                                                            <div style="font-size: 13px; color: #666; line-height: 1.4;">${role.ability || ''}</div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            `).join('')}
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- 恶魔 -->
-                                    <div style="display: flex; margin-top: 8px;">
-                                        <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; background: #8b0000; padding: 12px 6px; min-height: 100px; min-width: 30px; flex-shrink: 0;">
-                                            <span style="font-family: 'Philo', serif; font-size: 16px; color: white; font-weight: bold; writing-mode: vertical-rl; text-orientation: mixed; letter-spacing: 2px;">恶魔</span>
-                                        </div>
-                                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 6px 10px; border-left: 3px solid #8b0000;">
-                                            ${highlightedDemon.map(role => `
-                                                <div style="background: white; padding: 12px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                                                    <div style="display: flex; gap: 12px;">
-                                                        <img src="${convertToLocalPath(role.image)}" style="width: 65px; height: 65px; object-fit: cover; flex-shrink: 0;">
-                                                        <div style="flex: 1; min-width: 0;">
-                                                            <div style="font-weight: bold; font-size: 15px; color: #333; margin-bottom: 3px;">${role.name}</div>
-                                                            <div style="font-size: 13px; color: #666; line-height: 1.4;">${role.ability || ''}</div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            `).join('')}
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- 自定义阵营 -->
-                                    ${highlightedCustomTeams.map(team => `
-                                    <div style="display: flex; margin-top: 8px;">
-                                        <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; background: ${team.color}; padding: 12px 6px; min-height: 100px; min-width: 30px; flex-shrink: 0;">
-                                            <span style="font-family: 'Philo', serif; font-size: 16px; color: white; font-weight: bold; writing-mode: vertical-rl; text-orientation: mixed; letter-spacing: 2px;">${team.name}</span>
-                                        </div>
-                                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 6px 10px; border-left: 3px solid ${team.color};">
-                                                ${team.roles.map(role => `
-                                                    <div style="background: white; padding: 12px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                                                        <div style="display: flex; gap: 12px;">
-                                                            <img src="${convertToLocalPath(role.image)}" style="width: 65px; height: 65px; object-fit: cover; flex-shrink: 0;">
-                                                            <div style="flex: 1; min-width: 0;">
-                                                                <div style="font-weight: bold; font-size: 15px; color: #333; margin-bottom: 3px;">${role.name}</div>
-                                                                <div style="font-size: 13px; color: #666; line-height: 1.4;">${role.ability || ''}</div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                `).join('')}
+                                                ` : ''}
                                             </div>
+                                            <!-- 镇民角色列表 -->
+                                            ${createRoleGrid(highlightedTownsfolk)}
+                                        </div>
+                                    </div>
+
+                                    <!-- 外来者区域 -->
+                                    <div style="display: flex; border-top: 2px solid #d4c1a4;">
+                                        <div style="width: 36px; background: linear-gradient(180deg, ${customTeamColors.outsider} 0%, ${hexToRgba(customTeamColors.outsider, 0.8)} 100%); display: flex; align-items: center; justify-content: center; border-radius: 6px 0 0 6px; flex-shrink: 0;">
+                                            <span style="writing-mode: vertical-rl; text-orientation: upright; color: white; font-size: 18px; font-weight: bold; letter-spacing: 4px;">${customTeamNames.outsider}</span>
+                                        </div>
+                                        <div style="flex: 1; background: rgba(255,255,255,0.7); border-radius: 0 6px 6px 0;">
+                                            ${createRoleGrid(highlightedOutsider)}
+                                        </div>
+                                    </div>
+
+                                    <!-- 爪牙区域 -->
+                                    <div style="display: flex; border-top: 2px solid #d4c1a4;">
+                                        <div style="width: 36px; background: linear-gradient(180deg, ${customTeamColors.minion} 0%, ${hexToRgba(customTeamColors.minion, 0.8)} 100%); display: flex; align-items: center; justify-content: center; border-radius: 6px 0 0 6px; flex-shrink: 0;">
+                                            <span style="writing-mode: vertical-rl; text-orientation: upright; color: white; font-size: 18px; font-weight: bold; letter-spacing: 4px;">${customTeamNames.minion}</span>
+                                        </div>
+                                        <div style="flex: 1; background: rgba(255,255,255,0.7); border-radius: 0 6px 6px 0;">
+                                            ${createRoleGrid(highlightedMinion, '#c41e3a')}
+                                        </div>
+                                    </div>
+
+                                    <!-- 自定义阵营区域 -->
+                                    ${highlightedCustomTeams.map(team => `
+                                    <div style="display: flex; border-top: 2px solid #d4c1a4;">
+                                        <div style="width: 36px; background: linear-gradient(180deg, ${team.color} 0%, ${hexToRgba(team.color, 0.8)} 100%); display: flex; align-items: center; justify-content: center; border-radius: 6px 0 0 6px; flex-shrink: 0;">
+                                            <span style="writing-mode: vertical-rl; text-orientation: upright; color: white; font-size: 18px; font-weight: bold; letter-spacing: 4px;">${team.name}</span>
+                                        </div>
+                                        <div style="flex: 1; background: rgba(255,255,255,0.7); border-radius: 0 6px 6px 0;">
+                                            ${createRoleGrid(team.roles)}
+                                        </div>
                                     </div>
                                     `).join('')}
-                                    
-                                    <!-- 旅行者/传奇角色 -->
-                                    ${showTravellersFabled && (fabledRoles.length > 0 || travellerRoles.length > 0) ? `
-                                    <div style="display: flex; margin-top: 8px;">
-                                        <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; background: #666; padding: 12px 6px; min-height: 100px; min-width: 30px; flex-shrink: 0;">
-                                            <span style="font-family: 'Philo', serif; font-size: 16px; color: white; font-weight: bold; writing-mode: vertical-rl; text-orientation: mixed; letter-spacing: 2px;">旅行者/传奇</span>
+
+                                    <!-- 恶魔区域（包含相克规则和状态栏） -->
+                                    <div style="display: flex; border-top: 2px solid #d4c1a4;">
+                                        <div style="width: 36px; background: linear-gradient(180deg, ${customTeamColors.demon} 0%, ${hexToRgba(customTeamColors.demon, 0.8)} 100%); display: flex; align-items: center; justify-content: center; border-radius: 6px 0 0 6px; flex-shrink: 0;">
+                                            <span style="writing-mode: vertical-rl; text-orientation: upright; color: white; font-size: 18px; font-weight: bold; letter-spacing: 4px;">${customTeamNames.demon}</span>
                                         </div>
-                                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 6px 10px; border-left: 3px solid #666;">
-                                            ${[...fabledRoles, ...travellerRoles].map(role => `
-                                                <div style="background: white; padding: 12px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                                                    <div style="display: flex; gap: 12px;">
-                                                        <img src="${convertToLocalPath(role.image)}" style="width: 65px; height: 65px; object-fit: cover; flex-shrink: 0;">
-                                                        <div style="flex: 1; min-width: 0;">
-                                                            <div style="font-weight: bold; font-size: 15px; color: #333; margin-bottom: 3px;">${role.name}</div>
-                                                            <div style="font-size: 13px; color: #666; line-height: 1.4;">${role.ability || ''}</div>
-                                                        </div>
+                                        <div style="flex: 1; display: flex; flex-direction: column;">
+                                            <!-- 恶魔角色列表 -->
+                                            <div style="background: rgba(255,255,255,0.7); border-radius: 0 6px 0 0;">
+                                                ${createRoleGrid(highlightedDemon, '#c41e3a')}
+                                            </div>
+
+                                            <!-- 相克规则 -->
+                                            ${showJinxRules && jinxRules.length > 0 ? `
+                                                <div style="background: rgba(255,255,255,0.7); padding: 10px; border-top: 2px dashed #c9b896;">
+                                                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                                                        ${jinxRules.map(rule => {
+                                                            const role1 = allRoles.find(r => r.name === rule.jinxRole1);
+                                                            const role2 = allRoles.find(r => r.name === rule.jinxRole2);
+                                                            return `
+                                                                <div style="display: flex; align-items: center; gap: 6px; padding: 8px 10px; background: rgba(255,255,255,0.95); border-radius: 4px; border: 1px solid #e0d5c5;">
+                                                                    <div style="display: flex; align-items: center; gap: 3px; flex-shrink: 0;">
+                                                                        ${role1 ? `<div style="width: 24px; height: 24px; border-radius: 3px; overflow: hidden;"><img src="${convertToLocalPath(role1.image)}" alt="${role1.name}" style="width: 100%; height: 100%; object-fit: cover; display: block;"></div>` : ''}
+                                                                        <span style="font-size: 12px; font-weight: bold; color: #333;">${rule.jinxRole1}</span>
+                                                                    </div>
+                                                                    <span style="color: #b8860b; font-weight: bold; flex-shrink: 0;">×</span>
+                                                                    <div style="display: flex; align-items: center; gap: 3px; flex-shrink: 0;">
+                                                                        ${role2 ? `<div style="width: 24px; height: 24px; border-radius: 3px; overflow: hidden;"><img src="${convertToLocalPath(role2.image)}" alt="${role2.name}" style="width: 100%; height: 100%; object-fit: cover; display: block;"></div>` : ''}
+                                                                        <span style="font-size: 12px; font-weight: bold; color: #333;">${rule.jinxRole2}</span>
+                                                                    </div>
+                                                                    <span style="color: #999; flex-shrink: 0;">:</span>
+                                                                    <span style="font-size: 12px; font-weight: normal; color: #5a4a3a; line-height: 1.5; flex: 1;">${rule.jinxRule}</span>
+                                                                </div>
+                                                            `;
+                                                        }).join('')}
                                                     </div>
                                                 </div>
-                                            `).join('')}
+                                            ` : ''}
+
+                                            <!-- 状态栏 -->
+                                            ${showStatusBar ? `
+                                                <div style="background: rgba(248,244,237,0.8); padding: 12px; border-radius: 0 0 6px 0; border-top: 1px solid #d4c1a4;">
+                                                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                                                        ${!metaInfoJson.state || metaInfoJson.state.length === 0 ? `
+                                                            <div style="padding: 8px 12px; background: rgba(255,255,255,0.95); border-radius: 4px; border-left: 3px solid #9932cc;">
+                                                                <div style="font-size: 12px; font-weight: bold; color: #9932cc; margin-bottom: 3px;">疯狂</div>
+                                                                <div style="font-size: 12px; font-weight: normal; color: #5a4a3a; line-height: 1.5;">当一名玩家需要"疯狂"地证明某件事情时，意味着他应该去努力说服其他玩家那件事情是真的。</div>
+                                                            </div>
+                                                            <div style="padding: 8px 12px; background: rgba(255,255,255,0.95); border-radius: 4px; border-left: 3px solid ${customTeamColors.demon};">
+                                                                <div style="font-size: 12px; font-weight: bold; color: ${customTeamColors.demon}; margin-bottom: 3px;">中毒/醉酒</div>
+                                                                <div style="font-size: 12px; font-weight: normal; color: #5a4a3a; line-height: 1.5;">中毒的玩家会失去自身能力，但他不会知道，仍以为自己具有能力。如果中毒的玩家能力会给他提供信息，那么信息可能正确可能错误，说书人会合理欺骗你。醉酒同理。</div>
+                                                            </div>
+                                                        ` : `
+                                                            ${metaInfoJson.state.map(state => `
+                                                                <div style="padding: 8px 12px; background: rgba(255,255,255,0.95); border-radius: 4px; border-left: 3px solid ${state.name === '疯狂' ? '#9932cc' : customTeamColors.demon};">
+                                                                    <div style="font-size: 12px; font-weight: bold; color: ${state.name === '疯狂' ? '#9932cc' : customTeamColors.demon}; margin-bottom: 3px;">${state.name}</div>
+                                                                    <div style="font-size: 12px; font-weight: normal; color: #5a4a3a; line-height: 1.5;">${state.description}</div>
+                                                                </div>
+                                                            `).join('')}
+                                                        `}
+                                                    </div>
+                                                </div>
+                                            ` : ''}
                                         </div>
                                     </div>
-                                    ` : ''}
-                                    
-                                    <!-- 底部：状态和规则 -->
-                                    ${showStatusBar || jinxRules.length > 0 ? `
-                                    <div style="margin-top: 4px; padding: 15px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                                        ${showStatusBar ? `
-                                        <div style="font-weight: bold; color: #8b0000; margin-bottom: 10px; font-size: 16px;">
-                                            <span style="background: #8b0000; color: white; padding: 3px 8px; border-radius: 4px; font-size: 13px;">异常状态</span>
-                                        </div>
-                                        <div style="font-size: 14px; line-height: 1.6; color: #333;">
-                                            ${!metaInfoJson.state || metaInfoJson.state.length === 0 ? `
-                                            <div style="margin-bottom: 6px;"><b style="color: #9932cc;">疯狂</b> - 当一名玩家需要"疯狂"地证明某件事情时，意味着他应该去努力说服其他玩家那件事情是真的。</div>
-                                            <div><b style="color: #8b0000;">中毒/醉酒</b> - 中毒的玩家会失去自身能力，但他不会知道，仍以为自己具有能力。如果中毒的玩家能力会给他提供信息，那么信息可能正确可能错误，说书人会合理欺骗你。醉酒同理。</div>
-                                            ` : `
-                                            ${metaInfoJson.state.map(state => `
-                                                <div style="margin-bottom: 6px;"><b style="color: ${state.name === '疯狂' ? '#9932cc' : '#8b0000'};">${state.name}</b> - ${state.description}</div>
-                                            `).join('')}
-                                            `}
-                                        </div>
-                                        ` : ''}
-                                        ${jinxRules.length > 0 ? `
-                                        <div style="${showStatusBar ? 'border-top: 1px solid #eee; margin-top: 10px; padding-top: 10px;' : ''}">
-                                            <div style="font-weight: bold; color: #8b0000; margin-bottom: 10px; font-size: 16px;">
-                                                <span style="background: #9932cc; color: white; padding: 3px 8px; border-radius: 4px; font-size: 13px;">相克规则</span>
-                                            </div>
-                                            <div style="font-size: 14px; line-height: 1.6; color: #333;">
-                                                ${jinxRules.map(rule => `
-                                                    <div style="margin-bottom: 6px;"><b style="color: #9932cc;">${rule.jinxRole1} + ${rule.jinxRole2}</b> - ${rule.jinxRule}</div>
-                                                `).join('')}
-                                            </div>
-                                        </div>
-                                        ` : ''}
-                                    </div>
-                                    ` : ''}
-                                    
-                                    <!-- 玩家数量表格 -->
-                                    ${showConfigTable ? `
-                                    <div style="margin-top: 8px; padding: 15px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                                        ${playerCountTable}
-                                    </div>
-                                    ` : ''}
                                 </div>
-                                <!-- 右侧：夜间顺序 -->
-                                <div style="width: 90px; padding-left: 10px; border-left: 1px solid #ddd; display: flex; flex-direction: column; align-items: center;">
-                                    <div style="font-family: 'Philo', serif; font-size: 12px; color: #8b0000; font-weight: bold; margin-bottom: 8px; display: flex; flex-direction: column; align-items: center;">
-                                        <span>夜</span>
-                                        <span>间</span>
-                                        <span>顺</span>
-                                        <span>序</span>
+
+                                <!-- 右侧：夜间行动顺序 -->
+                                <div style="width: 70px; display: flex; flex-direction: column; align-items: center; background: rgba(255,255,255,0.6); padding: 10px 4px; border-left: 2px solid #d4c1a4; flex-shrink: 0;">
+                                    <div style="color: #4a3728; font-size: 14px; font-weight: bold; margin-bottom: 10px; text-align: center; line-height: 1.3; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: 2px;">夜间顺序</div>
+                                    <div style="display: flex; flex-direction: column; gap: 6px; align-items: center;">
+                                        ${combinedOrder.map((item, index) => {
+                                            const info = nightOrderMap.get(item.name);
+                                            return `
+                                                <div style="display: flex; flex-direction: row; align-items: center; gap: 3px;">
+                                                    ${info.firstNight ? `<span style="font-size: 10px; color: #333; font-weight: bold; min-width: 12px; text-align: center;">${info.firstNight}</span>` : '<span style="font-size: 10px; min-width: 12px;"></span>'}
+                                                    <div style="display: flex; flex-direction: column; align-items: center; gap: 2px;">
+                                                        <div style="width: 40px; height: 40px; border-radius: 3px; border: 1px solid #b8a88a; overflow: hidden;">
+                                                            <img src="${convertToLocalPath(item.image)}" alt="${item.name}" style="width: 100%; height: 100%; object-fit: cover;">
+                                                        </div>
+                                                        ${info.firstNight ? `<div style="width: 100%; height: 3px; background-color: ${info.otherNight ? '#9932cc' : '#555'}; border-radius: 1px;"></div>` : '<div style="width: 100%; height: 3px; background-color: transparent;"></div>'}
+                                                    </div>
+                                                    ${info.otherNight ? `<span style="font-size: 10px; color: #9932cc; font-weight: bold; min-width: 12px; text-align: center;">${info.otherNight}</span>` : '<span style="font-size: 10px; min-width: 12px;"></span>'}
+                                                </div>
+                                            `;
+                                        }).join('')}
                                     </div>
-                                    <div style="display: flex; flex-direction: column; align-items: center;">
-                                        ${nightOrderCombined}
-                                    </div>
-                                    <!-- 底部注释：每行一个字 -->
-                                    <div style="font-size: 9px; color: #666; margin-top: 8px; display: flex; flex-direction: column; align-items: center;">
-                                        <span>*指</span>
-                                        <span>非</span>
-                                        <span>首</span>
-                                        <span>个</span>
-                                        <span>夜</span>
-                                        <span>晚</span>
-                                    </div>
+                                    <div style="margin-top: 10px; font-size: 9px; color: #8b7355; text-align: center; writing-mode: vertical-rl; letter-spacing: 1px;">*代表非首夜</div>
                                 </div>
                             </div>
-                            
+
+                            <!-- 自制规则 -->
                             ${showCustomRules && bootleggerRulesArray.length > 0 ? `
-                            <div style="margin-top: 10px; padding: 12px; background: white; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                                <div style="font-weight: bold; color: #8b0000; margin-bottom: 8px; font-size: 13px;">剧本自制规则</div>
-                                <div style="font-size: 11px; line-height: 1.4; color: #333;">
-                                    ${bootleggerRulesArray.map(rule => {
-                                        const parts = rule.split(' - ');
-                                        if (parts.length > 1) {
-                                            return `<div style="margin-bottom: 4px;"><b style="color: #8b0000;">${parts[0]}</b> - ${parts.slice(1).join(' - ')}</div>`;
-                                        } else {
-                                            return `<div style="margin-bottom: 4px;">${rule}</div>`;
-                                        }
-                                    }).join('')}
+                                <div style="margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.8); border-radius: 6px; border: 1px solid #c9b896;">
+                                    <div style="font-weight: bold; color: ${customTeamColors.demon}; margin-bottom: 10px; font-size: 14px; font-family: 'SimSun', '宋体', serif;">剧本自制规则</div>
+                                    <div style="font-size: 12px; line-height: 1.5; color: #4a3728;">
+                                        ${bootleggerRulesArray.map((rule, idx) => {
+                                            const parts = rule.split(' - ');
+                                            if (parts.length > 1) {
+                                                return `<div style="${idx > 0 ? 'margin-top: 6px;' : ''}"><b style="color: ${customTeamColors.demon};">${parts[0]}</b> - ${parts.slice(1).join(' - ')}</div>`;
+                                            } else {
+                                                return `<div style="${idx > 0 ? 'margin-top: 6px;' : ''}">${rule}</div>`;
+                                            }
+                                        }).join('')}
+                                    </div>
                                 </div>
-                            </div>
                             ` : ''}
-                            
-                            <!-- 底部注释 -->
                         </div>
                     `;
                 } else {
@@ -1147,24 +1256,29 @@ async function generateScriptImageV2() {
                 // 组装完整的剧本图HTML
                 scriptPage.innerHTML = scriptHtml;
                 
-                // 调整预览容器尺寸以匹配下载时的尺寸
+                // 调整预览容器尺寸以适应屏幕 - 使用滚动方式
                 setTimeout(() => {
-                    // 临时移除max-height和overflow限制以获取完整内容
-                    const originalMaxHeight = scriptPage.style.maxHeight;
-                    const originalOverflowY = scriptPage.style.overflowY;
+                    // 设置为原始A4尺寸
+                    scriptPage.style.width = '1240px';
+                    scriptPage.style.height = '1754px';
+                    scriptPage.style.transform = 'none';
+                    scriptPage.style.margin = '0';
+                    scriptPage.style.overflow = 'auto';
                     
-                    scriptPage.style.maxHeight = 'none';
-                    scriptPage.style.overflowY = 'visible';
+                    // 创建一个滚动容器
+                    const scrollContainer = document.createElement('div');
+                    scrollContainer.style.cssText = `
+                        max-width: calc(100vw - 40px);
+                        max-height: calc(100vh - 100px);
+                        overflow: auto;
+                        display: flex;
+                        justify-content: center;
+                        align-items: flex-start;
+                    `;
                     
-                    // 根据内容计算实际高度
-                    const fullHeight = scriptPage.scrollHeight;
-                    
-                    // 只设置高度，保持宽度不变
-                    scriptPage.style.height = fullHeight + 'px';
-                    
-                    // 恢复原始样式
-                    scriptPage.style.maxHeight = originalMaxHeight;
-                    scriptPage.style.overflowY = originalOverflowY;
+                    // 将scriptPage移到滚动容器中
+                    scriptPage.parentNode.insertBefore(scrollContainer, scriptPage);
+                    scrollContainer.appendChild(scriptPage);
                 }, 100);
                 
                 // 创建按钮容器 - 悬浮在屏幕正中
@@ -1218,26 +1332,37 @@ async function generateScriptImageV2() {
                         const fullWidth = scriptPage.scrollWidth;
                         
                         // 强制使用纵向A4比例（宽:高 = 1:1.414）
-                        const a4Ratio = 1.414; // A4纵向比例（高/宽 = 297/210）
+                        const a4Ratio = 1240 / 1754; // A4纵向比例（宽/高 = 1240/1754 ≈ 0.707）
                         
-                        // 计算画布尺寸：以内容宽度为基准，按A4比例计算高度
-                        let finalWidth = fullWidth;
-                        let finalHeight = finalWidth * a4Ratio;
+                        // 先让容器高度自适应内容
+                        scriptPage.style.height = 'auto';
+                        const actualHeight = scriptPage.offsetHeight;
+                        const actualWidth = scriptPage.offsetWidth;
                         
-                        // 如果计算的高度不够容纳内容，使用内容高度并重新计算宽度
-                        if (finalHeight < fullHeight) {
-                            finalHeight = fullHeight;
-                            finalWidth = finalHeight / a4Ratio;
+                        // 计算实际比例
+                        const actualRatio = actualWidth / actualHeight;
+                        
+                        let finalWidth, finalHeight;
+                        
+                        if (actualRatio > a4Ratio) {
+                            // 内容比较宽，以宽度为基准，按A4比例计算高度
+                            finalWidth = actualWidth;
+                            finalHeight = actualWidth / a4Ratio;
+                        } else {
+                            // 内容比较高，以高度为基准，按A4比例计算宽度
+                            finalHeight = actualHeight;
+                            finalWidth = actualHeight * a4Ratio;
                         }
                         
                         // 输出调试日志
                         console.log('=== 方案二下载调试日志 ===');
-                        console.log('内容实际高度:', fullHeight, 'px');
-                        console.log('内容实际宽度:', fullWidth, 'px');
-                        console.log('A4方向: 纵向');
+                        console.log('内容实际高度:', actualHeight, 'px');
+                        console.log('内容实际宽度:', actualWidth, 'px');
+                        console.log('内容实际比例 (宽:高):', actualRatio.toFixed(3));
+                        console.log('A4比例 (宽:高):', a4Ratio.toFixed(3));
                         console.log('最终宽度:', Math.round(finalWidth), 'px');
                         console.log('最终高度:', Math.round(finalHeight), 'px');
-                        console.log('最终比例 (高:宽):', (finalHeight / finalWidth).toFixed(3));
+                        console.log('最终比例 (宽:高):', (finalWidth / finalHeight).toFixed(3));
                         console.log('==========================');
                         
                         // 设置容器尺寸为纵向A4比例尺寸
