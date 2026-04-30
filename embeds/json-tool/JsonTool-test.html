@@ -4462,6 +4462,17 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
 
             if (!dirColumns) return;
 
+            // 对dirRolesJson进行去重，基于role.id
+            const uniqueRolesMap = new Map();
+            if (dirRolesJson && dirRolesJson.length > 0) {
+                dirRolesJson.forEach(role => {
+                    if (role && role.id && !uniqueRolesMap.has(role.id)) {
+                        uniqueRolesMap.set(role.id, role);
+                    }
+                });
+                dirRolesJson = Array.from(uniqueRolesMap.values());
+            }
+
             // 如果没有自制角色，隐藏容器
             if (!dirRolesJson || dirRolesJson.length === 0) {
                 if (dirRolesContainer) {
@@ -8209,6 +8220,9 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
             const selectedCheckboxes = document.querySelectorAll('.role-item input[type="checkbox"]:checked');
             let selectedRoles = [];
             
+            console.log('[updateSelectedRolesDisplay] 开始更新已选角色显示');
+            console.log('[updateSelectedRolesDisplay] 选中的复选框数量:', selectedCheckboxes.length);
+            
             selectedCheckboxes.forEach(checkbox => {
                 const roleItem = checkbox.closest('.role-item');
                 const img = roleItem.querySelector('img');
@@ -8243,34 +8257,24 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                 });
             });
 
-            // 添加自定义角色
-            dirRolesJson.forEach(role => {
-                // 从角色数据中获取团队信息
-                let category = '其他';
-                const team = role.team || '';
-                
-                if (team === 'townsfolk' || team === '镇民') {
-                    category = '镇民';
-                } else if (team === 'outsider' || team === '外来者') {
-                    category = '外来者';
-                } else if (team === 'minion' || team === '爪牙') {
-                    category = '爪牙';
-                } else if (team === 'demon' || team === '恶魔') {
-                    category = '恶魔';
-                } else if (team === 'traveller' || team === '旅行者') {
-                    category = '旅行者';
-                } else if (team === 'fabled' || team === '传奇') {
-                    category = '传奇';
-                }
-                
-                selectedRoles.push({
-                    id: role.id,
-                    name: role.name,
-                    image: role.image || '',
-                    ability: role.ability || '',
-                    category: category
-                });
+            console.log('[updateSelectedRolesDisplay] 通过复选框获取的角色:', JSON.stringify(selectedRoles.map(r => ({id: r.id, name: r.name}))));
+            
+            // 注意：不再自动添加 dirRolesJson 中的角色
+            // 只有通过复选框选中的角色才应该显示在已选角色区域
+            console.log('[updateSelectedRolesDisplay] dirRolesJson 长度:', dirRolesJson.length);
+            console.log('[updateSelectedRolesDisplay] dirRolesJson 内容:', JSON.stringify(dirRolesJson.map(r => ({id: r.id, name: r.name}))));
+            
+            console.log('[updateSelectedRolesDisplay] 最终已选角色:', JSON.stringify(selectedRoles.map(r => ({id: r.id, name: r.name}))));
+            
+            // 检查是否有重复
+            const idCount = {};
+            selectedRoles.forEach(r => {
+                idCount[r.id] = (idCount[r.id] || 0) + 1;
             });
+            const duplicates = Object.entries(idCount).filter(([id, count]) => count > 1);
+            if (duplicates.length > 0) {
+                console.warn('[updateSelectedRolesDisplay] 发现重复角色:', duplicates);
+            }
 
             // 按类别分组（保持原有顺序）
             const rolesByCategory = {};
@@ -9326,24 +9330,20 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
 
         // 切换角色选择状态
         function toggleRoleSelection(roleId) {
-            // 处理标准角色
+            console.log('[toggleRoleSelection] 尝试取消角色:', roleId);
+            
+            // 处理所有角色的复选框（包括标准角色和自制角色）
             const checkbox = document.querySelector(`.role-item input[type="checkbox"][value="${roleId}"]`);
             if (checkbox) {
                 checkbox.checked = false;
+                console.log('[toggleRoleSelection] 取消复选框勾选:', roleId);
                 updateSelectedRolesDisplay();
                 saveToLocalStorage();
                 return;
             }
             
-            // 处理自制角色
-            if (typeof dirRolesJson !== 'undefined') {
-                const roleIndex = dirRolesJson.findIndex(role => role.id === roleId);
-                if (roleIndex !== -1) {
-                    dirRolesJson.splice(roleIndex, 1);
-                    updateSelectedRolesDisplay();
-                    saveToLocalStorage();
-                }
-            }
+            // 如果没有找到复选框，可能是一个特殊情况
+            console.warn('[toggleRoleSelection] 未找到角色的复选框:', roleId);
         }
 
         // 图片懒加载和重试机制
