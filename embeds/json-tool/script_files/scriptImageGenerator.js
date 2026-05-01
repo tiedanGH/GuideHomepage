@@ -546,10 +546,8 @@ async function generateScriptImageV2() {
                     overflow: auto;
                 `;
                 
-                // 获取字号设置
-                const fontSizeInput = document.getElementById('font-size-setting');
-                const fontSize = fontSizeInput?.value || 'small';
-                const fontSizeMultiplier = fontSize === 'large' ? 1.2 : 1.0;
+                // 固定字号倍率
+                const fontSizeMultiplier = 1.0;
                 
                 // 创建剧本图容器 - 初始设置
                 const scriptPage = document.createElement('div');
@@ -604,23 +602,21 @@ async function generateScriptImageV2() {
 
                     // 构建该角色的相克规则文本HTML（显示在角色卡片下方，白色底框突出显示）
                     const jinxRulesHtml = showJinxRules && undisplayedJinxRules.length > 0 ? `
-                        <div style="margin-top: 6px; padding: 8px 10px; background: #ffffff; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 10px; line-height: 1.5; color: #555; box-shadow: 0 1px 3px rgba(0,0,0,0.08);">
+                        <div style="margin-top: 6px; padding: 8px 10px; background: rgba(255,255,255,0.95); font-size: 12px; line-height: 1.5; color: #5a4a3a;">
                             ${undisplayedJinxRules.map(rule => {
                                 const otherRoleName = rule.jinxRole1 === role.name ? rule.jinxRole2 : rule.jinxRole1;
                                 const otherRole = allRoles.find(r => r.name === otherRoleName);
-                                return `<div style="margin-bottom: 3px; display: flex; align-items: center; gap: 6px;">${otherRole ? `<img src="${convertToLocalPath(otherRole.image)}" style="width: 20px; height: 20px; object-fit: cover; border-radius: 3px; flex-shrink: 0;">` : ''} : ${rule.jinxRule}</div>`;
+                                return `<div style="margin-bottom: 3px; display: flex; align-items: center; gap: 6px;">${otherRole ? `<img src="${convertToLocalPath(otherRole.image)}" style="width: 24px; height: 24px; object-fit: cover; flex-shrink: 0;">` : ''}<span style="font-size: 12px; font-weight: bold; color: #333;">${otherRoleName}</span><span style="color: #999;">:</span><span style="font-size: 12px; font-weight: normal; color: #5a4a3a; line-height: 1.5;">${rule.jinxRule}</span></div>`;
                             }).join('')}
                         </div>
                     ` : '';
 
                     return `
-                        <div style="display: flex; align-items: flex-start; margin-bottom: 8px; break-inside: avoid;">
-                            <img src="${convertToLocalPath(role.image)}" style="width: 60px; height: 60px; object-fit: cover; margin-right: 8px; flex-shrink: 0;">
+                        <div style="display: flex; gap: 10px; padding: 8px; align-items: flex-start; background: rgb(246, 246, 244);">
+                            <img src="${convertToLocalPath(role.image)}" style="width: 70px; height: 70px; object-fit: cover; flex-shrink: 0; display: block;">
                             <div style="flex: 1; min-width: 0;">
-                                <div style="display: flex; flex-direction: row; align-items: center; flex-wrap: wrap;">
-                                    <div style="font-weight: bold; font-size: ${13 * fontSizeMultiplier}px; color: ${color}; margin-bottom: 2px; padding-right: 5px;">${role.name}</div>
-                                </div>
-                                <div style="font-size: ${11 * fontSizeMultiplier}px; line-height: 1.3; color: #333;">${role.ability || ''}</div>
+                                <div style="font-size: 16px; font-weight: bold; color: ${color}; margin-bottom: 2px; font-family: 'SimSun', '宋体', serif;">${role.name}</div>
+                                <div style="font-size: 12px; color: #4a3728; line-height: 1.4;">${role.ability || ''}</div>
                                 ${jinxRulesHtml}
                             </div>
                         </div>
@@ -639,13 +635,15 @@ async function generateScriptImageV2() {
                         // 横向排列（wrap方式）
                         return `
                             <div style="margin-bottom: 15px; max-width: 100%;">
-                                <div style="font-family: 'Philo', serif; font-size: 16px; font-weight: bold; color: ${color}; padding-bottom: 3px; margin-bottom: 8px; display: flex; align-items: center; max-width: 100%;">
-                                <div>${title}</div>
-                                <div style="flex: 1; height: 1px; background: ${color}; margin-left: 10px;"></div>
-                            </div>
-                                <div style="display: flex; flex-wrap: wrap; gap: 10px; max-width: 100%; box-sizing: border-box;">
+                                <!-- 阵营标题 -->
+                                <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                    <span style="font-family: 'Philo', serif; font-size: 18px; font-weight: bold; color: ${color}; text-transform: uppercase;">${title}</span>
+                                    <div style="flex: 1; height: 2px; background: ${color}; margin-left: 10px;"></div>
+                                </div>
+                                <!-- 角色列表 -->
+                                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
                                     ${roles.map(role => `
-                                        <div style="flex: 0 1 calc(50% - 10px); min-width: 250px; max-width: calc(50% - 10px); box-sizing: border-box;">
+                                        <div style="flex: 0 1 calc(50% - 4px); min-width: 250px; max-width: calc(50% - 4px); box-sizing: border-box;">
                                             ${createRoleCard(role, color)}
                                         </div>
                                     `).join('')}
@@ -660,19 +658,21 @@ async function generateScriptImageV2() {
                         
                         return `
                             <div style="margin-bottom: 15px; max-width: 100%;">
-                                <div style="font-family: 'Philo', serif; font-size: 16px; font-weight: bold; color: ${color}; padding-bottom: 3px; margin-bottom: 8px; display: flex; align-items: center; max-width: 100%;">
-                                <div>${title}</div>
-                                <div style="flex: 1; height: 1px; background: ${color}; margin-left: 10px;"></div>
-                            </div>
-                                <div style="display: flex; gap: 10px; max-width: 100%; box-sizing: border-box;">
-                                    <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+                                <!-- 阵营标题 -->
+                                <div style="display: flex; align-items: center; margin-bottom: 8px;">
+                                    <span style="font-family: 'Philo', serif; font-size: 18px; font-weight: bold; color: ${color}; text-transform: uppercase;">${title}</span>
+                                    <div style="flex: 1; height: 2px; background: ${color}; margin-left: 10px;"></div>
+                                </div>
+                                <!-- 角色列表 -->
+                                <div style="display: flex; gap: 12px;">
+                                    <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
                                         ${leftColumn.map(role => `
                                             <div style="box-sizing: border-box;">
                                                 ${createRoleCard(role, color)}
                                             </div>
                                         `).join('')}
                                     </div>
-                                    <div style="flex: 1; display: flex; flex-direction: column; gap: 10px;">
+                                    <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
                                         ${rightColumn.map(role => `
                                             <div style="box-sizing: border-box;">
                                                 ${createRoleCard(role, color)}
@@ -687,90 +687,90 @@ async function generateScriptImageV2() {
                 
                 // 构建玩家数量表格
                 const playerCountTable = `
-                    <div style="font-size: 11px; border-collapse: collapse; width: 100%;">
+                    <div style="font-size: 12px; border-collapse: collapse; width: 100%;">
                         <div style="display: flex; background: #5c4033; color: white; font-weight: bold;">
-                            <div style="width: 50px; padding: 4px 6px; text-align: center; border: 1px solid #3d2817;">玩家</div>
-                            <div style="flex: 1; padding: 4px 6px; text-align: center; border: 1px solid #3d2817;">5</div>
-                            <div style="flex: 1; padding: 4px 6px; text-align: center; border: 1px solid #3d2817;">6</div>
-                            <div style="flex: 1; padding: 4px 6px; text-align: center; border: 1px solid #3d2817;">7</div>
-                            <div style="flex: 1; padding: 4px 6px; text-align: center; border: 1px solid #3d2817;">8</div>
-                            <div style="flex: 1; padding: 4px 6px; text-align: center; border: 1px solid #3d2817;">9</div>
-                            <div style="flex: 1; padding: 4px 6px; text-align: center; border: 1px solid #3d2817;">10</div>
-                            <div style="flex: 1; padding: 4px 6px; text-align: center; border: 1px solid #3d2817;">11</div>
-                            <div style="flex: 1; padding: 4px 6px; text-align: center; border: 1px solid #3d2817;">12</div>
-                            <div style="flex: 1; padding: 4px 6px; text-align: center; border: 1px solid #3d2817;">13</div>
-                            <div style="flex: 1; padding: 4px 6px; text-align: center; border: 1px solid #3d2817;">14</div>
-                            <div style="flex: 1; padding: 4px 6px; text-align: center; border: 1px solid #3d2817;">15</div>
+                            <div style="width: 50px; padding: 5px 8px; text-align: center; border: 1px solid #3d2817;">玩家</div>
+                            <div style="flex: 1; padding: 5px 8px; text-align: center; border: 1px solid #3d2817;">5</div>
+                            <div style="flex: 1; padding: 5px 8px; text-align: center; border: 1px solid #3d2817;">6</div>
+                            <div style="flex: 1; padding: 5px 8px; text-align: center; border: 1px solid #3d2817;">7</div>
+                            <div style="flex: 1; padding: 5px 8px; text-align: center; border: 1px solid #3d2817;">8</div>
+                            <div style="flex: 1; padding: 5px 8px; text-align: center; border: 1px solid #3d2817;">9</div>
+                            <div style="flex: 1; padding: 5px 8px; text-align: center; border: 1px solid #3d2817;">10</div>
+                            <div style="flex: 1; padding: 5px 8px; text-align: center; border: 1px solid #3d2817;">11</div>
+                            <div style="flex: 1; padding: 5px 8px; text-align: center; border: 1px solid #3d2817;">12</div>
+                            <div style="flex: 1; padding: 5px 8px; text-align: center; border: 1px solid #3d2817;">13</div>
+                            <div style="flex: 1; padding: 5px 8px; text-align: center; border: 1px solid #3d2817;">14</div>
+                            <div style="flex: 1; padding: 5px 8px; text-align: center; border: 1px solid #3d2817;">15</div>
                         </div>
                         <div style="display: flex; background: white;">
-                            <div style="width: 50px; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0; color: #8b0000; font-weight: bold;">镇民</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">3</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">3</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">5</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">5</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">5</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">7</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">7</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">7</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">9</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">9</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">9</div>
+                            <div style="width: 50px; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0; color: #1e3a5f; font-weight: bold;">镇民</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">3</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">3</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">5</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">5</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">5</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">7</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">7</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">7</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">9</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">9</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">9</div>
                         </div>
                         <div style="display: flex; background: #f5f0e6;">
-                            <div style="width: 50px; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0; color: #0d5c5c; font-weight: bold;">外来者</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">0</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">1</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">0</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">1</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">2</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">0</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">1</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">2</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">0</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">1</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">2</div>
+                            <div style="width: 50px; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0; color: #0d5c5c; font-weight: bold;">外来者</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">0</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">1</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">0</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">1</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">2</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">0</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">1</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">2</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">0</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">1</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">2</div>
                         </div>
                         <div style="display: flex; background: white;">
-                            <div style="width: 50px; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0; color: #8b4513; font-weight: bold;">爪牙</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">1</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">1</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">1</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">1</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">1</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">2</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">2</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">2</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">3</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">3</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">3</div>
+                            <div style="width: 50px; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0; color: #8b4513; font-weight: bold;">爪牙</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">1</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">1</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">1</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">1</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">1</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">2</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">2</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">2</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">3</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">3</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">3</div>
                         </div>
                         <div style="display: flex; background: #f5f0e6;">
-                            <div style="width: 50px; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0; color: #8b4513; font-weight: bold;">小恶魔</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">0</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">0</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">0</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">0</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">0</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">0</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">0</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">0</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">0</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">0</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">0</div>
+                            <div style="width: 50px; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0; color: #8b4513; font-weight: bold;">小恶魔</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">0</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">0</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">0</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">0</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">0</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">0</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">0</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">0</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">0</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">0</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">0</div>
                         </div>
                         <div style="display: flex; background: white;">
-                            <div style="width: 50px; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0; color: #8b0000; font-weight: bold;">恶魔</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">1</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">1</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">1</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">1</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">1</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">1</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">1</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">1</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">1</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">1</div>
-                            <div style="flex: 1; padding: 3px 6px; text-align: center; border: 1px solid #d4c4b0;">1</div>
+                            <div style="width: 50px; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0; color: #8b0000; font-weight: bold;">恶魔</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">1</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">1</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">1</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">1</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">1</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">1</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">1</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">1</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">1</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">1</div>
+                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">1</div>
                         </div>
                     </div>
                 `;
@@ -782,7 +782,7 @@ async function generateScriptImageV2() {
                         ${scriptLogo ? `<img src="${scriptLogo}" style="max-width: 400px; max-height: 200px; object-fit: contain;">` : ''}
                         <div style="display: flex; flex-direction: column;">
                             ${scriptLogo ? `
-                                <div style="font-family: 'Philo', serif; font-size: 14px; color: #800000; font-weight: bold; font-style: italic;">
+                                <div style="font-family: 'Philo', serif; font-size: 12px; color: #800000; font-weight: bold; font-style: italic;">
                                     <span style="font-style: normal; font-size: 10px; color: #666;">by </span>${authorName || ''}
                                 </div>
                             ` : `
@@ -790,7 +790,7 @@ async function generateScriptImageV2() {
                                     ${editionName}
                                 </div>
                                 ${authorName ? `
-                                    <div style="font-family: 'Philo', serif; font-size: 14px; color: #800000; font-weight: bold; font-style: italic; margin-top: 3px;">
+                                    <div style="font-family: 'Philo', serif; font-size: 12px; color: #800000; font-weight: bold; font-style: italic; margin-top: 3px;">
                                         <span style="font-style: normal; font-size: 10px; color: #666;">by </span>${authorName}
                                     </div>
                                 ` : ''}
@@ -993,7 +993,7 @@ async function generateScriptImageV2() {
                     
                     // 生成单个角色卡片HTML
                     const createRoleCard = (role) => `
-                        <div style="display: flex; gap: 10px; padding: 8px; align-items: flex-start; background: rgba(255,255,255,0.95); border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border-bottom: 1px solid #e8e0d5;">
+                        <div style="display: flex; gap: 10px; padding: 8px; align-items: flex-start; background: rgba(255,255,255,0.95);">
                             <div style="width: 70px; height: 70px; flex-shrink: 0; overflow: hidden;">
                                 <img src="${convertToLocalPath(role.image)}" alt="${role.name}" style="width: 100%; height: 100%; object-fit: cover; display: block;">
                             </div>
@@ -1035,14 +1035,6 @@ async function generateScriptImageV2() {
                     // 方案二：参考产品布局 - 左侧角色区域，右侧夜间顺序
                     scriptHtml = `
                         <div style="width: 1240px; height: 1754px; background: ${hexToRgba(customBgColor, bgOpacity)}; padding: 25px; box-sizing: border-box; font-family: 'Microsoft YaHei', 'SimSun', sans-serif; position: relative;">
-                            <!-- 装饰性边框 - 复古风格 -->
-                            <div style="position: absolute; top: 15px; left: 15px; right: 15px; bottom: 15px; border: 3px double #b8a88a; pointer-events: none; box-shadow: inset 0 0 20px rgba(184, 168, 138, 0.3);"></div>
-                            
-                            <!-- 角落装饰 -->
-                            <div style="position: absolute; top: 10px; left: 10px; width: 30px; height: 30px; border-top: 3px solid #8b7355; border-left: 3px solid #8b7355; pointer-events: none;"></div>
-                            <div style="position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; border-top: 3px solid #8b7355; border-right: 3px solid #8b7355; pointer-events: none;"></div>
-                            <div style="position: absolute; bottom: 10px; left: 10px; width: 30px; height: 30px; border-bottom: 3px solid #8b7355; border-left: 3px solid #8b7355; pointer-events: none;"></div>
-                            <div style="position: absolute; bottom: 10px; right: 10px; width: 30px; height: 30px; border-bottom: 3px solid #8b7355; border-right: 3px solid #8b7355; pointer-events: none;"></div>
 
                             <!-- 主内容区域 -->
                             <div style="display: flex; gap: 12px; position: relative; z-index: 1;">
@@ -1143,7 +1135,7 @@ async function generateScriptImageV2() {
                                                             const role1 = allRoles.find(r => r.name === rule.jinxRole1);
                                                             const role2 = allRoles.find(r => r.name === rule.jinxRole2);
                                                             return `
-                                                                <div style="display: flex; align-items: center; gap: 6px; padding: 8px 10px; background: rgba(255,255,255,0.95); border-radius: 4px; border: 1px solid #e0d5c5;">
+                                                                <div style="display: flex; align-items: center; gap: 6px; padding: 8px 10px; background: rgba(255,255,255,0.95);">
                                                                     <div style="display: flex; align-items: center; gap: 3px; flex-shrink: 0;">
                                                                         ${role1 ? `<div style="width: 24px; height: 24px; border-radius: 3px; overflow: hidden;"><img src="${convertToLocalPath(role1.image)}" alt="${role1.name}" style="width: 100%; height: 100%; object-fit: cover; display: block;"></div>` : ''}
                                                                         <span style="font-size: 12px; font-weight: bold; color: #333;">${rule.jinxRole1}</span>
@@ -1218,7 +1210,7 @@ async function generateScriptImageV2() {
 
                             <!-- 自制规则 -->
                             ${showCustomRules && bootleggerRulesArray.length > 0 ? `
-                                <div style="margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.8); border-radius: 6px; border: 1px solid #c9b896;">
+                                <div style="margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.8); border-radius: 6px;">
                                     <div style="font-weight: bold; color: ${customTeamColors.demon}; margin-bottom: 10px; font-size: 14px; font-family: 'SimSun', '宋体', serif;">剧本自制规则</div>
                                     <div style="font-size: 12px; line-height: 1.5; color: #4a3728;">
                                         ${bootleggerRulesArray.map((rule, idx) => {
@@ -1503,10 +1495,8 @@ async function generateJinxAndConfigImage() {
                 // 获取剧本基本信息
                 const scriptName = metaInfoJson.name || '未知剧本';
                 
-                // 获取字号设置
-                const fontSizeInput = document.getElementById('font-size-setting');
-                const fontSize = fontSizeInput?.value || 'small';
-                const fontSizeMultiplier = fontSize === 'large' ? 1.2 : 1.0;
+                // 固定字号倍率
+                const fontSizeMultiplier = 1.0;
                 
                 // 获取背景颜色设置
                 const detailBgColor = document.getElementById('bg-color-setting')?.value || '#f6f6f4';
@@ -2383,21 +2373,6 @@ function toggleScriptConfigModal() {
                     </div>
                 </div>
 
-                <!-- 字号设置 -->
-                <div style="margin-bottom: 20px;">
-                    <h4 style="margin: 0 0 10px 0; color: var(--text-color); font-size: 14px; font-weight: bold;">字号设置</h4>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
-                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
-                            <input type="radio" name="fontSize" value="small" checked style="width: 16px; height: 16px;">
-                            <span>小字号</span>
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
-                            <input type="radio" name="fontSize" value="large" style="width: 16px; height: 16px;">
-                            <span>大字号</span>
-                        </label>
-                    </div>
-                </div>
-
                 <!-- 背景颜色设置 -->
                 <div style="margin-bottom: 20px;">
                     <h4 style="margin: 0 0 10px 0; color: var(--text-color); font-size: 14px; font-weight: bold;">背景颜色</h4>
@@ -2515,17 +2490,6 @@ function loadScriptConfigToModal() {
             if (showJinxRules) document.getElementById('modal-showJinxRules').checked = showJinxRules.checked;
             if (horizontalLayout) document.getElementById('modal-horizontalLayout').checked = horizontalLayout.checked;
             if (reverseOtherNight) document.getElementById('modal-reverseOtherNight').checked = reverseOtherNight.checked;
-            
-            // 字号设置
-            const fontSizeInput = document.getElementById('font-size-setting');
-            const fontSizeRadios = document.querySelectorAll('input[name="fontSize"]');
-            fontSizeRadios.forEach(radio => {
-                if (fontSizeInput && fontSizeInput.value === radio.value) {
-                    radio.checked = true;
-                } else if (!fontSizeInput && radio.value === 'small') {
-                    radio.checked = true;
-                }
-            });
             
             // 背景颜色设置
             const bgColorInput = document.getElementById('bg-color-setting');
@@ -2687,25 +2651,6 @@ function saveScriptConfig() {
             if (showJinxRules) showJinxRules.checked = document.getElementById('modal-showJinxRules').checked;
             if (horizontalLayout) horizontalLayout.checked = document.getElementById('modal-horizontalLayout').checked;
             if (reverseOtherNight) reverseOtherNight.checked = document.getElementById('modal-reverseOtherNight').checked;
-            
-            // 字号设置
-            const fontSizeRadios = document.querySelectorAll('input[name="fontSize"]');
-            let selectedFontSize = 'small';
-            fontSizeRadios.forEach(radio => {
-                if (radio.checked) {
-                    selectedFontSize = radio.value;
-                }
-            });
-            
-            // 保存字号设置到隐藏的input元素
-            let fontSizeInput = document.getElementById('font-size-setting');
-            if (!fontSizeInput) {
-                fontSizeInput = document.createElement('input');
-                fontSizeInput.type = 'hidden';
-                fontSizeInput.id = 'font-size-setting';
-                document.body.appendChild(fontSizeInput);
-            }
-            fontSizeInput.value = selectedFontSize;
             
             // 保存背景颜色设置到隐藏的input元素
             let bgColorInput = document.getElementById('bg-color-setting');
