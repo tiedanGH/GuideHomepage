@@ -57,10 +57,29 @@ async function generateScriptImageV2() {
                 console.log('剧本图V2生成 - 被选中的角色数量:', selectedRoles.length);
                 console.log('剧本图V2生成 - 被选中的角色:', selectedRoles.map(role => role.name));
                 
-                // 直接使用selectedRoles作为allRoles，因为selectedRoles已经包含了所有被选中的角色及其属性
+                // 用于显示的角色列表（只用被选中的角色）
                 const allRoles = selectedRoles;
                 console.log('剧本图V2生成 - 使用selectedRoles作为allRoles，角色数量:', allRoles.length);
                 console.log('剧本图V2生成 - allRoles中的角色:', allRoles.map(role => role.name));
+                
+                // 创建一个包含所有角色的完整列表，用于查找剧本信息中保存的角色ID
+                // 使用window对象安全访问全局变量，避免const变量提升问题
+                const allRolesForLookup = [
+                    ...(window.townsfolkRoles || []),
+                    ...(window.outsidersRoles || []),
+                    ...(window.minionsRoles || []),
+                    ...(window.demonsRoles || []),
+                    ...(window.fabledRoles || []),
+                    ...(window.travellersRoles || [])
+                ];
+                // 如果有自制角色，也添加到列表中
+                if (typeof dirRolesJson !== 'undefined') {
+                    allRolesForLookup.push(...dirRolesJson);
+                }
+                if (typeof window.dirRolesJson !== 'undefined') {
+                    allRolesForLookup.push(...window.dirRolesJson);
+                }
+                console.log('剧本图V2生成 - allRolesForLookup用于查找的角色数量:', allRolesForLookup.length);
                 const editionName = metaInfoJson.name || '未知剧本';
                 const authorName = metaInfoJson.author || '';
                 const scriptLogo = metaInfoJson.logo || document.getElementById('logo')?.value?.trim() || '';
@@ -213,17 +232,28 @@ async function generateScriptImageV2() {
                             console.log('首夜角色ID:', roleId, '找到元信息角色:', metaRolesMap[roleId].name);
                             return metaRolesMap[roleId];
                         }
-                        // 查找对应的角色
-                        let role = allRoles.find(role => role.id === roleId) || null;
-                        // 如果在allRoles中没有找到，尝试从dirRolesJson中查找
+                        // 查找对应的角色（使用allRolesForLookup获取角色数据）
+                        let role = allRolesForLookup.find(role => role.id === roleId) || null;
                         if (!role && typeof dirRolesJson !== 'undefined') {
                             role = dirRolesJson.find(role => role.id === roleId) || null;
                         }
+                        if (!role && typeof window.dirRolesJson !== 'undefined') {
+                            role = window.dirRolesJson.find(role => role.id === roleId) || null;
+                        }
+                        // 找到角色后，检查是否在selectedRoles中（是否被勾选）
                         if (role) {
-                            console.log('首夜角色ID:', roleId, '找到角色:', role.name);
-                            return role;
+                            const isSelected = allRoles.some(selectedRole => selectedRole.id === roleId);
+                            if (isSelected) {
+                                console.log('首夜角色ID:', roleId, '找到角色:', role.name, '已被勾选');
+                                return role;
+                            } else {
+                                console.log('首夜角色ID:', roleId, '找到角色:', role.name, '但未被勾选，跳过');
+                                return null;
+                            }
                         }
                         console.log('首夜角色ID:', roleId, '未找到角色');
+                        console.log('调试信息 - allRolesForLookup中的角色ID数量:', allRolesForLookup.length);
+                        console.log('调试信息 - selectedRoles中的角色ID:', allRoles.map(r => r.id));
                         return null;
                     }).filter(Boolean);
                     
@@ -317,17 +347,28 @@ async function generateScriptImageV2() {
                             console.log('其他夜晚角色ID:', roleId, '找到元信息角色:', metaRolesMap[roleId].name);
                             return metaRolesMap[roleId];
                         }
-                        // 查找对应的角色
-                        let role = allRoles.find(role => role.id === roleId) || null;
-                        // 如果在allRoles中没有找到，尝试从dirRolesJson中查找
+                        // 查找对应的角色（使用allRolesForLookup获取角色数据）
+                        let role = allRolesForLookup.find(role => role.id === roleId) || null;
                         if (!role && typeof dirRolesJson !== 'undefined') {
                             role = dirRolesJson.find(role => role.id === roleId) || null;
                         }
+                        if (!role && typeof window.dirRolesJson !== 'undefined') {
+                            role = window.dirRolesJson.find(role => role.id === roleId) || null;
+                        }
+                        // 找到角色后，检查是否在selectedRoles中（是否被勾选）
                         if (role) {
-                            console.log('其他夜晚角色ID:', roleId, '找到角色:', role.name);
-                            return role;
+                            const isSelected = allRoles.some(selectedRole => selectedRole.id === roleId);
+                            if (isSelected) {
+                                console.log('其他夜晚角色ID:', roleId, '找到角色:', role.name, '已被勾选');
+                                return role;
+                            } else {
+                                console.log('其他夜晚角色ID:', roleId, '找到角色:', role.name, '但未被勾选，跳过');
+                                return null;
+                            }
                         }
                         console.log('其他夜晚角色ID:', roleId, '未找到角色');
+                        console.log('调试信息 - allRolesForLookup中的角色ID数量:', allRolesForLookup.length);
+                        console.log('调试信息 - selectedRoles中的角色ID:', allRoles.map(r => r.id));
                         return null;
                     }).filter(Boolean);
                     
@@ -538,22 +579,24 @@ async function generateScriptImageV2() {
                     background: rgba(0, 0, 0, 0.85);
                     display: flex;
                     flex-direction: column;
-                    justify-content: center;
+                    justify-content: flex-start;
                     align-items: center;
                     z-index: 10000;
-                    padding: 20px;
+                    padding: ${isMobile ? '10px' : '20px'};
                     box-sizing: border-box;
                     overflow: auto;
                 `;
                 
-                // 固定字号倍率
-                const fontSizeMultiplier = 1.0;
+                // 获取字号设置
+                const fontSizeInput = document.getElementById('font-size-setting');
+                const fontSize = fontSizeInput?.value || 'small';
+                const fontSizeMultiplier = fontSize === 'large' ? 1.2 : 1.0;
                 
                 // 创建剧本图容器 - 初始设置
                 const scriptPage = document.createElement('div');
                 scriptPage.style.cssText = `
                     background: ${hexToRgba(customBgColor, bgOpacity)};
-                    width: ${isMobile ? '520px' : '1240px'};
+                    width: ${isMobile ? '520px' : '8.27in'};
                     padding: ${isMobile ? '10px' : '0.3in'};
                     box-sizing: border-box;
                     position: relative;
@@ -1250,29 +1293,24 @@ async function generateScriptImageV2() {
                 // 组装完整的剧本图HTML
                 scriptPage.innerHTML = scriptHtml;
                 
-                // 调整预览容器尺寸以适应屏幕 - 使用滚动方式
+                // 调整预览容器尺寸以匹配下载时的尺寸
                 setTimeout(() => {
-                    // 设置为原始A4尺寸
-                    scriptPage.style.width = '1240px';
-                    scriptPage.style.height = '1754px';
-                    scriptPage.style.transform = 'none';
-                    scriptPage.style.margin = '0';
-                    scriptPage.style.overflow = 'auto';
+                    // 临时移除max-height和overflow限制以获取完整内容
+                    const originalMaxHeight = scriptPage.style.maxHeight;
+                    const originalOverflowY = scriptPage.style.overflowY;
                     
-                    // 创建一个滚动容器
-                    const scrollContainer = document.createElement('div');
-                    scrollContainer.style.cssText = `
-                        max-width: calc(100vw - 40px);
-                        max-height: calc(100vh - 100px);
-                        overflow: auto;
-                        display: flex;
-                        justify-content: center;
-                        align-items: flex-start;
-                    `;
+                    scriptPage.style.maxHeight = 'none';
+                    scriptPage.style.overflowY = 'visible';
                     
-                    // 将scriptPage移到滚动容器中
-                    scriptPage.parentNode.insertBefore(scrollContainer, scriptPage);
-                    scrollContainer.appendChild(scriptPage);
+                    // 根据内容计算实际高度
+                    const fullHeight = scriptPage.scrollHeight;
+                    
+                    // 只设置高度，保持宽度不变
+                    scriptPage.style.height = fullHeight + 'px';
+                    
+                    // 恢复原始样式
+                    scriptPage.style.maxHeight = originalMaxHeight;
+                    scriptPage.style.overflowY = originalOverflowY;
                 }, 100);
                 
                 // 创建按钮容器 - 悬浮在屏幕正中
@@ -1325,38 +1363,27 @@ async function generateScriptImageV2() {
                         const fullHeight = scriptPage.scrollHeight;
                         const fullWidth = scriptPage.scrollWidth;
                         
-                        // 强制使用纵向A4比例（宽:高 = 1:1.414）
-                        const a4Ratio = 1240 / 1754; // A4纵向比例（宽/高 = 1240/1754 ≈ 0.707）
+                        // 强制使用纵向A4比例（高:宽 = 1.414:1）
+                        const a4Ratio = 1.414; // A4纵向比例（高/宽 = 297/210）
                         
-                        // 先让容器高度自适应内容
-                        scriptPage.style.height = 'auto';
-                        const actualHeight = scriptPage.offsetHeight;
-                        const actualWidth = scriptPage.offsetWidth;
+                        // 计算画布尺寸：以内容宽度为基准，按A4比例计算高度
+                        let finalWidth = fullWidth;
+                        let finalHeight = finalWidth * a4Ratio;
                         
-                        // 计算实际比例
-                        const actualRatio = actualWidth / actualHeight;
-                        
-                        let finalWidth, finalHeight;
-                        
-                        if (actualRatio > a4Ratio) {
-                            // 内容比较宽，以宽度为基准，按A4比例计算高度
-                            finalWidth = actualWidth;
-                            finalHeight = actualWidth / a4Ratio;
-                        } else {
-                            // 内容比较高，以高度为基准，按A4比例计算宽度
-                            finalHeight = actualHeight;
-                            finalWidth = actualHeight * a4Ratio;
+                        // 如果计算的高度不够容纳内容，使用内容高度并重新计算宽度
+                        if (finalHeight < fullHeight) {
+                            finalHeight = fullHeight;
+                            finalWidth = finalHeight / a4Ratio;
                         }
                         
                         // 输出调试日志
                         console.log('=== 方案二下载调试日志 ===');
-                        console.log('内容实际高度:', actualHeight, 'px');
-                        console.log('内容实际宽度:', actualWidth, 'px');
-                        console.log('内容实际比例 (宽:高):', actualRatio.toFixed(3));
-                        console.log('A4比例 (宽:高):', a4Ratio.toFixed(3));
+                        console.log('内容实际高度:', fullHeight, 'px');
+                        console.log('内容实际宽度:', fullWidth, 'px');
+                        console.log('A4方向: 纵向');
                         console.log('最终宽度:', Math.round(finalWidth), 'px');
                         console.log('最终高度:', Math.round(finalHeight), 'px');
-                        console.log('最终比例 (宽:高):', (finalWidth / finalHeight).toFixed(3));
+                        console.log('最终比例 (高:宽):', (finalHeight / finalWidth).toFixed(3));
                         console.log('==========================');
                         
                         // 设置容器尺寸为纵向A4比例尺寸
