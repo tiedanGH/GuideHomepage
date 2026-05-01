@@ -139,6 +139,10 @@ body.initialized .category:not(.collapsed) .category-title::after {
     color: #00bcd4;
     border-color: #00bcd4;
 }
+.category-title.ai-chat {
+    color: #6c5ce7;
+    border-color: #6c5ce7;
+}
 .category-title.workshop {
     color: #ff6bd6;
     border-color: #ff6bd6;
@@ -162,6 +166,10 @@ body.initialized .category:not(.collapsed) .category-title::after {
 .category-title.battle {
     color: #9b59b6;
     border-color: #9b59b6;
+}
+.category-title.utility {
+    color: #5c6b73;
+    border-color: #5c6b73;
 }
 .category-title.uncategorized {
     color: #7f8c8d;
