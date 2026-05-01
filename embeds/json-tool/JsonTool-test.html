@@ -3315,6 +3315,7 @@
                 
                 // 更新自制角色
                 dirRolesJson = allCustomItems;
+                window.dirRolesJson = dirRolesJson;
                 
                 // 更新已选角色显示
                 updateSelectedRolesDisplay();
@@ -3785,6 +3786,7 @@
                 const savedDirRolesJson = localStorage.getItem('dirRolesJson');
                 if (savedDirRolesJson) {
                     dirRolesJson = JSON.parse(savedDirRolesJson);
+                    window.dirRolesJson = dirRolesJson;
                 }
 
                 // 恢复角色排序信息
@@ -4153,6 +4155,7 @@
 
         // 存储用户创建的自制角色数据
         let dirRolesJson = [];
+        window.dirRolesJson = dirRolesJson;
 
         // 存储从JSON文件导入的所有角色数据
         let editionRolesJson = [];
@@ -4211,7 +4214,7 @@
         ]
 const originalInteractionsCount = interactions.length;
 const originalJinxesCount = jinxes.length;
-const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demonsRoles, ...fabledRoles, ...travellersRoles];
+let allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demonsRoles, ...fabledRoles, ...travellersRoles];
 
         //存储旧版角色ID的数组，用于判断是否是旧版角色
         const legacyRolesID = ['oldkingCustomVER', 'oldlil_monstaCustomVER', 'oldballoonistCustomVER', 'oldplague_doctorCustomVER', 'oldharpyCustomVER', 'oldlleechCustomVER', 'oldorgan_grinderCustomVER', 'oldacrobatCustomVER', 'oldfarmerCustomVER', 'oldalsaahirCustomVER', 'oldboomdandyCustomVER', 'oldlycanthropeCustomVER', 'oldriotCustomVER', 'oldalchemistCustomVER', 'oldal-hadikhiaCustomVER', 'oldpit-hagCustomVER']
@@ -4458,6 +4461,11 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
 
         // 动态加载自制角色
         function loadDirRoles() {
+            // 更新 allRoles，包含自制角色
+            allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demonsRoles, ...fabledRoles, ...travellersRoles, ...dirRolesJson];
+            // 更新 window.dirRolesJson 确保外部脚本也能访问
+            window.dirRolesJson = dirRolesJson;
+
             // 获取自制角色容器
             const dirColumns = document.getElementById('dir-columns');
             const dirRolesContainer = document.getElementById('dir-roles-container');
@@ -5020,6 +5028,9 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
 
             // 刷新自制角色列表
             loadDirRoles();
+            
+            // 更新夜间顺序按钮（关键修复！）
+            updateNightNumOfMetaInfoInput();
 
             alert('自制角色添加成功！');
         }
@@ -6674,6 +6685,7 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                 
                 // 清除自制角色
                 dirRolesJson = [];
+                window.dirRolesJson = dirRolesJson;
                 
                 // 重置角色排序
                 roleOrder = {};
@@ -7321,8 +7333,14 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                 loadRoles(fabledRoles, 'fabled-columns');
                 loadRoles(travellersRoles, 'travellers-columns');
                 
+                // 重新加载自制角色列表
+                loadDirRoles();
+                
                 // 更新已选角色显示
                 updateSelectedRolesDisplay();
+                
+                // 更新夜间顺序按钮（关键修复！）
+                updateNightNumOfMetaInfoInput();
                 
                 // 保存数据到本地存储
                 saveToLocalStorage();
@@ -8137,6 +8155,9 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
             loadRoles(travellersRoles, 'travellers-columns');
             loadDirRoles(); // 加载自制角色
 
+            // 初始化夜间顺序按钮（包含自制角色）
+            updateNightNumOfMetaInfoInput();
+
             // 初始化选项卡
             initTabs();
             
@@ -8438,6 +8459,9 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
             
             // 更新全局selectedRoles变量
             window.selectedRoles = selectedRoles;
+            
+            // 更新夜间顺序按钮（包含自制角色）
+            updateNightNumOfMetaInfoInput();
             
             // 保存数据到本地存储
             saveToLocalStorage();
@@ -8995,8 +9019,8 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
                 }
             });
             
-            // 获取所有角色（确保能访问到角色数据）
-            const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demonsRoles, ...fabledRoles, ...travellersRoles];
+            // 获取所有角色（确保能访问到角色数据，包含自制角色）
+            const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demonsRoles, ...fabledRoles, ...travellersRoles, ...dirRolesJson];
             
             // 获取剧本信息中的夜间顺序数据
             let scriptNightOrderData = null;
@@ -10835,7 +10859,11 @@ const allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demo
         let otherNightSortable = null;
 
         function updateNightNumOfMetaInfoInput() {
-            editionRolesJson = [...selectedRoles, ...dirRolesJson];
+            // 先刷新选中角色数据，确保获取最新的角色信息（包括自制角色）
+            getSelectedRoles();
+            
+            // 只使用被选中的角色（selectedRoles 中已经包含了被选中的自制角色）
+            editionRolesJson = selectedRoles;
 
             // 更新首夜行动顺序按钮
             updateFirstNightButtons();
