@@ -590,7 +590,8 @@ async function generateScriptImageV2() {
                 // 获取字号设置
                 const fontSizeInput = document.getElementById('font-size-setting');
                 const fontSize = fontSizeInput?.value || 'small';
-                const fontSizeMultiplier = fontSize === 'large' ? 1.2 : 1.0;
+                // 移动端使用更大的字号倍率，提升可读性
+                const fontSizeMultiplier = isMobile ? 1.4 : (fontSize === 'large' ? 1.2 : 1.0);
                 
                 // 创建剧本图容器 - 初始设置
                 const scriptPage = document.createElement('div');
