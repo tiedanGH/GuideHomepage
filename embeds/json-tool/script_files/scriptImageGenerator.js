@@ -1361,22 +1361,15 @@ async function generateScriptImageV2() {
                         const a4Ratio = 1.414;
                         let finalWidth, finalHeight;
                         
-                        if (isMobileDevice) {
-                            // 移动端：直接使用内容实际尺寸，不强制A4比例
-                            finalWidth = fullWidth;
+                        // 统一使用A4比例，确保跨平台一致性
+                        // 计算画布尺寸：以内容宽度为基准，按A4比例计算高度
+                        finalWidth = fullWidth;
+                        finalHeight = fullWidth * a4Ratio;
+                        
+                        // 如果计算的高度不够容纳内容，使用内容高度并重新计算宽度
+                        if (finalHeight < fullHeight) {
                             finalHeight = fullHeight;
-                        } else {
-                            // 桌面端：强制使用纵向A4比例
-                            
-                            // 计算画布尺寸：以内容宽度为基准，按A4比例计算高度
-                            finalWidth = fullWidth;
-                            finalHeight = finalWidth * a4Ratio;
-                            
-                            // 如果计算的高度不够容纳内容，使用内容高度并重新计算宽度
-                            if (finalHeight < fullHeight) {
-                                finalHeight = fullHeight;
-                                finalWidth = finalHeight / a4Ratio;
-                            }
+                            finalWidth = finalHeight / a4Ratio;
                         }
                         
                         // 输出调试日志
@@ -1387,18 +1380,12 @@ async function generateScriptImageV2() {
                         console.log('设计宽度: 1240px');
                         console.log('内容实际高度:', fullHeight, 'px');
                         console.log('设计宽度:', fullWidth, 'px');
-                        if (isMobileDevice) {
-                            console.log('移动端模式：不强制A4比例');
-                            console.log('最终宽度:', Math.round(finalWidth), 'px');
-                            console.log('最终高度:', Math.round(finalHeight), 'px');
-                        } else {
-                            console.log('A4纵向比例 (高:宽):', a4Ratio);
-                            console.log('以宽度为基准的A4高度:', Math.round(finalWidth * a4Ratio), 'px');
-                            console.log('最终宽度:', Math.round(finalWidth), 'px');
-                            console.log('最终高度:', Math.round(finalHeight), 'px');
-                            console.log('最终比例 (高:宽):', (finalHeight / finalWidth).toFixed(3));
-                            console.log('高度调整原因:', finalHeight < fullHeight ? 'A4高度小于内容高度，已扩展宽度' : 'A4高度大于内容高度，按比例使用A4尺寸');
-                        }
+                        console.log('A4纵向比例 (高:宽):', a4Ratio);
+                        console.log('以宽度为基准的A4高度:', Math.round(fullWidth * a4Ratio), 'px');
+                        console.log('最终宽度:', Math.round(finalWidth), 'px');
+                        console.log('最终高度:', Math.round(finalHeight), 'px');
+                        console.log('最终比例 (高:宽):', (finalHeight / finalWidth).toFixed(3));
+                        console.log('高度调整原因:', finalHeight < fullHeight ? 'A4高度小于内容高度，已扩展宽度' : 'A4高度大于内容高度，按比例使用A4尺寸');
                         console.log('html2canvas scale:', 2);
                         console.log('==========================');
                         
