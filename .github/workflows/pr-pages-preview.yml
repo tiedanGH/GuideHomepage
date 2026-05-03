@@ -1,26 +1,48 @@
-name: PR Pages Preview
+name: PR Cloudflare Preview
 
 on:
   pull_request_target:
-    types: [opened, synchronize, reopened, closed]
+    types: [opened, synchronize, reopened]
 
 permissions:
-  contents: write
+  contents: read
   issues: write
-  pages: write
   pull-requests: write
 
 concurrency:
-  group: pages-preview
-  cancel-in-progress: false
+  group: cloudflare-preview-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 
 jobs:
   deploy-preview:
-    if: ${{ github.event.action != 'closed' && github.event.repository.fork == false }}
+    if: ${{ github.event.repository.fork == false }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
     steps:
+      - name: Validate Cloudflare config
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_PROJECT_NAME: ${{ vars.CLOUDFLARE_PROJECT_NAME }}
+        run: |
+          set -euo pipefail
+
+          if [[ -z "${CLOUDFLARE_API_TOKEN:-}" ]]; then
+            echo "::error::Missing secret CLOUDFLARE_API_TOKEN."
+            exit 1
+          fi
+
+          if [[ -z "${CLOUDFLARE_ACCOUNT_ID:-}" ]]; then
+            echo "::error::Missing secret CLOUDFLARE_ACCOUNT_ID."
+            exit 1
+          fi
+
+          if [[ -z "${CLOUDFLARE_PROJECT_NAME:-}" ]]; then
+            echo "::error::Missing repository variable CLOUDFLARE_PROJECT_NAME."
+            exit 1
+          fi
+
       - name: Checkout PR
         uses: actions/checkout@v4
         with:
@@ -30,134 +52,38 @@ jobs:
           persist-credentials: false
           path: source
 
-      - name: Checkout base site
-        uses: actions/checkout@v4
-        with:
-          repository: ${{ github.repository }}
-          ref: ${{ github.event.pull_request.base.sha }}
-          submodules: recursive
-          persist-credentials: false
-          path: base-source
-
-      - name: Publish preview to gh-pages
-        id: publish
-        env:
-          GH_TOKEN: ${{ github.token }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
+      - name: Prepare static site
         run: |
           set -euo pipefail
 
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-
-          git clone --depth=1 --branch gh-pages "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" pages || {
-            mkdir pages
-            git -C pages init
-            git -C pages checkout --orphan gh-pages
-            git -C pages remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          }
-
-          if [[ ! -f pages/index.html && -f base-source/index.html ]]; then
-            rsync -a \
-              --exclude ".git" \
-              --exclude ".github" \
-              --exclude ".idea" \
-              --exclude "pr-[0-9]*/" \
-              "base-source/" "pages/"
-          fi
-
-          mkdir -p "pages/pr-${PR_NUMBER}"
+          mkdir site
           rsync -a --delete \
             --exclude ".git" \
             --exclude ".github" \
             --exclude ".idea" \
-            "source/" "pages/pr-${PR_NUMBER}/"
+            "source/" "site/"
 
-          touch pages/.nojekyll
-          git -C pages add .
-
-          if git -C pages diff --cached --quiet; then
-            echo "No preview changes to publish."
-            exit 0
-          fi
-
-          git -C pages commit -m "deploy preview for PR #${PR_NUMBER}"
-          git -C pages push origin gh-pages
-
-      - name: Configure GitHub Pages source
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-
-          if gh api "repos/${GITHUB_REPOSITORY}/pages" >/dev/null 2>&1; then
-            gh api \
-              --method PUT \
-              "repos/${GITHUB_REPOSITORY}/pages" \
-              -f "source[branch]=gh-pages" \
-              -f "source[path]=/"
-          else
-            gh api \
-              --method POST \
-              "repos/${GITHUB_REPOSITORY}/pages" \
-              -f "source[branch]=gh-pages" \
-              -f "source[path]=/"
-          fi
-
-          gh api --method POST "repos/${GITHUB_REPOSITORY}/pages/builds" || true
-
-      - name: Wait for preview URL
-        id: wait-preview
-        env:
-          GH_TOKEN: ${{ github.token }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-        run: |
-          set -euo pipefail
-
-          base_url="$(gh api "repos/${GITHUB_REPOSITORY}/pages" --jq '.html_url // empty')"
-          if [[ -z "$base_url" ]]; then
-            owner="${GITHUB_REPOSITORY_OWNER,,}"
-            repo="${GITHUB_REPOSITORY#*/}"
-            repo="${repo,,}"
-
-            if [[ "$repo" == "${owner}.github.io" ]]; then
-              base_url="https://${owner}.github.io"
-            else
-              base_url="https://${owner}.github.io/${repo}"
-            fi
-          fi
-
-          preview_url="${base_url%/}/pr-${PR_NUMBER}/"
-          echo "preview_url=${preview_url}" >> "$GITHUB_OUTPUT"
-
-          for attempt in {1..30}; do
-            status="$(curl -L -s -o /dev/null -w "%{http_code}" "$preview_url" || true)"
-            if [[ "$status" == "200" ]]; then
-              echo "Preview is ready: $preview_url"
-              exit 0
-            fi
-
-            echo "Preview is not ready yet. Attempt ${attempt}/30 returned HTTP ${status}."
-            sleep 10
-          done
-
-          echo "Preview did not become ready in time."
-          exit 1
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy site --project-name=${{ vars.CLOUDFLARE_PROJECT_NAME }} --branch=pr-${{ github.event.pull_request.number }}
 
       - name: Comment preview URL
         uses: actions/github-script@v7
         env:
           PR_NUMBER: ${{ github.event.pull_request.number }}
-          PREVIEW_URL: ${{ steps.wait-preview.outputs.preview_url }}
+          PREVIEW_URL: https://pr-${{ github.event.pull_request.number }}.${{ vars.CLOUDFLARE_PROJECT_NAME }}.pages.dev
         with:
           script: |
-            const marker = '<!-- pr-pages-preview -->';
+            const marker = '<!-- pr-cloudflare-preview -->';
             const { owner, repo } = context.repo;
-            const prNumber = process.env.PR_NUMBER;
+            const issue_number = Number(process.env.PR_NUMBER);
             const previewUrl = process.env.PREVIEW_URL;
             const body = [
               marker,
-              '\u2705 PR \u9884\u89c8\u9875\u9762\u5df2\u90e8\u7f72\u6210\u529f\u3002',
+              '\u2705 PR \u9884\u89c8\u9875\u9762\u5df2\u90e8\u7f72\u5230 Cloudflare Pages\u3002',
               '',
               `\u6d4b\u8bd5\u94fe\u63a5\uff1a${previewUrl}`,
               '',
@@ -167,7 +93,7 @@ jobs:
             const comments = await github.paginate(github.rest.issues.listComments, {
               owner,
               repo,
-              issue_number: Number(prNumber),
+              issue_number,
               per_page: 100,
             });
 
@@ -186,38 +112,7 @@ jobs:
               await github.rest.issues.createComment({
                 owner,
                 repo,
-                issue_number: Number(prNumber),
+                issue_number,
                 body,
               });
             }
-
-  cleanup-preview:
-    if: ${{ github.event.action == 'closed' && github.event.repository.fork == false }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-
-    steps:
-      - name: Remove preview from gh-pages
-        env:
-          GH_TOKEN: ${{ github.token }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-        run: |
-          set -euo pipefail
-
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
-
-          git clone --depth=1 --branch gh-pages "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" pages || {
-            echo "No gh-pages branch found. Nothing to clean up."
-            exit 0
-          }
-          rm -rf "pages/pr-${PR_NUMBER}"
-          git -C pages add .
-
-          if git -C pages diff --cached --quiet; then
-            echo "No preview files to remove."
-            exit 0
-          fi
-
-          git -C pages commit -m "remove preview for PR #${PR_NUMBER}"
-          git -C pages push origin gh-pages
