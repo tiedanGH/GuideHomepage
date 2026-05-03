@@ -1,0 +1,144 @@
+name: PR Pages Preview
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, closed]
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: pages-preview
+  cancel-in-progress: false
+
+jobs:
+  deploy-preview:
+    if: ${{ github.event.action != 'closed' && github.event.repository.fork == false && github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          submodules: recursive
+          path: source
+
+      - name: Publish preview to gh-pages
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          git clone --depth=1 --branch gh-pages "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" pages || {
+            mkdir pages
+            git -C pages init
+            git -C pages checkout --orphan gh-pages
+            git -C pages remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          }
+
+          mkdir -p "pages/pr-${PR_NUMBER}"
+          rsync -a --delete \
+            --exclude ".git" \
+            --exclude ".github" \
+            "source/" "pages/pr-${PR_NUMBER}/"
+
+          touch pages/.nojekyll
+          git -C pages add .
+
+          if git -C pages diff --cached --quiet; then
+            echo "No preview changes to publish."
+            exit 0
+          fi
+
+          git -C pages commit -m "deploy preview for PR #${PR_NUMBER}"
+          git -C pages push origin gh-pages
+
+      - name: Comment preview URL
+        uses: actions/github-script@v7
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        with:
+          script: |
+            const marker = '<!-- pr-pages-preview -->';
+            const { owner, repo } = context.repo;
+            const prNumber = process.env.PR_NUMBER;
+            const lowerOwner = owner.toLowerCase();
+            const lowerRepo = repo.toLowerCase();
+            const baseUrl = lowerRepo === `${lowerOwner}.github.io`
+              ? `https://${lowerOwner}.github.io`
+              : `https://${lowerOwner}.github.io/${lowerRepo}`;
+            const previewUrl = `${baseUrl}/pr-${prNumber}/`;
+            const body = [
+              marker,
+              '\u2705 PR \u9884\u89c8\u9875\u9762\u5df2\u90e8\u7f72\u6210\u529f\u3002',
+              '',
+              `\u6d4b\u8bd5\u94fe\u63a5\uff1a${previewUrl}`,
+              '',
+              '\u672c\u8bc4\u8bba\u4f1a\u5728\u540e\u7eed PR \u66f4\u65b0\u540e\u81ea\u52a8\u5237\u65b0\u3002',
+            ].join('\n');
+
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner,
+              repo,
+              issue_number: Number(prNumber),
+              per_page: 100,
+            });
+
+            const previous = comments.find((comment) =>
+              comment.user?.type === 'Bot' && comment.body?.includes(marker)
+            );
+
+            if (previous) {
+              await github.rest.issues.updateComment({
+                owner,
+                repo,
+                comment_id: previous.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: Number(prNumber),
+                body,
+              });
+            }
+
+  cleanup-preview:
+    if: ${{ github.event.action == 'closed' && github.event.repository.fork == false && github.event.pull_request.head.repo.full_name == github.repository }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Remove preview from gh-pages
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          git clone --depth=1 --branch gh-pages "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" pages || {
+            echo "No gh-pages branch found. Nothing to clean up."
+            exit 0
+          }
+          rm -rf "pages/pr-${PR_NUMBER}"
+          git -C pages add .
+
+          if git -C pages diff --cached --quiet; then
+            echo "No preview files to remove."
+            exit 0
+          fi
+
+          git -C pages commit -m "remove preview for PR #${PR_NUMBER}"
+          git -C pages push origin gh-pages
