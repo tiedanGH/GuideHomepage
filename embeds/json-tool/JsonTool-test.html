@@ -3043,29 +3043,19 @@
                 return;
             }
             
-            // 创建剧本信息
-            const metaInfoJson = {
+            // 创建剧本信息（使用已保存的metaInfoJson）
+            const metaInfoJsonCopy = {
+                ...metaInfoJson,
                 "id": "_meta",
-                "name": "",
-                "author": "",
-                "logo": "",
-                "hideTitle": false,
-                "background": "https://botc.app/assets/background1-C0iW8pNy.webp",
-                "almanac": "",
-                "bootlegger": [""],
-                "firstNight": [""],
-                "otherNight": [""],
                 "a jinxed": "相克",
                 "a jinxedName": "相克",
                 "b jinxed": "相克",
                 "b jinxedName": "相克",
-                "state": [],
-                "description": ""
             };
             
             // 创建JSON数据数组
             const jsonData = [];
-            jsonData.push(metaInfoJson);
+            jsonData.push(metaInfoJsonCopy);
             
             // 收集所有角色对象
             const allRoles = [];
@@ -3125,7 +3115,9 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = '工具生成的剧本JSON文件.json';
+            // 使用剧本名作为文件名
+            const scriptName = metaInfoJson?.name?.trim();
+            a.download = (scriptName !== '') ? scriptName + '.json' : '工具生成的剧本JSON文件.json';
             
             // 触发下载
             document.body.appendChild(a);
@@ -6640,20 +6632,23 @@ let allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demons
             // 创建下载链接并触发下载
             const a = document.createElement('a');
             a.href = url;
-            // json文件名优先使用json-file-name
-            if (document.getElementById('json-file-name').value.trim() !== '') {
-                a.download = document.getElementById('json-file-name').value.trim() + '.json';
-            }
-            else {
+            // json文件名优先使用剧本名（直接从表单获取），最后使用默认名
+            const form = document.getElementById('meta-info-group');
+            console.log('【调试】表单元素:', form);
+            const editionNameInput = form?.querySelector('#edition-name');
+            console.log('【调试】剧本名输入框:', editionNameInput);
+            const scriptName = editionNameInput?.value?.trim();
+            console.log('【调试】剧本名:', scriptName);
+            if (scriptName !== '') {
+                a.download = scriptName + '.json';
+            } else {
                 a.download = '工具生成的剧本JSON文件.json';
             }
             a.click();
             URL.revokeObjectURL(url);
 
             // 显示下载成功提示
-            const fileName = document.getElementById('json-file-name').value.trim() !== '' 
-                ? document.getElementById('json-file-name').value.trim() + '.json'
-                : '工具生成的剧本JSON文件.json';
+            const fileName = scriptName !== '' ? scriptName + '.json' : '工具生成的剧本JSON文件.json';
             alert(`JSON文件"${fileName}"已下载！`);
         }
 
@@ -12831,7 +12826,7 @@ let allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demons
         <input type="checkbox" id="showTravellersFabled" checked>
         <input type="checkbox" id="showJinxRules" checked>
         <input type="checkbox" id="horizontalLayout">
-        <input type="checkbox" id="reverseOtherNight">
+        <input type="checkbox" id="reverseOtherNight" checked>
         <input type="password" id="ai-api-key">
         <input type="text" id="ai-model-endpoint">
         <input type="text" id="custom-townsfolk-name">
