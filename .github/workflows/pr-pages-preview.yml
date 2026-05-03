@@ -1,7 +1,7 @@
 name: PR Pages Preview
 
 on:
-  pull_request:
+  pull_request_target:
     types: [opened, synchronize, reopened, closed]
 
 permissions:
@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   deploy-preview:
-    if: ${{ github.event.action != 'closed' && github.event.repository.fork == false && github.event.pull_request.head.repo.full_name == github.repository }}
+    if: ${{ github.event.action != 'closed' && github.event.repository.fork == false }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
@@ -23,8 +23,10 @@ jobs:
       - name: Checkout PR
         uses: actions/checkout@v4
         with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
           ref: ${{ github.event.pull_request.head.sha }}
           submodules: recursive
+          persist-credentials: false
           path: source
 
       - name: Publish preview to gh-pages
@@ -113,7 +115,7 @@ jobs:
             }
 
   cleanup-preview:
-    if: ${{ github.event.action == 'closed' && github.event.repository.fork == false && github.event.pull_request.head.repo.full_name == github.repository }}
+    if: ${{ github.event.action == 'closed' && github.event.repository.fork == false }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
