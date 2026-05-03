@@ -1259,7 +1259,7 @@ async function generateScriptImageV2() {
                 } else {
                     // 方案一：经典布局 - 标题在上，夜间顺序在两侧
                     scriptHtml = `
-                        <div style="width: 1240px; min-height: 1754px; display: flex; flex-direction: column; position: relative; max-width: 100%; box-sizing: border-box;">
+                        <div style="width: 1240px; min-height: 1754px; display: flex; flex-direction: column; height: 100%; position: relative; max-width: 100%; box-sizing: border-box;">
                             <!-- 顶部区域：标题和玩家数量表格 -->
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; max-width: 100%; box-sizing: border-box;">
                                 ${titleSection}
