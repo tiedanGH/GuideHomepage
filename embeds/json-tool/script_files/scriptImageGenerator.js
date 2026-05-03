@@ -586,19 +586,19 @@ async function generateScriptImageV2() {
                     box-sizing: border-box;
                     overflow: auto;
                 `;
-                
+
                 // 获取字号设置
                 const fontSizeInput = document.getElementById('font-size-setting');
                 const fontSize = fontSizeInput?.value || 'small';
                 // 移动端使用更大的字号倍率，提升可读性
                 const fontSizeMultiplier = isMobile ? 4.6: (fontSize === 'large' ? 1.2 : 1.0);
-                
-                // 创建剧本图容器 - 初始设置
+
+                // 创建剧本图容器 - 固定宽度设置
                 const scriptPage = document.createElement('div');
                 scriptPage.style.cssText = `
                     background: ${hexToRgba(customBgColor, bgOpacity)};
-                    width: ${isMobile ? '520px' : '8.27in'};
-                    padding: ${isMobile ? '10px' : '0.3in'};
+                    width: ${isMobile ? '1240px' : '8.27in'};
+                    padding: ${isMobile ? '8px' : '0.3in'};
                     box-sizing: border-box;
                     position: relative;
                     font-family: 'Assistant', 'Microsoft YaHei', sans-serif;
