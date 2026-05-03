@@ -580,25 +580,26 @@ async function generateScriptImageV2() {
                     display: flex;
                     flex-direction: column;
                     justify-content: flex-start;
-                    align-items: center;
+                    align-items: flex-start;
                     z-index: 10000;
                     padding: ${isMobile ? '10px' : '20px'};
                     box-sizing: border-box;
                     overflow: auto;
                 `;
-                
+
                 // 获取字号设置
                 const fontSizeInput = document.getElementById('font-size-setting');
                 const fontSize = fontSizeInput?.value || 'small';
                 // 移动端使用更大的字号倍率，提升可读性
                 const fontSizeMultiplier = isMobile ? 4.6: (fontSize === 'large' ? 1.2 : 1.0);
-                
-                // 创建剧本图容器 - 初始设置
+
+                // 创建剧本图容器 - 响应式宽度设置
                 const scriptPage = document.createElement('div');
+                const mobileWidth = window.innerWidth;
                 scriptPage.style.cssText = `
                     background: ${hexToRgba(customBgColor, bgOpacity)};
-                    width: ${isMobile ? '520px' : '8.27in'};
-                    padding: ${isMobile ? '10px' : '0.3in'};
+                    width: ${isMobile ? mobileWidth + 'px' : '8.27in'};
+                    padding: ${isMobile ? '8px' : '0.3in'};
                     box-sizing: border-box;
                     position: relative;
                     font-family: 'Assistant', 'Microsoft YaHei', sans-serif;
@@ -858,12 +859,13 @@ async function generateScriptImageV2() {
                     </div>
                 `;
                 
-                // 构建角色列表区域HTML
+                // 构建角色列表区域HTML（响应式夜序宽度）
+                const nightOrderWidth = isMobile ? Math.max(20, mobileWidth * 0.04) : 25;
                 const rolesSection = `
                     <div style="display: flex; flex: 1; position: relative; max-width: 100%; box-sizing: border-box;">
                         ${showNightOrder ? `
                         <!-- 左侧首夜顺序 -->
-                        <div style="width: 25px; display: flex; flex-direction: column; align-items: center; padding-right: 2px;">
+                        <div style="width: ${nightOrderWidth}px; display: flex; flex-direction: column; align-items: center; padding-right: 2px;">
                             ${firstNightHtml}
                         </div>
                         
@@ -893,7 +895,7 @@ async function generateScriptImageV2() {
                         </div>
                         
                         <!-- 右侧其他夜顺序 -->
-                        <div style="width: 25px; display: flex; flex-direction: ${!reverseOtherNight ? 'column' : 'column-reverse'}; align-items: center; padding-left: 2px;">
+                        <div style="width: ${nightOrderWidth}px; display: flex; flex-direction: ${!reverseOtherNight ? 'column' : 'column-reverse'}; align-items: center; padding-left: 2px;">
                             ${otherNightHtml}
                         </div>
                         ` : ''}
@@ -1257,9 +1259,10 @@ async function generateScriptImageV2() {
                         </div>
                     `;
                 } else {
-                    // 方案一：经典布局 - 标题在上，夜间顺序在两侧
+                    // 方案一：经典布局 - 标题在上，夜间顺序在两侧（响应式宽度）
+                    const innerWidth = isMobile ? mobileWidth - 16 : 1240; // 减去padding的宽度
                     scriptHtml = `
-                        <div style="width: 1240px; min-height: 1754px; display: flex; flex-direction: column; height: 100%; position: relative; max-width: 100%; box-sizing: border-box;">
+                        <div style="width: ${innerWidth}px; min-height: 1754px; display: flex; flex-direction: column; height: 100%; position: relative; max-width: 100%; box-sizing: border-box;">
                             <!-- 顶部区域：标题和玩家数量表格 -->
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; max-width: 100%; box-sizing: border-box;">
                                 ${titleSection}
