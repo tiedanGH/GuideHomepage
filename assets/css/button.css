@@ -79,7 +79,7 @@
     color: #ff4945;
 }
 
-/* AI对战平台按钮 */
+/* AgentGame按钮 */
 .button.agent-game {
     background: linear-gradient(145deg, #1890ff, #0b6edc);
     box-shadow: 0 4px 14px rgba(24, 144, 255, 0.4);
