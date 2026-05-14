@@ -657,7 +657,7 @@ async function generateScriptImageV2() {
 
                     return `
                         <div style="display: flex; gap: 10px; padding: 8px; align-items: flex-start; background: rgb(246, 246, 244);">
-                            <img src="${convertToLocalPath(role.image)}" style="width: 70px; height: 70px; object-fit: cover; flex-shrink: 0; display: block;">
+                            <img src="${convertToLocalPath(role.image)}" style="width: 90px; height: 90px; object-fit: cover; flex-shrink: 0; display: block;">
                             <div style="flex: 1; min-width: 0;">
                                 <div style="font-size: 24px; font-weight: bold; color: ${color}; margin-bottom: 2px; font-family: 'SimSun', '宋体', serif;">${role.name}</div>
                                 <div style="font-size: 20px; color: #4a3728; line-height: 1.4;">${role.ability || ''}</div>
@@ -1024,12 +1024,12 @@ async function generateScriptImageV2() {
                     // 生成单个角色卡片HTML
                     const createRoleCard = (role) => `
                         <div style="display: flex; gap: 10px; padding: 8px; align-items: flex-start; background: rgba(255,255,255,0.95);">
-                            <div style="width: 70px; height: 70px; flex-shrink: 0; overflow: hidden;">
+                            <div style="width: 90px; height: 90px; flex-shrink: 0; overflow: hidden;">
                                 <img src="${convertToLocalPath(role.image)}" alt="${role.name}" style="width: 100%; height: 100%; object-fit: cover; display: block;">
                             </div>
                             <div style="flex: 1; min-width: 0;">
-                                <div style="font-size: 16px; font-weight: bold; color: ${nameColor}; margin-bottom: 2px; font-family: 'SimSun', '宋体', serif;">${role.name}</div>
-                                <div style="font-size: 12px; color: #4a3728; line-height: 1.4;">${role.ability || ''}</div>
+                                <div style="font-size: 24px; font-weight: bold; color: ${nameColor}; margin-bottom: 2px; font-family: 'SimSun', '宋体', serif;">${role.name}</div>
+                                <div style="font-size: 20px; color: #4a3728; line-height: 1.4;">${role.ability || ''}</div>
                             </div>
                         </div>
                     `;
