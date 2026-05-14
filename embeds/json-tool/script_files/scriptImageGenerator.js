@@ -657,10 +657,10 @@ async function generateScriptImageV2() {
 
                     return `
                         <div style="display: flex; gap: 10px; padding: 8px; align-items: flex-start; background: rgb(246, 246, 244);">
-                            <img src="${convertToLocalPath(role.image)}" style="width: 70px; height: 70px; object-fit: cover; flex-shrink: 0; display: block;">
-                            <div style="flex: 1; min-width: 0;">
-                                <div style="font-size: 16px; font-weight: bold; color: ${color}; margin-bottom: 2px; font-family: 'SimSun', '宋体', serif;">${role.name}</div>
-                                <div style="font-size: 12px; color: #4a3728; line-height: 1.4;">${role.ability || ''}</div>
+                            <img src="${convertToLocalPath(role.image)}" style="width: 120px; height: 120px; object-fit: cover; flex-shrink: 0; display: block;">
+                            <div style="flex: 1; min-width: 0; font-family: 'Microsoft YaHei', Heiti;">
+                                <div style="font-size: 24px; font-weight: bold; color: ${color}; margin-bottom: 2px;">${role.name}</div>
+                                <div style="font-size: 20px; font-weight: bold; color: #4a3728; line-height: 1.4;">${role.ability || ''}</div>
                                 ${jinxRulesHtml}
                             </div>
                         </div>
@@ -731,7 +731,7 @@ async function generateScriptImageV2() {
                 
                 // 构建玩家数量表格
                 const playerCountTable = `
-                    <div style="font-size: 12px; border-collapse: collapse; width: 100%;">
+                    <div style="font-size: 12px; border-collapse: collapse; width: 100%; white-space: nowrap;">
                         <div style="display: flex; background: #5c4033; color: white; font-weight: bold;">
                             <div style="width: 50px; padding: 5px 8px; text-align: center; border: 1px solid #3d2817;">玩家</div>
                             <div style="flex: 1; padding: 5px 8px; text-align: center; border: 1px solid #3d2817;">5</div>
@@ -746,7 +746,7 @@ async function generateScriptImageV2() {
                             <div style="flex: 1; padding: 5px 8px; text-align: center; border: 1px solid #3d2817;">14</div>
                             <div style="flex: 1; padding: 5px 8px; text-align: center; border: 1px solid #3d2817;">15</div>
                         </div>
-                        <div style="display: flex; background: white;">
+                        <div style="display: flex; background: white; color: #5c4033;">
                             <div style="width: 50px; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0; color: #1e3a5f; font-weight: bold;">镇民</div>
                             <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">3</div>
                             <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">3</div>
@@ -760,7 +760,7 @@ async function generateScriptImageV2() {
                             <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">9</div>
                             <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">9</div>
                         </div>
-                        <div style="display: flex; background: #f5f0e6;">
+                        <div style="display: flex; background: #f5f0e6; color: #5c4033;">
                             <div style="width: 50px; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0; color: #0d5c5c; font-weight: bold;">外来者</div>
                             <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">0</div>
                             <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">1</div>
@@ -774,7 +774,7 @@ async function generateScriptImageV2() {
                             <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">1</div>
                             <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">2</div>
                         </div>
-                        <div style="display: flex; background: white;">
+                        <div style="display: flex; background: white; color: #5c4033;">
                             <div style="width: 50px; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0; color: #8b4513; font-weight: bold;">爪牙</div>
                             <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">1</div>
                             <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">1</div>
@@ -788,7 +788,7 @@ async function generateScriptImageV2() {
                             <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">3</div>
                             <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">3</div>
                         </div>
-                        <div style="display: flex; background: white;">
+                        <div style="display: flex; background: white; color: #5c4033;">
                             <div style="width: 50px; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0; color: #8b0000; font-weight: bold;">恶魔</div>
                             <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">1</div>
                             <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">1</div>
@@ -909,7 +909,7 @@ async function generateScriptImageV2() {
                             <span>异常状态</span>
                             <div style="flex: 1; height: 1px; background: ${customTeamColors.demon}; margin-left: 8px;"></div>
                         </div>
-                        <div style="font-size: 10px; line-height: 1.4; color: #333; max-width: 100%; box-sizing: border-box;">
+                        <div style="font-size: 10px; line-height: 1.4; color: #333; max-width: 100%; box-sizing: border-box; font-family: 'Microsoft YaHei', Heiti; font-weight: bold;">
                             ${!metaInfoJson.state || metaInfoJson.state.length === 0 ? `
                             <!-- 默认状态：显示中毒醉酒和疯狂 -->
                             <div style="margin-bottom: 4px;"><b style="color: #9932cc;">疯狂</b> - 当一名玩家需要"疯狂"地证明某件事情时，意味着他应该去努力说服其他玩家那件事情是真的。</div>
@@ -1024,12 +1024,12 @@ async function generateScriptImageV2() {
                     // 生成单个角色卡片HTML
                     const createRoleCard = (role) => `
                         <div style="display: flex; gap: 10px; padding: 8px; align-items: flex-start; background: rgba(255,255,255,0.95);">
-                            <div style="width: 70px; height: 70px; flex-shrink: 0; overflow: hidden;">
+                            <div style="width: 120px; height: 120px; flex-shrink: 0; overflow: hidden;">
                                 <img src="${convertToLocalPath(role.image)}" alt="${role.name}" style="width: 100%; height: 100%; object-fit: cover; display: block;">
                             </div>
                             <div style="flex: 1; min-width: 0;">
-                                <div style="font-size: 16px; font-weight: bold; color: ${nameColor}; margin-bottom: 2px; font-family: 'SimSun', '宋体', serif;">${role.name}</div>
-                                <div style="font-size: 12px; color: #4a3728; line-height: 1.4;">${role.ability || ''}</div>
+                                <div style="font-size: 24px; font-weight: bold; color: ${nameColor}; margin-bottom: 2px; font-family: 'Microsoft YaHei', Heiti;">${role.name}</div>
+                                <div style="font-size: 20px; color: #4a3728; line-height: 1.4;">${role.ability || ''}</div>
                             </div>
                         </div>
                     `;
@@ -1165,18 +1165,18 @@ async function generateScriptImageV2() {
                                                             const role1 = allRoles.find(r => r.name === rule.jinxRole1);
                                                             const role2 = allRoles.find(r => r.name === rule.jinxRole2);
                                                             return `
-                                                                <div style="display: flex; align-items: center; gap: 6px; padding: 8px 10px; background: rgba(255,255,255,0.95);">
+                                                                <div style="display: flex; align-items: center; gap: 6px; padding: 8px 10px; background: rgba(255,255,255,0.95); font-weight: bold; font-family: 'Microsoft YaHei', Heiti;">
                                                                     <div style="display: flex; align-items: center; gap: 3px; flex-shrink: 0;">
                                                                         ${role1 ? `<div style="width: 24px; height: 24px; border-radius: 3px; overflow: hidden;"><img src="${convertToLocalPath(role1.image)}" alt="${role1.name}" style="width: 100%; height: 100%; object-fit: cover; display: block;"></div>` : ''}
-                                                                        <span style="font-size: 12px; font-weight: bold; color: #333;">${rule.jinxRole1}</span>
+                                                                        <span style="font-size: 12px; color: #333;">${rule.jinxRole1}</span>
                                                                     </div>
                                                                     <span style="color: #b8860b; font-weight: bold; flex-shrink: 0;">×</span>
                                                                     <div style="display: flex; align-items: center; gap: 3px; flex-shrink: 0;">
                                                                         ${role2 ? `<div style="width: 24px; height: 24px; border-radius: 3px; overflow: hidden;"><img src="${convertToLocalPath(role2.image)}" alt="${role2.name}" style="width: 100%; height: 100%; object-fit: cover; display: block;"></div>` : ''}
-                                                                        <span style="font-size: 12px; font-weight: bold; color: #333;">${rule.jinxRole2}</span>
+                                                                        <span style="font-size: 12px; color: #333;">${rule.jinxRole2}</span>
                                                                     </div>
                                                                     <span style="color: #999; flex-shrink: 0;">:</span>
-                                                                    <span style="font-size: 12px; font-weight: normal; color: #5a4a3a; line-height: 1.5; flex: 1;">${rule.jinxRule}</span>
+                                                                    <span style="font-size: 12px; color: #5a4a3a; line-height: 1.5; flex: 1;">${rule.jinxRule}</span>
                                                                 </div>
                                                             `;
                                                         }).join('')}
@@ -1187,21 +1187,21 @@ async function generateScriptImageV2() {
                                             <!-- 状态栏 -->
                                             ${showStatusBar ? `
                                                 <div style="background: rgba(248,244,237,0.8); padding: 12px; border-radius: 0 0 6px 0; border-top: 1px solid #d4c1a4;">
-                                                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                                                    <div style="display: flex; flex-direction: column; gap: 8px; font-weight: bold; font-family: 'Microsoft YaHei', Heiti;">
                                                         ${!metaInfoJson.state || metaInfoJson.state.length === 0 ? `
                                                             <div style="padding: 8px 12px; background: rgba(255,255,255,0.95); border-radius: 4px; border-left: 3px solid #9932cc;">
-                                                                <div style="font-size: 12px; font-weight: bold; color: #9932cc; margin-bottom: 3px;">疯狂</div>
-                                                                <div style="font-size: 12px; font-weight: normal; color: #5a4a3a; line-height: 1.5;">当一名玩家需要"疯狂"地证明某件事情时，意味着他应该去努力说服其他玩家那件事情是真的。</div>
+                                                                <div style="font-size: 14px; color: #9932cc; margin-bottom: 3px;">疯狂</div>
+                                                                <div style="font-size: 12px; color: #5a4a3a; line-height: 1.5;">当一名玩家需要"疯狂"地证明某件事情时，意味着他应该去努力说服其他玩家那件事情是真的。</div>
                                                             </div>
                                                             <div style="padding: 8px 12px; background: rgba(255,255,255,0.95); border-radius: 4px; border-left: 3px solid ${customTeamColors.demon};">
-                                                                <div style="font-size: 12px; font-weight: bold; color: ${customTeamColors.demon}; margin-bottom: 3px;">中毒/醉酒</div>
-                                                                <div style="font-size: 12px; font-weight: normal; color: #5a4a3a; line-height: 1.5;">中毒的玩家会失去自身能力，但他不会知道，仍以为自己具有能力。如果中毒的玩家能力会给他提供信息，那么信息可能正确可能错误，说书人会合理欺骗你。醉酒同理。</div>
+                                                                <div style="font-size: 14px; color: ${customTeamColors.demon}; margin-bottom: 3px;">中毒/醉酒</div>
+                                                                <div style="font-size: 12px; color: #5a4a3a; line-height: 1.5;">中毒的玩家会失去自身能力，但他不会知道，仍以为自己具有能力。如果中毒的玩家能力会给他提供信息，那么信息可能正确可能错误，说书人会合理欺骗你。醉酒同理。</div>
                                                             </div>
                                                         ` : `
                                                             ${metaInfoJson.state.map(state => `
                                                                 <div style="padding: 8px 12px; background: rgba(255,255,255,0.95); border-radius: 4px; border-left: 3px solid ${state.name === '疯狂' ? '#9932cc' : customTeamColors.demon};">
-                                                                    <div style="font-size: 12px; font-weight: bold; color: ${state.name === '疯狂' ? '#9932cc' : customTeamColors.demon}; margin-bottom: 3px;">${state.name}</div>
-                                                                    <div style="font-size: 12px; font-weight: normal; color: #5a4a3a; line-height: 1.5;">${state.description}</div>
+                                                                    <div style="font-size: 14px; color: ${state.name === '疯狂' ? '#9932cc' : customTeamColors.demon}; margin-bottom: 3px;">${state.name}</div>
+                                                                    <div style="font-size: 12px; color: #5a4a3a; line-height: 1.5;">${state.description}</div>
                                                                 </div>
                                                             `).join('')}
                                                         `}
@@ -1405,7 +1405,9 @@ async function generateScriptImageV2() {
                         // 设置容器尺寸为纵向A4比例尺寸
                         scriptPage.style.width = finalWidth + 'px';
                         scriptPage.style.height = finalHeight + 'px';
-                        
+                        scriptPage.children[0].style.width = '100%';
+                        scriptPage.children[0].style.height = '100%';
+
                         html2canvas(scriptPage, {
                             scale: 2,
                             useCORS: true,
