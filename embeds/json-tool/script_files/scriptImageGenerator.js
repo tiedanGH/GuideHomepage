@@ -659,8 +659,8 @@ async function generateScriptImageV2() {
                         <div style="display: flex; gap: 10px; padding: 8px; align-items: flex-start; background: rgb(246, 246, 244);">
                             <img src="${convertToLocalPath(role.image)}" style="width: 70px; height: 70px; object-fit: cover; flex-shrink: 0; display: block;">
                             <div style="flex: 1; min-width: 0;">
-                                <div style="font-size: 16px; font-weight: bold; color: ${color}; margin-bottom: 2px; font-family: 'SimSun', '宋体', serif;">${role.name}</div>
-                                <div style="font-size: 12px; color: #4a3728; line-height: 1.4;">${role.ability || ''}</div>
+                                <div style="font-size: 24px; font-weight: bold; color: ${color}; margin-bottom: 2px; font-family: 'SimSun', '宋体', serif;">${role.name}</div>
+                                <div style="font-size: 20px; color: #4a3728; line-height: 1.4;">${role.ability || ''}</div>
                                 ${jinxRulesHtml}
                             </div>
                         </div>
@@ -1405,7 +1405,9 @@ async function generateScriptImageV2() {
                         // 设置容器尺寸为纵向A4比例尺寸
                         scriptPage.style.width = finalWidth + 'px';
                         scriptPage.style.height = finalHeight + 'px';
-                        
+                        scriptPage.children[0].style.width = '100%';
+                        scriptPage.children[0].style.height = '100%';
+
                         html2canvas(scriptPage, {
                             scale: 2,
                             useCORS: true,
