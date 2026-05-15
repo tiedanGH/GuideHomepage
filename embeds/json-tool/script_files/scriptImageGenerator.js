@@ -600,6 +600,7 @@ async function generateScriptImageV2() {
                     width: ${isMobile ? '1240px' : '8.27in'};
                     padding: ${isMobile ? '8px' : '0.3in'};
                     box-sizing: border-box;
+                    padding: 0.3in;
                     position: relative;
                     font-family: 'Assistant', 'Microsoft YaHei', sans-serif;
                     margin: ${isMobile ? '0' : 'auto'};
@@ -614,8 +615,6 @@ async function generateScriptImageV2() {
                 const otherNightHtml = allOtherNight.map(role => `
                     <img src="${convertToLocalPath(role.image)}" style="width: 45px; height: 45px; margin: -5px 0; object-fit: cover; display: block;${!reverseOtherNight ? '' : ' transform: rotate(180deg);'}">
                 `).join('');
-                
-
                 
                 // 为每个角色创建相克规则映射
                 const roleJinxMap = {};
@@ -1064,7 +1063,7 @@ async function generateScriptImageV2() {
                 if (scriptLayout === 'scheme2') {
                     // 方案二：参考产品布局 - 左侧角色区域，右侧夜间顺序
                     scriptHtml = `
-                        <div style="width: 1240px; min-height: 1754px; background: ${hexToRgba(customBgColor, bgOpacity)}; padding: 25px; box-sizing: border-box; font-family: 'Microsoft YaHei', 'SimSun', sans-serif; position: relative;">
+                        <div style="width: 100%; height: 100%; min-height: 1754px; background: ${hexToRgba(customBgColor, bgOpacity)}; box-sizing: border-box; font-family: 'Microsoft YaHei', 'SimSun', sans-serif; position: relative;">
 
                             <!-- 主内容区域 -->
                             <div style="display: flex; gap: 12px; position: relative; z-index: 1;">
@@ -1214,7 +1213,7 @@ async function generateScriptImageV2() {
 
                                 ${showNightOrder ? `
                                 <!-- 右侧：夜间行动顺序 -->
-                                <div style="width: 70px; display: flex; flex-direction: column; align-items: center; background: rgba(255,255,255,0.6); padding: 10px 4px; border-left: 2px solid #d4c1a4; flex-shrink: 0;">
+                                <div style="width: 70px; display: flex; flex-direction: column; align-items: center; background: rgba(255,255,255,0.6); padding: 10px 6px; border-left: 2px solid #d4c1a4; flex-shrink: 0;">
                                     <div style="color: #4a3728; font-size: 14px; font-weight: bold; margin-bottom: 10px; text-align: center; line-height: 1.3; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: 2px;">夜间顺序</div>
                                     <div style="display: flex; flex-direction: column; gap: 6px; align-items: center;">
                                         ${combinedOrder.map((item, index) => {
@@ -1259,7 +1258,7 @@ async function generateScriptImageV2() {
                 } else {
                     // 方案一：经典布局 - 标题在上，夜间顺序在两侧
                     scriptHtml = `
-                        <div style="width: 1240px; min-height: 1754px; display: flex; flex-direction: column; height: 100%; position: relative; max-width: 100%; box-sizing: border-box;">
+                        <div style="width: 1240px; min-height: 1754px; display: flex; flex-direction: column; height: 100%; width: 100%; position: relative; max-width: 100%; box-sizing: border-box;">
                             <!-- 顶部区域：标题和玩家数量表格 -->
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; max-width: 100%; box-sizing: border-box;">
                                 ${titleSection}
@@ -1346,75 +1345,38 @@ async function generateScriptImageV2() {
                     // 临时移除max-height和overflow限制以获取完整内容
                     scriptPage.style.maxHeight = 'none';
                     scriptPage.style.overflowY = 'visible';
-                    scriptPage.style.width = '1240px'; // 强制使用设计宽度
-                    
-                    // 等待DOM更新后获取完整尺寸（增加等待时间确保布局完成）
-                    setTimeout(() => {
-                        // 获取完整内容高度（使用 scrollHeight 或 offsetHeight，取较大值）
-                        const fullHeight = Math.max(scriptPage.scrollHeight, scriptPage.offsetHeight);
-                        const fullWidth = 1240; // 使用设计宽度
-                        
-                        // 检测是否为移动端
-                        const isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-                        
-                        // A4纵向比例（高:宽 = 1.414:1）
-                        const a4Ratio = 1.414;
-                        let finalWidth, finalHeight;
-                        
-                        if (isMobileDevice) {
-                            // 移动端：直接使用内容实际尺寸，不强制A4比例
-                            finalWidth = fullWidth;
-                            finalHeight = fullHeight;
-                        } else {
-                            // 桌面端：强制使用纵向A4比例
-                            
-                            // 计算画布尺寸：以内容宽度为基准，按A4比例计算高度
-                            finalWidth = fullWidth;
-                            finalHeight = finalWidth * a4Ratio;
-                            
-                            // 如果计算的高度不够容纳内容，使用内容高度并重新计算宽度
-                            if (finalHeight < fullHeight) {
-                                finalHeight = fullHeight;
-                                finalWidth = finalHeight / a4Ratio;
-                            }
-                        }
-                        
-                        // 输出调试日志
-                        console.log('=== 剧本图下载调试日志 ===');
-                        console.log('方案类型:', scriptLayout === 'scheme1' ? '方案一（仿国外版）' : '方案二（自制彩色）');
-                        console.log('设备类型:', isMobileDevice ? '移动端' : '桌面端');
-                        console.log('脚本页面原始样式 - width:', originalWidth, 'height:', originalHeight);
-                        console.log('设计宽度: 1240px');
-                        console.log('内容实际高度:', fullHeight, 'px');
-                        console.log('设计宽度:', fullWidth, 'px');
-                        if (isMobileDevice) {
-                            console.log('移动端模式：不强制A4比例');
-                            console.log('最终宽度:', Math.round(finalWidth), 'px');
-                            console.log('最终高度:', Math.round(finalHeight), 'px');
-                        } else {
-                            console.log('A4纵向比例 (高:宽):', a4Ratio);
-                            console.log('以宽度为基准的A4高度:', Math.round(finalWidth * a4Ratio), 'px');
-                            console.log('最终宽度:', Math.round(finalWidth), 'px');
-                            console.log('最终高度:', Math.round(finalHeight), 'px');
-                            console.log('最终比例 (高:宽):', (finalHeight / finalWidth).toFixed(3));
-                            console.log('高度调整原因:', finalHeight < fullHeight ? 'A4高度小于内容高度，已扩展宽度' : 'A4高度大于内容高度，按比例使用A4尺寸');
-                        }
-                        console.log('html2canvas scale:', 2);
-                        console.log('==========================');
-                        
-                        // 设置容器尺寸为纵向A4比例尺寸
-                        scriptPage.style.width = finalWidth + 'px';
-                        scriptPage.style.height = finalHeight + 'px';
-                        scriptPage.children[0].style.width = '100%';
-                        scriptPage.children[0].style.height = '100%';
 
-                        html2canvas(scriptPage, {
-                            scale: 2,
-                            useCORS: true,
-                            allowTaint: true,
+                    // 强制使用A4比例
+                    const isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+                    const a4Ratio = 1.414;
+                    let a4Width = 1240;
+                    let a4Height = a4Width * a4Ratio;
+                    scriptPage.style.width = a4Width + 'px';
+                    scriptPage.style.height = a4Height + 'px';
+
+
+                    // 方案二没有内边距
+                    if (scriptLayout === 'scheme2')
+                        scriptPage.style.padding = '0';
+                    else
+                        scriptPage.style.padding = '0.3in';
+                    
+                    // 等待DOM更新后再调用渲染
+                    const DOM_RERNDER_TIMEOUT = 300;
+                    setTimeout(() => {
+                        // 如果高度不够容纳内容，就以高度为准重新计算宽度
+                        const fullHeight = Math.max(scriptPage.scrollHeight, scriptPage.offsetHeight);
+                        if (fullHeight > a4Height) {
+                            a4Height = fullHeight;
+                            a4Width = a4Height / a4Ratio;
+                            scriptPage.style.width = a4Width + 'px';
+                            scriptPage.style.height = a4Height + 'px';
+                        }
+
+                        htmlToImage.toCanvas(scriptPage, {
                             backgroundColor: hexToRgba(customBgColor, bgOpacity),
-                            windowWidth: finalWidth,
-                            windowHeight: finalHeight
+                            canvasWidth: Math.ceil(a4Width),
+                            canvasHeight: Math.ceil(a4Height)
                         }).then(function(canvas) {
                             // 恢复原始样式
                             scriptPage.style.maxHeight = originalMaxHeight;
@@ -1497,7 +1459,7 @@ async function generateScriptImageV2() {
                             scriptPage.style.width = originalWidth;
                             scriptPage.style.height = originalHeight;
                         });
-                    }, 300); // 增加等待时间到300ms确保DOM完全更新
+                    }, DOM_RERNDER_TIMEOUT);
                 };
                 buttonContainer.appendChild(downloadButton);
                 
@@ -1851,7 +1813,6 @@ async function generateJinxAndConfigImage() {
                 printPage.style.cssText = `
                     width: ${isMobile ? '520px' : '8.27in'};
                     height: ${isMobile ? '870px' : '11.69in'};
-                    padding: ${isMobile ? '10px' : '0.3in'};
                     margin: ${isMobile ? '0' : '0 auto'};
                     background: ${hexToRgba(detailBgColor, detailBgOpacity)};
                     box-sizing: border-box;
@@ -1998,7 +1959,7 @@ async function generateJinxAndConfigImage() {
                 
                 // 组装完整的细节图HTML - 模仿剧本图的布局样式
                 printPage.innerHTML = `
-                    <div style="display: flex; flex-direction: column; height: 100%; position: relative; max-width: 100%; box-sizing: border-box;">
+                    <div style="display: flex; flex-direction: column; height: 100%; width: 100% position: relative; max-width: 100%; box-sizing: border-box;">
                         <!-- 顶部区域：剧本标题 -->
                         <div style="display: flex; justify-content: center; margin-bottom: 20px; padding-top: 10px;">
                             <div style="font-family: 'Philo', serif; font-size: ${34 * fontSizeMultiplier}px; text-align: center; color: #800000; font-weight: bold;">
@@ -2194,29 +2155,29 @@ async function generateJinxAndConfigImage() {
                     
                     // 临时移除高度限制，让内容完全显示
                     printPage.style.height = 'auto';
+
+                    // 强制使用a4比例
+                    const a4Ratio = 1.414;
+                    let a4Width = 8.27 * 96; // 8.27英寸转换为像素（96dpi）
+                    let a4Height = a4Width * a4Ratio; // A4比例（297/210）
+                    printPage.style.width = a4Width + 'px';
+                    printPage.style.height = a4Height + 'px';
                     
                     // 等待DOM更新后获取完整尺寸
                     setTimeout(() => {
-                        // 获取内容的实际高度
-                        const fullHeight = printPage.scrollHeight;
-                        const a4Width = 8.27 * 96; // 8.27英寸转换为像素（96dpi）
-                        const a4Height = a4Width * 1.414; // A4比例（297/210）
+                        // 如果高度不够容纳内容，就以高度为准重新计算宽度
+                        const fullHeight = Math.max(printPage.scrollHeight, printPage.offsetHeight);
+                        if (fullHeight > a4Height) {
+                            a4Height = fullHeight;
+                            a4Width = a4Height / a4Ratio;
+                            printPage.style.width = a4Width + 'px';
+                            printPage.style.height = a4Height + 'px';
+                        }
                         
-                        // 计算最终高度：取内容实际高度和A4比例高度的较大值
-                        const finalHeight = Math.max(fullHeight, a4Height);
-                        
-                        // 设置容器尺寸，宽度固定为A4，高度保持A4比例
-                        printPage.style.width = a4Width + 'px';
-                        printPage.style.height = finalHeight + 'px';
-                        
-                        html2canvas(printPage, {
-                            scale: 2,
-                            useCORS: true,
-                            allowTaint: true,
+                        htmlToImage.toCanvas(printPage, {
                             backgroundColor: hexToRgba(detailBgColor, detailBgOpacity),
-                            // 确保捕获整个内容
-                            windowWidth: a4Width,
-                            windowHeight: finalHeight
+                            canvasWidth: Math.ceil(a4Width),
+                            canvasHeight: Math.ceil(a4Height)
                         }).then(function(canvas) {
                             // 恢复原始样式
                             printPage.style.width = originalWidth;
