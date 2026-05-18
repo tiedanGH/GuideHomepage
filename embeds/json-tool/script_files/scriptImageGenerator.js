@@ -1013,25 +1013,53 @@ async function generateScriptImageV2() {
                 const highlightedDemon = demonRoles.map(r => ({...r, ability: highlightAbility(r.ability)}));
                 const highlightedCustomTeams = validCustomTeams.map(t => ({...t, roles: t.roles.map(r => ({...r, ability: highlightAbility(r.ability)}))}));
                 
-                // 方案二角色列表布局函数
-                const createRoleGrid = (roles, nameColor = '#333') => {
+                // 方案二和方案三角色列表布局函数
+                const createRoleGrid = (roles, nameColor = '#333', jinxRules = [], allRolesList = [], forceVertical = false) => {
                     if (roles.length === 0) return '';
-                    
+
                     const horizontalLayout = document.getElementById('horizontalLayout');
-                    const useHorizontalLayout = horizontalLayout && horizontalLayout.checked;
+                    const useHorizontalLayout = !forceVertical && horizontalLayout && horizontalLayout.checked;
+                    
+                    // 获取角色的相克规则
+                    const getJinxRuleForRole = (roleName) => {
+                        if (!showJinxRules || jinxRules.length === 0) return null;
+                        return jinxRules.find(rule => rule.jinxRole1 === roleName || rule.jinxRole2 === roleName);
+                    };
+                    
+                    // 获取相克的另一个角色
+                    const getOtherRole = (jinxRule, currentRoleName) => {
+                        const otherRoleName = jinxRule.jinxRole1 === currentRoleName ? jinxRule.jinxRole2 : jinxRule.jinxRole1;
+                        return allRolesList.find(r => r.name === otherRoleName);
+                    };
                     
                     // 生成单个角色卡片HTML
-                    const createRoleCard = (role) => `
-                        <div style="display: flex; gap: 10px; padding: 8px; align-items: flex-start; background: rgba(255,255,255,0.95);">
-                            <div style="width: 120px; height: 120px; flex-shrink: 0; overflow: hidden;">
-                                <img src="${convertToLocalPath(role.image)}" alt="${role.name}" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                    const createRoleCard = (role) => {
+                        const jinxRule = getJinxRuleForRole(role.name);
+                        const otherRole = jinxRule ? getOtherRole(jinxRule, role.name) : null;
+                        const jinxRuleDisplay = jinxRule ? `
+                            <div style="margin-top: 8px; padding: 8px 10px; background: rgba(217, 196, 161, 0.5); border-radius: 4px; display: flex; align-items: flex-start; gap: 8px;">
+                                ${otherRole ? `<img src="${convertToLocalPath(otherRole.image)}" alt="${otherRole.name}" style="width: 24px; height: 24px; object-fit: cover; border-radius: 3px; flex-shrink: 0;">` : ''}
+                                <div style="flex: 1;">
+                                    <span style="font-size: 11px; color: #8b7355; font-weight: bold;">(相克规则：</span>
+                                    <span style="font-size: 11px; color: #5a4a3a;">${jinxRule.jinxRule}</span>
+                                    <span style="font-size: 11px; color: #8b7355; font-weight: bold;">)</span>
+                                </div>
                             </div>
-                            <div style="flex: 1; min-width: 0;">
-                                <div style="font-size: 24px; font-weight: bold; color: ${nameColor}; margin-bottom: 2px; font-family: 'Microsoft YaHei', Heiti;">${role.name}</div>
-                                <div style="font-size: 20px; color: #4a3728; line-height: 1.4;">${role.ability || ''}</div>
+                        ` : '';
+                        
+                        return `
+                            <div style="display: flex; gap: 10px; padding: 8px; align-items: flex-start; background: #ede4d5;">
+                                <div style="width: 120px; height: 120px; flex-shrink: 0; overflow: hidden;">
+                                    <img src="${convertToLocalPath(role.image)}" alt="${role.name}" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                                </div>
+                                <div style="flex: 1; min-width: 0;">
+                                    <div style="font-size: 24px; font-weight: bold; color: ${nameColor}; margin-bottom: 2px; font-family: 'Microsoft YaHei', Heiti;">${role.name}</div>
+                                    <div style="font-size: 20px; color: #4a3728; line-height: 1.4;">${role.ability || ''}</div>
+                                    ${jinxRuleDisplay}
+                                </div>
                             </div>
-                        </div>
-                    `;
+                        `;
+                    };
                     
                     if (useHorizontalLayout) {
                         // 横向排列：两列Grid布局，同时填充
@@ -1061,6 +1089,7 @@ async function generateScriptImageV2() {
                 
                 let scriptHtml = '';
                 if (scriptLayout === 'scheme2') {
+                    // 方案二：参考产品布局 - 左侧角色区域，右侧夜间顺序
                     // 方案二：参考产品布局 - 左侧角色区域，右侧夜间顺序
                     scriptHtml = `
                         <div style="width: 100%; height: 100%; min-height: 1754px; background: ${hexToRgba(customBgColor, bgOpacity)}; box-sizing: border-box; font-family: 'Microsoft YaHei', 'SimSun', sans-serif; position: relative;">
@@ -1255,6 +1284,176 @@ async function generateScriptImageV2() {
                             ` : ''}
                         </div>
                     `;
+                } else if (scriptLayout === 'scheme3') {
+                    // 方案三：竞赛风格布局 - 左右侧边栏竖贯通，顶部标题全域，双列角色排布
+                    scriptHtml = `
+                        <div style="width: 100%; height: 100%; min-height: 1754px; background: ${hexToRgba(customBgColor, bgOpacity)}; box-sizing: border-box; font-family: 'Microsoft YaHei', 'SimSun', sans-serif; position: relative;">
+                            <!-- 角落装饰图片 -->
+                            <img src="images/10003.png" alt="装饰" style="position: absolute; top: 0; right: 0; width: 120px; height: auto; z-index: 10;" />
+                            <img src="images/10004.png" alt="装饰" style="position: absolute; bottom: 0; left: 0; width: 120px; height: auto; z-index: 10;" />
+                            <img src="images/10002.png" alt="装饰" style="position: absolute; bottom: 0; right: 0; width: 120px; height: auto; z-index: 10;" />
+                            <img src="images/10002.png" alt="装饰" style="position: absolute; top: 0; left: 0; width: 120px; height: auto; z-index: 10; transform: rotate(180deg);" />
+                            
+                            <!-- 主体布局：三栏结构 -->
+                            <div style="display: flex; min-height: 100%;">
+                                <!-- 左侧边栏 - 首夜顺序 -->
+                                ${showNightOrder ? `
+                                <div style="width: 50px; background: linear-gradient(90deg, #172e3e 85%, #387298 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 0; flex-shrink: 0; min-height: 100%;">
+                                    <div style="color: white; font-size: 16px; font-weight: bold; letter-spacing: 4px; margin-bottom: 15px; text-align: center; line-height: 1.8;">首个<br>夜晚</div>
+                                    ${allFirstNight.map(role => `
+                                        <img src="${convertToLocalPath(role.image)}" alt="${role.name}" style="width: 35px; height: 35px; object-fit: cover; margin: 3px 0; border-radius: 3px;">
+                                    `).join('')}
+                                </div>
+                                ` : ''}
+
+                                <!-- 中间主内容区域 -->
+                                <div style="flex: 1; display: flex; flex-direction: column; background: #ede4d5;">
+                                    <!-- 顶部标题区域 -->
+                                    <div style="background: #ede4d5; padding: 20px 30px; display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; position: relative;">
+                                        <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: url('images/zhuangshi.png') no-repeat center center; background-size: contain; opacity: 0.3;"></div>
+                                        <div style="flex: 1; text-align: center; position: relative; z-index: 1;">
+                                            <h1 style="font-size: 40px; margin: 0 0 8px 0; color: #1e3a5f; font-weight: bold; font-family: 'SimSun', '宋体', serif; letter-spacing: 4px;">${editionName}</h1>
+                                            <div style="font-size: 16px; color: black; font-family: 'Microsoft YaHei', Heiti; text-shadow: -1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white;">剧本作者：${authorName || ''}</div>
+                                        </div>
+
+                                        <!-- 剧本自定义规则 - 标题右侧 -->
+                                        ${showCustomRules && bootleggerRulesArray.length > 0 ? `
+                                            <div style="flex-shrink: 0; width: 280px; padding: 12px; background: rgb(195, 183, 168); border-radius: 6px; border: 1px solid rgb(117, 105, 100); position: relative; z-index: 1;">
+                                                <div style="font-size: 12px; line-height: 1.6; color: #4a3728;">
+                                                    ${bootleggerRulesArray.map((rule, idx) => {
+                                                        const parts = rule.split(' - ');
+                                                        if (parts.length > 1) {
+                                                            return `<div style="${idx > 0 ? 'margin-top: 8px;' : ''}"><b style="color: ${customTeamColors.demon};">${parts[0]}</b> - ${parts.slice(1).join(' - ')}</div>`;
+                                                        } else {
+                                                            return `<div style="${idx > 0 ? 'margin-top: 8px;' : ''}">${rule}</div>`;
+                                                        }
+                                                    }).join('')}
+                                                </div>
+                                            </div>
+                                        ` : ''}
+                                    </div>
+
+                                    <!-- 善良阵营·镇民区域 -->
+                                    <div style="background: #ede4d5; padding: 15px 20px;">
+                                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                                            <h2 style="font-size: 18px; margin: 0; color: ${customTeamColors.townsfolk}; font-weight: bold;">善良阵营 · 镇民</h2>
+                                            <div style="flex: 1; height: 1px; background: rgb(121, 111, 98);"></div>
+                                        </div>
+                                        ${createRoleGrid(highlightedTownsfolk, customTeamColors.townsfolk, jinxRules, allRoles)}
+                                    </div>
+
+                                    <!-- 善良阵营·外来者区域 -->
+                                    <div style="background: #ede4d5; padding: 15px 20px;">
+                                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                                            <h2 style="font-size: 18px; margin: 0; color: ${customTeamColors.outsider}; font-weight: bold;">善良阵营 · 外来者</h2>
+                                            <div style="flex: 1; height: 1px; background: rgb(121, 111, 98);"></div>
+                                        </div>
+                                        ${createRoleGrid(highlightedOutsider, customTeamColors.outsider, jinxRules, allRoles)}
+                                    </div>
+
+                                    <!-- 邪恶阵营·爪牙区域 -->
+                                    <div style="background: #ede4d5; padding: 15px 20px;">
+                                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                                            <h2 style="font-size: 18px; margin: 0; color: ${customTeamColors.minion}; font-weight: bold;">邪恶阵营 · 爪牙</h2>
+                                            <div style="flex: 1; height: 1px; background: rgb(121, 111, 98);"></div>
+                                        </div>
+                                        ${createRoleGrid(highlightedMinion, customTeamColors.minion, jinxRules, allRoles)}
+                                    </div>
+
+                                    <!-- 邪恶阵营·恶魔区域 -->
+                                    <div style="background: #ede4d5; padding: 15px 20px;">
+                                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                                            <h2 style="font-size: 18px; margin: 0; color: ${customTeamColors.demon}; font-weight: bold;">邪恶阵营 · 恶魔</h2>
+                                            <div style="flex: 1; height: 1px; background: rgb(121, 111, 98);"></div>
+                                        </div>
+                                        ${createRoleGrid(highlightedDemon, customTeamColors.demon, jinxRules, allRoles)}
+                                    </div>
+
+                                    <!-- 自定义阵营区域 -->
+                                    ${highlightedCustomTeams.map(team => `
+                                    <div style="background: #ede4d5; padding: 15px 20px;">
+                                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                                            <h2 style="font-size: 18px; margin: 0; color: ${team.color}; font-weight: bold;">${team.name}</h2>
+                                            <div style="flex: 1; height: 1px; background: rgb(121, 111, 98);"></div>
+                                        </div>
+                                        ${createRoleGrid(team.roles, team.color, jinxRules, allRoles)}
+                                    </div>
+                                    `).join('')}
+
+                                    <!-- 旅行者/传奇角色区域 -->
+                                    ${showTravellersFabled && (travellerRoles.length > 0 || fabledRoles.length > 0) ? `
+                                        <div style="background: #ede4d5; padding: 15px 20px;">
+                                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+                                                <div style="flex: 1; height: 1px; background: rgb(121, 111, 98);"></div>
+                                                <h2 style="font-size: 18px; margin: 0; color: #D4AF37; font-weight: bold; text-shadow: -1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white;">旅行者和传奇角色</h2>
+                                            </div>
+                                            <div style="display: flex; gap: 12px; padding: 8px;">
+                                                <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+                                                    ${travellerRoles.map(role => `
+                                                        <div style="display: flex; gap: 10px; padding: 8px; align-items: flex-start; background: #ede4d5;">
+                                                            <div style="width: 60px; height: 60px; flex-shrink: 0; overflow: hidden;">
+                                                                <img src="${convertToLocalPath(role.image)}" alt="${role.name}" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                                                            </div>
+                                                            <div style="flex: 1; min-width: 0;">
+                                                                <div style="font-size: 18px; font-weight: bold; color: #D4AF37; margin-bottom: 2px; font-family: 'Microsoft YaHei', Heiti; text-shadow: -1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white;">${role.name}</div>
+                                                                <div style="font-size: 14px; color: #4a3728; line-height: 1.4;">${role.ability || ''}</div>
+                                                            </div>
+                                                        </div>
+                                                    `).join('')}
+                                                </div>
+                                                <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+                                                    ${fabledRoles.map(role => `
+                                                        <div style="display: flex; gap: 10px; padding: 8px; align-items: flex-start; background: #ede4d5;">
+                                                            <div style="width: 60px; height: 60px; flex-shrink: 0; overflow: hidden;">
+                                                                <img src="${convertToLocalPath(role.image)}" alt="${role.name}" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                                                            </div>
+                                                            <div style="flex: 1; min-width: 0;">
+                                                                <div style="font-size: 18px; font-weight: bold; color: #D4AF37; margin-bottom: 2px; font-family: 'Microsoft YaHei', Heiti; text-shadow: -1px -1px 0 white, 1px -1px 0 white, -1px 1px 0 white, 1px 1px 0 white;">${role.name}</div>
+                                                                <div style="font-size: 14px; color: #4a3728; line-height: 1.4;">${role.ability || ''}</div>
+                                                            </div>
+                                                        </div>
+                                                    `).join('')}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ` : ''}
+
+                                    <!-- 底部规则说明区 - 宽度为恶魔阵营的2/3，居中显示 -->
+                                    <div style="display: flex; justify-content: center; padding: 10px 0;">
+                                        <div style="width: 66.66%; background: rgb(195, 183, 168); padding: 10px 15px; border-radius: 8px; border: 2px solid rgb(117, 105, 100);">
+                                            <div style="display: flex; flex-direction: column; gap: 8px;">
+                                                <!-- 疯狂 -->
+                                                <div>
+                                                    <div style="font-size: 14px; color: #9932cc; font-weight: bold; margin-bottom: 3px;">疯狂</div>
+                                                    <div style="font-size: 12px; color: #4a3728; line-height: 1.4;">${highlightAbility('当你陷入「疯狂」时，意味着你需要向其他玩家有诚意且努力的证明某件事情，如不这么做会受到惩罚。')}</div>
+                                                </div>
+                                                <!-- 中毒/醉酒 -->
+                                                <div>
+                                                    <div style="font-size: 14px; color: ${customTeamColors.demon}; font-weight: bold; margin-bottom: 3px;">中毒 / 醉酒</div>
+                                                    <div style="font-size: 12px; color: #4a3728; line-height: 1.4;">${highlightAbility('中毒的玩家会失去能力，但会认为自己仍具有能力，说书人会做出这些玩家仍然具有能力的行为。如果中毒玩家的角色能力会给他提供信息，说书人可能会给出错误信息，中毒的玩家不会得知自己中毒。醉酒同理。')}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- 底部装饰区域 - 橄榄枝 + *号说明 -->
+                                    <div style="display: flex; justify-content: center; align-items: center; padding: 0px 0 0 0; margin-top: auto; background: #ede4d5;">
+                                        <img src="images/dibu.png" alt="装饰" style="width: 100%; max-height: 80px; object-fit: contain;" />
+                                    </div>
+                                </div>
+
+                                <!-- 右侧边栏 - 他夜顺序 -->
+                                ${showNightOrder ? `
+                                <div style="width: 50px; background: linear-gradient(-90deg, #172e3e 85%, #387298 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 0; flex-shrink: 0; min-height: 100%;">
+                                    <div style="color: white; font-size: 16px; font-weight: bold; letter-spacing: 4px; margin-bottom: 15px; text-align: center; line-height: 1.8;">其他<br>夜晚</div>
+                                    ${allOtherNight.map(role => `
+                                        <img src="${convertToLocalPath(role.image)}" alt="${role.name}" style="width: 35px; height: 35px; object-fit: cover; margin: 3px 0; border-radius: 3px;">
+                                    `).join('')}
+                                </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
                 } else {
                     // 方案一：经典布局 - 标题在上，夜间顺序在两侧
                     scriptHtml = `
@@ -1355,8 +1554,8 @@ async function generateScriptImageV2() {
                     scriptPage.style.height = a4Height + 'px';
 
 
-                    // 方案二没有内边距
-                    if (scriptLayout === 'scheme2')
+                    // 方案二和方案三没有内边距
+                    if (scriptLayout === 'scheme2' || scriptLayout === 'scheme3')
                         scriptPage.style.padding = '0';
                     else
                         scriptPage.style.padding = '0.3in';
@@ -1513,7 +1712,16 @@ async function generateJinxAndConfigImage() {
                 const reverseOtherNight = document.getElementById('reverseOtherNight')?.checked ?? false;
                 
                 // 获取当前选中的角色
-                const allRoles = [...getSelectedRoles(), ...dirRolesJson];
+                const selectedRoles = getSelectedRoles();
+                const selectedRoleIds = selectedRoles.map(role => role.id);
+                const selectedDirRoles = dirRolesJson.filter(role => {
+                    if (selectedRoleIds.includes(role.id)) {
+                        return false;
+                    }
+                    const checkbox = document.querySelector(`#dir-columns input[type="checkbox"][value="${role.id}"]`);
+                    return checkbox && checkbox.checked;
+                });
+                const allRoles = [...selectedRoles, ...selectedDirRoles];
                 const roleNames = allRoles.map(role => role.name);
                 
                 // 获取相克规则
@@ -2341,6 +2549,13 @@ function toggleScriptConfigModal() {
                                 <div style="font-size: 12px; color: #666;">自制彩色布局</div>
                             </div>
                         </label>
+                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 10px; background: white; border-radius: 8px; border: 2px solid transparent; transition: all 0.2s;">
+                            <input type="radio" name="scriptLayout" value="scheme3" style="width: 18px; height: 18px;">
+                            <div>
+                                <div style="font-weight: 600; color: #333;">方案三</div>
+                                <div style="font-size: 12px; color: #666;">仿博物馆布局</div>
+                            </div>
+                        </label>
                     </div>
                 </div>
 
@@ -2740,6 +2955,12 @@ function saveScriptConfig() {
             
             // 关闭弹窗
             document.body.removeChild(document.getElementById('script-config-modal'));
+            
+            // 更新页面背景色为用户选择的颜色
+            if (bgColorInput) {
+                document.documentElement.style.setProperty('--background-color', bgColorInput.value);
+            }
+            
             alert('设置已保存！');
         }
 

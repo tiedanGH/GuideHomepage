@@ -3070,8 +3070,11 @@
                 }
             });
             
-            // 添加自制角色
+            // 添加自制角色（只添加选中的）
             dirRolesJson.forEach(role => {
+                if (selectedRoleIds.includes(role.id)) {
+                    return;
+                }
                 allRoles.push(role);
                 jsonData.push(role);
             });
@@ -3181,8 +3184,11 @@
                 }
             });
             
-            // 添加自制角色
+            // 添加自制角色（只添加选中的）
             dirRolesJson.forEach(role => {
+                if (selectedRoleIds.includes(role.id)) {
+                    return;
+                }
                 allRoles.push(role);
                 jsonData.push(role);
             });
@@ -3274,10 +3280,16 @@
                 }
             });
             
-            // 添加所有自定义项（包括用户手动添加的相克规则和Json By信息）
+            // 添加选中的自定义项（跳过已通过 selectedRoleIds 添加的角色）
             dirRolesJson.forEach(item => {
-                allRoles.push(item);
-                jsonData.push(item);
+                if (selectedRoleIds.includes(item.id)) {
+                    return;
+                }
+                const checkbox = document.querySelector(`#dir-columns input[type="checkbox"][value="${item.id}"]`);
+                if (checkbox && checkbox.checked) {
+                    allRoles.push(item);
+                    jsonData.push(item);
+                }
             });
             
             // 自动生成的相克规则会被用户手动添加的规则覆盖，所以这里不再自动生成
@@ -3646,9 +3658,11 @@
                 }
             });
             
-            // 添加自制角色
+            // 添加自制角色（只添加选中的）
             dirRolesJson.forEach(role => {
-                jsonData.push(role);
+                if (!selectedRoleIds.includes(role.id)) {
+                    jsonData.push(role);
+                }
             });
             
             // 转换为JSON字符串
@@ -3907,6 +3921,12 @@
 
             // 从本地存储恢复数据
             loadFromLocalStorage();
+            
+            // 初始化页面背景色为用户选择的颜色
+            const bgColorInput = document.getElementById('bg-color-setting');
+            if (bgColorInput) {
+                document.documentElement.style.setProperty('--background-color', bgColorInput.value);
+            }
 
             // 解析URL中的Almanac数据
             parseAlmanacFromUrl();
@@ -12024,7 +12044,16 @@ let allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demons
             const selectionInfo = document.getElementById('selection-info');
             
             // 获取所有选中的角色
-            const editionRoles = [...getSelectedRoles(), ...dirRolesJson];
+            const selectedRoles = getSelectedRoles();
+            const selectedRoleIds = selectedRoles.map(role => role.id);
+            const selectedDirRoles = dirRolesJson.filter(role => {
+                if (selectedRoleIds.includes(role.id)) {
+                    return false;
+                }
+                const checkbox = document.querySelector(`#dir-columns input[type="checkbox"][value="${role.id}"]`);
+                return checkbox && checkbox.checked;
+            });
+            const editionRoles = [...selectedRoles, ...selectedDirRoles];
             
             // 过滤出有Almanac信息的角色
             const rolesWithAlmanac = editionRoles.filter(role => role.almanac && 
