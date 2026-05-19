@@ -859,15 +859,15 @@ async function generateScriptImageV2() {
                 
                 // 构建角色列表区域HTML
                 const rolesSection = `
-                    <div style="display: flex; flex: 1; position: relative; max-width: 100%; box-sizing: border-box;">
+                    <div style="display: flex; flex: 1; position: relative; max-width: 100%; box-sizing: border-box; align-items: stretch;">
                         ${showNightOrder ? `
                         <!-- 左侧首夜顺序 -->
-                        <div style="width: 25px; display: flex; flex-direction: column; align-items: center; padding-right: 2px;">
+                        <div style="width: 25px; display: flex; flex-direction: column; align-items: center; padding-right: 2px; flex-shrink: 0;">
                             ${firstNightHtml}
                         </div>
                         
                         <!-- 左侧分割线（首夜） -->
-                        <div style="display: flex; flex-direction: column; align-items: center; padding: 0 1px;">
+                        <div style="display: flex; flex-direction: column; align-items: center; padding: 0 1px; flex-shrink: 0;">
                             <div style="flex: 1; width: 1px; background: #333;"></div>
                             <div style="font-family: 'Philo', serif; font-size: 12px; padding: 4px 0; color: #333; font-weight: bold; line-height: 1.5; white-space: pre;">首<br>夜</div>
                             <div style="flex: 1; width: 1px; background: #333;"></div>
@@ -885,14 +885,14 @@ async function generateScriptImageV2() {
                         
                         ${showNightOrder ? `
                         <!-- 右侧分割线（他夜） -->
-                        <div style="display: flex; flex-direction: column; align-items: center; padding: 0 1px;">
+                        <div style="display: flex; flex-direction: column; align-items: center; padding: 0 1px; flex-shrink: 0;">
                             <div style="flex: 1; width: 1px; background: #333;"></div>
                             <div style="font-family: 'Philo', serif; font-size: 12px; padding: 4px 0; color: #333; font-weight: bold; line-height: 1.5; white-space: pre; transform: rotate(180deg);">他<br>夜</div>
                             <div style="flex: 1; width: 1px; background: #333;"></div>
                         </div>
                         
                         <!-- 右侧其他夜顺序 -->
-                        <div style="width: 25px; display: flex; flex-direction: ${!reverseOtherNight ? 'column' : 'column-reverse'}; align-items: center; padding-left: 2px;">
+                        <div style="width: 25px; display: flex; flex-direction: ${!reverseOtherNight ? 'column' : 'column-reverse'}; align-items: center; padding-left: 2px; flex-shrink: 0;">
                             ${otherNightHtml}
                         </div>
                         ` : ''}
@@ -1014,7 +1014,7 @@ async function generateScriptImageV2() {
                 const highlightedCustomTeams = validCustomTeams.map(t => ({...t, roles: t.roles.map(r => ({...r, ability: highlightAbility(r.ability)}))}));
                 
                 // 方案二和方案三角色列表布局函数
-                const createRoleGrid = (roles, nameColor = '#333', jinxRules = [], allRolesList = [], forceVertical = false) => {
+                const createRoleGrid = (roles, nameColor = '#333', jinxRules = [], allRolesList = [], forceVertical = false, cardBgColor = '#ede4d5') => {
                     if (roles.length === 0) return '';
 
                     const horizontalLayout = document.getElementById('horizontalLayout');
@@ -1048,7 +1048,7 @@ async function generateScriptImageV2() {
                         ` : '';
                         
                         return `
-                            <div style="display: flex; gap: 10px; padding: 8px; align-items: flex-start; background: #ede4d5;">
+                            <div style="display: flex; gap: 10px; padding: 8px; align-items: flex-start; background: ${cardBgColor};">
                                 <div style="width: 120px; height: 120px; flex-shrink: 0; overflow: hidden;">
                                     <img src="${convertToLocalPath(role.image)}" alt="${role.name}" style="width: 100%; height: 100%; object-fit: cover; display: block;">
                                 </div>
@@ -1095,7 +1095,7 @@ async function generateScriptImageV2() {
                         <div style="width: 100%; height: 100%; min-height: 1754px; background: ${hexToRgba(customBgColor, bgOpacity)}; box-sizing: border-box; font-family: 'Microsoft YaHei', 'SimSun', sans-serif; position: relative;">
 
                             <!-- 主内容区域 -->
-                            <div style="display: flex; gap: 12px; position: relative; z-index: 1;">
+                            <div style="display: flex; gap: 12px; position: relative; z-index: 1; align-items: stretch;">
                                 <!-- 左侧：角色列表 -->
                                 <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
                                     <!-- 镇民区域（包含标题、作者、旅行者/传奇、二维码、配置表） -->
@@ -1138,7 +1138,7 @@ async function generateScriptImageV2() {
                                                 ` : ''}
                                             </div>
                                             <!-- 镇民角色列表 -->
-                                            ${createRoleGrid(highlightedTownsfolk)}
+                                            ${createRoleGrid(highlightedTownsfolk, '#333', [], [], false, hexToRgba(customBgColor, 0.7))}
                                         </div>
                                     </div>
 
@@ -1148,7 +1148,7 @@ async function generateScriptImageV2() {
                                             <span style="writing-mode: vertical-rl; text-orientation: upright; color: white; font-size: 18px; font-weight: bold; letter-spacing: 4px;">${customTeamNames.outsider}</span>
                                         </div>
                                         <div style="flex: 1; background: rgba(255,255,255,0.7); border-radius: 0 6px 6px 0;">
-                                            ${createRoleGrid(highlightedOutsider)}
+                                            ${createRoleGrid(highlightedOutsider, '#333', [], [], false, hexToRgba(customBgColor, 0.7))}
                                         </div>
                                     </div>
 
@@ -1158,7 +1158,7 @@ async function generateScriptImageV2() {
                                             <span style="writing-mode: vertical-rl; text-orientation: upright; color: white; font-size: 18px; font-weight: bold; letter-spacing: 4px;">${customTeamNames.minion}</span>
                                         </div>
                                         <div style="flex: 1; background: rgba(255,255,255,0.7); border-radius: 0 6px 6px 0;">
-                                            ${createRoleGrid(highlightedMinion, '#c41e3a')}
+                                            ${createRoleGrid(highlightedMinion, customTeamColors.minion, [], [], false, hexToRgba(customBgColor, 0.7))}
                                         </div>
                                     </div>
 
@@ -1169,7 +1169,7 @@ async function generateScriptImageV2() {
                                             <span style="writing-mode: vertical-rl; text-orientation: upright; color: white; font-size: 18px; font-weight: bold; letter-spacing: 4px;">${team.name}</span>
                                         </div>
                                         <div style="flex: 1; background: rgba(255,255,255,0.7); border-radius: 0 6px 6px 0;">
-                                            ${createRoleGrid(team.roles)}
+                                            ${createRoleGrid(team.roles, team.color, [], [], false, hexToRgba(customBgColor, 0.7))}
                                         </div>
                                     </div>
                                     `).join('')}
@@ -1182,7 +1182,7 @@ async function generateScriptImageV2() {
                                         <div style="flex: 1; display: flex; flex-direction: column;">
                                             <!-- 恶魔角色列表 -->
                                             <div style="background: rgba(255,255,255,0.7); border-radius: 0 6px 0 0;">
-                                                ${createRoleGrid(highlightedDemon, '#c41e3a')}
+                                                ${createRoleGrid(highlightedDemon, customTeamColors.demon, [], [], false, hexToRgba(customBgColor, 0.7))}
                                             </div>
 
                                             <!-- 相克规则 -->
@@ -1295,10 +1295,10 @@ async function generateScriptImageV2() {
                             <img src="images/10002.png" alt="装饰" style="position: absolute; top: 0; left: 0; width: 120px; height: auto; z-index: 10; transform: rotate(180deg);" />
                             
                             <!-- 主体布局：三栏结构 -->
-                            <div style="display: flex; min-height: 100%;">
+                            <div style="display: flex; align-items: stretch;">
                                 <!-- 左侧边栏 - 首夜顺序 -->
                                 ${showNightOrder ? `
-                                <div style="width: 50px; background: linear-gradient(90deg, #172e3e 85%, #387298 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 0; flex-shrink: 0; min-height: 100%;">
+                                <div style="width: 50px; background: linear-gradient(90deg, #172e3e 85%, #387298 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 0; flex-shrink: 0;">
                                     <div style="color: white; font-size: 16px; font-weight: bold; letter-spacing: 4px; margin-bottom: 15px; text-align: center; line-height: 1.8;">首个<br>夜晚</div>
                                     ${allFirstNight.map(role => `
                                         <img src="${convertToLocalPath(role.image)}" alt="${role.name}" style="width: 35px; height: 35px; object-fit: cover; margin: 3px 0; border-radius: 3px;">
@@ -1444,7 +1444,7 @@ async function generateScriptImageV2() {
 
                                 <!-- 右侧边栏 - 他夜顺序 -->
                                 ${showNightOrder ? `
-                                <div style="width: 50px; background: linear-gradient(-90deg, #172e3e 85%, #387298 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 0; flex-shrink: 0; min-height: 100%;">
+                                <div style="width: 50px; background: linear-gradient(-90deg, #172e3e 85%, #387298 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 0; flex-shrink: 0;">
                                     <div style="color: white; font-size: 16px; font-weight: bold; letter-spacing: 4px; margin-bottom: 15px; text-align: center; line-height: 1.8;">其他<br>夜晚</div>
                                     ${allOtherNight.map(role => `
                                         <img src="${convertToLocalPath(role.image)}" alt="${role.name}" style="width: 35px; height: 35px; object-fit: cover; margin: 3px 0; border-radius: 3px;">
