@@ -1,6 +1,50 @@
 // 剧本图生成工具函数
 // 此文件包含生成剧本图、细节图等功能
 
+// ========== 日志系统（仅输出到控制台）==========
+let logIdCounter = 0;
+
+// 添加日志
+function addLog(type, message, details = null) {
+    const timestamp = new Date().toLocaleTimeString();
+    ++logIdCounter;
+    
+    // 输出到控制台
+    const logMessage = `[${timestamp}] [${type.toUpperCase()}] ${message}`;
+    if (details) {
+        console.log(logMessage, details);
+    } else {
+        console.log(logMessage);
+    }
+}
+
+// 信息日志
+function logInfo(message, details) {
+    return addLog('info', message, details);
+}
+
+// 成功日志
+function logSuccess(message, details) {
+    return addLog('success', message, details);
+}
+
+// 警告日志
+function logWarning(message, details) {
+    return addLog('warning', message, details);
+}
+
+// 错误日志
+function logError(message, details) {
+    return addLog('error', message, details);
+}
+
+// 清除日志
+function clearLog() {
+    logIdCounter = 0;
+}
+
+// ========== 辅助函数 ==========
+
 // 辅助函数：将十六进制颜色转换为 rgba 格式
 function hexToRgba(hex, opacity) {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -47,20 +91,22 @@ async function generateScriptImageV2() {
                 // 防止重复点击
                 let isGeneratingScriptImage = false;
                 if (isGeneratingScriptImage) {
-                    console.log('剧本图生成中，请稍候...');
+                    logWarning('剧本图生成中，请稍候...');
                     return;
                 }
                 isGeneratingScriptImage = true;
                 
+                // 清空日志
+                clearLog();
+                logInfo('开始生成剧本图');
+                
                 // 获取数据
                 selectedRoles = getSelectedRoles();
-                console.log('剧本图V2生成 - 被选中的角色数量:', selectedRoles.length);
-                console.log('剧本图V2生成 - 被选中的角色:', selectedRoles.map(role => role.name));
+                logSuccess('获取到被选中的角色', { 数量: selectedRoles.length, 角色列表: selectedRoles.map(role => role.name) });
                 
                 // 用于显示的角色列表（只用被选中的角色）
                 const allRoles = selectedRoles;
-                console.log('剧本图V2生成 - 使用selectedRoles作为allRoles，角色数量:', allRoles.length);
-                console.log('剧本图V2生成 - allRoles中的角色:', allRoles.map(role => role.name));
+                logInfo('使用selectedRoles作为allRoles', { 数量: allRoles.length });
                 
                 // 创建一个包含所有角色的完整列表，用于查找剧本信息中保存的角色ID
                 // 使用window对象安全访问全局变量，避免const变量提升问题
@@ -79,7 +125,7 @@ async function generateScriptImageV2() {
                 if (typeof window.dirRolesJson !== 'undefined') {
                     allRolesForLookup.push(...window.dirRolesJson);
                 }
-                console.log('剧本图V2生成 - allRolesForLookup用于查找的角色数量:', allRolesForLookup.length);
+                logInfo('allRolesForLookup用于查找的角色数量', { 数量: allRolesForLookup.length });
                 const editionName = metaInfoJson.name || '未知剧本';
                 const authorName = metaInfoJson.author || '';
                 const scriptLogo = metaInfoJson.logo || document.getElementById('logo')?.value?.trim() || '';
@@ -136,15 +182,14 @@ async function generateScriptImageV2() {
                 const hasEmptyState = metaInfoJson.state && metaInfoJson.state.length === 0;
                 // 决定是否显示状态栏
                 const showStatusBar = isFirstTime || hasState;
-                console.log('是否显示状态栏:', showStatusBar, '是否首次生成:', isFirstTime, '是否有状态:', hasState, '是否保存了空状态:', hasEmptyState);
+                logInfo('状态栏配置', { 显示状态栏: showStatusBar, 首次生成: isFirstTime, 有状态: hasState, 保存了空状态: hasEmptyState });
                 
                 // 获取相克规则
                 const jinxRules = [];
                 const roleNames = allRoles.map(role => role.name);
                 
-                console.log('剧本图V2生成 - 角色名称列表:', roleNames);
-                console.log('剧本图V2生成 - jinxes变量是否存在:', typeof jinxes !== 'undefined');
-                console.log('剧本图V2生成 - jinxes长度:', typeof jinxes !== 'undefined' ? jinxes.length : 0);
+                logInfo('角色名称列表', { 数量: roleNames.length, 列表: roleNames });
+                logInfo('相克规则信息', { 存在: typeof jinxes !== 'undefined', 数量: typeof jinxes !== 'undefined' ? jinxes.length : 0 });
                 
                 // 检查是否存在相克规则库
                 if (typeof jinxes !== 'undefined') {
@@ -202,15 +247,13 @@ async function generateScriptImageV2() {
                     });
                 }
                 
-                console.log('剧本图V2生成 - 匹配的相克规则数量:', jinxRules.length);
-                console.log('剧本图V2生成 - 匹配的相克规则:', jinxRules);
+                logSuccess('相克规则匹配完成', { 匹配数量: jinxRules.length, 规则列表: jinxRules });
                 
                 // 获取首夜和其他夜晚顺序
                 let allFirstNight = [];
                 let allOtherNight = [];
                 
-                console.log('剧本图V2生成 - metaInfoJson.firstNight:', metaInfoJson.firstNight);
-                console.log('剧本图V2生成 - metaInfoJson.otherNight:', metaInfoJson.otherNight);
+                logInfo('夜间顺序元信息', { firstNight: metaInfoJson.firstNight, otherNight: metaInfoJson.otherNight });
                 
                 // 定义元信息角色映射
                 const metaRolesMap = {
@@ -224,12 +267,12 @@ async function generateScriptImageV2() {
                 
                 // 优先使用metaInfoJson中的夜间顺序
                 if (metaInfoJson.firstNight && metaInfoJson.firstNight.length > 0 && metaInfoJson.firstNight[0] !== "") {
-                    console.log('使用metaInfoJson中的首夜顺序');
+                    logInfo('使用metaInfoJson中的首夜顺序');
                     // 按照metaInfoJson.firstNight中的顺序构建首夜顺序
                     const orderedFirstNight = metaInfoJson.firstNight.map(roleId => {
                         // 先检查是否是元信息角色
                         if (metaRolesMap[roleId]) {
-                            console.log('首夜角色ID:', roleId, '找到元信息角色:', metaRolesMap[roleId].name);
+                            logInfo('找到元信息角色', { roleId, 名称: metaRolesMap[roleId].name });
                             return metaRolesMap[roleId];
                         }
                         // 查找对应的角色（使用allRolesForLookup获取角色数据）
@@ -244,16 +287,14 @@ async function generateScriptImageV2() {
                         if (role) {
                             const isSelected = allRoles.some(selectedRole => selectedRole.id === roleId);
                             if (isSelected) {
-                                console.log('首夜角色ID:', roleId, '找到角色:', role.name, '已被勾选');
+                                logInfo('找到角色并已勾选', { roleId, 名称: role.name });
                                 return role;
                             } else {
-                                console.log('首夜角色ID:', roleId, '找到角色:', role.name, '但未被勾选，跳过');
+                                logWarning('找到角色但未被勾选，跳过', { roleId, 名称: role.name });
                                 return null;
                             }
                         }
-                        console.log('首夜角色ID:', roleId, '未找到角色');
-                        console.log('调试信息 - allRolesForLookup中的角色ID数量:', allRolesForLookup.length);
-                        console.log('调试信息 - selectedRoles中的角色ID:', allRoles.map(r => r.id));
+                        logWarning('未找到首夜角色', { roleId, 查找池大小: allRolesForLookup.length });
                         return null;
                     }).filter(Boolean);
                     
@@ -564,8 +605,18 @@ async function generateScriptImageV2() {
                     }
                 });
                 
+                logSuccess('角色分类完成', {
+                    镇民: townsfolkRoles.length,
+                    外来者: outsiderRoles.length,
+                    爪牙: minionRoles.length,
+                    恶魔: demonRoles.length,
+                    传奇: fabledRoles.length,
+                    旅行者: travellerRoles.length
+                });
+                
                 // 检测是否为移动端
                 const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+                logInfo('检测设备类型', { isMobile });
                 
                 // 创建预览容器
                 const previewContainer = document.createElement('div');
@@ -592,6 +643,7 @@ async function generateScriptImageV2() {
                 const fontSize = fontSizeInput?.value || 'small';
                 // 移动端使用更大的字号倍率，提升可读性
                 const fontSizeMultiplier = isMobile ? 4.6: (fontSize === 'large' ? 1.2 : 1.0);
+                logInfo('字号设置', { fontSize, fontSizeMultiplier });
 
                 // 创建剧本图容器 - 固定宽度设置
                 const scriptPage = document.createElement('div');
@@ -623,9 +675,11 @@ async function generateScriptImageV2() {
                         rule.jinxRole1 === role.name || rule.jinxRole2 === role.name
                     );
                 });
+                logInfo('相克规则映射构建完成', { 角色数量: allRoles.length, 有相克的角色数: Object.keys(roleJinxMap).filter(k => roleJinxMap[k].length > 0).length });
 
                 // 用于跟踪已经展示过的相克规则（避免重复显示）
                 const displayedJinxRules = new Set();
+                logInfo('开始构建角色卡片和阵营HTML');
 
                 // 构建角色卡片HTML
                 const createRoleCard = (role, color = '#0b6aaf') => {
@@ -1088,18 +1142,20 @@ async function generateScriptImageV2() {
                 };
                 
                 let scriptHtml = '';
-                if (scriptLayout === 'scheme2') {
-                    // 方案二：参考产品布局 - 左侧角色区域，右侧夜间顺序
-                    // 方案二：参考产品布局 - 左侧角色区域，右侧夜间顺序
-                    scriptHtml = `
-                        <div style="width: 100%; height: 100%; min-height: 1754px; background: ${hexToRgba(customBgColor, bgOpacity)}; box-sizing: border-box; font-family: 'Microsoft YaHei', 'SimSun', sans-serif; position: relative;">
-
+                logInfo('开始构建HTML', { 布局方案: scriptLayout });
+                
+                try {
+                    if (scriptLayout === 'scheme2') {
+                        logInfo('使用方案二布局');
+                        // 方案二：参考产品布局 - 左侧角色区域，右侧夜间顺序
+                        scriptHtml = `
+                        <div style="width: 100%; height: 100%; min-height: 1754px; background: ${hexToRgba(customBgColor, bgOpacity)}; box-sizing: border-box; font-family: 'Microsoft YaHei', 'SimSun', sans-serif; position: relative; display: flex; flex-direction: column;">
                             <!-- 主内容区域 -->
-                            <div style="display: flex; gap: 12px; position: relative; z-index: 1; align-items: stretch;">
+                            <div style="display: flex; gap: 12px; position: relative; z-index: 1; align-items: stretch; flex: 1;">
                                 <!-- 左侧：角色列表 -->
-                                <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+                                <div style="flex: 1; display: flex; flex-direction: column; gap: 8px; min-height: 1754px;">
                                     <!-- 镇民区域（包含标题、作者、旅行者/传奇、二维码、配置表） -->
-                                    <div style="display: flex;">
+                                    <div style="display: flex; flex: 1;">
                                         <div style="width: 40px; background: linear-gradient(180deg, ${customTeamColors.townsfolk} 0%, ${hexToRgba(customTeamColors.townsfolk, 0.8)} 100%); display: flex; align-items: center; justify-content: center; border-radius: 6px 0 0 6px; flex-shrink: 0;">
                                             <span style="writing-mode: vertical-rl; text-orientation: upright; color: white; font-size: 22px; font-weight: bold; letter-spacing: 6px;">${customTeamNames.townsfolk}</span>
                                         </div>
@@ -1143,7 +1199,7 @@ async function generateScriptImageV2() {
                                     </div>
 
                                     <!-- 外来者区域 -->
-                                    <div style="display: flex; border-top: 2px solid #d4c1a4;">
+                                    <div style="display: flex; border-top: 2px solid #d4c1a4; flex: 1;">
                                         <div style="width: 36px; background: linear-gradient(180deg, ${customTeamColors.outsider} 0%, ${hexToRgba(customTeamColors.outsider, 0.8)} 100%); display: flex; align-items: center; justify-content: center; border-radius: 6px 0 0 6px; flex-shrink: 0;">
                                             <span style="writing-mode: vertical-rl; text-orientation: upright; color: white; font-size: 18px; font-weight: bold; letter-spacing: 4px;">${customTeamNames.outsider}</span>
                                         </div>
@@ -1153,7 +1209,7 @@ async function generateScriptImageV2() {
                                     </div>
 
                                     <!-- 爪牙区域 -->
-                                    <div style="display: flex; border-top: 2px solid #d4c1a4;">
+                                    <div style="display: flex; border-top: 2px solid #d4c1a4; flex: 1;">
                                         <div style="width: 36px; background: linear-gradient(180deg, ${customTeamColors.minion} 0%, ${hexToRgba(customTeamColors.minion, 0.8)} 100%); display: flex; align-items: center; justify-content: center; border-radius: 6px 0 0 6px; flex-shrink: 0;">
                                             <span style="writing-mode: vertical-rl; text-orientation: upright; color: white; font-size: 18px; font-weight: bold; letter-spacing: 4px;">${customTeamNames.minion}</span>
                                         </div>
@@ -1175,7 +1231,7 @@ async function generateScriptImageV2() {
                                     `).join('')}
 
                                     <!-- 恶魔区域（包含相克规则和状态栏） -->
-                                    <div style="display: flex; border-top: 2px solid #d4c1a4;">
+                                    <div style="display: flex; border-top: 2px solid #d4c1a4; flex: 1;">
                                         <div style="width: 36px; background: linear-gradient(180deg, ${customTeamColors.demon} 0%, ${hexToRgba(customTeamColors.demon, 0.8)} 100%); display: flex; align-items: center; justify-content: center; border-radius: 6px 0 0 6px; flex-shrink: 0;">
                                             <span style="writing-mode: vertical-rl; text-orientation: upright; color: white; font-size: 18px; font-weight: bold; letter-spacing: 4px;">${customTeamNames.demon}</span>
                                         </div>
@@ -1285,9 +1341,10 @@ async function generateScriptImageV2() {
                         </div>
                     `;
                 } else if (scriptLayout === 'scheme3') {
+                    logInfo('使用方案三布局');
                     // 方案三：竞赛风格布局 - 左右侧边栏竖贯通，顶部标题全域，双列角色排布
                     scriptHtml = `
-                        <div style="width: 100%; height: 100%; min-height: 1754px; background: ${hexToRgba(customBgColor, bgOpacity)}; box-sizing: border-box; font-family: 'Microsoft YaHei', 'SimSun', sans-serif; position: relative;">
+                        <div style="width: 100%; height: 100%; min-height: 1754px; background: ${hexToRgba(customBgColor, bgOpacity)}; box-sizing: border-box; font-family: 'Microsoft YaHei', 'SimSun', sans-serif; position: relative; display: flex; flex-direction: column;">
                             <!-- 角落装饰图片 -->
                             <img src="images/10003.png" alt="装饰" style="position: absolute; top: 0; right: 0; width: 120px; height: auto; z-index: 10;" />
                             <img src="images/10004.png" alt="装饰" style="position: absolute; bottom: 0; left: 0; width: 120px; height: auto; z-index: 10;" />
@@ -1295,7 +1352,7 @@ async function generateScriptImageV2() {
                             <img src="images/10002.png" alt="装饰" style="position: absolute; top: 0; left: 0; width: 120px; height: auto; z-index: 10; transform: rotate(180deg);" />
                             
                             <!-- 主体布局：三栏结构 -->
-                            <div style="display: flex; align-items: stretch;">
+                            <div style="display: flex; align-items: stretch; flex: 1;">
                                 <!-- 左侧边栏 - 首夜顺序 -->
                                 ${showNightOrder ? `
                                 <div style="width: 50px; background: linear-gradient(90deg, #172e3e 85%, #387298 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 0; flex-shrink: 0;">
@@ -1334,7 +1391,7 @@ async function generateScriptImageV2() {
                                     </div>
 
                                     <!-- 善良阵营·镇民区域 -->
-                                    <div style="background: #ede4d5; padding: 15px 20px;">
+                                    <div style="background: #ede4d5; padding: 15px 20px; flex: 1;">
                                         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
                                             <h2 style="font-size: 18px; margin: 0; color: ${customTeamColors.townsfolk}; font-weight: bold;">善良阵营 · 镇民</h2>
                                             <div style="flex: 1; height: 1px; background: rgb(121, 111, 98);"></div>
@@ -1343,7 +1400,7 @@ async function generateScriptImageV2() {
                                     </div>
 
                                     <!-- 善良阵营·外来者区域 -->
-                                    <div style="background: #ede4d5; padding: 15px 20px;">
+                                    <div style="background: #ede4d5; padding: 15px 20px; flex: 1;">
                                         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
                                             <h2 style="font-size: 18px; margin: 0; color: ${customTeamColors.outsider}; font-weight: bold;">善良阵营 · 外来者</h2>
                                             <div style="flex: 1; height: 1px; background: rgb(121, 111, 98);"></div>
@@ -1352,7 +1409,7 @@ async function generateScriptImageV2() {
                                     </div>
 
                                     <!-- 邪恶阵营·爪牙区域 -->
-                                    <div style="background: #ede4d5; padding: 15px 20px;">
+                                    <div style="background: #ede4d5; padding: 15px 20px; flex: 1;">
                                         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
                                             <h2 style="font-size: 18px; margin: 0; color: ${customTeamColors.minion}; font-weight: bold;">邪恶阵营 · 爪牙</h2>
                                             <div style="flex: 1; height: 1px; background: rgb(121, 111, 98);"></div>
@@ -1361,7 +1418,7 @@ async function generateScriptImageV2() {
                                     </div>
 
                                     <!-- 邪恶阵营·恶魔区域 -->
-                                    <div style="background: #ede4d5; padding: 15px 20px;">
+                                    <div style="background: #ede4d5; padding: 15px 20px; flex: 1;">
                                         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
                                             <h2 style="font-size: 18px; margin: 0; color: ${customTeamColors.demon}; font-weight: bold;">邪恶阵营 · 恶魔</h2>
                                             <div style="flex: 1; height: 1px; background: rgb(121, 111, 98);"></div>
@@ -1371,7 +1428,7 @@ async function generateScriptImageV2() {
 
                                     <!-- 自定义阵营区域 -->
                                     ${highlightedCustomTeams.map(team => `
-                                    <div style="background: #ede4d5; padding: 15px 20px;">
+                                    <div style="background: #ede4d5; padding: 15px 20px; flex: 1;">
                                         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
                                             <h2 style="font-size: 18px; margin: 0; color: ${team.color}; font-weight: bold;">${team.name}</h2>
                                             <div style="flex: 1; height: 1px; background: rgb(121, 111, 98);"></div>
@@ -1474,9 +1531,19 @@ async function generateScriptImageV2() {
                         </div>
                     `;
                 }
+                } catch (error) {
+                    logError('HTML构建失败', { 错误: error.message, 堆栈: error.stack });
+                }
                 
                 // 组装完整的剧本图HTML
-                scriptPage.innerHTML = scriptHtml;
+                logInfo('HTML组装完成，开始赋值到页面');
+                try {
+                    scriptPage.innerHTML = scriptHtml;
+                    logSuccess('HTML赋值到页面成功');
+                } catch (error) {
+                    logError('HTML赋值失败', { 错误: error.message, 堆栈: error.stack });
+                    throw error;
+                }
                 
                 // 调整预览容器尺寸以匹配下载时的尺寸
                 setTimeout(() => {
@@ -1533,13 +1600,13 @@ async function generateScriptImageV2() {
                     touch-action: manipulation;
                 `;
                 downloadButton.onclick = function() {
-                    console.log('【调试】下载按钮被点击');
+                    logInfo('点击了下载按钮');
                     // 保存原始样式
                     const originalMaxHeight = scriptPage.style.maxHeight;
                     const originalOverflowY = scriptPage.style.overflowY;
                     const originalWidth = scriptPage.style.width;
                     const originalHeight = scriptPage.style.height;
-                    console.log('【调试】原始样式 - maxHeight:', originalMaxHeight, 'overflowY:', originalOverflowY, 'width:', originalWidth, 'height:', originalHeight);
+                    logInfo('原始样式', { maxHeight: originalMaxHeight, overflowY: originalOverflowY, width: originalWidth, height: originalHeight });
                     
                     // 临时移除max-height和overflow限制以获取完整内容
                     scriptPage.style.maxHeight = 'none';
@@ -1552,6 +1619,7 @@ async function generateScriptImageV2() {
                     let a4Height = a4Width * a4Ratio;
                     scriptPage.style.width = a4Width + 'px';
                     scriptPage.style.height = a4Height + 'px';
+                    logInfo('设置A4尺寸', { a4Width, a4Height });
 
 
                     // 方案二和方案三没有内边距
@@ -1565,18 +1633,55 @@ async function generateScriptImageV2() {
                     setTimeout(() => {
                         // 如果高度不够容纳内容，就以高度为准重新计算宽度
                         const fullHeight = Math.max(scriptPage.scrollHeight, scriptPage.offsetHeight);
+                        logInfo('内容高度计算', { scrollHeight: scriptPage.scrollHeight, offsetHeight: scriptPage.offsetHeight, fullHeight });
+                        
                         if (fullHeight > a4Height) {
                             a4Height = fullHeight;
                             a4Width = a4Height / a4Ratio;
                             scriptPage.style.width = a4Width + 'px';
                             scriptPage.style.height = a4Height + 'px';
+                            logInfo('调整后的尺寸', { a4Width, a4Height });
                         }
 
-                        htmlToImage.toCanvas(scriptPage, {
+                        logInfo('开始使用htmlToImage转换为Canvas', { canvasWidth: Math.ceil(a4Width), canvasHeight: Math.ceil(a4Height) });
+                        
+                        // 为所有跨域图片添加crossOrigin属性
+                        const allImages = scriptPage.querySelectorAll('img');
+                        let hasCrossOriginImages = false;
+                        const crossOriginUrls = [];
+                        allImages.forEach((img, index) => {
+                            if (img.src && (img.src.startsWith('http://') || img.src.startsWith('https://')) && !img.src.includes(window.location.hostname)) {
+                                hasCrossOriginImages = true;
+                                crossOriginUrls.push(img.src);
+                                // 添加跨域支持
+                                if (!img.crossOrigin) {
+                                    img.crossOrigin = 'anonymous';
+                                }
+                            }
+                        });
+                        
+                        if (hasCrossOriginImages) {
+                            logWarning('检测到跨域图片，已添加crossOrigin属性', { 数量: crossOriginUrls.length, URL: crossOriginUrls.slice(0, 5) });
+                        } else {
+                            logInfo('未检测到跨域图片');
+                        }
+                        
+                        // 设置跨域配置
+                        const htmlToImageOptions = {
                             backgroundColor: hexToRgba(customBgColor, bgOpacity),
                             canvasWidth: Math.ceil(a4Width),
-                            canvasHeight: Math.ceil(a4Height)
-                        }).then(function(canvas) {
+                            canvasHeight: Math.ceil(a4Height),
+                            logging: true,
+                            useCORS: true,
+                            allowTaint: true,
+                            proxy: ''
+                        };
+                        
+                        logInfo('htmlToImage配置', htmlToImageOptions);
+                        
+                        // 定义下载成功后的处理函数
+                        const handleDownloadSuccess = function(canvas) {
+                            logSuccess('Canvas转换成功');
                             // 恢复原始样式
                             scriptPage.style.maxHeight = originalMaxHeight;
                             scriptPage.style.overflowY = originalOverflowY;
@@ -1586,12 +1691,14 @@ async function generateScriptImageV2() {
                             // 使用更兼容移动端的下载方式
                             const dataUrl = canvas.toDataURL('image/png');
                             const filename = editionName + '_剧本图.png';
+                            logInfo('生成DataURL成功', { filename, dataUrlLength: dataUrl.length });
                             
                             // 检测是否为移动端
                             const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
                             
                             // 优化移动端下载逻辑
                             if (isMobile) {
+                                logInfo('移动端下载逻辑');
                                 // 方案1：尝试使用Blob对象和download属性
                                 try {
                                     const blob = dataURLToBlob(dataUrl);
@@ -1620,12 +1727,14 @@ async function generateScriptImageV2() {
                                         URL.revokeObjectURL(url);
                                     }, 100);
                                     
+                                    logSuccess('移动端下载触发成功');
+                                    
                                     // 提示用户
                                     setTimeout(() => {
                                         alert('请在弹出的下载提示中选择保存图片');
                                     }, 500);
                                 } catch (e) {
-                                    console.error('Blob下载失败:', e);
+                                    logError('Blob下载失败', { 错误: e.message, 堆栈: e.stack });
                                     // 方案2：在新窗口打开图片，让用户长按保存
                                     const newWindow = window.open();
                                     if (newWindow) {
@@ -1638,6 +1747,7 @@ async function generateScriptImageV2() {
                                     }
                                 }
                             } else {
+                                logInfo('桌面端下载逻辑');
                                 // 桌面端：直接下载
                                 const link = document.createElement('a');
                                 link.download = filename;
@@ -1648,16 +1758,64 @@ async function generateScriptImageV2() {
                                 setTimeout(() => {
                                     document.body.removeChild(link);
                                 }, 100);
+                                logSuccess('桌面端下载触发成功');
                             }
-                        }).catch(function(error) {
-                            console.error('生成图片失败:', error);
-                            alert('生成图片失败，请重试');
+                        };
+                        
+                        // 定义错误处理函数
+                        const handleConversionError = function(error, methodName) {
+                            logError(methodName + '转换失败', { 
+                                错误: error.message, 
+                                堆栈: error.stack,
+                                错误类型: error.name,
+                                错误详情: error.toString()
+                            });
+                            
+                            alert('生成图片失败，请重试\n\n错误信息: ' + error.message);
                             // 恢复原始样式
                             scriptPage.style.maxHeight = originalMaxHeight;
                             scriptPage.style.overflowY = originalOverflowY;
                             scriptPage.style.width = originalWidth;
                             scriptPage.style.height = originalHeight;
-                        });
+                        };
+                        
+                        // 优先使用html2canvas，因为它对跨域图片处理更好
+                        if (typeof html2canvas !== 'undefined') {
+                            logInfo('使用html2canvas作为主要方案');
+                            html2canvas(scriptPage, {
+                                backgroundColor: hexToRgba(customBgColor, bgOpacity),
+                                width: Math.ceil(a4Width),
+                                height: Math.ceil(a4Height),
+                                useCORS: true,
+                                allowTaint: true,
+                                logging: true
+                            }).then(handleDownloadSuccess).catch(function(error) {
+                                logError('html2canvas转换失败', { 错误: error.message, 堆栈: error.stack });
+                                // 尝试使用htmlToImage作为备用方案
+                                if (typeof htmlToImage !== 'undefined') {
+                                    logInfo('html2canvas失败，尝试使用htmlToImage');
+                                    htmlToImage.toCanvas(scriptPage, htmlToImageOptions).then(handleDownloadSuccess).catch(function(htmlToImageError) {
+                                        handleConversionError(htmlToImageError, 'htmlToImage');
+                                    });
+                                } else {
+                                    handleConversionError(error, 'html2canvas');
+                                }
+                            });
+                        } else if (typeof htmlToImage !== 'undefined') {
+                            // 如果没有html2canvas，使用htmlToImage
+                            logInfo('使用htmlToImage作为主要方案');
+                            htmlToImage.toCanvas(scriptPage, htmlToImageOptions).then(handleDownloadSuccess).catch(function(error) {
+                                handleConversionError(error, 'htmlToImage');
+                            });
+                        } else {
+                            logError('没有可用的图片转换库', { html2canvas: typeof html2canvas, htmlToImage: typeof htmlToImage });
+                            alert('生成图片失败：没有可用的图片转换库');
+                            // 恢复原始样式
+                            scriptPage.style.maxHeight = originalMaxHeight;
+                            scriptPage.style.overflowY = originalOverflowY;
+                            scriptPage.style.width = originalWidth;
+                            scriptPage.style.height = originalHeight;
+                        }
                     }, DOM_RERNDER_TIMEOUT);
                 };
                 buttonContainer.appendChild(downloadButton);
@@ -1683,16 +1841,22 @@ async function generateScriptImageV2() {
                 };
                 buttonContainer.appendChild(closeButton);
                 
+                logInfo('HTML构建完成，准备添加到页面');
+                
                 // 先添加按钮容器，再添加剧本图页面，让按钮显示在上方
                 previewContainer.appendChild(buttonContainer);
                 previewContainer.appendChild(scriptPage);
                 document.body.appendChild(previewContainer);
                 
+                logSuccess('剧本图生成成功！');
+                
             } catch (error) {
+                logError('生成剧本图失败', { 错误: error.message, 堆栈: error.stack });
                 alert('生成剧本图失败，请检查角色数据');
                 console.error('生成剧本图错误:', error);
             } finally {
                 isGeneratingScriptImage = false;
+                logInfo('剧本图生成任务结束');
             }
         }
 
