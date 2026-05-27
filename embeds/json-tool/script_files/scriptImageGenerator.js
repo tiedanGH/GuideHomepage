@@ -680,7 +680,7 @@ async function generateScriptImageV2() {
                             <div style="margin-bottom: 15px; max-width: 100%;">
                                 <!-- 阵营标题 -->
                                 <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                                    <span style="font-family: 'Philo', serif; font-size: 18px; font-weight: bold; color: ${color}; text-transform: uppercase;">${title}</span>
+                                    <span style="font-family: 'Philo', serif; font-size: 40px; font-weight: bold; color: ${color}; text-transform: uppercase;">${title}</span>
                                     <div style="flex: 1; height: 2px; background: ${color}; margin-left: 10px;"></div>
                                 </div>
                                 <!-- 角色列表 -->
@@ -703,7 +703,7 @@ async function generateScriptImageV2() {
                             <div style="margin-bottom: 15px; max-width: 100%;">
                                 <!-- 阵营标题 -->
                                 <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                                    <span style="font-family: 'Philo', serif; font-size: 18px; font-weight: bold; color: ${color}; text-transform: uppercase;">${title}</span>
+                                    <span style="font-family: 'Philo', serif; font-size: 40px; font-weight: bold; color: ${color}; text-transform: uppercase;">${title}</span>
                                     <div style="flex: 1; height: 2px; background: ${color}; margin-left: 10px;"></div>
                                 </div>
                                 <!-- 角色列表 -->
@@ -1053,8 +1053,8 @@ async function generateScriptImageV2() {
                                     <img src="${convertToLocalPath(role.image)}" alt="${role.name}" style="width: 100%; height: 100%; object-fit: cover; display: block;">
                                 </div>
                                 <div style="flex: 1; min-width: 0;">
-                                    <div style="font-size: ${scriptLayout === 'scheme3' ? '28px' : '24px'}; font-weight: bold; color: ${nameColor}; margin-bottom: 2px; font-family: 'Microsoft YaHei', Heiti;">${role.name}</div>
-                                    <div style="font-size: ${scriptLayout === 'scheme3' ? '24px' : '20px'}; font-weight: bold; color: #4a3728; line-height: 1.4;">${role.ability || ''}</div>
+                                    <div style="font-size: 28px; font-weight: bold; color: ${nameColor}; margin-bottom: 2px; font-family: 'Microsoft YaHei', Heiti;">${role.name}</div>
+                                    <div style="font-size: 24px; font-weight: bold; color: #4a3728; line-height: 1.4;">${role.ability || ''}</div>
                                     ${jinxRuleDisplay}
                                 </div>
                             </div>
@@ -1310,7 +1310,7 @@ async function generateScriptImageV2() {
                                     <div style="background: #ede4d5; padding: 20px 30px; position: relative; min-height: 120px; display: flex; align-items: center; justify-content: center;">
                                         <img src="images/zhuangshi.png" alt="装饰" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100%; max-height: 120px; object-fit: contain; opacity: 0.6;" />
                                         <div style="position: relative; z-index: 1; text-align: center;">
-                                            <h1 style="font-size: 40px; margin: 0 0 8px 0; color: #1e3a5f; font-weight: bold; font-family: 'SimSun', '宋体', serif; letter-spacing: 4px;">${editionName}</h1>
+                                            <h1 style="font-size: 100px; margin: 0 0 8px 0; color: #1e3a5f; font-weight: bold; font-family: 'SimSun', '宋体', serif; letter-spacing: 4px;">${editionName}</h1>
                                             <div style="font-size: 16px; color: #6b5a45; text-align: right;">剧本作者：${authorName || ''}</div>
                                         </div>
                                         ${showCustomRules && bootleggerRulesArray.length > 0 ? `
@@ -1529,8 +1529,8 @@ async function generateScriptImageV2() {
                     else
                         scriptPage.style.padding = '0.3in';
                     
-                    // 等待DOM更新后再调用渲染，方案三内容较多，需要更长时间
-                    const DOM_RERNDER_TIMEOUT = (scriptLayout === 'scheme3' && isMobileDevice) ? 800 : 300;
+                    // 等待DOM更新后再调用渲染
+                    const DOM_RERNDER_TIMEOUT = 300;
                     setTimeout(() => {
                         // 如果高度不够容纳内容，就以高度为准重新计算宽度
                         const fullHeight = Math.max(scriptPage.scrollHeight, scriptPage.offsetHeight);
@@ -1544,9 +1544,7 @@ async function generateScriptImageV2() {
                         htmlToImage.toCanvas(scriptPage, {
                             backgroundColor: hexToRgba(customBgColor, bgOpacity),
                             canvasWidth: Math.ceil(a4Width),
-                            canvasHeight: Math.ceil(a4Height),
-                            imageTimeout: 10000,
-                            skipFonts: true
+                            canvasHeight: Math.ceil(a4Height)
                         }).then(function(canvas) {
                             // 恢复原始样式
                             scriptPage.style.maxHeight = originalMaxHeight;
@@ -2328,43 +2326,59 @@ async function generateJinxAndConfigImage() {
                     touch-action: manipulation;
                 `;
                 downloadButton.onclick = function() {
+                    console.log('【调试】下载按钮被点击');
                     // 保存原始样式
-                    const originalWidth = printPage.style.width;
-                    const originalHeight = printPage.style.height;
+                    const originalMaxHeight = scriptPage.style.maxHeight;
+                    const originalOverflowY = scriptPage.style.overflowY;
+                    const originalWidth = scriptPage.style.width;
+                    const originalHeight = scriptPage.style.height;
+                    console.log('【调试】原始样式 - maxHeight:', originalMaxHeight, 'overflowY:', originalOverflowY, 'width:', originalWidth, 'height:', originalHeight);
                     
-                    // 临时移除高度限制，让内容完全显示
-                    printPage.style.height = 'auto';
+                    // 临时移除max-height和overflow限制以获取完整内容
+                    scriptPage.style.maxHeight = 'none';
+                    scriptPage.style.overflowY = 'visible';
 
-                    // 强制使用a4比例
+                    // 强制使用A4比例
+                    const isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
                     const a4Ratio = 1.414;
-                    let a4Width = 8.27 * 96; // 8.27英寸转换为像素（96dpi）
-                    let a4Height = a4Width * a4Ratio; // A4比例（297/210）
-                    printPage.style.width = a4Width + 'px';
-                    printPage.style.height = a4Height + 'px';
+                    let a4Width = 1240;
+                    let a4Height = a4Width * a4Ratio;
+                    scriptPage.style.width = a4Width + 'px';
+                    scriptPage.style.height = a4Height + 'px';
+
+
+                    // 方案二和方案三没有内边距
+                    if (scriptLayout === 'scheme2' || scriptLayout === 'scheme3')
+                        scriptPage.style.padding = '0';
+                    else
+                        scriptPage.style.padding = '0.3in';
                     
-                    // 等待DOM更新后获取完整尺寸
+                    // 等待DOM更新后再调用渲染
+                    const DOM_RERNDER_TIMEOUT = 300;
                     setTimeout(() => {
                         // 如果高度不够容纳内容，就以高度为准重新计算宽度
-                        const fullHeight = Math.max(printPage.scrollHeight, printPage.offsetHeight);
+                        const fullHeight = Math.max(scriptPage.scrollHeight, scriptPage.offsetHeight);
                         if (fullHeight > a4Height) {
                             a4Height = fullHeight;
                             a4Width = a4Height / a4Ratio;
-                            printPage.style.width = a4Width + 'px';
-                            printPage.style.height = a4Height + 'px';
+                            scriptPage.style.width = a4Width + 'px';
+                            scriptPage.style.height = a4Height + 'px';
                         }
-                        
-                        htmlToImage.toCanvas(printPage, {
-                            backgroundColor: hexToRgba(detailBgColor, detailBgOpacity),
+
+                        htmlToImage.toCanvas(scriptPage, {
+                            backgroundColor: hexToRgba(customBgColor, bgOpacity),
                             canvasWidth: Math.ceil(a4Width),
                             canvasHeight: Math.ceil(a4Height)
                         }).then(function(canvas) {
                             // 恢复原始样式
-                            printPage.style.width = originalWidth;
-                            printPage.style.height = originalHeight;
+                            scriptPage.style.maxHeight = originalMaxHeight;
+                            scriptPage.style.overflowY = originalOverflowY;
+                            scriptPage.style.width = originalWidth;
+                            scriptPage.style.height = originalHeight;
                             
                             // 使用更兼容移动端的下载方式
                             const dataUrl = canvas.toDataURL('image/png');
-                            const filename = scriptName + '_细节图.png';
+                            const filename = editionName + '_剧本图.png';
                             
                             // 检测是否为移动端
                             const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
@@ -2432,10 +2446,12 @@ async function generateJinxAndConfigImage() {
                             console.error('生成图片失败:', error);
                             alert('生成图片失败，请重试');
                             // 恢复原始样式
-                            printPage.style.width = originalWidth;
-                            printPage.style.height = originalHeight;
+                            scriptPage.style.maxHeight = originalMaxHeight;
+                            scriptPage.style.overflowY = originalOverflowY;
+                            scriptPage.style.width = originalWidth;
+                            scriptPage.style.height = originalHeight;
                         });
-                    }, 100);
+                    }, DOM_RERNDER_TIMEOUT);
                 };
                 buttonContainer.appendChild(downloadButton);
                 
@@ -2524,7 +2540,7 @@ function toggleScriptConfigModal() {
                             <input type="radio" name="scriptLayout" value="scheme3" style="width: 18px; height: 18px;">
                             <div>
                                 <div style="font-weight: 600; color: #333;">方案三</div>
-                                <div style="font-size: 12px; color: #666;">仿博物馆布局</div>
+                                <div style="font-size: 12px; color: #666;">竞赛风格布局</div>
                             </div>
                         </label>
                     </div>
