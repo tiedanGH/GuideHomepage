@@ -1529,8 +1529,8 @@ async function generateScriptImageV2() {
                     else
                         scriptPage.style.padding = '0.3in';
                     
-                    // 等待DOM更新后再调用渲染
-                    const DOM_RERNDER_TIMEOUT = 300;
+                    // 等待DOM更新后再调用渲染，方案三内容较多，需要更长时间
+                    const DOM_RERNDER_TIMEOUT = (scriptLayout === 'scheme3' && isMobileDevice) ? 800 : 300;
                     setTimeout(() => {
                         // 如果高度不够容纳内容，就以高度为准重新计算宽度
                         const fullHeight = Math.max(scriptPage.scrollHeight, scriptPage.offsetHeight);
@@ -1544,7 +1544,9 @@ async function generateScriptImageV2() {
                         htmlToImage.toCanvas(scriptPage, {
                             backgroundColor: hexToRgba(customBgColor, bgOpacity),
                             canvasWidth: Math.ceil(a4Width),
-                            canvasHeight: Math.ceil(a4Height)
+                            canvasHeight: Math.ceil(a4Height),
+                            imageTimeout: 10000,
+                            skipFonts: true
                         }).then(function(canvas) {
                             // 恢复原始样式
                             scriptPage.style.maxHeight = originalMaxHeight;
