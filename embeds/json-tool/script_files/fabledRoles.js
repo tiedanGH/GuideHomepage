@@ -551,7 +551,7 @@ const fabledRoles = [
                 "name": "园丁-奇遇",
                 "pinyin": "yuanding",
                 "pinyinsuoxie": "yd",
-                "image": "images/Gardener.png",
+                "image": "images/gardener.png",
                 "ability": "由说书人来为一名或更多玩家派发角色。",
                 "scripts": ["传奇角色"],
                 "firstNight": 0,

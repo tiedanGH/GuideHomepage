@@ -2513,6 +2513,7 @@ function toggleScriptConfigModal() {
             modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 10000;';
             
             const modalContent = document.createElement('div');
+            modalContent.className = 'script-config-modal';
             modalContent.style.cssText = 'background: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 800px; max-height: 80vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.3);';
             
             modalContent.innerHTML = `
@@ -2540,7 +2541,7 @@ function toggleScriptConfigModal() {
                             <input type="radio" name="scriptLayout" value="scheme3" style="width: 18px; height: 18px;">
                             <div>
                                 <div style="font-weight: 600; color: #333;">方案三</div>
-                                <div style="font-size: 12px; color: #666;">竞赛风格布局</div>
+                                <div style="font-size: 12px; color: #666;">仿博物馆风格布局</div>
                             </div>
                         </label>
                     </div>
