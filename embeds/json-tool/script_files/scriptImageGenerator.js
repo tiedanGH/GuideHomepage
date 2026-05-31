@@ -1,6 +1,7 @@
 // 剧本图生成工具函数
 // 此文件包含生成剧本图、细节图等功能
-
+// 存储用户手动添加的相克规则
+let userAddedJinxRules = [];
 // 辅助函数：将十六进制颜色转换为 rgba 格式
 function hexToRgba(hex, opacity) {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -180,7 +181,10 @@ async function generateScriptImageV2() {
                 }
                 
                 // 检查是否存在用户在JSON编辑器中添加的相克规则（存储在dirRolesJson中）
+                console.log('【剧本图调试】检查dirRolesJson中的相克规则, dirRolesJson类型:', typeof dirRolesJson, ', window.dirRolesJson类型:', typeof window.dirRolesJson);
                 if (typeof dirRolesJson !== 'undefined') {
+                    console.log('【剧本图调试】dirRolesJson内容:', dirRolesJson);
+                    console.log('【剧本图调试】dirRolesJson中的相克规则数量:', dirRolesJson.filter(item => item.team === 'a jinxed' || item.team === '相克').length);
                     dirRolesJson.forEach(item => {
                         // 检查是否是相克规则项（通过team字段或id后缀判断）
                         if ((item.team === 'a jinxed' || item.team === '相克') && item.name && item.ability) {
@@ -223,8 +227,16 @@ async function generateScriptImageV2() {
                 };
                 
                 // 优先使用metaInfoJson中的夜间顺序
+                console.log('【夜间顺序调试】metaInfoJson.firstNight:', metaInfoJson.firstNight);
+                console.log('【夜间顺序调试】allRolesForLookup长度:', allRolesForLookup.length);
+                console.log('【夜间顺序调试】allRoles长度:', allRoles.length);
+                console.log('【夜间顺序调试】allRoles中的前5个角色ID:', allRoles.slice(0, 5).map(r => r.id));
+                console.log('【夜间顺序调试】firstNight > 0的角色数量:', allRoles.filter(r => r.firstNight > 0).length);
                 if (metaInfoJson.firstNight && metaInfoJson.firstNight.length > 0 && metaInfoJson.firstNight[0] !== "") {
                     console.log('使用metaInfoJson中的首夜顺序');
+                    console.log('【首夜调试】metaInfoJson.firstNight内容:', metaInfoJson.firstNight);
+                    console.log('【首夜调试】allRolesForLookup中的角色ID前10个:', allRolesForLookup.slice(0, 10).map(r => r.id));
+                    console.log('【首夜调试】selectedRoles中的角色ID前10个:', selectedRoles.slice(0, 10).map(r => r.id));
                     // 按照metaInfoJson.firstNight中的顺序构建首夜顺序
                     const orderedFirstNight = metaInfoJson.firstNight.map(roleId => {
                         // 先检查是否是元信息角色
@@ -234,11 +246,14 @@ async function generateScriptImageV2() {
                         }
                         // 查找对应的角色（使用allRolesForLookup获取角色数据）
                         let role = allRolesForLookup.find(role => role.id === roleId) || null;
+                        console.log('【首夜调试】在allRolesForLookup中查找', roleId, '结果:', role ? role.name : 'null');
                         if (!role && typeof dirRolesJson !== 'undefined') {
                             role = dirRolesJson.find(role => role.id === roleId) || null;
+                            console.log('【首夜调试】在dirRolesJson中查找', roleId, '结果:', role ? role.name : 'null');
                         }
                         if (!role && typeof window.dirRolesJson !== 'undefined') {
                             role = window.dirRolesJson.find(role => role.id === roleId) || null;
+                            console.log('【首夜调试】在window.dirRolesJson中查找', roleId, '结果:', role ? role.name : 'null');
                         }
                         // 找到角色后，检查是否在selectedRoles中（是否被勾选）
                         if (role) {
@@ -1728,6 +1743,27 @@ async function generateJinxAndConfigImage() {
                         trialJinxes.forEach(rule => {
                             if (roleNames.includes(rule.jinxRole1) && roleNames.includes(rule.jinxRole2)) {
                                 jinxRules.push(rule);
+                            }
+                        });
+                    }
+                    if (typeof dirRolesJson !== 'undefined') {
+                        console.log('【细节图调试】dirRolesJson内容:', dirRolesJson);
+                        console.log('【细节图调试】dirRolesJson中的相克规则数量:', dirRolesJson.filter(item => item.team === 'a jinxed' || item.team === '相克').length);
+                        dirRolesJson.forEach(item => {
+                            if ((item.team === 'a jinxed' || item.team === '相克') && item.name && item.ability) {
+                                const nameParts = item.name.split(' & ');
+                                if (nameParts.length === 2) {
+                                    const jinxRole1 = nameParts[0];
+                                    const jinxRole2 = nameParts[1];
+                                    if (roleNames.includes(jinxRole1) && roleNames.includes(jinxRole2)) {
+                                        const jinxRule = {
+                                            jinxRole1: jinxRole1,
+                                            jinxRole2: jinxRole2,
+                                            jinxRule: item.ability
+                                        };
+                                        jinxRules.push(jinxRule);
+                                    }
+                                }
                             }
                         });
                     }

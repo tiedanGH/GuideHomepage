@@ -3097,8 +3097,32 @@
             .selected-roles-grid {
                 grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
             }
-        }
+        }/* ========== 移动端已选角色单列布局强制修复 ========== */
+/* 确保已选角色容器为单列 */
+#selected-roles-display,
+.selected-roles-grid {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+}
 
+/* 每个角色卡片占满宽度 */
+.selected-role-card {
+    width: 100% !important;
+    margin: 0 0 8px 0 !important;
+    box-sizing: border-box;
+}
+
+/* 移动端卡片内边距舒适 */
+@media (max-width: 768px) {
+    .selected-role-card {
+        padding: 14px;
+    }
+    .selected-role-header {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+}
     </style>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 </head>
@@ -4259,7 +4283,7 @@
                 const metaInfo = jsonData.find(item => item.id === '_meta');
                 const standardRoles = jsonData.filter(item => item.id !== '_meta' && !item.id.startsWith('custom-') && !item.id.endsWith('_meta') && item.id !== 'Json By');
                 const customRoles = jsonData.filter(item => item.id && item.id.startsWith('custom-'));
-                const jinxRules = jsonData.filter(item => item.id && item.id.endsWith('_meta'));
+                const jinxRules = jsonData.filter(item => item.id && (item.id.endsWith('_meta') || item.team === 'a jinxed' || item.team === '相克' || item.id.startsWith('jinx_')));
                 const jsonByInfo = jsonData.find(item => item.id === 'Json By');
                 
                 // 保存所有自定义项
@@ -6909,10 +6933,23 @@ let allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demons
             // 从按钮容器中获取首夜行动顺序
             const firstNightContainer = form.querySelector('#first-night-buttons-container');
             const firstNightButtons = firstNightContainer ? firstNightContainer.querySelectorAll('.draggable-button') : [];
-            const trimmedFirstNight = Array.from(firstNightButtons)
+            let trimmedFirstNight = Array.from(firstNightButtons)
                 .map(btn => btn.getAttribute('data-role-id'))
                 .filter(roleId => roleId && roleId.trim() !== '');
             console.log('首夜行动顺序:', trimmedFirstNight);
+
+            // 如果用户没有手动添加任何角色到顺序中（只包含元信息角色或为空），使用默认顺序
+            const metaRoles = ['twilight', 'minioninfo', 'demoninfo', 'dawn'];
+            const hasNonMetaRoles = trimmedFirstNight.some(roleId => !metaRoles.includes(roleId));
+            
+            if (!hasNonMetaRoles) {
+                console.log('用户未添加任何首夜角色，使用默认顺序');
+                // 使用默认顺序：所有firstNight > 0的角色按firstNight值排序
+                const firstNightRoles = [...selectedRoles, ...dirRolesJson]
+                    .filter(role => role.firstNight > 0)
+                    .sort((a, b) => a.firstNight - b.firstNight);
+                trimmedFirstNight = firstNightRoles.map(role => role.id);
+            }
 
             // 确保首夜行动顺序包含黄昏、爪牙信息、恶魔信息和黎明
             let finalFirstNight = [...trimmedFirstNight];
@@ -6924,10 +6961,23 @@ let allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demons
             // 从按钮容器中获取其他夜晚行动顺序
             const otherNightContainer = form.querySelector('#other-night-buttons-container');
             const otherNightButtons = otherNightContainer ? otherNightContainer.querySelectorAll('.draggable-button') : [];
-            const trimmedOtherNight = Array.from(otherNightButtons)
+            let trimmedOtherNight = Array.from(otherNightButtons)
                 .map(btn => btn.getAttribute('data-role-id'))
                 .filter(roleId => roleId && roleId.trim() !== '');
             console.log('其他夜晚行动顺序:', trimmedOtherNight);
+
+            // 如果用户没有手动添加任何角色到顺序中，使用默认顺序
+            const otherNightMetaRoles = ['twilight', 'dawn', 'exposure'];
+            const hasOtherNightNonMetaRoles = trimmedOtherNight.some(roleId => !otherNightMetaRoles.includes(roleId));
+            
+            if (!hasOtherNightNonMetaRoles) {
+                console.log('用户未添加任何其他夜晚角色，使用默认顺序');
+                // 使用默认顺序：所有otherNight > 0的角色按otherNight值排序
+                const otherNightRoles = [...selectedRoles, ...dirRolesJson]
+                    .filter(role => role.otherNight > 0)
+                    .sort((a, b) => a.otherNight - b.otherNight);
+                trimmedOtherNight = otherNightRoles.map(role => role.id);
+            }
 
             // 确保其他夜晚行动顺序包含黄昏和黎明
             let finalOtherNight = [...trimmedOtherNight];
@@ -8788,6 +8838,28 @@ let allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demons
                     textarea.offsetHeight; // 触发重排
                     textarea.style.display = 'block';
                     
+                    // 更新 dirRolesJson，确保添加的相克规则能被剧本图读取
+                    const jinxRulesFromJson = jsonData.filter(item => item.id && (item.id.endsWith('_meta') || item.team === 'a jinxed' || item.team === '相克' || item.id.startsWith('jinx_')));
+                    console.log('【调试日志】addJinxRule - 从jsonData中过滤出的相克规则:', jinxRulesFromJson);
+                    console.log('【调试日志】addJinxRule - 当前的dirRolesJson:', dirRolesJson);
+                    console.log('【调试日志】addJinxRule - window.dirRolesJson:', window.dirRolesJson);
+                    if (dirRolesJson) {
+                        const existingJinxIds = dirRolesJson.filter(item => item.team === 'a jinxed' || item.team === '相克').map(item => item.id);
+                        console.log('【调试日志】addJinxRule - existingJinxIds:', existingJinxIds);
+                        jinxRulesFromJson.forEach(jinx => {
+                            if (!existingJinxIds.includes(jinx.id)) {
+                                dirRolesJson.push(jinx);
+                                console.log('【调试日志】addJinxRule - 添加新相克规则:', jinx.id, jinx.name);
+                            } else {
+                                console.log('【调试日志】addJinxRule - 相克规则已存在，跳过:', jinx.id);
+                            }
+                        });
+                        window.dirRolesJson = dirRolesJson;
+                        console.log('【调试日志】addJinxRule - 更新后的dirRolesJson:', dirRolesJson);
+                    } else {
+                        console.log('【调试日志】addJinxRule - dirRolesJson为空或未定义');
+                    }
+                    
                     // 切换到JSON编辑选项卡显示结果
                     switchTab('json-editor');
                     
@@ -9433,6 +9505,12 @@ let allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demons
         function updateSelectedRolesDisplay() {
             const displayContainer = document.getElementById('selected-roles-display');
             const countElement = document.getElementById('selected-count');
+            // 强制设置为单列布局（覆盖任何内联样式）
+if (displayContainer) {
+    displayContainer.style.display = 'grid';
+    displayContainer.style.gridTemplateColumns = '1fr';
+    displayContainer.style.gap = '16px';
+}
             
             if (!displayContainer || !countElement) return;
 
@@ -11978,20 +12056,53 @@ let allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demons
             // 按firstNight值排序
             firstNightRoles.sort((a, b) => a.firstNight - b.firstNight);
 
-            // 获取或创建按钮容器
-            let container = document.getElementById('first-night-buttons-container');
+            // 获取或创建按钮容器 - 优先在弹窗中查找，其次在主文档中查找
+            let container = null;
+            const metaInfoForm = document.getElementById('add-meta-info-form');
+            if (metaInfoForm) {
+                container = metaInfoForm.querySelector('#first-night-buttons-container');
+            }
             if (!container) {
-                container = document.createElement('div');
-                container.id = 'first-night-buttons-container';
-                container.className = 'first-night-buttons-container';
-
-                const textarea = document.getElementById('edition-firstNight');
-                if (textarea && textarea.parentNode) {
-                    textarea.parentNode.insertBefore(container, textarea.nextSibling);
-                } else {
-                    // 如果没有找到textarea，将容器添加到body末尾或跳过
-                    // 由于没有合适的位置，暂时不添加到DOM
-                    return;
+                container = document.getElementById('first-night-buttons-container');
+            }
+            
+            // 如果弹窗中存在容器但没有找到相应元素，或者容器根本不存在
+            if (!container) {
+                // 尝试在弹窗的meta-info-group中查找或创建容器
+                const metaInfoGroup = metaInfoForm ? metaInfoForm.querySelector('#meta-info-group') : null;
+                if (metaInfoGroup) {
+                    container = metaInfoGroup.querySelector('#first-night-buttons-container');
+                }
+                
+                // 如果meta-info-group中有容器但按钮还没创建，我们仍然使用它
+                // 如果meta-info-group中也没有，我们需要确保有容器可以添加按钮
+                if (!container && metaInfoGroup) {
+                    console.log('updateFirstNightButtons: 在弹窗中创建first-night-buttons-container');
+                    container = document.createElement('div');
+                    container.id = 'first-night-buttons-container';
+                    container.className = 'first-night-buttons-container';
+                    container.style.cssText = 'min-height: 50px; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; background: white;';
+                    
+                    // 找到其他夜晚容器，在它之前插入
+                    const otherNightContainer = metaInfoGroup.querySelector('#other-night-buttons-container');
+                    if (otherNightContainer) {
+                        metaInfoGroup.insertBefore(container, otherNightContainer);
+                    } else {
+                        // 如果没有其他夜晚容器，添加到bootlegger之后
+                        const bootlegger = metaInfoGroup.querySelector('#bootlegger');
+                        if (bootlegger && bootlegger.parentNode) {
+                            bootlegger.parentNode.insertBefore(container, bootlegger.nextSibling);
+                        } else {
+                            metaInfoGroup.appendChild(container);
+                        }
+                    }
+                } else if (!container) {
+                    // 如果连弹窗都没有，在主文档中查找
+                    container = document.getElementById('first-night-buttons-container');
+                    if (!container) {
+                        console.log('updateFirstNightButtons: 未找到first-night-buttons-container，跳过');
+                        return;
+                    }
                 }
             }
 
@@ -12070,20 +12181,50 @@ let allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demons
             // 按otherNight值排序
             otherNightRoles.sort((a, b) => a.otherNight - b.otherNight);
 
-            // 获取或创建按钮容器
-            let container = document.getElementById('other-night-buttons-container');
+            // 获取或创建按钮容器 - 优先在弹窗中查找，其次在主文档中查找
+            let container = null;
+            const metaInfoForm = document.getElementById('add-meta-info-form');
+            if (metaInfoForm) {
+                container = metaInfoForm.querySelector('#other-night-buttons-container');
+            }
             if (!container) {
-                container = document.createElement('div');
-                container.id = 'other-night-buttons-container';
-                container.className = 'other-night-buttons-container';
-
-                const textarea = document.getElementById('edition-otherNight');
-                if (textarea && textarea.parentNode) {
-                    textarea.parentNode.insertBefore(container, textarea.nextSibling);
-                } else {
-                    // 如果没有找到textarea，将容器添加到body末尾或跳过
-                    // 由于没有合适的位置，暂时不添加到DOM
-                    return;
+                container = document.getElementById('other-night-buttons-container');
+            }
+            
+            // 如果弹窗中存在容器但没有找到相应元素，或者容器根本不存在
+            if (!container) {
+                // 尝试在弹窗的meta-info-group中查找或创建容器
+                const metaInfoGroup = metaInfoForm ? metaInfoForm.querySelector('#meta-info-group') : null;
+                if (metaInfoGroup) {
+                    container = metaInfoGroup.querySelector('#other-night-buttons-container');
+                }
+                
+                if (!container && metaInfoGroup) {
+                    console.log('updateOtherNightButtons: 在弹窗中创建other-night-buttons-container');
+                    container = document.createElement('div');
+                    container.id = 'other-night-buttons-container';
+                    container.className = 'other-night-buttons-container';
+                    container.style.cssText = 'min-height: 50px; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; background: white;';
+                    
+                    // 找到按钮容器之后添加
+                    const firstNightContainer = metaInfoGroup.querySelector('#first-night-buttons-container');
+                    if (firstNightContainer && firstNightContainer.nextSibling) {
+                        metaInfoGroup.insertBefore(container, firstNightContainer.nextSibling);
+                    } else {
+                        const bootlegger = metaInfoGroup.querySelector('#bootlegger');
+                        if (bootlegger && bootlegger.parentNode) {
+                            bootlegger.parentNode.insertBefore(container, bootlegger.nextSibling);
+                        } else {
+                            metaInfoGroup.appendChild(container);
+                        }
+                    }
+                } else if (!container) {
+                    // 如果连弹窗都没有，在主文档中查找
+                    container = document.getElementById('other-night-buttons-container');
+                    if (!container) {
+                        console.log('updateOtherNightButtons: 未找到other-night-buttons-container，跳过');
+                        return;
+                    }
                 }
             }
 
