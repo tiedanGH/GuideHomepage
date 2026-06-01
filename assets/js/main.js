@@ -66,6 +66,7 @@ function openWechatMiniProgram(token) {
     if (navigator.clipboard && window.isSecureContext) {
         navigator.clipboard.writeText(token)
             .then(() => {
+                alert('小程序令牌已复制，请前往微信打开');
                 launchWechat();
             })
             .catch(() => {
@@ -87,6 +88,7 @@ function openWechatMiniProgram(token) {
 
         try {
             document.execCommand('copy');
+            alert('小程序令牌已复制，请前往微信打开');
         } catch (e) {
             prompt('请手动复制以下内容：', text);
         }
