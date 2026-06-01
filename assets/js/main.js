@@ -52,3 +52,46 @@ document.querySelectorAll(".menu-group").forEach(group => {
         }
     });
 });
+
+// 微信小程序唤起
+function openWechatMiniProgram(token) {
+    if (!token) return;
+
+    const launchWechat = () => {
+        // 尝试唤起微信
+        window.location.href = 'weixin://';
+    };
+
+    // 优先使用现代复制API
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(token)
+            .then(() => {
+                launchWechat();
+            })
+            .catch(() => {
+                fallbackCopy(token);
+            });
+    } else {
+        fallbackCopy(token);
+    }
+
+    function fallbackCopy(text) {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.left = '-9999px';
+
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+
+        try {
+            document.execCommand('copy');
+        } catch (e) {
+            prompt('请手动复制以下内容：', text);
+        }
+
+        document.body.removeChild(textarea);
+        launchWechat();
+    }
+}

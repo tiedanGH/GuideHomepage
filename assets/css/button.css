@@ -50,6 +50,25 @@
     height: 38px;
 }
 
+/* 灵光按钮 */
+.button.lingguang {
+    background: linear-gradient(145deg, rgba(30, 60, 114, 0.9), rgba(20, 30, 48, 0.9));
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+.button.lingguang:hover {
+    background: linear-gradient(145deg, rgba(40, 80, 150, 0.95), rgba(30, 50, 80, 0.95));
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* 比赛按钮 */
+.button.match {
+    background: linear-gradient(135deg, #1a1a40, #3a0ca3);
+    box-shadow: 0 4px 20px rgba(58, 12, 163, 0.5);
+}
+.button.match:hover {
+    box-shadow: 0 8px 30px rgba(90, 120, 255, 0.6);
+}
+
 /* 血染钟楼按钮 */
 .button.menu.blood {
     background: #8B0000;
@@ -103,23 +122,27 @@
     box-shadow: 0 6px 20px rgba(227, 65, 115, 0.4);
 }
 
-/* 灵光按钮 */
-.button.lingguang {
-    background: linear-gradient(145deg, rgba(30, 60, 114, 0.9), rgba(20, 30, 48, 0.9));
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+/* 恶魔的游戏 */
+.button.demon {
+    background: linear-gradient(
+            135deg,
+            #4a0000 0%,
+            #8b0000 25%,
+            #d62828 60%,
+            #ff6a00 100%
+    );
+    box-shadow: 0 4px 15px rgba(214, 40, 40, 0.45), inset 0 1px 0 rgba(255, 180, 100, 0.25);
 }
-.button.lingguang:hover {
-    background: linear-gradient(145deg, rgba(40, 80, 150, 0.95), rgba(30, 50, 80, 0.95));
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-}
-
-/* 比赛按钮 */
-.button.match {
-    background: linear-gradient(135deg, #1a1a40, #3a0ca3);
-    box-shadow: 0 4px 20px rgba(58, 12, 163, 0.5);
-}
-.button.match:hover {
-    box-shadow: 0 8px 30px rgba(90, 120, 255, 0.6);
+.button.demon:hover {
+    background: linear-gradient(
+            135deg,
+            #600000 0%,
+            #b30000 25%,
+            #ff3434 60%,
+            #ff8c00 100%
+    );
+    box-shadow: 0 6px 20px rgba(255, 60, 60, 0.6), 0 0 18px rgba(255, 120, 0, 0.45);
+    filter: brightness(1.08);
 }
 
 /* Github按钮 */
