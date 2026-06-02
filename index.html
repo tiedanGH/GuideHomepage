@@ -11,10 +11,10 @@
     <link rel="icon" href="favicon.ico">
     <link rel="apple-touch-icon" href="assets/icons/favicon.png"/>
 
-    <link rel="stylesheet" href="assets/css/main.css?v=20251216"/>
+    <link rel="stylesheet" href="assets/css/main.css?v=20260601"/>
     <link rel="stylesheet" href="assets/css/button.css?v=20260404"/>
 
-    <script src="assets/js/main.js" defer></script>
+    <script src="assets/js/main.js?v=20260601" defer></script>
 </head>
 <body>
 
@@ -94,14 +94,18 @@
                 <img src="assets/icons/vite.svg" class="btn-icon" alt=""/>
                 大杀四方
             </a>
-            <a href="javascript:void(0)"
-               class="button demon"
-               onclick="openWechatMiniProgram(this.dataset.token)"
-               data-token="#小程序://恶魔游戏/jKI8l5NbTh6ZCBo">
-                <img src="assets/icons/demon.png" class="btn-icon" alt=""/>
-                恶魔的游戏
-                <small class="author">微信小程序</small>
-            </a>
+            <div class="demon-group">
+                <a href="javascript:void(0)"
+                   class="button demon"
+                   data-token="#小程序://恶魔游戏/jKI8l5NbTh6ZCBo">
+                    <img src="assets/icons/demon.png" class="btn-icon" alt=""/>
+                    恶魔的游戏
+                    <small class="author">微信小程序</small>
+                </a>
+                <div class="demon-qr-panel">
+                    <img src="assets/img/demon_qr_code.png" alt="恶魔的游戏小程序二维码" class="demon-qr-img"/>
+                </div>
+            </div>
         </div>
 
         <div class="github-section">

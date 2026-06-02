@@ -53,47 +53,56 @@ document.querySelectorAll(".menu-group").forEach(group => {
     });
 });
 
-// 微信小程序唤起
-function openWechatMiniProgram(token) {
+// 恶魔的游戏：点击展开二维码 + 复制小程序口令
+document.querySelectorAll(".demon-group").forEach(group => {
+    const btn = group.querySelector(".button.demon");
+    const panel = group.querySelector(".demon-qr-panel");
+    if (!btn || !panel) return;
+
+    btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        panel.classList.toggle("open");
+        copyMiniProgramToken(btn.dataset.token);
+    });
+
+    document.addEventListener("click", (e) => {
+        if (!group.contains(e.target)) {
+            panel.classList.remove("open");
+        }
+    });
+});
+
+function copyMiniProgramToken(token) {
     if (!token) return;
 
-    const launchWechat = () => {
-        // 尝试唤起微信
-        window.location.href = 'weixin://';
-    };
+    const successMsg = "小程序口令已复制，请前往微信打开";
 
-    // 优先使用现代复制API
     if (navigator.clipboard && window.isSecureContext) {
         navigator.clipboard.writeText(token)
-            .then(() => {
-                alert('小程序令牌已复制，请前往微信打开');
-                launchWechat();
-            })
-            .catch(() => {
-                fallbackCopy(token);
-            });
+            .then(() => alert(successMsg))
+            .catch(() => fallbackCopy(token));
     } else {
         fallbackCopy(token);
     }
 
     function fallbackCopy(text) {
-        const textarea = document.createElement('textarea');
+        const textarea = document.createElement("textarea");
         textarea.value = text;
-        textarea.style.position = 'fixed';
-        textarea.style.left = '-9999px';
+        textarea.style.position = "fixed";
+        textarea.style.left = "-9999px";
 
         document.body.appendChild(textarea);
         textarea.focus();
         textarea.select();
 
         try {
-            document.execCommand('copy');
-            alert('小程序令牌已复制，请前往微信打开');
+            document.execCommand("copy");
+            alert(successMsg);
         } catch (e) {
-            prompt('请手动复制以下内容：', text);
+            prompt("请手动复制以下内容：", text);
         }
 
         document.body.removeChild(textarea);
-        launchWechat();
     }
 }
