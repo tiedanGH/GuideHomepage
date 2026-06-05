@@ -327,6 +327,7 @@ p {
     height: 200px;
     object-fit: contain;
     border-radius: 6px;
+    cursor: pointer;
 }
 @media (hover:hover) {
     .demon-group:hover .demon-qr-panel {

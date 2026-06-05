@@ -53,26 +53,27 @@ document.querySelectorAll(".menu-group").forEach(group => {
     });
 });
 
-// 恶魔的游戏：首次点击展开二维码；二维码已展开后再次点击复制小程序口令并询问是否跳转微信
+// 恶魔的游戏：按钮纯当开关切换二维码；二维码点击复制小程序口令并询问是否跳转微信，长按交给浏览器原生保存
 document.querySelectorAll(".demon-group").forEach(group => {
     const btn = group.querySelector(".button.demon");
     const panel = group.querySelector(".demon-qr-panel");
+    const qr = group.querySelector(".demon-qr-img");
     if (!btn || !panel) return;
 
+    // 按钮：切换二维码展开/收起（等同血染按钮二级菜单逻辑）
     btn.addEventListener("click", (e) => {
         e.preventDefault();
         e.stopPropagation();
-
-        // 二维码可见的判定：JS 标记打开 或 桌面端正在悬停
-        const isVisible = panel.classList.contains("open") || group.matches(":hover");
-
-        if (!isVisible) {
-            panel.classList.add("open");
-            return;
-        }
-
-        copyTokenAndPromptWechat(btn.dataset.token);
+        panel.classList.toggle("open");
     });
+
+    // 二维码图片：点击复制口令并询问是否跳转微信。长按由浏览器原生菜单接管（不拦截 contextmenu / touchstart）
+    if (qr) {
+        qr.addEventListener("click", (e) => {
+            e.stopPropagation();
+            copyTokenAndPromptWechat(qr.dataset.token);
+        });
+    }
 
     // 点击外部关闭二维码
     document.addEventListener("click", (e) => {
