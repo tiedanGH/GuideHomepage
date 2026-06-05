@@ -853,13 +853,7 @@
                 padding: 12px;                                 /* 内边距 */
             }
 
-            /* 增大剧本卡片点击区域 */
-            #domesticScriptsGrid > div,
-            #overseasScriptsGrid > div {
-                cursor: pointer;                               /* 鼠标指针 */
-                user-select: none;                             /* 禁止文本选择 */
-                padding: 12px;                                 /* 内边距 */
-            }
+
 
             /* 增大角色操作按钮点击区域 */
             .role-action-btn {
@@ -1080,28 +1074,7 @@
                 font-size: 14px;
             }
 
-            /* 剧本卡片网格调整 */
-            #domesticScriptsGrid,
-            #overseasScriptsGrid {
-                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-                gap: 10px;
-            }
 
-            /* 剧本卡片调整 */
-            #domesticScriptsGrid > div,
-            #overseasScriptsGrid > div {
-                padding: 8px;
-            }
-
-            #domesticScriptsGrid h4,
-            #overseasScriptsGrid h4 {
-                font-size: 12px;
-            }
-
-            #domesticScriptsGrid p,
-            #overseasScriptsGrid p {
-                font-size: 10px;
-            }
 
             /* 主布局调整 */
             .main-layout {
@@ -1299,11 +1272,7 @@
                 max-height: 50px;
             }
 
-            /* 剧本卡片网格调整 */
-            #domesticScriptsGrid,
-            #overseasScriptsGrid {
-                grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-            }
+
 
             /* 主布局调整 */
             .main-layout {
@@ -3176,55 +3145,6 @@
                             <button class="import-btn add-role-btn" onclick="toggleDirInput()">添加</button>
                         </div>
                     </div>
-                    <div class="tab-buttons">
-                        <button class="tab-btn" data-tab="script">剧本</button>
-                        <button class="tab-btn active" data-tab="roles">角色</button>
-                    </div>
-                    
-                    <!-- 剧本选项卡 -->
-                    <div class="tab-content" id="script-tab">
-                        <!-- 剧本搜索区域 -->
-                        <div class="control-section">
-                            <h3>🔍 剧本搜索</h3>
-                            <input type="text" id="script-search-input" placeholder="搜索剧本..." style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; box-sizing: border-box; margin-bottom: 10px;">
-                            <div id="script-search-results"></div>
-                        </div>
-
-                        <!-- 剧本相关链接 -->
-                        <div class="control-section">
-                            <h3>📚 剧本资源</h3>
-                            <a href="https://clocktower-wiki.gstonegames.com/index.php?title=%E8%A7%84%E5%88%99%E8%B0%83%E6%95%B4%E6%8F%90%E5%89%8D%E5%85%AC%E7%A4%BA" target="_blank" style="font-size: 14px; font-weight: bold; display: block; margin-bottom: 8px; color: var(--primary-color);">点击这里查看新、旧角色能力对比</a>
-                            <a href="javascript:void(0);" onclick="openOriginalScriptsWindow()" style="font-size: 14px; font-weight: bold; display: block; margin-bottom: 8px; color: var(--primary-color);">点击这里获取全原创角色剧本</a>
-                            <a href="javascript:void(0);" onclick="openPartialScriptsWindow()" style="font-size: 14px; font-weight: bold; display: block; margin-bottom: 8px; color: #28a745;">点击这里获取部分原创角色剧本</a>
-                            <a href="https://jsontool.netlify.app/findediton" target="_blank" style="font-size: 14px; font-weight: bold; display: block; margin-bottom: 8px; color: var(--primary-color);">根据角色筛选剧本</a>
-                        </div>
-
-                        <!-- 快速选择角色伸缩框 -->
-                        <div class="control-section">
-                            <h3>⚡ 快速选择</h3>
-                            <a href="javascript:void(0);" onclick="toggleRolePasteBox()" style="font-size: 14px; font-weight: bold; display: block; margin-bottom: 10px; color: #667eea;">筛选剧本后快速选择角色</a>
-                            <div id="rolePasteBoxContainer" style="display: none; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background: rgb(244, 233, 216);">
-                                <p style="margin-bottom: 10px; color: #666; font-size: 14px;">请粘贴你图片识别的文字，系统将自动选择这些角色（偶有遗漏，但可以快速自己手动补充）：</p>
-                                <p style="margin-bottom: 10px; color: #666; font-size: 12px;">支持正则表达式搜索，例如：<code>^.*师$</code> 匹配所有以"师"结尾的角色</p>
-                                <div style="margin-bottom: 10px; padding: 10px; background: #f8f9fa; border-radius: 4px; font-size: 12px; color: #666;">
-                                    <strong>正则表达式示例：</strong><br>
-                                    <code>^.*师$</code> - 匹配所有以"师"结尾的角色（如：预言师、魔术师）<br>
-                                    <code>^[小大].*$</code> - 匹配所有以"小"或"大"开头的角色<br>
-                                    <code>.*[女男]$</code> - 匹配所有以"女"或"男"结尾的角色<br>
-                                    <code>^.{2,3}$</code> - 匹配所有2-3个字符的角色名称
-                                </div>
-                                <textarea id="rolePasteBox" style="width: 100%; height: 100px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; resize: vertical; font-family: Arial, sans-serif; font-size: 14px;" oninput="handleRoleBoxInput('rolePasteBox', 'roleSecondBox')"></textarea>
-                                
-                                <!-- 第二输入框：备选角色 -->
-                                <p style="margin-top: 15px; margin-bottom: 10px; color: #666; font-size: 14px;">或粘贴角色名称到此处（用顿号分割），系统将自动选择这些角色：</p>
-                                <textarea id="roleSecondBox" style="width: 100%; height: 80px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; resize: vertical; font-family: Arial, sans-serif; font-size: 14px;" placeholder="例如：洗衣妇、图书管理员、调查员" oninput="handleRoleBoxInput('roleSecondBox', 'rolePasteBox')"></textarea>
-                                
-                                <button onclick="selectRolesFromPasteBox()" style="margin-top: 10px; padding: 8px 16px; background: var(--primary-color); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">选择角色</button>
-                                <button onclick="clearRolePasteBox()" style="margin-top: 10px; margin-left: 10px; padding: 8px 16px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">清空</button>
-                            </div>
-                        </div>
-                    </div>
-                    
                     <!-- 角色选项卡 -->
                     <div class="tab-content active" id="roles-tab">
                         <!-- 剧本选择区域 -->
@@ -3250,6 +3170,26 @@
                                 <option value="ability">按能力搜索</option>
                             </select>
                             <div id="search-results"></div>
+                        </div>
+
+                        <!-- 剧本搜索伸缩框 -->
+                        <div class="control-section">
+                            <h3>📚 剧本搜索</h3>
+                            <a href="javascript:void(0);" onclick="toggleRolePasteBox()" style="display: block; padding: 12px 16px; background: #28a745; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; text-align: center; text-decoration: none; font-weight: bold; margin-bottom: 10px;">📷 识别板子图文字选择</a>
+                            <div id="rolePasteBoxContainer" style="display: none; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background: rgb(244, 233, 216);">
+                                <p style="margin-bottom: 10px; color: #666; font-size: 14px;">请粘贴你图片识别的文字，系统将自动选择这些角色（偶有遗漏，但可以快速自己手动补充）：</p>
+                                <p style="margin-bottom: 10px; color: #666; font-size: 12px;">支持正则表达式搜索，例如：<code>^.*师$</code> 匹配所有以"师"结尾的角色</p>
+                                <div style="margin-bottom: 10px; padding: 10px; background: #f8f9fa; border-radius: 4px; font-size: 12px; color: #666;">
+                                    <strong>正则表达式示例：</strong><br>
+                                    <code>^.*师$</code> - 匹配所有以"师"结尾的角色（如：预言师、魔术师）<br>
+                                    <code>^[小大].*$</code> - 匹配所有以"小"或"大"开头的角色<br>
+                                    <code>.*[女男]$</code> - 匹配所有以"女"或"男"结尾的角色<br>
+                                    <code>^.{2,3}$</code> - 匹配所有2-3个字符的角色名称
+                                </div>
+                                <textarea id="rolePasteBox" style="width: 100%; height: 100px; padding: 10px; border: 1px solid #ccc; border-radius: 4px; resize: vertical; font-family: Arial, sans-serif; font-size: 14px;" oninput="handleRoleBoxInput('rolePasteBox', 'roleSecondBox')"></textarea>
+                            </div>
+                            
+                            <a href="https://nbr.princessgrimoire.online/" target="_blank" style="display: block; padding: 12px 16px; background: #28a745; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; text-align: center; text-decoration: none; font-weight: bold; margin-top: 10px;">🌐 访问 NBR 剧本库</a>
                         </div>
 
                         <!-- 角色展示区 -->
@@ -3390,11 +3330,11 @@
                         <div id="meta-info-group" style="margin-top: 16px; margin-bottom: 20px;">
                             <div style="margin-bottom: 20px;">
                                 <h4 style="margin-bottom: 8px; color: var(--text-color); font-weight: 600;">剧本名 <span style="color: red;">*</span></h4>
-                                <input type="text" id="edition-name" value="" style="width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: 12px; font-size: 16px; transition: all 0.3s ease;" placeholder="请输入剧本名">
+                                <input type="text" id="edition-name" value="" style="width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: 12px; font-size: 16px; transition: all 0.3s ease; color: var(--text-color); background-color: var(--card-bg-color);" placeholder="请输入剧本名">
                             </div>
                             <div style="margin-bottom: 20px;">
                                 <h4 style="margin-bottom: 8px; color: var(--text-color); font-weight: 600;">作者（选填）：</h4>
-                                <input type="text" id="author-name" value="" style="width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: 12px; font-size: 16px; transition: all 0.3s ease;" placeholder="请输入作者">
+                                <input type="text" id="author-name" value="" style="width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: 12px; font-size: 16px; transition: all 0.3s ease; color: var(--text-color); background-color: var(--card-bg-color);" placeholder="请输入作者">
                             </div>
                             <div style="margin-bottom: 20px;">
                                 <h4 style="margin-bottom: 8px; color: var(--text-color); font-weight: 600;">在魔典隐藏作者和剧本名（选填）：</h4>
@@ -3405,7 +3345,7 @@
                             </div>
                             <div style="margin-bottom: 20px;">
                                 <h4 style="margin-bottom: 8px; color: var(--text-color); font-weight: 600;">剧本描述（选填）：</h4>
-                                <textarea id="edition-description" style="width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: 12px; min-height: 80px; font-size: 16px; resize: vertical; transition: all 0.3s ease;" placeholder="请输入剧本描述"></textarea>
+                                <textarea id="edition-description" style="width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: 12px; min-height: 80px; font-size: 16px; resize: vertical; transition: all 0.3s ease; color: var(--text-color); background-color: var(--card-bg-color);" placeholder="请输入剧本描述"></textarea>
                             </div>
                             
                             <div id="state-container" style="margin-bottom: 20px;">
@@ -3420,8 +3360,8 @@
                                         <label><input type="checkbox" name="state-type" value="madness" checked>疯狂
                                         </label>
                                     </div>
-                                    <input type="text" id="state-name" style="width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: 12px; font-size: 16px; transition: all 0.3s ease; margin-bottom: 10px;" placeholder="状态名">
-                                    <textarea name="state-desc" style="width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: 12px; min-height: 80px; font-size: 16px; resize: vertical; transition: all 0.3s ease; margin-bottom: 10px;" placeholder="剧本涉及的状态描述"></textarea>
+                                    <input type="text" id="state-name" style="width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: 12px; font-size: 16px; transition: all 0.3s ease; margin-bottom: 10px; color: var(--text-color); background-color: var(--card-bg-color);" placeholder="状态名">
+                                    <textarea name="state-desc" style="width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: 12px; min-height: 80px; font-size: 16px; resize: vertical; transition: all 0.3s ease; margin-bottom: 10px; color: var(--text-color); background-color: var(--card-bg-color);" placeholder="剧本涉及的状态描述"></textarea>
                                     <button type="button" class="remove-state-btn" onclick="removeStateInput(this)" style="display:none; padding: 8px 16px; background: #e53e3e; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.3s ease;">删除</button>
                                 </div>
                                 <button type="button" class="add-state-btn" onclick="addStateInput()" style="padding: 10px 20px; background: linear-gradient(135deg, #718096 0%, #a0aec0 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.3s ease; margin-top: 10px;">添加状态描述</button>
@@ -3441,7 +3381,7 @@
                                         <img id="preview-logo" src="" alt="预览" style="max-width: 100px; max-height: 100px; border-radius: 4px; border: 2px solid #ddd;">
                                         <button type="button" id="clear-logo" style="margin-top: 5px; padding: 5px 10px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">清除图片</button>
                                     </div>
-                                    <textarea id="logo" style="width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: 12px; min-height: 60px; font-size: 16px; resize: vertical; transition: all 0.3s ease;" placeholder="剧本图片URL，会显示在魔典中间，或使用上方上传功能"></textarea>
+                                    <textarea id="logo" style="width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: 12px; min-height: 60px; font-size: 16px; resize: vertical; transition: all 0.3s ease; color: var(--text-color); background-color: var(--card-bg-color);" placeholder="剧本图片URL，会显示在魔典中间，或使用上方上传功能"></textarea>
                                 </div>
                             </div>
                             <div style="margin-bottom: 20px;">
@@ -3458,7 +3398,7 @@
                                         <img id="preview-background" src="" alt="预览" style="max-width: 200px; max-height: 100px; border-radius: 4px; border: 2px solid #ddd;">
                                         <button type="button" id="clear-background" style="margin-top: 5px; padding: 5px 10px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">清除图片</button>
                                     </div>
-                                    <textarea id="background" style="width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: 12px; min-height: 60px; font-size: 16px; resize: vertical; transition: all 0.3s ease;" placeholder="魔典背景图URL，或使用上方上传功能"></textarea>
+                                    <textarea id="background" style="width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: 12px; min-height: 60px; font-size: 16px; resize: vertical; transition: all 0.3s ease; color: var(--text-color); background-color: var(--card-bg-color);" placeholder="魔典背景图URL，或使用上方上传功能"></textarea>
                                 </div>
                             </div>
                             <div style="margin-bottom: 20px;">
@@ -3475,12 +3415,12 @@
                                         <img id="preview-qrcode" src="" alt="预览" style="max-width: 100px; max-height: 100px; border-radius: 4px; border: 2px solid #ddd;">
                                         <button type="button" id="clear-qrcode" style="margin-top: 5px; padding: 5px 10px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">清除图片</button>
                                     </div>
-                                    <textarea id="qrcode-image-input" style="width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: 12px; min-height: 60px; font-size: 16px; resize: vertical; transition: all 0.3s ease;" placeholder="二维码图片URL，或使用上方上传功能"></textarea>
+                                    <textarea id="qrcode-image-input" style="width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: 12px; min-height: 60px; font-size: 16px; resize: vertical; transition: all 0.3s ease; color: var(--text-color); background-color: var(--card-bg-color);" placeholder="二维码图片URL，或使用上方上传功能"></textarea>
                                 </div>
                             </div>
                             <div style="margin-bottom: 20px;">
                                 <h4 style="margin-bottom: 8px; color: var(--text-color); font-weight: 600;">剧本自制规则（选填）：</h4>
-                                <textarea id="bootlegger" style="width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: 12px; min-height: 80px; font-size: 16px; resize: vertical; transition: all 0.3s ease;" placeholder="请输入剧本自制规则"></textarea>
+                                <textarea id="bootlegger" style="width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: 12px; min-height: 80px; font-size: 16px; resize: vertical; transition: all 0.3s ease; color: var(--text-color); background-color: var(--card-bg-color);" placeholder="请输入剧本自制规则"></textarea>
                             </div>
                             <div class="button-container" style="display: flex; gap: 16px; margin-top: 10px;">
                                 <button onclick="saveMetaInfoFromModal()" class="action-btn-primary" style="flex: 1;">保存</button>
@@ -3549,15 +3489,39 @@
                 <!-- 夜序选项卡 -->
                 <div class="right-tab-content" id="night-order">
                     <div class="sidebar-card">
-                        <!-- 夜间顺序展示区 -->
-                        <div class="night-order-section">
-                            <h3 style="margin: 0 0 12px 0; font-size: 14px; font-weight: 600; color: var(--text-color); display: flex; justify-content: space-between; align-items: center;">
-                                🌙 夜间顺序 <span class="selected-count" id="night-order-count-display">0</span>
-                            </h3>
-                            <div id="night-order-display">
-                                <div style="text-align: center; color: #999; padding: 20px;">
-                                    暂无夜间顺序
+                        <!-- 子选项卡按钮 -->
+                        <div style="display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 2px solid var(--border-color); padding-bottom: 8px;">
+                            <button id="night-order-wakeup-tab" onclick="switchNightOrderSubTab('wakeup')" style="flex: 1; padding: 10px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; background: var(--primary-color, #4299e1); color: white; transition: all 0.2s;">唤醒</button>
+                            <button id="night-order-sort-tab" onclick="switchNightOrderSubTab('sort')" style="flex: 1; padding: 10px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; background: var(--card-bg-color); color: var(--text-color); transition: all 0.2s; border: 1px solid var(--border-color);">排序</button>
+                        </div>
+
+                        <!-- 唤醒选项卡内容 -->
+                        <div id="night-order-wakeup-content">
+                            <!-- 夜间顺序展示区 -->
+                            <div class="night-order-section">
+                                <h3 style="margin: 0 0 12px 0; font-size: 14px; font-weight: 600; color: var(--text-color); display: flex; justify-content: space-between; align-items: center;">
+                                    🌙 夜间顺序 <span class="selected-count" id="night-order-count-display">0</span>
+                                </h3>
+                                <div id="night-order-display">
+                                    <div style="text-align: center; color: #999; padding: 20px;">
+                                        暂无夜间顺序
+                                    </div>
                                 </div>
+                            </div>
+                        </div>
+
+                        <!-- 排序选项卡内容 -->
+                        <div id="night-order-sort-content" style="display: none;">
+                            <!-- 首夜行动顺序 -->
+                            <div style="margin-top: 0;">
+                                <h4 style="margin-bottom: 8px; color: var(--text-color); font-weight: 600;">首夜行动顺序（拖拽修改）：</h4>
+                                <div id="first-night-buttons-container" class="first-night-buttons-container" style="min-height: 50px; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; background: var(--card-bg-color);"></div>
+                            </div>
+
+                            <!-- 其他夜晚行动顺序 -->
+                            <div style="margin-top: 20px;">
+                                <h4 style="margin-bottom: 8px; color: var(--text-color); font-weight: 600;">其他夜晚行动顺序（拖拽修改）：</h4>
+                                <div id="other-night-buttons-container" class="other-night-buttons-container" style="min-height: 50px; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; background: var(--card-bg-color);"></div>
                             </div>
                         </div>
                     </div>
@@ -4680,9 +4644,7 @@
 
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <!-- <script src="https://cdn.jsdelivr.net/npm/html-to-image@1.11.13/dist/html-to-image.min.js"></script> -->
-    <script src="./script_files/scriptsData.js"></script>
-    <script src="./script_files/partialScriptsData.js"></script>
-    <script src="./script_files/editionLib.js"></script>
+
 
     <script>
 
@@ -4749,11 +4711,11 @@
                     
                     if (role.almanac) {
                         const almanac = role.almanac;
-                        if (almanac.flavor) almanacBookHTML += `<div style="margin-bottom: 15px;"><h5 style="color: #4a5568; margin-bottom: 5px;">Flavor</h5><p style="line-height: 1.6; color: #4a5568;">${almanac.flavor}</p></div>`;
-                        if (almanac.overview) almanacBookHTML += `<div style="margin-bottom: 15px;"><h5 style="color: #4a5568; margin-bottom: 5px;">Overview</h5><p style="line-height: 1.6; color: #4a5568;">${almanac.overview}</p></div>`;
-                        if (almanac.examples) almanacBookHTML += `<div style="margin-bottom: 15px;"><h5 style="color: #4a5568; margin-bottom: 5px;">Examples</h5><p style="line-height: 1.6; color: #4a5568;">${almanac.examples}</p></div>`;
-                        if (almanac.howToRun) almanacBookHTML += `<div style="margin-bottom: 15px;"><h5 style="color: #4a5568; margin-bottom: 5px;">How To Run</h5><p style="line-height: 1.6; color: #4a5568;">${almanac.howToRun}</p></div>`;
-                        if (almanac.tip) almanacBookHTML += `<div style="margin-bottom: 15px;"><h5 style="color: #4a5568; margin-bottom: 5px;">Tip</h5><p style="line-height: 1.6; color: #4a5568;">${almanac.tip}</p></div>`;
+                        if (almanac.flavor) almanacBookHTML += `<div style="margin-bottom: 15px;"><h5 style="color: #4a5568; margin-bottom: 5px;">风味</h5><p style="line-height: 1.6; color: #4a5568;">${almanac.flavor}</p></div>`;
+                        if (almanac.overview) almanacBookHTML += `<div style="margin-bottom: 15px;"><h5 style="color: #4a5568; margin-bottom: 5px;">概述</h5><p style="line-height: 1.6; color: #4a5568;">${almanac.overview}</p></div>`;
+                        if (almanac.examples) almanacBookHTML += `<div style="margin-bottom: 15px;"><h5 style="color: #4a5568; margin-bottom: 5px;">示例</h5><p style="line-height: 1.6; color: #4a5568;">${almanac.examples}</p></div>`;
+                        if (almanac.howToRun) almanacBookHTML += `<div style="margin-bottom: 15px;"><h5 style="color: #4a5568; margin-bottom: 5px;">运作方式</h5><p style="line-height: 1.6; color: #4a5568;">${almanac.howToRun}</p></div>`;
+                        if (almanac.tip) almanacBookHTML += `<div style="margin-bottom: 15px;"><h5 style="color: #4a5568; margin-bottom: 5px;">提示</h5><p style="line-height: 1.6; color: #4a5568;">${almanac.tip}</p></div>`;
                     }
                     
                     almanacBookHTML += `</div>`;
@@ -4845,6 +4807,12 @@
                 }
 
                 console.log('数据已从本地存储恢复');
+                
+                // 延迟初始化夜序按钮，确保DOM已完全加载
+                setTimeout(() => {
+                    updateFirstNightButtons();
+                    updateOtherNightButtons();
+                }, 500);
             } catch (error) {
                 console.error('恢复数据失败:', error);
             }
@@ -5758,24 +5726,24 @@ let allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demons
                     <div style="margin-top: 20px; padding: 20px; background-color: #f0f0f0; border-radius: 12px; margin-bottom: 20px;">
                         <h4 style="color: #6b46c1; margin-bottom: 15px; font-weight: 600;">Almanac 信息（选填）</h4>
                         <div style="margin-bottom: 15px;">
-                            <h5 style="margin-bottom: 8px; color: var(--text-color); font-weight: 500;">Flavor：</h5>
-                            <textarea id="add-almanac-flavor" style="width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: 12px; min-height: 60px; font-size: 16px; resize: vertical; transition: all 0.3s ease;" placeholder="请输入Flavor信息"></textarea>
+                            <h5 style="margin-bottom: 8px; color: var(--text-color); font-weight: 500;">风味：</h5>
+                            <textarea id="add-almanac-flavor" style="width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: 12px; min-height: 60px; font-size: 16px; resize: vertical; transition: all 0.3s ease;" placeholder="请输入风味信息"></textarea>
                         </div>
                         <div style="margin-bottom: 15px;">
-                            <h5 style="margin-bottom: 8px; color: var(--text-color); font-weight: 500;">Overview：</h5>
-                            <textarea id="add-almanac-overview" style="width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: 12px; min-height: 60px; font-size: 16px; resize: vertical; transition: all 0.3s ease;" placeholder="请输入Overview信息"></textarea>
+                            <h5 style="margin-bottom: 8px; color: var(--text-color); font-weight: 500;">概述：</h5>
+                            <textarea id="add-almanac-overview" style="width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: 12px; min-height: 60px; font-size: 16px; resize: vertical; transition: all 0.3s ease;" placeholder="请输入概述信息"></textarea>
                         </div>
                         <div style="margin-bottom: 15px;">
-                            <h5 style="margin-bottom: 8px; color: var(--text-color); font-weight: 500;">Examples：</h5>
-                            <textarea id="add-almanac-examples" style="width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: 12px; min-height: 60px; font-size: 16px; resize: vertical; transition: all 0.3s ease;" placeholder="请输入Examples信息"></textarea>
+                            <h5 style="margin-bottom: 8px; color: var(--text-color); font-weight: 500;">示例：</h5>
+                            <textarea id="add-almanac-examples" style="width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: 12px; min-height: 60px; font-size: 16px; resize: vertical; transition: all 0.3s ease;" placeholder="请输入示例信息"></textarea>
                         </div>
                         <div style="margin-bottom: 15px;">
-                            <h5 style="margin-bottom: 8px; color: var(--text-color); font-weight: 500;">How To Run：</h5>
-                            <textarea id="add-almanac-how-to-run" style="width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: 12px; min-height: 60px; font-size: 16px; resize: vertical; transition: all 0.3s ease;" placeholder="请输入How To Run信息"></textarea>
+                            <h5 style="margin-bottom: 8px; color: var(--text-color); font-weight: 500;">运作方式：</h5>
+                            <textarea id="add-almanac-how-to-run" style="width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: 12px; min-height: 60px; font-size: 16px; resize: vertical; transition: all 0.3s ease;" placeholder="请输入运作方式信息"></textarea>
                         </div>
                         <div style="margin-bottom: 15px;">
-                            <h5 style="margin-bottom: 8px; color: var(--text-color); font-weight: 500;">Tip：</h5>
-                            <textarea id="add-almanac-tip" style="width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: 12px; min-height: 60px; font-size: 16px; resize: vertical; transition: all 0.3s ease;" placeholder="请输入Tip信息"></textarea>
+                            <h5 style="margin-bottom: 8px; color: var(--text-color); font-weight: 500;">提示：</h5>
+                            <textarea id="add-almanac-tip" style="width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: 12px; min-height: 60px; font-size: 16px; resize: vertical; transition: all 0.3s ease;" placeholder="请输入提示信息"></textarea>
                         </div>
                     </div>
                     <div style="margin-bottom: 20px;">
@@ -5942,11 +5910,11 @@ let allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demons
                 document.getElementById('add-remindersGlobal3').value.trim(),
                 document.getElementById('add-remindersGlobal4').value.trim()
             ].filter(item => item); // 过滤空值
-            const almanacFlavor = document.getElementById('add-almanac-flavor').value.trim();
-            const almanacOverview = document.getElementById('add-almanac-overview').value.trim();
-            const almanacExamples = document.getElementById('add-almanac-examples').value.trim();
+            const almanac风味 = document.getElementById('add-almanac-flavor').value.trim();
+            const almanac概述 = document.getElementById('add-almanac-overview').value.trim();
+            const almanac示例 = document.getElementById('add-almanac-examples').value.trim();
             const almanacHowToRun = document.getElementById('add-almanac-how-to-run').value.trim();
-            const almanacTip = document.getElementById('add-almanac-tip').value.trim();
+            const almanac提示 = document.getElementById('add-almanac-tip').value.trim();
             const setup = document.getElementById('add-setup').checked;
             
             if (!roleName || !ability) {
@@ -6014,13 +5982,13 @@ let allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demons
             if (remindersGlobal.length > 0) newRole.remindersGlobal = remindersGlobal;
             
             // 添加Almanac信息
-            if (almanacFlavor || almanacOverview || almanacExamples || almanacHowToRun || almanacTip) {
+            if (almanac风味 || almanac概述 || almanac示例 || almanacHowToRun || almanac提示) {
                 newRole.almanac = {
-                    flavor: almanacFlavor,
-                    overview: almanacOverview,
-                    examples: almanacExamples,
+                    flavor: almanac风味,
+                    overview: almanac概述,
+                    examples: almanac示例,
                     howToRun: almanacHowToRun,
-                    tip: almanacTip
+                    tip: almanac提示
                 };
             }
             
@@ -6245,11 +6213,11 @@ let allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demons
                 <div id="meta-info-group" style="margin-bottom: 20px;">
                     <div style="margin-bottom: 20px;">
                         <h4 style="margin-bottom: 8px; color: var(--text-color); font-weight: 600;">剧本名 <span style="color: red;">*</span></h4>
-                        <input type="text" id="edition-name" value="" style="width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: 12px; font-size: 16px; transition: all 0.3s ease;" placeholder="请输入剧本名">
+                        <input type="text" id="edition-name" value="" style="width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: 12px; font-size: 16px; transition: all 0.3s ease; color: var(--text-color); background-color: var(--card-bg-color);" placeholder="请输入剧本名">
                     </div>
                     <div style="margin-bottom: 20px;">
                         <h4 style="margin-bottom: 8px; color: var(--text-color); font-weight: 600;">作者（选填）：</h4>
-                        <input type="text" id="author-name" value="" style="width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: 12px; font-size: 16px; transition: all 0.3s ease;" placeholder="请输入作者">
+                        <input type="text" id="author-name" value="" style="width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: 12px; font-size: 16px; transition: all 0.3s ease; color: var(--text-color); background-color: var(--card-bg-color);" placeholder="请输入作者">
                     </div>
                     <div style="margin-bottom: 20px;">
                         <h4 style="margin-bottom: 8px; color: var(--text-color); font-weight: 600;">在魔典隐藏作者和剧本名（选填）：</h4>
@@ -6260,7 +6228,7 @@ let allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demons
                     </div>
                     <div style="margin-bottom: 20px;">
                         <h4 style="margin-bottom: 8px; color: var(--text-color); font-weight: 600;">剧本描述（选填）：</h4>
-                        <textarea id="edition-description" style="width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: 12px; min-height: 80px; font-size: 16px; resize: vertical; transition: all 0.3s ease;" placeholder="请输入剧本描述"></textarea>
+                        <textarea id="edition-description" style="width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: 12px; min-height: 80px; font-size: 16px; resize: vertical; transition: all 0.3s ease; color: var(--text-color); background-color: var(--card-bg-color);" placeholder="请输入剧本描述"></textarea>
                     </div>
                     <div style="margin-bottom: 20px;">
                         <h4 style="margin-bottom: 8px; color: var(--text-color); font-weight: 600;">剧本图标（选填）：</h4>
@@ -6276,7 +6244,7 @@ let allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demons
                                 <img id="preview-logo" src="" alt="预览" style="max-width: 100px; max-height: 100px; border-radius: 4px; border: 2px solid #ddd;">
                                 <button type="button" id="clear-logo" style="margin-top: 5px; padding: 5px 10px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">清除图片</button>
                             </div>
-                            <textarea id="logo" style="width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: 12px; min-height: 60px; font-size: 16px; resize: vertical; transition: all 0.3s ease;" placeholder="剧本图片URL，会显示在魔典中间，或使用上方上传功能"></textarea>
+                            <textarea id="logo" style="width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: 12px; min-height: 60px; font-size: 16px; resize: vertical; transition: all 0.3s ease; color: var(--text-color); background-color: var(--card-bg-color);" placeholder="剧本图片URL，会显示在魔典中间，或使用上方上传功能"></textarea>
                         </div>
                     </div>
                     <div style="margin-bottom: 20px;">
@@ -6293,7 +6261,7 @@ let allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demons
                                 <img id="preview-background" src="" alt="预览" style="max-width: 200px; max-height: 100px; border-radius: 4px; border: 2px solid #ddd;">
                                 <button type="button" id="clear-background" style="margin-top: 5px; padding: 5px 10px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">清除图片</button>
                             </div>
-                            <textarea id="background" style="width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: 12px; min-height: 60px; font-size: 16px; resize: vertical; transition: all 0.3s ease;" placeholder="魔典背景图URL，或使用上方上传功能"></textarea>
+                            <textarea id="background" style="width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: 12px; min-height: 60px; font-size: 16px; resize: vertical; transition: all 0.3s ease; color: var(--text-color); background-color: var(--card-bg-color);" placeholder="魔典背景图URL，或使用上方上传功能"></textarea>
                         </div>
                     </div>
                     <div style="margin-bottom: 20px;">
@@ -6310,12 +6278,12 @@ let allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demons
                                 <img id="preview-qrcode" src="" alt="预览" style="max-width: 100px; max-height: 100px; border-radius: 4px; border: 2px solid #ddd;">
                                 <button type="button" id="clear-qrcode" style="margin-top: 5px; padding: 5px 10px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">清除图片</button>
                             </div>
-                            <textarea id="qrcode-image-input" style="width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: 12px; min-height: 60px; font-size: 16px; resize: vertical; transition: all 0.3s ease;" placeholder="二维码图片URL，或使用上方上传功能"></textarea>
+                            <textarea id="qrcode-image-input" style="width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: 12px; min-height: 60px; font-size: 16px; resize: vertical; transition: all 0.3s ease; color: var(--text-color); background-color: var(--card-bg-color);" placeholder="二维码图片URL，或使用上方上传功能"></textarea>
                         </div>
                     </div>
                     <div style="margin-bottom: 20px;">
                         <h4 style="margin-bottom: 8px; color: var(--text-color); font-weight: 600;">剧本自制规则（选填）：</h4>
-                        <textarea id="bootlegger" style="width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: 12px; min-height: 80px; font-size: 16px; resize: vertical; transition: all 0.3s ease;" placeholder="请输入剧本自制规则"></textarea>
+                        <textarea id="bootlegger" style="width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: 12px; min-height: 80px; font-size: 16px; resize: vertical; transition: all 0.3s ease; color: var(--text-color); background-color: var(--card-bg-color);" placeholder="请输入剧本自制规则"></textarea>
                     </div>
                     <div class="button-container" style="display: flex; gap: 16px; margin-top: 30px;">
                         <button onclick="cancelAddMetaInfo()" class="cancel-meta-info-button" style="flex: 1; padding: 14px 28px; font-size: 16px; font-weight: 600; border: none; border-radius: 16px; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: var(--shadow-md); margin-top: 0; background: linear-gradient(135deg, #718096 0%, #a0aec0 100%); color: white; position: relative; overflow: hidden;">取消</button>
@@ -6656,13 +6624,26 @@ let allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demons
                         <h4 style="margin-bottom: 8px; color: var(--text-color); font-weight: 600;">剧本自制规则（选填）：</h4>
                         <textarea id="bootlegger" style="width: 100%; padding: 14px; border: 2px solid var(--border-color); border-radius: 12px; min-height: 80px; font-size: 16px; resize: vertical; transition: all 0.3s ease;" placeholder="请输入剧本自制规则"></textarea>
                     </div>
+                    
+                    <!-- 夜序子选项卡 -->
                     <div style="margin-bottom: 20px;">
-                        <h4 style="margin-bottom: 8px; color: var(--text-color); font-weight: 600;">首夜行动顺序（拖拽修改）：</h4>
-                        <div id="first-night-buttons-container" class="first-night-buttons-container" style="min-height: 50px; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; background: white;"></div>
-                    </div>
-                    <div style="margin-bottom: 20px;">
-                        <h4 style="margin-bottom: 8px; color: var(--text-color); font-weight: 600;">其他夜晚行动顺序（拖拽修改）：</h4>
-                        <div id="other-night-buttons-container" class="other-night-buttons-container" style="min-height: 50px; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; background: white;"></div>
+                        <div style="display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 2px solid var(--border-color); padding-bottom: 8px;">
+                            <button id="modal-night-order-wakeup-tab" onclick="switchModalNightOrderSubTab('wakeup')" style="flex: 1; padding: 10px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; background: var(--primary-color, #4299e1); color: white; transition: all 0.2s;">唤醒</button>
+                            <button id="modal-night-order-sort-tab" onclick="switchModalNightOrderSubTab('sort')" style="flex: 1; padding: 10px 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; background: white; color: var(--text-color); transition: all 0.2s; border: 1px solid var(--border-color);">排序</button>
+                        </div>
+                        
+                        <!-- 唤醒选项卡内容 -->
+                        <div id="modal-night-order-wakeup-content">
+                            <p style="color: #666; font-size: 13px;">请切换到"排序"选项卡调整夜间顺序</p>
+                        </div>
+                        
+                        <!-- 排序选项卡内容 -->
+                        <div id="modal-night-order-sort-content" style="display: none;">
+                            <h4 style="margin-bottom: 8px; color: var(--text-color); font-weight: 600;">首夜行动顺序（拖拽修改）：</h4>
+                            <div id="first-night-buttons-container" class="first-night-buttons-container" style="min-height: 50px; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; background: white;"></div>
+                            <h4 style="margin-bottom: 8px; color: var(--text-color); font-weight: 600; margin-top: 16px;">其他夜晚行动顺序（拖拽修改）：</h4>
+                            <div id="other-night-buttons-container" class="other-night-buttons-container" style="min-height: 50px; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; background: white;"></div>
+                        </div>
                     </div>
 
                     <div class="button-container" style="display: flex; gap: 16px; margin-top: 30px;">
@@ -8114,23 +8095,23 @@ let allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demons
                 <div id="edit-tab-almanac" class="edit-tab-content">
                     <div style="padding: 16px; background-color: #f8f9fa; border-radius: 10px;">
                         <div style="margin-bottom: 14px;">
-                            <h5 style="margin-bottom: 6px; color: var(--text-color); font-weight: 500;">Flavor：</h5>
+                            <h5 style="margin-bottom: 6px; color: var(--text-color); font-weight: 500;">风味：</h5>
                             <textarea id="edit-almanac-flavor" style="width: 100%; padding: 12px; border: 2px solid var(--border-color); border-radius: 10px; min-height: 60px; font-size: 14px; resize: vertical;">${(role.almanac && role.almanac.flavor) || ''}</textarea>
                         </div>
                         <div style="margin-bottom: 14px;">
-                            <h5 style="margin-bottom: 6px; color: var(--text-color); font-weight: 500;">Overview：</h5>
+                            <h5 style="margin-bottom: 6px; color: var(--text-color); font-weight: 500;">概述：</h5>
                             <textarea id="edit-almanac-overview" style="width: 100%; padding: 12px; border: 2px solid var(--border-color); border-radius: 10px; min-height: 60px; font-size: 14px; resize: vertical;">${(role.almanac && role.almanac.overview) || ''}</textarea>
                         </div>
                         <div style="margin-bottom: 14px;">
-                            <h5 style="margin-bottom: 6px; color: var(--text-color); font-weight: 500;">Examples：</h5>
+                            <h5 style="margin-bottom: 6px; color: var(--text-color); font-weight: 500;">示例：</h5>
                             <textarea id="edit-almanac-examples" style="width: 100%; padding: 12px; border: 2px solid var(--border-color); border-radius: 10px; min-height: 60px; font-size: 14px; resize: vertical;">${(role.almanac && role.almanac.examples) || ''}</textarea>
                         </div>
                         <div style="margin-bottom: 14px;">
-                            <h5 style="margin-bottom: 6px; color: var(--text-color); font-weight: 500;">How To Run：</h5>
+                            <h5 style="margin-bottom: 6px; color: var(--text-color); font-weight: 500;">运作方式：</h5>
                             <textarea id="edit-almanac-how-to-run" style="width: 100%; padding: 12px; border: 2px solid var(--border-color); border-radius: 10px; min-height: 60px; font-size: 14px; resize: vertical;">${(role.almanac && role.almanac.howToRun) || ''}</textarea>
                         </div>
                         <div style="margin-bottom: 14px;">
-                            <h5 style="margin-bottom: 6px; color: var(--text-color); font-weight: 500;">Tip：</h5>
+                            <h5 style="margin-bottom: 6px; color: var(--text-color); font-weight: 500;">提示：</h5>
                             <textarea id="edit-almanac-tip" style="width: 100%; padding: 12px; border: 2px solid var(--border-color); border-radius: 10px; min-height: 60px; font-size: 14px; resize: vertical;">${(role.almanac && role.almanac.tip) || ''}</textarea>
                         </div>
                     </div>
@@ -8249,11 +8230,133 @@ let allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demons
                 });
             }
             
-            // 显示修改角色容器
-            editContainer.style.display = 'block';
+            // 检查是否是移动端
+            const isMobile = window.innerWidth <= 768;
             
-            // 滚动到修改角色容器位置
-            editContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            if (isMobile) {
+                // 移动端：使用弹窗显示
+                const modalOverlay = document.createElement('div');
+                modalOverlay.id = 'edit-role-modal-overlay';
+                modalOverlay.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background-color: rgba(0, 0, 0, 0.7);
+                    z-index: 1000;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                `;
+                
+                const modalContent = document.createElement('div');
+                modalContent.style.cssText = `
+                    background: white;
+                    width: 90%;
+                    max-width: 400px;
+                    max-height: 80vh;
+                    border-radius: 16px;
+                    overflow: hidden;
+                    position: relative;
+                    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+                `;
+                
+                const closeBtn = document.createElement('button');
+                closeBtn.innerHTML = '✕';
+                closeBtn.style.cssText = `
+                    position: absolute;
+                    top: 10px;
+                    right: 10px;
+                    width: 36px;
+                    height: 36px;
+                    border: none;
+                    background: rgba(0, 0, 0, 0.1);
+                    border-radius: 50%;
+                    font-size: 18px;
+                    color: #666;
+                    cursor: pointer;
+                    z-index: 10;
+                `;
+                closeBtn.onclick = cancelEditRole;
+                
+                modalContent.appendChild(closeBtn);
+                modalContent.appendChild(editContainer);
+                modalOverlay.appendChild(modalContent);
+                document.body.appendChild(modalOverlay);
+                
+                // 设置弹窗内编辑容器的样式
+                editContainer.style.display = 'block';
+                editContainer.style.margin = '0';
+                editContainer.style.padding = '16px';
+                editContainer.style.borderRadius = '0';
+                editContainer.style.boxShadow = 'none';
+                editContainer.style.maxHeight = 'calc(80vh - 60px)';
+                editContainer.style.overflowY = 'auto';
+            } else {
+                // 桌面端：内联显示并滚动到位置
+                editContainer.style.display = 'block';
+                editContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+        
+        // 切换夜序子选项卡
+        function switchNightOrderSubTab(tabName) {
+            const wakeupTab = document.getElementById('night-order-wakeup-tab');
+            const sortTab = document.getElementById('night-order-sort-tab');
+            const wakeupContent = document.getElementById('night-order-wakeup-content');
+            const sortContent = document.getElementById('night-order-sort-content');
+            
+            if (tabName === 'wakeup') {
+                wakeupTab.style.background = 'var(--primary-color, #4299e1)';
+                wakeupTab.style.color = 'white';
+                sortTab.style.background = 'var(--card-bg-color)';
+                sortTab.style.color = 'var(--text-color)';
+                wakeupContent.style.display = 'block';
+                sortContent.style.display = 'none';
+            } else if (tabName === 'sort') {
+                sortTab.style.background = 'var(--primary-color, #4299e1)';
+                sortTab.style.color = 'white';
+                wakeupTab.style.background = 'var(--card-bg-color)';
+                wakeupTab.style.color = 'var(--text-color)';
+                sortContent.style.display = 'block';
+                wakeupContent.style.display = 'none';
+                
+                // 切换到排序选项卡时刷新按钮
+                updateFirstNightButtons();
+                updateOtherNightButtons();
+            }
+        }
+        
+        // 切换弹窗中的夜序子选项卡
+        function switchModalNightOrderSubTab(tabName) {
+            const wakeupTab = document.getElementById('modal-night-order-wakeup-tab');
+            const sortTab = document.getElementById('modal-night-order-sort-tab');
+            const wakeupContent = document.getElementById('modal-night-order-wakeup-content');
+            const sortContent = document.getElementById('modal-night-order-sort-content');
+            
+            if (tabName === 'wakeup') {
+                wakeupTab.style.background = 'var(--primary-color, #4299e1)';
+                wakeupTab.style.color = 'white';
+                sortTab.style.background = 'white';
+                sortTab.style.color = 'var(--text-color)';
+                sortTab.style.border = '1px solid var(--border-color)';
+                wakeupContent.style.display = 'block';
+                sortContent.style.display = 'none';
+            } else if (tabName === 'sort') {
+                sortTab.style.background = 'var(--primary-color, #4299e1)';
+                sortTab.style.color = 'white';
+                sortTab.style.border = 'none';
+                wakeupTab.style.background = 'white';
+                wakeupTab.style.color = 'var(--text-color)';
+                wakeupTab.style.border = '1px solid var(--border-color)';
+                sortContent.style.display = 'block';
+                wakeupContent.style.display = 'none';
+                
+                // 切换到排序选项卡时刷新按钮
+                updateFirstNightButtons();
+                updateOtherNightButtons();
+            }
         }
         
         // 切换修改角色选项卡
@@ -8280,9 +8383,24 @@ let allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demons
         function cancelEditRole() {
             const editContainer = document.getElementById('edit-role-container');
             const formContent = document.getElementById('edit-role-form-content');
+            const modalOverlay = document.getElementById('edit-role-modal-overlay');
+            
+            // 移除弹窗遮罩层（移动端）
+            if (modalOverlay) {
+                document.body.removeChild(modalOverlay);
+            }
+            
+            // 重置编辑容器样式
             if (editContainer) {
                 editContainer.style.display = 'none';
+                editContainer.style.margin = '';
+                editContainer.style.padding = '';
+                editContainer.style.borderRadius = '';
+                editContainer.style.boxShadow = '';
+                editContainer.style.maxHeight = '';
+                editContainer.style.overflowY = '';
             }
+            
             if (formContent) {
                 formContent.innerHTML = '';
             }
@@ -8314,11 +8432,11 @@ let allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demons
                 document.getElementById('edit-remindersGlobal3').value.trim(),
                 document.getElementById('edit-remindersGlobal4').value.trim()
             ].filter(item => item); // 过滤空值
-            const almanacFlavor = document.getElementById('edit-almanac-flavor').value.trim();
-            const almanacOverview = document.getElementById('edit-almanac-overview').value.trim();
-            const almanacExamples = document.getElementById('edit-almanac-examples').value.trim();
+            const almanac风味 = document.getElementById('edit-almanac-flavor').value.trim();
+            const almanac概述 = document.getElementById('edit-almanac-overview').value.trim();
+            const almanac示例 = document.getElementById('edit-almanac-examples').value.trim();
             const almanacHowToRun = document.getElementById('edit-almanac-how-to-run').value.trim();
-            const almanacTip = document.getElementById('edit-almanac-tip').value.trim();
+            const almanac提示 = document.getElementById('edit-almanac-tip').value.trim();
             const setup = document.getElementById('edit-setup').checked;
             
             if (!roleName || !ability) {
@@ -8354,13 +8472,13 @@ let allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demons
                     r.setup = setup;
                     
                     // 更新Almanac信息
-                    if (almanacFlavor || almanacOverview || almanacExamples || almanacHowToRun || almanacTip) {
+                    if (almanac风味 || almanac概述 || almanac示例 || almanacHowToRun || almanac提示) {
                         r.almanac = {
-                            flavor: almanacFlavor,
-                            overview: almanacOverview,
-                            examples: almanacExamples,
+                            flavor: almanac风味,
+                            overview: almanac概述,
+                            examples: almanac示例,
                             howToRun: almanacHowToRun,
-                            tip: almanacTip
+                            tip: almanac提示
                         };
                     }
                     
@@ -8387,13 +8505,13 @@ let allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demons
                         r.setup = setup;
                         
                         // 更新Almanac信息
-                        if (almanacFlavor || almanacOverview || almanacExamples || almanacHowToRun || almanacTip) {
+                        if (almanac风味 || almanac概述 || almanac示例 || almanacHowToRun || almanac提示) {
                             r.almanac = {
-                                flavor: almanacFlavor,
-                                overview: almanacOverview,
-                                examples: almanacExamples,
+                                flavor: almanac风味,
+                                overview: almanac概述,
+                                examples: almanac示例,
                                 howToRun: almanacHowToRun,
-                                tip: almanacTip
+                                tip: almanac提示
                             };
                         }
                         
@@ -9322,122 +9440,6 @@ let allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demons
             });
         }
 
-        // 初始化剧本搜索功能
-        function initScriptSearch() {
-            const scriptSearchInput = document.getElementById('script-search-input');
-            const scriptSearchResults = document.getElementById('script-search-results');
-            
-            if (scriptSearchInput && scriptSearchResults) {
-                scriptSearchInput.addEventListener('input', function() {
-                    const searchTerm = this.value.trim().toLowerCase();
-                    
-                    if (searchTerm.length === 0) {
-                        scriptSearchResults.innerHTML = '';
-                        return;
-                    }
-                    
-                    // 从editionLib中获取剧本列表
-                    let scripts = [];
-                    if (typeof editionLib !== 'undefined' && Array.isArray(editionLib)) {
-                        scripts = editionLib.map(item => item.meta_name);
-                    } else {
-                        // 如果editionLib未加载，使用默认剧本列表
-                        scripts = [
-                            '暗流涌动',
-                            '黯月初升',
-                            '梦殒春宵',
-                            '实验性角色',
-                            '华灯初上',
-                            '山雨欲来',
-                            '旧版角色',
-                            '传奇角色',
-                            '旅行者'
-                        ];
-                    }
-                    
-                    // 过滤剧本
-                    const filteredScripts = scripts.filter(script => 
-                        script.toLowerCase().includes(searchTerm)
-                    );
-                    
-                    // 显示搜索结果
-                    if (filteredScripts.length > 0) {
-                        let resultsHTML = '<ul style="list-style: none; padding: 0; margin: 0;">';
-                        filteredScripts.forEach(script => {
-                            resultsHTML += `<li style="padding: 8px; border-bottom: 1px solid #eee; cursor: pointer;" onclick="selectScript('${script}')">${script}</li>`;
-                        });
-                        resultsHTML += '</ul>';
-                        scriptSearchResults.innerHTML = resultsHTML;
-                    } else {
-                        scriptSearchResults.innerHTML = '<p style="color: #666; padding: 8px;">未找到匹配的剧本</p>';
-                    }
-                });
-                
-                // 点击其他地方关闭搜索结果
-                document.addEventListener('click', function(event) {
-                    if (!scriptSearchInput.contains(event.target) && !scriptSearchResults.contains(event.target)) {
-                        scriptSearchResults.innerHTML = '';
-                    }
-                });
-            }
-        }
-
-        // 选择剧本
-        function selectScript(scriptName) {
-            // 清空搜索框并隐藏搜索结果
-            const scriptSearchInput = document.getElementById('script-search-input');
-            const scriptSearchResults = document.getElementById('script-search-results');
-            if (scriptSearchInput) scriptSearchInput.value = scriptName;
-            if (scriptSearchResults) scriptSearchResults.innerHTML = '';
-            
-            // 从editionLib中查找剧本
-            if (typeof editionLib !== 'undefined' && Array.isArray(editionLib)) {
-                const script = editionLib.find(item => item.meta_name === scriptName);
-                if (script && script.roleName) {
-                    // 清空所有已选角色
-                    document.querySelectorAll('.role-item input[type="checkbox"]').forEach(checkbox => {
-                        checkbox.checked = false;
-                    });
-                    
-                    // 勾选剧本中的所有角色
-                    script.roleName.forEach(roleName => {
-                        // 查找包含该角色名称的复选框
-                        const roleCheckboxes = document.querySelectorAll('.role-item input[type="checkbox"]');
-                        roleCheckboxes.forEach(checkbox => {
-                            const roleItem = checkbox.closest('.role-item');
-                            if (roleItem && roleItem.textContent.includes(roleName)) {
-                                checkbox.checked = true;
-                            }
-                        });
-                    });
-                    
-                    // 更新已选角色显示
-                    updateSelectedRolesDisplay();
-                    
-                    // 显示成功提示
-                    const successDiv = document.createElement('div');
-                    successDiv.style.cssText = 'background: #d4edda; color: #155724; padding: 10px; margin: 10px 0; border-radius: 4px; font-size: 14px;';
-                    successDiv.innerHTML = `✅ 已选择剧本 "${scriptName}" 的所有角色`;
-                    successDiv.id = 'script-selection-success';
-                    
-                    // 移除旧的提示
-                    const oldSuccessDiv = document.getElementById('script-selection-success');
-                    if (oldSuccessDiv) oldSuccessDiv.remove();
-                    
-                    // 添加新提示
-                    const scriptSearchContainer = document.querySelector('.script-search');
-                    if (scriptSearchContainer) {
-                        scriptSearchContainer.appendChild(successDiv);
-                        
-                        // 3秒后自动移除提示
-                        setTimeout(() => {
-                            successDiv.remove();
-                        }, 3000);
-                    }
-                }
-            }
-        }
-
         // 初始化加载角色
         window.onload = function() {
             loadRoles(townsfolkRoles, 'townsfolk-columns');
@@ -9453,9 +9455,6 @@ let allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demons
 
             // 初始化选项卡
             initTabs();
-            
-            // 初始化剧本搜索功能
-            initScriptSearch();
 
             // 为脚本选择添加事件监听器
             document.querySelectorAll('.script-selection input[type="checkbox"]').forEach(checkbox => {
@@ -9699,30 +9698,30 @@ if (displayContainer) {
                     // 纵向排列角色（每个角色占一行）
                     roles.forEach((role, index) => {
                         html += `
-                            <div class="selected-role-card" title="点击编辑角色" data-role-id="${role.id}" data-category="${category}" style="user-select: none;">
+                            <div class="selected-role-card" onclick="editRole('${role.id}')" title="点击编辑角色" data-role-id="${role.id}" data-category="${category}" style="user-select: none; cursor: pointer;">
                                 <div class="selected-role-header" style="display: flex; align-items: center;">
                                     <div style="display: flex; flex-direction: column; gap: 1px; margin-right: 10px;">
-                                        <button type="button" class="role-action-btn move-up-btn" onclick="moveRoleUp('${role.id}')" title="上移" style="padding: 0px 6px; font-size: 9px; color: #666; background: transparent; border: none; cursor: pointer;">↑</button>
-                                        <button type="button" class="role-action-btn move-down-btn" onclick="moveRoleDown('${role.id}')" title="下移" style="padding: 0px 6px; font-size: 9px; color: #666; background: transparent; border: none; cursor: pointer;">↓</button>
+                                        <button type="button" class="role-action-btn move-up-btn" onclick="event.stopPropagation(); moveRoleUp('${role.id}')" title="上移" style="padding: 0px 6px; font-size: 9px; color: #666; background: transparent; border: none; cursor: pointer;">↑</button>
+                                        <button type="button" class="role-action-btn move-down-btn" onclick="event.stopPropagation(); moveRoleDown('${role.id}')" title="下移" style="padding: 0px 6px; font-size: 9px; color: #666; background: transparent; border: none; cursor: pointer;">↓</button>
                                     </div>
                                     <img src="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2245%22 fill=%22%23f0f0f0%22/><text x=%2250%22 y=%2260%22 text-anchor=%22middle%22 font-size=%2230%22> ${role.name.charAt(0)} </text></svg>" data-src="${role.image}" alt="${role.name}" class="lazy-load" data-retry="0" data-max-retry="3" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex-shrink: 0;">
-                                    <span class="selected-role-name" onclick="editRole('${role.id}')" title="点击编辑角色信息" style="flex-grow: 1; margin: 0 10px; cursor: pointer;">${role.name}</span>
+                                    <span class="selected-role-name" title="点击编辑角色信息" style="flex-grow: 1; margin: 0 10px;">${role.name}</span>
                                     <div class="selected-role-actions" style="flex-shrink: 0;">
-                                        <button type="button" class="role-action-btn copy-btn" onclick="copyRoleAbility('${role.ability}', '${role.name}', '${role.image}')" title="复制角色信息" style="margin: 0 2px;">
+                                        <button type="button" class="role-action-btn copy-btn" onclick="event.stopPropagation(); copyRoleAbility('${role.ability}', '${role.name}', '${role.image}')" title="复制角色信息" style="margin: 0 2px;">
                                             <span style="font-size: 16px; font-weight: bold;">📋</span>
                                         </button>
-                                        <button type="button" class="role-action-btn pin-btn ${pinnedRoles.has(role.id) ? 'active' : ''}" onclick="togglePinRole('${role.id}')" title="固定此角色" style="margin: 0 2px;">
+                                        <button type="button" class="role-action-btn pin-btn ${pinnedRoles.has(role.id) ? 'active' : ''}" onclick="event.stopPropagation(); togglePinRole('${role.id}')" title="固定此角色" style="margin: 0 2px;">
                                             <span style="font-size: 16px; font-weight: bold;">🔒</span>
                                         </button>
-                                        <button type="button" class="role-action-btn exclude-btn ${excludedRoles.has(role.id) ? 'active' : ''}" onclick="toggleExcludeRole('${role.id}')" title="排除此角色" style="margin: 0 2px;">
+                                        <button type="button" class="role-action-btn exclude-btn ${excludedRoles.has(role.id) ? 'active' : ''}" onclick="event.stopPropagation(); toggleExcludeRole('${role.id}')" title="排除此角色" style="margin: 0 2px;">
                                             <span style="font-size: 16px; font-weight: bold;">🚫</span>
                                         </button>
-                                        <button type="button" class="role-action-btn delete-btn" onclick="toggleRoleSelection('${role.id}')" title="删除此角色" style="margin: 0 2px;">
+                                        <button type="button" class="role-action-btn delete-btn" onclick="event.stopPropagation(); toggleRoleSelection('${role.id}')" title="删除此角色" style="margin: 0 2px;">
                                             <span style="font-size: 16px; font-weight: bold;">🗑️</span>
                                         </button>
                                     </div>
                                 </div>
-                                ${role.ability ? `<div class="selected-role-ability" onclick="editRole('${role.id}')" title="点击编辑角色信息" style="margin-left: 60px; padding: 8px 0; cursor: pointer;">${highlightAbility(role.ability)}</div>` : ''}
+                                ${role.ability ? `<div class="selected-role-ability" title="点击编辑角色信息" style="margin-left: 60px; padding: 8px 0;">${highlightAbility(role.ability)}</div>` : ''}
                             </div>
                         `;
                         globalIndex++;
@@ -9762,6 +9761,10 @@ if (displayContainer) {
             
             // 更新夜间顺序按钮（包含自制角色）
             updateNightNumOfMetaInfoInput();
+            
+            // 更新夜序选项卡中的按钮
+            updateFirstNightButtons();
+            updateOtherNightButtons();
             
             // 保存数据到本地存储
             saveToLocalStorage();
@@ -12057,230 +12060,366 @@ if (displayContainer) {
         }
 
         function updateFirstNightButtons() {
-            // 获取所有firstNight不为0的角色
-            const firstNightRoles = [
-                { "id": "twilight", "name": "黄昏", "firstNight": 0 },
-                ...(editionRolesJson.filter(role => role.firstNight > 0)),
-                { "id": "minioninfo", "name": "爪牙信息", "firstNight": 2000 },
-                { "id": "demoninfo", "name": "恶魔信息", "firstNight": 3000 },
-                { "id": "dawn", "name": "黎明", "firstNight": 12799 }
-            ];
+            // 元信息角色映射
+            const metaRolesMap = {
+                'minioninfo': { "id": "minioninfo", "name": "爪牙信息", "firstNight": 2000 },
+                'demoninfo': { "id": "demoninfo", "name": "恶魔信息", "firstNight": 3000 },
+                'twilight': { "id": "twilight", "name": "黄昏", "firstNight": 0 },
+                'dawn': { "id": "dawn", "name": "黎明", "firstNight": 12799 }
+            };
 
-            // 按firstNight值排序
-            firstNightRoles.sort((a, b) => a.firstNight - b.firstNight);
+            let firstNightRoles;
+            let useDefaultOrder = false;
 
-            // 获取或创建按钮容器 - 优先在弹窗中查找，其次在主文档中查找
-            let container = null;
-            const metaInfoForm = document.getElementById('add-meta-info-form');
-            if (metaInfoForm) {
-                container = metaInfoForm.querySelector('#first-night-buttons-container');
+            // 优先使用 metaInfoJson.firstNight 中的用户顺序
+            if (metaInfoJson.firstNight && metaInfoJson.firstNight.length > 0) {
+                console.log('updateFirstNightButtons: 使用用户自定义的首夜顺序', metaInfoJson.firstNight);
+                
+                // 按照 metaInfoJson.firstNight 中的顺序构建角色列表
+                firstNightRoles = metaInfoJson.firstNight.map(roleId => {
+                    // 先检查是否是元信息角色
+                    if (metaRolesMap[roleId]) {
+                        return metaRolesMap[roleId];
+                    }
+                    // 在 editionRolesJson 中查找对应的角色
+                    return editionRolesJson.find(role => role.id === roleId);
+                }).filter(Boolean); // 过滤掉 null/undefined
+                
+                // 检查过滤后的数组是否有有效内容
+                // 如果过滤后的数组只有元信息角色，没有实际的游戏角色，则回退到默认顺序
+                const hasGameRoles = firstNightRoles.some(role => 
+                    !['twilight', 'minioninfo', 'demoninfo', 'dawn'].includes(role.id)
+                );
+                
+                if (!hasGameRoles) {
+                    console.log('updateFirstNightButtons: 用户顺序中没有游戏角色，回退到默认顺序');
+                    useDefaultOrder = true;
+                    // 清理无效的用户顺序数据
+                    delete metaInfoJson.firstNight;
+                    saveToLocalStorage();
+                }
+            } else {
+                useDefaultOrder = true;
             }
-            if (!container) {
-                container = document.getElementById('first-night-buttons-container');
+
+            if (useDefaultOrder) {
+                console.log('updateFirstNightButtons: 使用默认的首夜顺序');
+                // 如果 metaInfoJson 中没有用户自定义的顺序，或者用户顺序无效，则使用默认顺序
+                firstNightRoles = [
+                    { "id": "twilight", "name": "黄昏", "firstNight": 0 },
+                    ...(editionRolesJson.filter(role => role.firstNight > 0)),
+                    { "id": "minioninfo", "name": "爪牙信息", "firstNight": 2000 },
+                    { "id": "demoninfo", "name": "恶魔信息", "firstNight": 3000 },
+                    { "id": "dawn", "name": "黎明", "firstNight": 12799 }
+                ];
+                // 按firstNight值排序
+                firstNightRoles.sort((a, b) => a.firstNight - b.firstNight);
+            }
+
+            // 获取所有容器（夜序选项卡和弹窗中的容器）
+            const containers = [];
+            
+            // 先找夜序选项卡中的容器
+            const mainContainer = document.getElementById('first-night-buttons-container');
+            if (mainContainer) {
+                containers.push(mainContainer);
             }
             
-            // 如果弹窗中存在容器但没有找到相应元素，或者容器根本不存在
-            if (!container) {
-                // 尝试在弹窗的meta-info-group中查找或创建容器
-                const metaInfoGroup = metaInfoForm ? metaInfoForm.querySelector('#meta-info-group') : null;
-                if (metaInfoGroup) {
-                    container = metaInfoGroup.querySelector('#first-night-buttons-container');
-                }
-                
-                // 如果meta-info-group中有容器但按钮还没创建，我们仍然使用它
-                // 如果meta-info-group中也没有，我们需要确保有容器可以添加按钮
-                if (!container && metaInfoGroup) {
-                    console.log('updateFirstNightButtons: 在弹窗中创建first-night-buttons-container');
-                    container = document.createElement('div');
-                    container.id = 'first-night-buttons-container';
-                    container.className = 'first-night-buttons-container';
-                    container.style.cssText = 'min-height: 50px; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; background: white;';
-                    
-                    // 找到其他夜晚容器，在它之前插入
-                    const otherNightContainer = metaInfoGroup.querySelector('#other-night-buttons-container');
-                    if (otherNightContainer) {
-                        metaInfoGroup.insertBefore(container, otherNightContainer);
-                    } else {
-                        // 如果没有其他夜晚容器，添加到bootlegger之后
-                        const bootlegger = metaInfoGroup.querySelector('#bootlegger');
-                        if (bootlegger && bootlegger.parentNode) {
-                            bootlegger.parentNode.insertBefore(container, bootlegger.nextSibling);
+            // 再找弹窗中的容器
+            const metaInfoForm = document.getElementById('add-meta-info-form');
+            if (metaInfoForm) {
+                const modalContainer = metaInfoForm.querySelector('#first-night-buttons-container');
+                if (modalContainer) {
+                    containers.push(modalContainer);
+                } else {
+                    // 如果弹窗中没有容器，尝试创建
+                    const metaInfoGroup = metaInfoForm.querySelector('#meta-info-group');
+                    if (metaInfoGroup) {
+                        console.log('updateFirstNightButtons: 在弹窗中创建first-night-buttons-container');
+                        const newModalContainer = document.createElement('div');
+                        newModalContainer.id = 'first-night-buttons-container';
+                        newModalContainer.className = 'first-night-buttons-container';
+                        newModalContainer.style.cssText = 'min-height: 50px; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; background: var(--card-bg-color);';
+                        
+                        // 找到其他夜晚容器，在它之前插入
+                        const otherNightContainer = metaInfoGroup.querySelector('#other-night-buttons-container');
+                        if (otherNightContainer) {
+                            metaInfoGroup.insertBefore(newModalContainer, otherNightContainer);
                         } else {
-                            metaInfoGroup.appendChild(container);
+                            // 如果没有其他夜晚容器，添加到bootlegger之后
+                            const bootlegger = metaInfoGroup.querySelector('#bootlegger');
+                            if (bootlegger && bootlegger.parentNode) {
+                                bootlegger.parentNode.insertBefore(newModalContainer, bootlegger.nextSibling);
+                            } else {
+                                metaInfoGroup.appendChild(newModalContainer);
+                            }
                         }
-                    }
-                } else if (!container) {
-                    // 如果连弹窗都没有，在主文档中查找
-                    container = document.getElementById('first-night-buttons-container');
-                    if (!container) {
-                        console.log('updateFirstNightButtons: 未找到first-night-buttons-container，跳过');
-                        return;
+                        containers.push(newModalContainer);
                     }
                 }
             }
 
-            // 清空容器
-            container.innerHTML = '';
+            if (containers.length === 0) {
+                console.log('updateFirstNightButtons: 未找到任何first-night-buttons-container，跳过');
+                return;
+            }
 
-            // 创建按钮
-            firstNightRoles.forEach(role => {
-                const button = document.createElement('div');
-                button.className = 'draggable-button';
-                button.setAttribute('data-role-id', role.id);
-
-                // 特殊处理minioninfo和demoninfo的显示
-                if (role.id === 'minioninfo') {
-                    button.innerHTML = `爪牙信息 (2000)`;
-                } else if (role.id === 'demoninfo') {
-                    button.innerHTML = `恶魔信息 (3000)`;
-                } else {
-                    button.innerHTML = `${role.name} (${role.firstNight})`;
-                }
-
-                // 添加点击事件（点击添加角色ID到文本框）
-                button.addEventListener('click', () => {
-                    addRoleToFirstNightOrder(role.id);
-                });
-
-                container.appendChild(button);
-            });
-
-            // 初始化Sortable.js
+            // 销毁旧的sortable实例
             if (firstNightSortable) {
                 firstNightSortable.destroy();
             }
 
-            firstNightSortable = new Sortable(container, {
-                animation: 150,
-                ghostClass: 'sortable-ghost',
-                chosenClass: 'sortable-chosen',
-                dragClass: 'sortable-drag',
-                onStart: function(evt) {
-                    window.draggedElement = evt.item;
-                    window.originalIndex = evt.oldIndex;
-                    window.buttonsBeforeDrag = Array.from(container.children).map(btn => btn.cloneNode(true));
-                },
-                onEnd: function(evt) {
-                    const draggedRoleId = evt.item.getAttribute('data-role-id');
-                    const newIndex = evt.newIndex;
+            // 为每个容器创建按钮
+            containers.forEach((container, index) => {
+                // 清空容器
+                container.innerHTML = '';
 
-                    if (draggedRoleId === 'minioninfo' || draggedRoleId === 'demoninfo') {
-                        updateAffectedValues(container, draggedRoleId, newIndex);
+                // 创建按钮
+                firstNightRoles.forEach(role => {
+                    const button = document.createElement('div');
+                    button.className = 'draggable-button';
+                    button.setAttribute('data-role-id', role.id);
+
+                    // 特殊处理minioninfo和demoninfo的显示
+                    if (role.id === 'minioninfo') {
+                        button.innerHTML = `爪牙信息 (2000)`;
+                    } else if (role.id === 'demoninfo') {
+                        button.innerHTML = `恶魔信息 (3000)`;
+                    } else {
+                        button.innerHTML = `${role.name} (${role.firstNight})`;
                     }
 
-                    updateFirstNightOrderFromButtons();
+                    container.appendChild(button);
+                });
 
-                    if (draggedRoleId !== 'minioninfo' && draggedRoleId !== 'demoninfo') {
-                        updateFirstNightValuesInButtons();
-                    }
+                // 只为主容器初始化Sortable.js
+                if (index === 0 && container === mainContainer) {
+                    firstNightSortable = new Sortable(container, {
+                        animation: 150,
+                        ghostClass: 'sortable-ghost',
+                        chosenClass: 'sortable-chosen',
+                        dragClass: 'sortable-drag',
+                        onStart: function(evt) {
+                            window.draggedElement = evt.item;
+                            window.originalIndex = evt.oldIndex;
+                            window.buttonsBeforeDrag = Array.from(container.children).map(btn => btn.cloneNode(true));
+                        },
+                        onEnd: function(evt) {
+                            const draggedRoleId = evt.item.getAttribute('data-role-id');
+                            const newIndex = evt.newIndex;
 
-                    window.draggedElement = null;
-                    window.originalIndex = null;
-                    window.buttonsBeforeDrag = null;
+                            if (draggedRoleId === 'minioninfo' || draggedRoleId === 'demoninfo') {
+                                updateAffectedValues(container, draggedRoleId, newIndex);
+                            }
+
+                            // 更新metaInfoJson并同步到所有容器
+                            updateFirstNightOrderFromButtons();
+                            updateMetaInfoFromNightOrder();
+                            updateFirstNightButtons();
+
+                            if (draggedRoleId !== 'minioninfo' && draggedRoleId !== 'demoninfo') {
+                                updateFirstNightValuesInButtons();
+                            }
+
+                            window.draggedElement = null;
+                            window.originalIndex = null;
+                            window.buttonsBeforeDrag = null;
+                        }
+                    });
                 }
             });
-
         }
 
         function updateOtherNightButtons() {
-            // 获取所有otherNight不为0的角色
-            const otherNightRoles = [
-                { "id": "twilight", "name": "黄昏", "otherNight": 0 },
-                ...(editionRolesJson.filter(role => role.otherNight > 0)),
-                {"id":"exposure","name":"暴露","otherNight":4700},
-                { "id": "dawn", "name": "黎明", "otherNight": 15000 }
-            ];
+            // 元信息角色映射
+            const metaRolesMap = {
+                'twilight': { "id": "twilight", "name": "黄昏", "otherNight": 0 },
+                'exposure': {"id":"exposure","name":"暴露","otherNight":4700},
+                'dawn': { "id": "dawn", "name": "黎明", "otherNight": 15000 }
+            };
 
-            // 按otherNight值排序
-            otherNightRoles.sort((a, b) => a.otherNight - b.otherNight);
+            let otherNightRoles;
+            let useDefaultOrder = false;
 
-            // 获取或创建按钮容器 - 优先在弹窗中查找，其次在主文档中查找
-            let container = null;
-            const metaInfoForm = document.getElementById('add-meta-info-form');
-            if (metaInfoForm) {
-                container = metaInfoForm.querySelector('#other-night-buttons-container');
+            // 优先使用 metaInfoJson.otherNight 中的用户顺序
+            if (metaInfoJson.otherNight && metaInfoJson.otherNight.length > 0) {
+                console.log('updateOtherNightButtons: 使用用户自定义的其他夜晚顺序', metaInfoJson.otherNight);
+                
+                // 按照 metaInfoJson.otherNight 中的顺序构建角色列表
+                otherNightRoles = metaInfoJson.otherNight.map(roleId => {
+                    // 先检查是否是元信息角色
+                    if (metaRolesMap[roleId]) {
+                        return metaRolesMap[roleId];
+                    }
+                    // 在 editionRolesJson 中查找对应的角色
+                    return editionRolesJson.find(role => role.id === roleId);
+                }).filter(Boolean); // 过滤掉 null/undefined
+                
+                // 检查过滤后的数组是否有有效内容
+                // 如果过滤后的数组只有元信息角色，没有实际的游戏角色，则回退到默认顺序
+                const hasGameRoles = otherNightRoles.some(role => 
+                    !['twilight', 'exposure', 'dawn'].includes(role.id)
+                );
+                
+                if (!hasGameRoles) {
+                    console.log('updateOtherNightButtons: 用户顺序中没有游戏角色，回退到默认顺序');
+                    useDefaultOrder = true;
+                    // 清理无效的用户顺序数据
+                    delete metaInfoJson.otherNight;
+                    saveToLocalStorage();
+                }
+            } else {
+                useDefaultOrder = true;
             }
-            if (!container) {
-                container = document.getElementById('other-night-buttons-container');
+
+            if (useDefaultOrder) {
+                console.log('updateOtherNightButtons: 使用默认的其他夜晚顺序');
+                // 如果 metaInfoJson 中没有用户自定义的顺序，或者用户顺序无效，则使用默认顺序
+                otherNightRoles = [
+                    { "id": "twilight", "name": "黄昏", "otherNight": 0 },
+                    ...(editionRolesJson.filter(role => role.otherNight > 0)),
+                    {"id":"exposure","name":"暴露","otherNight":4700},
+                    { "id": "dawn", "name": "黎明", "otherNight": 15000 }
+                ];
+                // 按otherNight值排序
+                otherNightRoles.sort((a, b) => a.otherNight - b.otherNight);
+            }
+
+            // 获取所有容器（夜序选项卡和弹窗中的容器）
+            const containers = [];
+            
+            // 先找夜序选项卡中的容器
+            const mainContainer = document.getElementById('other-night-buttons-container');
+            if (mainContainer) {
+                containers.push(mainContainer);
             }
             
-            // 如果弹窗中存在容器但没有找到相应元素，或者容器根本不存在
-            if (!container) {
-                // 尝试在弹窗的meta-info-group中查找或创建容器
-                const metaInfoGroup = metaInfoForm ? metaInfoForm.querySelector('#meta-info-group') : null;
-                if (metaInfoGroup) {
-                    container = metaInfoGroup.querySelector('#other-night-buttons-container');
-                }
-                
-                if (!container && metaInfoGroup) {
-                    console.log('updateOtherNightButtons: 在弹窗中创建other-night-buttons-container');
-                    container = document.createElement('div');
-                    container.id = 'other-night-buttons-container';
-                    container.className = 'other-night-buttons-container';
-                    container.style.cssText = 'min-height: 50px; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; background: white;';
-                    
-                    // 找到按钮容器之后添加
-                    const firstNightContainer = metaInfoGroup.querySelector('#first-night-buttons-container');
-                    if (firstNightContainer && firstNightContainer.nextSibling) {
-                        metaInfoGroup.insertBefore(container, firstNightContainer.nextSibling);
-                    } else {
-                        const bootlegger = metaInfoGroup.querySelector('#bootlegger');
-                        if (bootlegger && bootlegger.parentNode) {
-                            bootlegger.parentNode.insertBefore(container, bootlegger.nextSibling);
+            // 再找弹窗中的容器
+            const metaInfoForm = document.getElementById('add-meta-info-form');
+            if (metaInfoForm) {
+                const modalContainer = metaInfoForm.querySelector('#other-night-buttons-container');
+                if (modalContainer) {
+                    containers.push(modalContainer);
+                } else {
+                    // 如果弹窗中没有容器，尝试创建
+                    const metaInfoGroup = metaInfoForm.querySelector('#meta-info-group');
+                    if (metaInfoGroup) {
+                        console.log('updateOtherNightButtons: 在弹窗中创建other-night-buttons-container');
+                        const newModalContainer = document.createElement('div');
+                        newModalContainer.id = 'other-night-buttons-container';
+                        newModalContainer.className = 'other-night-buttons-container';
+                        newModalContainer.style.cssText = 'min-height: 50px; border: 1px solid var(--border-color); border-radius: 8px; padding: 10px; background: var(--card-bg-color);';
+                        
+                        // 找到按钮容器之后添加
+                        const firstNightContainer = metaInfoGroup.querySelector('#first-night-buttons-container');
+                        if (firstNightContainer && firstNightContainer.nextSibling) {
+                            metaInfoGroup.insertBefore(newModalContainer, firstNightContainer.nextSibling);
                         } else {
-                            metaInfoGroup.appendChild(container);
+                            const bootlegger = metaInfoGroup.querySelector('#bootlegger');
+                            if (bootlegger && bootlegger.parentNode) {
+                                bootlegger.parentNode.insertBefore(newModalContainer, bootlegger.nextSibling);
+                            } else {
+                                metaInfoGroup.appendChild(newModalContainer);
+                            }
                         }
-                    }
-                } else if (!container) {
-                    // 如果连弹窗都没有，在主文档中查找
-                    container = document.getElementById('other-night-buttons-container');
-                    if (!container) {
-                        console.log('updateOtherNightButtons: 未找到other-night-buttons-container，跳过');
-                        return;
+                        containers.push(newModalContainer);
                     }
                 }
             }
 
-            // 清空容器
-            container.innerHTML = '';
+            if (containers.length === 0) {
+                console.log('updateOtherNightButtons: 未找到任何other-night-buttons-container，跳过');
+                return;
+            }
 
-            // 创建按钮
-            otherNightRoles.forEach(role => {
-                const button = document.createElement('div');
-                button.className = 'draggable-button';
-                button.setAttribute('data-role-id', role.id);
-                button.innerHTML = `${role.name} (${role.otherNight})`;
-
-                button.addEventListener('click', () => {
-                    addRoleToOtherNightOrder(role.id);
-                });
-
-                container.appendChild(button);
-            });
-
-            // 初始化Sortable.js
+            // 销毁旧的sortable实例
             if (otherNightSortable) {
                 otherNightSortable.destroy();
             }
 
-            otherNightSortable = new Sortable(container, {
-                animation: 150,
-                ghostClass: 'sortable-ghost',
-                chosenClass: 'sortable-chosen',
-                dragClass: 'sortable-drag',
-                onStart: function(evt) {
-                    window.draggedElement = evt.item;
-                    window.originalIndex = evt.oldIndex;
-                },
-                onEnd: function(evt) {
-                    updateOtherNightOrderFromButtons();
-                    updateOtherNightValuesInButtons();
+            // 为每个容器创建按钮
+            containers.forEach((container, index) => {
+                // 清空容器
+                container.innerHTML = '';
 
-                    window.draggedElement = null;
-                    window.originalIndex = null;
+                // 创建按钮
+                otherNightRoles.forEach(role => {
+                    const button = document.createElement('div');
+                    button.className = 'draggable-button';
+                    button.setAttribute('data-role-id', role.id);
+                    button.innerHTML = `${role.name} (${role.otherNight})`;
+
+                    container.appendChild(button);
+                });
+
+                // 只为主容器初始化Sortable.js
+                if (index === 0 && container === mainContainer) {
+                    otherNightSortable = new Sortable(container, {
+                        animation: 150,
+                        ghostClass: 'sortable-ghost',
+                        chosenClass: 'sortable-chosen',
+                        dragClass: 'sortable-drag',
+                        onStart: function(evt) {
+                            window.draggedElement = evt.item;
+                            window.originalIndex = evt.oldIndex;
+                        },
+                        onEnd: function(evt) {
+                            // 更新metaInfoJson并同步到所有容器
+                            updateOtherNightOrderFromButtons();
+                            updateMetaInfoFromNightOrder();
+                            updateOtherNightButtons();
+                            updateOtherNightValuesInButtons();
+
+                            window.draggedElement = null;
+                            window.originalIndex = null;
+                        }
+                    });
                 }
             });
+        }
 
+        // 从夜序选项卡的按钮更新metaInfoJson
+        function updateMetaInfoFromNightOrder() {
+            // 获取首夜顺序
+            const firstNightContainer = document.getElementById('first-night-buttons-container');
+            if (firstNightContainer) {
+                const firstNightButtons = firstNightContainer.querySelectorAll('.draggable-button');
+                const firstNightOrder = Array.from(firstNightButtons)
+                    .map(btn => btn.getAttribute('data-role-id'))
+                    .filter(roleId => roleId && roleId.trim() !== '');
+                
+                // 确保包含必要的元素
+                if (!firstNightOrder.includes('twilight')) firstNightOrder.unshift('twilight');
+                if (!firstNightOrder.includes('minioninfo')) firstNightOrder.push('minioninfo');
+                if (!firstNightOrder.includes('demoninfo')) firstNightOrder.push('demoninfo');
+                if (!firstNightOrder.includes('dawn')) firstNightOrder.push('dawn');
+                
+                metaInfoJson.firstNight = firstNightOrder;
+            }
+
+            // 获取其他夜晚顺序
+            const otherNightContainer = document.getElementById('other-night-buttons-container');
+            if (otherNightContainer) {
+                const otherNightButtons = otherNightContainer.querySelectorAll('.draggable-button');
+                const otherNightOrder = Array.from(otherNightButtons)
+                    .map(btn => btn.getAttribute('data-role-id'))
+                    .filter(roleId => roleId && roleId.trim() !== '');
+                
+                // 确保包含必要的元素
+                if (!otherNightOrder.includes('twilight')) otherNightOrder.unshift('twilight');
+                if (!otherNightOrder.includes('exposure')) otherNightOrder.push('exposure');
+                if (!otherNightOrder.includes('dawn')) otherNightOrder.push('dawn');
+                
+                metaInfoJson.otherNight = otherNightOrder;
+            }
+
+            // 更新夜间顺序展示区（使用全局selectedRoles）
+            if (window.selectedRoles && window.selectedRoles.length > 0) {
+                updateNightOrderDisplay(window.selectedRoles);
+            }
+
+            // 保存数据到本地存储
+            saveToLocalStorage();
         }
 
         // 辅助函数：根据按钮顺序获取顺序字符串（不再设置文本框）
@@ -13181,55 +13320,7 @@ if (displayContainer) {
             }
         }
 
-        // 动态加载外部剧本数据文件
-        function loadScriptDataFiles() {
-            // 定义需要加载的脚本文件列表
-            const scriptsToLoad = [
-                {
-                    src: 'script_files/editionLib.js',
-                    name: 'editionLib'
-                },
-                {
-                    src: 'script_files/scriptsData.js',
-                    name: 'scriptsData'
-                },
-                {
-                    src: 'script_files/partialScriptsData.js',
-                    name: 'partialScriptsData'
-                }
-            ];
 
-            // 遍历加载每个脚本文件
-            scriptsToLoad.forEach(scriptInfo => {
-                const script = document.createElement('script');
-                script.src = scriptInfo.src;
-                script.type = 'text/javascript';
-
-                script.onload = function() {
-                    console.log(`成功加载: ${scriptInfo.name}`);
-                    // 检查全局变量是否存在
-                    if (typeof window[scriptInfo.name] !== 'undefined') {
-                        console.log(`${scriptInfo.name} 数据已可用，共 ${window[scriptInfo.name].length} 个剧本`);
-                    }
-                };
-
-                script.onerror = function() {
-                    console.error(`加载失败: ${scriptInfo.name}`);
-                    // 显示友好的错误提示
-                    const warningDiv = document.createElement('div');
-                    warningDiv.style.cssText = 'background: #fff3cd; color: #856404; padding: 10px; margin: 10px 0; border-radius: 4px; font-size: 14px;';
-                    warningDiv.innerHTML = `⚠️ 无法加载剧本数据文件: ${scriptInfo.name}，部分功能可能不可用`;
-                    document.body.insertBefore(warningDiv, document.body.firstChild);
-                };
-
-                document.head.appendChild(script);
-            });
-        }
-
-        // 页面加载完成后自动加载剧本数据
-        window.addEventListener('DOMContentLoaded', function() {
-            loadScriptDataFiles();
-        });
 
         // 显示角色Almanac信息函数
         function showRoleAlmanac(role) {
@@ -13242,11 +13333,11 @@ if (displayContainer) {
             let almanacHTML = `<h2 style="margin-top: 0; color: #6b46c1;">${role.name} - Almanac</h2><div style="margin-top: 20px;">`;
             if (role.almanac) {
                 const almanac = role.almanac;
-                if (almanac.flavor) almanacHTML += `<div style="margin-bottom: 20px;"><h3 style="color: #4a5568; margin-bottom: 10px;">Flavor</h3><p style="line-height: 1.6;">${almanac.flavor}</p></div>`;
-                if (almanac.overview) almanacHTML += `<div style="margin-bottom: 20px;"><h3 style="color: #4a5568; margin-bottom: 10px;">Overview</h3><p style="line-height: 1.6;">${almanac.overview}</p></div>`;
-                if (almanac.examples) almanacHTML += `<div style="margin-bottom: 20px;"><h3 style="color: #4a5568; margin-bottom: 10px;">Examples</h3><p style="line-height: 1.6;">${almanac.examples}</p></div>`;
-                if (almanac.howToRun) almanacHTML += `<div style="margin-bottom: 20px;"><h3 style="color: #4a5568; margin-bottom: 10px;">How To Run</h3><p style="line-height: 1.6;">${almanac.howToRun}</p></div>`;
-                if (almanac.tip) almanacHTML += `<div style="margin-bottom: 20px;"><h3 style="color: #4a5568; margin-bottom: 10px;">Tip</h3><p style="line-height: 1.6;">${almanac.tip}</p></div>`;
+                if (almanac.flavor) almanacHTML += `<div style="margin-bottom: 20px;"><h3 style="color: #4a5568; margin-bottom: 10px;">风味</h3><p style="line-height: 1.6;">${almanac.flavor}</p></div>`;
+                if (almanac.overview) almanacHTML += `<div style="margin-bottom: 20px;"><h3 style="color: #4a5568; margin-bottom: 10px;">概述</h3><p style="line-height: 1.6;">${almanac.overview}</p></div>`;
+                if (almanac.examples) almanacHTML += `<div style="margin-bottom: 20px;"><h3 style="color: #4a5568; margin-bottom: 10px;">示例</h3><p style="line-height: 1.6;">${almanac.examples}</p></div>`;
+                if (almanac.howToRun) almanacHTML += `<div style="margin-bottom: 20px;"><h3 style="color: #4a5568; margin-bottom: 10px;">运作方式</h3><p style="line-height: 1.6;">${almanac.howToRun}</p></div>`;
+                if (almanac.tip) almanacHTML += `<div style="margin-bottom: 20px;"><h3 style="color: #4a5568; margin-bottom: 10px;">提示</h3><p style="line-height: 1.6;">${almanac.tip}</p></div>`;
             } else {
                 almanacHTML += `<p style="color: #718096; font-style: italic;">此角色暂无Almanac信息</p>`;
             }
@@ -13326,11 +13417,11 @@ if (displayContainer) {
                     
                     if (role.almanac) {
                         const almanac = role.almanac;
-                        if (almanac.flavor) almanacBookHTML += `<div style="margin-bottom: 15px;"><h5 style="color: #4a5568; margin-bottom: 5px;">Flavor</h5><p style="line-height: 1.6; color: #4a5568;">${almanac.flavor}</p></div>`;
-                        if (almanac.overview) almanacBookHTML += `<div style="margin-bottom: 15px;"><h5 style="color: #4a5568; margin-bottom: 5px;">Overview</h5><p style="line-height: 1.6; color: #4a5568;">${almanac.overview}</p></div>`;
-                        if (almanac.examples) almanacBookHTML += `<div style="margin-bottom: 15px;"><h5 style="color: #4a5568; margin-bottom: 5px;">Examples</h5><p style="line-height: 1.6; color: #4a5568;">${almanac.examples}</p></div>`;
-                        if (almanac.howToRun) almanacBookHTML += `<div style="margin-bottom: 15px;"><h5 style="color: #4a5568; margin-bottom: 5px;">How To Run</h5><p style="line-height: 1.6; color: #4a5568;">${almanac.howToRun}</p></div>`;
-                        if (almanac.tip) almanacBookHTML += `<div style="margin-bottom: 15px;"><h5 style="color: #4a5568; margin-bottom: 5px;">Tip</h5><p style="line-height: 1.6; color: #4a5568;">${almanac.tip}</p></div>`;
+                        if (almanac.flavor) almanacBookHTML += `<div style="margin-bottom: 15px;"><h5 style="color: #4a5568; margin-bottom: 5px;">风味</h5><p style="line-height: 1.6; color: #4a5568;">${almanac.flavor}</p></div>`;
+                        if (almanac.overview) almanacBookHTML += `<div style="margin-bottom: 15px;"><h5 style="color: #4a5568; margin-bottom: 5px;">概述</h5><p style="line-height: 1.6; color: #4a5568;">${almanac.overview}</p></div>`;
+                        if (almanac.examples) almanacBookHTML += `<div style="margin-bottom: 15px;"><h5 style="color: #4a5568; margin-bottom: 5px;">示例</h5><p style="line-height: 1.6; color: #4a5568;">${almanac.examples}</p></div>`;
+                        if (almanac.howToRun) almanacBookHTML += `<div style="margin-bottom: 15px;"><h5 style="color: #4a5568; margin-bottom: 5px;">运作方式</h5><p style="line-height: 1.6; color: #4a5568;">${almanac.howToRun}</p></div>`;
+                        if (almanac.tip) almanacBookHTML += `<div style="margin-bottom: 15px;"><h5 style="color: #4a5568; margin-bottom: 5px;">提示</h5><p style="line-height: 1.6; color: #4a5568;">${almanac.tip}</p></div>`;
                     }
                     
                     almanacBookHTML += `</div>`;
@@ -13710,302 +13801,6 @@ if (displayContainer) {
 
 
 
-        // 打开原创剧本窗口
-        function openOriginalScriptsWindow() {
-            document.getElementById('originalScriptsWindow').style.display = 'block';
-            renderScripts();
-        }
-
-        // 关闭原创剧本窗口
-        function closeOriginalScriptsWindow() {
-            document.getElementById('originalScriptsWindow').style.display = 'none';
-        }
-
-        // 打开部分原创角色剧本窗口
-        function openPartialScriptsWindow() {
-            document.getElementById('partialScriptsWindow').style.display = 'block';
-            renderPartialScripts();
-        }
-
-        // 关闭部分原创角色剧本窗口
-        function closePartialScriptsWindow() {
-            document.getElementById('partialScriptsWindow').style.display = 'none';
-        }
-
-        // 渲染剧本卡片
-        function renderScripts() {
-            const domesticGrid = document.getElementById('domesticScriptsGrid');
-            const overseasGrid = document.getElementById('overseasScriptsGrid');
-            const teenseyGrid = document.getElementById('teenseyScriptsGrid');
-            const searchInput = document.getElementById('original-script-search');
-            const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
-
-            // 清空网格
-            domesticGrid.innerHTML = '';
-            overseasGrid.innerHTML = '';
-            if (teenseyGrid) teenseyGrid.innerHTML = '';
-
-            // 检查scriptsData是否存在
-            if (!scriptsData) {
-                domesticGrid.innerHTML = `
-                    <div style="text-align: center; padding: 40px; color: #666;">
-                        <p>全原创剧本数据加载失败</p>
-                        <p style="font-size: 12px; margin-top: 10px;">请检查 scriptsData.js 文件是否存在且格式正确</p>
-                    </div>
-                `;
-                return;
-            }
-
-            // 过滤剧本
-            function filterScripts(scripts) {
-                if (!scripts) return [];
-                if (!searchTerm) return scripts;
-                return scripts.filter(script => 
-                    script.name.toLowerCase().includes(searchTerm) || 
-                    script.author.toLowerCase().includes(searchTerm)
-                );
-            }
-
-            // 渲染国内剧本
-            const filteredDomestic = filterScripts(scriptsData.domestic);
-            filteredDomestic.forEach(script => {
-                const card = createScriptCard(script);
-                domesticGrid.appendChild(card);
-            });
-
-            // 渲染海外剧本
-            const filteredOverseas = filterScripts(scriptsData.overseas);
-            filteredOverseas.forEach(script => {
-                const card = createScriptCard(script);
-                overseasGrid.appendChild(card);
-            });
-
-            // 渲染汀西维尔剧本
-            if (scriptsData.teensey && teenseyGrid) {
-                const filteredTeensey = filterScripts(scriptsData.teensey);
-                filteredTeensey.forEach(script => {
-                    const card = createScriptCard(script);
-                    teenseyGrid.appendChild(card);
-                });
-            }
-        }
-
-        // 渲染部分原创角色剧本卡片
-        function renderPartialScripts() {
-            const withoutPrivateGrid = document.getElementById('partialWithoutPrivateGrid');
-            const withPrivateGrid = document.getElementById('partialWithPrivateGrid');
-            const teenseyGrid = document.getElementById('partialTeenseyGrid');
-            const searchInput = document.getElementById('partial-script-search');
-            const searchTerm = searchInput ? searchInput.value.toLowerCase().trim() : '';
-
-            // 清空网格
-            withoutPrivateGrid.innerHTML = '';
-            withPrivateGrid.innerHTML = '';
-            if (teenseyGrid) teenseyGrid.innerHTML = '';
-
-            // 检查partialScriptsData是否存在
-            if (!partialScriptsData) {
-                withoutPrivateGrid.innerHTML = `
-                    <div style="text-align: center; padding: 40px; color: #666;">
-                        <p>部分原创剧本数据加载失败</p>
-                        <p style="font-size: 12px; margin-top: 10px;">请检查 partialScriptsData.js 文件是否存在且格式正确</p>
-                    </div>
-                `;
-                return;
-            }
-
-            // 过滤剧本
-            function filterScripts(scripts) {
-                if (!scripts) return [];
-                if (!searchTerm) return scripts;
-                return scripts.filter(script => 
-                    script.name.toLowerCase().includes(searchTerm) || 
-                    script.author.toLowerCase().includes(searchTerm)
-                );
-            }
-
-            // 渲染不含私货剧本
-            if (partialScriptsData.withoutPrivate) {
-                const filteredWithoutPrivate = filterScripts(partialScriptsData.withoutPrivate);
-                filteredWithoutPrivate.forEach(script => {
-                    const card = createPartialScriptCard(script);
-                    withoutPrivateGrid.appendChild(card);
-                });
-            }
-
-            // 渲染包含私货剧本
-            if (partialScriptsData.withPrivate) {
-                const filteredWithPrivate = filterScripts(partialScriptsData.withPrivate);
-                filteredWithPrivate.forEach(script => {
-                    const card = createPartialScriptCard(script);
-                    withPrivateGrid.appendChild(card);
-                });
-            }
-
-            // 渲染汀西维尔剧本
-            if (partialScriptsData.teensey && teenseyGrid) {
-                const filteredTeensey = filterScripts(partialScriptsData.teensey);
-                filteredTeensey.forEach(script => {
-                    const card = createPartialScriptCard(script);
-                    teenseyGrid.appendChild(card);
-                });
-            }
-        }
-
-        // 创建剧本卡片
-        function createScriptCard(script) {
-            const card = document.createElement('div');
-            card.style.cssText = `
-                background: white;
-                border-radius: 12px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-                overflow: hidden;
-                transition: transform 0.2s, box-shadow 0.2s;
-                cursor: pointer;
-                border: 1px solid #e0e0e0;
-                min-height: 180px;
-                display: flex;
-                flex-direction: column;
-            `;
-
-            // 鼠标悬停效果
-            card.addEventListener('mouseover', () => {
-                card.style.transform = 'translateY(-4px)';
-                card.style.boxShadow = '0 8px 24px rgba(0,0,0,0.15)';
-            });
-
-            card.addEventListener('mouseout', () => {
-                card.style.transform = 'translateY(0)';
-                card.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
-            });
-
-            // 卡片内容
-            let logoHtml = '';
-            if (script.logo) {
-                logoHtml = `
-                    <div style="height: 90px; background: #f5f5f5; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                        <img src="${script.logo}" alt="${script.name}" style="max-height: 70px; max-width: 160px; object-fit: contain;">
-                    </div>
-                `;
-            }
-
-            // 获取剧本描述
-            let description = script.description || '';
-            if (!description && script.json) {
-                try {
-                    const jsonData = JSON.parse(script.json);
-                    const meta = jsonData.find(item => item.id === '_meta');
-                    if (meta && meta.description) {
-                        description = meta.description;
-                    }
-                } catch (e) {
-                    // JSON解析失败，忽略
-                }
-            }
-
-            card.innerHTML = `
-                ${logoHtml}
-                <div style="padding: 12px; flex-grow: 1; display: flex; flex-direction: column;">
-                    <h3 style="margin: 0 0 6px 0; font-size: 15px; font-weight: bold; color: #333;">${script.name}</h3>
-                    <p style="margin: 0 0 8px 0; font-size: 13px; color: #666;">作者: ${script.author}</p>
-                    ${description ? `<p style="margin: 0 0 12px 0; font-size: 12px; color: #999; line-height: 1.3; flex-grow: 1;">${description}</p>` : ''}
-                    <button style="width: 100%; padding: 8px; background: #667eea; color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; margin-top: auto;">
-                        复制JSON
-                    </button>
-                </div>
-            `;
-            
-            // 添加事件监听器处理复制操作
-            const copyButton = card.querySelector('button');
-            copyButton.addEventListener('click', () => {
-                copyScriptJson(script.json || '');
-            });
-
-            return card;
-        }
-
-        // 创建部分原创角色剧本卡片
-        function createPartialScriptCard(script) {
-            const card = document.createElement('div');
-            card.style.cssText = `
-                background: white;
-                border-radius: 12px;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-                overflow: hidden;
-                transition: transform 0.2s, box-shadow 0.2s;
-                cursor: pointer;
-                border: 1px solid #e0e0e0;
-                min-height: 180px;
-                display: flex;
-                flex-direction: column;
-            `;
-
-            // 鼠标悬停效果
-            card.addEventListener('mouseover', () => {
-                card.style.transform = 'translateY(-4px)';
-                card.style.boxShadow = '0 8px 24px rgba(0,0,0,0.15)';
-            });
-
-            card.addEventListener('mouseout', () => {
-                card.style.transform = 'translateY(0)';
-                card.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
-            });
-
-            // 卡片内容
-            let logoHtml = '';
-            if (script.logo) {
-                logoHtml = `
-                    <div style="height: 90px; background: #f5f5f5; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                        <img src="${script.logo}" alt="${script.name}" style="max-height: 70px; max-width: 160px; object-fit: contain;">
-                    </div>
-                `;
-            }
-
-            // 获取剧本描述
-            let description = script.description || '';
-            if (!description && script.json) {
-                try {
-                    const jsonData = JSON.parse(script.json);
-                    const meta = jsonData.find(item => item.id === '_meta');
-                    if (meta && meta.description) {
-                        description = meta.description;
-                    }
-                } catch (e) {
-                    // JSON解析失败，忽略
-                }
-            }
-
-            card.innerHTML = `
-                ${logoHtml}
-                <div style="padding: 12px; flex-grow: 1; display: flex; flex-direction: column;">
-                    <h3 style="margin: 0 0 6px 0; font-size: 15px; font-weight: bold; color: #333;">${script.name}</h3>
-                    <p style="margin: 0 0 8px 0; font-size: 13px; color: #666;">作者: ${script.author}</p>
-                    ${description ? `<p style="margin: 0 0 12px 0; font-size: 12px; color: #999; line-height: 1.3; flex-grow: 1;">${description}</p>` : ''}
-                    <button style="width: 100%; padding: 8px; background: #28a745; color: white; border: none; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; margin-top: auto;">
-                        复制JSON
-                    </button>
-                </div>
-            `;
-            
-            // 添加事件监听器处理复制操作
-            const copyButton = card.querySelector('button');
-            copyButton.addEventListener('click', () => {
-                copyScriptJson(script.json || '');
-            });
-
-            return card;
-        }
-
-        // 复制剧本JSON到剪贴板
-        function copyScriptJson(json) {
-            navigator.clipboard.writeText(json).then(() => {
-                alert('剧本JSON已复制到剪贴板！');
-            }).catch(err => {
-                console.error('复制失败:', err);
-                alert('复制失败，请手动复制');
-            });
-        }
-
         // 切换FAB菜单显示/隐藏
         function toggleFabMenu() {
             const fabMenu = document.getElementById('fab-menu');
@@ -14121,84 +13916,6 @@ if (displayContainer) {
                 <line x1="5" y1="12" x2="19" y2="12"></line>
             </svg>
         </button>
-    </div>
-
-    <!-- 原创剧本窗口 -->
-    <div id="originalScriptsWindow" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 10000;">
-        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: white; border-radius: 0; box-shadow: none; overflow: hidden;">
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; flex-wrap: wrap; gap: 10px;">
-                <h2 style="margin: 0; font-size: 20px;">全原创角色剧本</h2>
-                <div style="display: flex; gap: 10px; align-items: center; flex-grow: 1; min-width: 250px;">
-                    <input type="text" id="original-script-search" placeholder="搜索剧本名或作者" style="padding: 8px 12px; border: none; border-radius: 4px; font-size: 14px; flex-grow: 1; min-width: 0;" oninput="renderScripts()">
-                    <button onclick="closeOriginalScriptsWindow()" style="background: white; color: #667eea; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center;">&times;</button>
-                </div>
-            </div>
-            <div style="padding: 15px; height: calc(100% - 80px); overflow-y: auto;">
-                <div style="text-align: center; margin-bottom: 20px;">
-                    <p style="font-size: 14px; color: #666;">点击下方剧本卡片，即可复制完整的JSON内容到剪贴板</p>
-                </div>
-
-                <div style="margin-bottom: 30px;">
-                    <h3 style="margin: 0 0 15px 0; color: #333; font-size: 18px; font-weight: bold; border-bottom: 2px solid #667eea; padding-bottom: 8px;">国内剧本</h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px;" id="domesticScriptsGrid">
-                        <!-- 国内剧本将通过JavaScript动态添加 -->
-                    </div>
-                </div>
-
-                <div style="margin-bottom: 30px;">
-                    <h3 style="margin: 0 0 15px 0; color: #333; font-size: 18px; font-weight: bold; border-bottom: 2px solid #667eea; padding-bottom: 8px;">海外剧本</h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px;" id="overseasScriptsGrid">
-                        <!-- 海外剧本将通过JavaScript动态添加 -->
-                    </div>
-                </div>
-
-                <div style="margin-bottom: 30px;">
-                    <h3 style="margin: 0 0 15px 0; color: #333; font-size: 18px; font-weight: bold; border-bottom: 2px solid #667eea; padding-bottom: 8px;">汀西维尔剧本</h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px;" id="teenseyScriptsGrid">
-                        <!-- 汀西维尔剧本将通过JavaScript动态添加 -->
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- 部分原创角色剧本窗口 -->
-    <div id="partialScriptsWindow" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 10000;">
-        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: white; border-radius: 0; box-shadow: none; overflow: hidden;">
-            <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; flex-wrap: wrap; gap: 10px;">
-                <h2 style="margin: 0; font-size: 20px;">部分原创角色剧本</h2>
-                <div style="display: flex; gap: 10px; align-items: center; flex-grow: 1; min-width: 250px;">
-                    <input type="text" id="partial-script-search" placeholder="搜索剧本名或作者" style="padding: 8px 12px; border: none; border-radius: 4px; font-size: 14px; flex-grow: 1; min-width: 0;" oninput="renderPartialScripts()">
-                    <button onclick="closePartialScriptsWindow()" style="background: white; color: #28a745; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center;">&times;</button>
-                </div>
-            </div>
-            <div style="padding: 15px; height: calc(100% - 80px); overflow-y: auto;">
-                <div style="text-align: center; margin-bottom: 20px;">
-                    <p style="font-size: 14px; color: #666;">点击下方剧本卡片，即可复制完整的JSON内容到剪贴板</p>
-                </div>
-
-                <div style="margin-bottom: 30px;">
-                    <h3 style="margin: 0 0 15px 0; color: #333; font-size: 18px; font-weight: bold; border-bottom: 2px solid #28a745; padding-bottom: 8px;">不含私货剧本</h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px;" id="partialWithoutPrivateGrid">
-                        <!-- 不含私货剧本将通过JavaScript动态添加 -->
-                    </div>
-                </div>
-
-                <div style="margin-bottom: 30px;">
-                    <h3 style="margin: 0 0 15px 0; color: #333; font-size: 18px; font-weight: bold; border-bottom: 2px solid #28a745; padding-bottom: 8px;">包含私货剧本</h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px;" id="partialWithPrivateGrid">
-                        <!-- 包含私货剧本将通过JavaScript动态添加 -->
-                    </div>
-                </div>
-
-                <div style="margin-bottom: 30px;">
-                    <h3 style="margin: 0 0 15px 0; color: #333; font-size: 18px; font-weight: bold; border-bottom: 2px solid #28a745; padding-bottom: 8px;">汀西维尔剧本</h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px;" id="partialTeenseyGrid">
-                        <!-- 汀西维尔剧本将通过JavaScript动态添加 -->
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
 
