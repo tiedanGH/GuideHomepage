@@ -24,6 +24,41 @@
         window.demonsRoles = demonsRoles;
         window.fabledRoles = fabledRoles;
         window.travellersRoles = travellersRoles;
+        
+        // 阵营默认图片映射
+        const TEAM_IMAGE_MAP = {
+            "townsfolk": "./images/townfolk.png",
+            "outsider": "./images/outsider.png",
+            "minion": "./images/minions.png",
+            "demon": "./images/demon.png",
+            "fabled": "./images/fabled.png",
+            "traveller": "./images/travellers.png"
+        };
+        
+        // URL转Base64（用于生成图片时临时转换）
+        window.urlToBase64 = function(url) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.crossOrigin = 'Anonymous';
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    try {
+                        const dataUrl = canvas.toDataURL('image/png');
+                        resolve(dataUrl);
+                    } catch (e) {
+                        reject(e);
+                    }
+                };
+                img.onerror = function(error) {
+                    reject(error);
+                };
+                img.src = url;
+            });
+        };
     </script>
     <script src="./script_files/scriptImageGenerator.js"></script>
     <style>
@@ -8235,6 +8270,12 @@ let allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demons
             
             if (isMobile) {
                 // 移动端：使用弹窗显示
+                // 先移除已存在的弹窗，防止重复创建
+                const existingModal = document.getElementById('edit-role-modal-overlay');
+                if (existingModal) {
+                    document.body.removeChild(existingModal);
+                }
+                
                 const modalOverlay = document.createElement('div');
                 modalOverlay.id = 'edit-role-modal-overlay';
                 modalOverlay.style.cssText = `
@@ -8281,7 +8322,16 @@ let allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demons
                 closeBtn.onclick = cancelEditRole;
                 
                 modalContent.appendChild(closeBtn);
+                
+                // 保存editContainer的原始位置和父元素
+                const originalParent = editContainer.parentNode;
+                const originalNextSibling = editContainer.nextSibling;
+                
+                // 将editContainer移动到弹窗中，并保存原始位置信息
                 modalContent.appendChild(editContainer);
+                editContainer.dataset.originalParent = originalParent ? 'original' : 'none';
+                editContainer.dataset.originalNextSibling = originalNextSibling ? 'hasNext' : 'none';
+                
                 modalOverlay.appendChild(modalContent);
                 document.body.appendChild(modalOverlay);
                 
@@ -8386,7 +8436,12 @@ let allRoles = [...townsfolkRoles, ...outsidersRoles, ...minionsRoles, ...demons
             const modalOverlay = document.getElementById('edit-role-modal-overlay');
             
             // 移除弹窗遮罩层（移动端）
-            if (modalOverlay) {
+            if (modalOverlay && editContainer) {
+                // 在移除弹窗之前，先把editContainer移回DOM中
+                // 直接添加到body末尾，这样最安全
+                document.body.appendChild(editContainer);
+                
+                // 然后移除弹窗
                 document.body.removeChild(modalOverlay);
             }
             
@@ -9730,6 +9785,9 @@ if (displayContainer) {
                 
                 displayContainer.innerHTML = html;
                 
+                // 重新扫描并转换外部图片
+                // 不再自动转换已选角色图片，仅在生成剧本图时转换
+                
                 // 重新初始化懒加载，处理新添加的图片
                 setTimeout(initLazyLoad, 100);
                 
@@ -10593,11 +10651,12 @@ if (displayContainer) {
                 );
             }
             
-            // 加载单个图片
+            // 加载单个图片（不再转换外部URL，仅在生成剧本图时转换）
             function loadImage(img) {
                 if (img.dataset.src) {
-                    const src = img.dataset.src;
+                    let src = img.dataset.src;
                     
+                    // 直接加载，不转换外部URL（图片转换仅在生成剧本图时进行）
                     // 创建新的图片对象进行加载
                     const tempImg = new Image();
                     tempImg.onload = function() {
@@ -10642,7 +10701,9 @@ if (displayContainer) {
         }
         
         // 初始化懒加载
-        window.addEventListener('DOMContentLoaded', initLazyLoad);
+        window.addEventListener('DOMContentLoaded', function() {
+            initLazyLoad();
+        });
 
 
 
@@ -11438,6 +11499,17 @@ if (displayContainer) {
             reader.onload = function(e) {
                 try {
                     const jsonData = JSON.parse(e.target.result);
+                    
+                    // 调试：检查导入的数据中有多少外部图片
+                    const roleItems = jsonData.filter(item => item.id && item.id !== "_meta" && !item.id.startsWith("Jinx:"));
+                    const externalImages = roleItems.filter(role => role.image && 
+                        (role.image.startsWith('http://') || role.image.startsWith('https://')));
+                    console.log('[导入调试] 发现外部图片数量:', externalImages.length);
+                    externalImages.forEach(role => {
+                        console.log('[导入调试] 外部图片:', role.name, '->', role.image);
+                    });
+                    
+                    // 直接导入，不转换图片
                     processLoadedJson(jsonData);
                     
                     // 关闭弹窗
@@ -11445,7 +11517,12 @@ if (displayContainer) {
                         document.body.removeChild(modal);
                     }
                     
-                    alert('JSON文件导入成功！');
+                    const externalCount = externalImages.length;
+                    let successMsg = 'JSON文件导入成功！';
+                    if (externalCount > 0) {
+                        successMsg += `\n\n注意：检测到 ${externalCount} 个外部图片URL。\n生成剧本图时将自动转换为Base64。`;
+                    }
+                    alert(successMsg);
                 } catch (error) {
                     alert('解析JSON文件失败: ' + error.message);
                 }
@@ -11462,8 +11539,20 @@ if (displayContainer) {
             navigator.clipboard.readText().then(function(text) {
                 try {
                     const jsonData = JSON.parse(text);
+                    
+                    // 获取转换信息
+                    const roleItems = jsonData.filter(item => item.id && item.id !== "_meta" && !item.id.startsWith("Jinx:"));
+                    const externalImages = roleItems.filter(role => role.image && 
+                        (role.image.startsWith('http://') || role.image.startsWith('https://')));
+                    
+                    // 直接导入，不转换图片
                     processLoadedJson(jsonData);
-                    alert('JSON粘贴成功！');
+                    
+                    let successMsg = 'JSON粘贴成功！';
+                    if (externalImages.length > 0) {
+                        successMsg += `\n\n注意：检测到 ${externalImages.length} 个外部图片URL。\n生成剧本图时将自动转换为Base64。`;
+                    }
+                    alert(successMsg);
                 } catch (error) {
                     alert('解析粘贴的JSON数据失败: ' + error.message);
                 }
@@ -11475,6 +11564,8 @@ if (displayContainer) {
 
         // 处理加载的JSON数据
         function processLoadedJson(jsonData) {
+            // 直接处理JSON，不进行图片转换（图片转换在生成剧本图时进行）
+            
             // 清空现有选择
             document.querySelectorAll('.role-item input[type="checkbox"]').forEach(checkbox => {
                 checkbox.checked = false;
@@ -11698,6 +11789,8 @@ if (displayContainer) {
             // 更新选择计数和已选角色显示
             updateSelectionCount();
             updateSelectedRolesDisplay();
+            // 确保所有外部图片URL被转换
+            // 不再自动转换已选角色图片，仅在生成剧本图时转换
             // 渲染自制角色列表
             loadDirRoles();
             // 勾选导入的自制角色

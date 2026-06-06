@@ -1068,7 +1068,7 @@ async function generateScriptImageV2() {
                                     <img src="${convertToLocalPath(role.image)}" alt="${role.name}" style="width: 100%; height: 100%; object-fit: cover; display: block;">
                                 </div>
                                 <div style="flex: 1; min-width: 0;">
-                                    <div style="font-size: 28px; font-weight: bold; color: ${nameColor}; margin-bottom: 2px; font-family: 'Microsoft YaHei', Heiti;">${role.name}</div>
+                                    <div style="font-size: 36px; font-weight: bold; color: ${nameColor}; margin-bottom: 2px; font-family: 'Microsoft YaHei', Heiti;">${role.name}</div>
                                     <div style="font-size: 24px; font-weight: bold; color: #4a3728; line-height: 1.4;">${role.ability || ''}</div>
                                     ${jinxRuleDisplay}
                                 </div>
@@ -1404,27 +1404,27 @@ async function generateScriptImageV2() {
                                         </div>
                                     ` : ''}
 
-                                    <!-- 底部规则说明区 - 宽度为恶魔阵营的2/3，居中显示 -->
-                                    <div style="display: flex; justify-content: center; padding: 10px 0;">
-                                        <div style="width: 66.66%; background: rgb(195, 183, 168); padding: 10px 15px; border-radius: 8px; border: 2px solid rgb(117, 105, 100);">
-                                            <div style="display: flex; flex-direction: column; gap: 8px;">
-                                                <!-- 疯狂 -->
-                                                <div>
-                                                    <div style="font-size: 14px; color: #9932cc; font-weight: bold; margin-bottom: 3px;">疯狂</div>
-                                                    <div style="font-size: 12px; color: #4a3728; line-height: 1.4;">${highlightAbility('当你陷入「疯狂」时，意味着你需要向其他玩家有诚意且努力的证明某件事情，如不这么做会受到惩罚。')}</div>
-                                                </div>
-                                                <!-- 中毒/醉酒 -->
-                                                <div>
-                                                    <div style="font-size: 14px; color: ${customTeamColors.demon}; font-weight: bold; margin-bottom: 3px;">中毒 / 醉酒</div>
-                                                    <div style="font-size: 12px; color: #4a3728; line-height: 1.4;">${highlightAbility('中毒的玩家会失去能力，但会认为自己仍具有能力，说书人会做出这些玩家仍然具有能力的行为。如果中毒玩家的角色能力会给他提供信息，说书人可能会给出错误信息，中毒的玩家不会得知自己中毒。醉酒同理。')}</div>
+                                    <!-- 底部装饰区域 - 橄榄枝 + *号说明 + 状态栏覆盖在上面 -->
+                                    <div style="display: flex; justify-content: center; align-items: center; padding: 0px 0 0 0; margin-top: auto; background: #ede4d5; position: relative; min-height: 180px;">
+                                        <img src="images/dibu.png" alt="装饰" style="width: 100%; min-height: 180px; height: auto; object-fit: contain;" />
+                                        
+                                        <!-- 状态栏 - 覆盖在底部图片上 -->
+                                        <div style="position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%); width: 70%;">
+                                            <div style="background: rgba(195, 183, 168, 0.9); padding: 12px 18px; border-radius: 10px; border: 2px solid rgb(117, 105, 100);">
+                                                <div style="display: flex; flex-direction: column; gap: 10px;">
+                                                    <!-- 疯狂 -->
+                                                    <div>
+                                                        <div style="font-size: 14px; color: #9932cc; font-weight: bold; margin-bottom: 3px;">疯狂</div>
+                                                        <div style="font-size: 12px; color: #4a3728; line-height: 1.4;">${highlightAbility('当你陷入「疯狂」时，意味着你需要向其他玩家有诚意且努力的证明某件事情，如不这么做会受到惩罚。')}</div>
+                                                    </div>
+                                                    <!-- 中毒/醉酒 -->
+                                                    <div>
+                                                        <div style="font-size: 14px; color: ${customTeamColors.demon}; font-weight: bold; margin-bottom: 3px;">中毒 / 醉酒</div>
+                                                        <div style="font-size: 12px; color: #4a3728; line-height: 1.4;">${highlightAbility('中毒的玩家会失去能力，但会认为自己仍具有能力，说书人会做出这些玩家仍然具有能力的行为。如果中毒玩家的角色能力会给他提供信息，说书人可能会给出错误信息，中毒的玩家不会得知自己中毒。醉酒同理。')}</div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-
-                                    <!-- 底部装饰区域 - 橄榄枝 + *号说明 -->
-                                    <div style="display: flex; justify-content: center; align-items: center; padding: 0px 0 0 0; margin-top: auto; background: #ede4d5;">
-                                        <img src="images/dibu.png" alt="装饰" style="width: 100%; min-height: 80px; height: auto; object-fit: contain;" />
                                     </div>
                                 </div>
 
@@ -1556,83 +1556,189 @@ async function generateScriptImageV2() {
                             scriptPage.style.height = a4Height + 'px';
                         }
 
-                        htmlToImage.toCanvas(scriptPage, {
-                            backgroundColor: hexToRgba(customBgColor, bgOpacity),
-                            canvasWidth: Math.ceil(a4Width),
-                            canvasHeight: Math.ceil(a4Height)
-                        }).then(function(canvas) {
-                            // 恢复原始样式
-                            scriptPage.style.maxHeight = originalMaxHeight;
-                            scriptPage.style.overflowY = originalOverflowY;
-                            scriptPage.style.width = originalWidth;
-                            scriptPage.style.height = originalHeight;
+                        // 生成图片前，将外部图片URL转换为Base64
+                        const convertImagesToBase64 = async () => {
+                            const scriptImages = scriptPage.querySelectorAll('img');
+                            const externalImages = [];
                             
-                            // 使用更兼容移动端的下载方式
-                            const dataUrl = canvas.toDataURL('image/png');
-                            const filename = editionName + '_剧本图.png';
+                            // 获取所有已有角色的图片URL（内置角色）
+                            const builtInRoleImages = new Set();
+                            const builtInRoles = [
+                                ...(window.townsfolkRoles || []),
+                                ...(window.outsidersRoles || []),
+                                ...(window.minionsRoles || []),
+                                ...(window.demonsRoles || []),
+                                ...(window.fabledRoles || []),
+                                ...(window.travellersRoles || [])
+                            ];
+                            builtInRoles.forEach(role => {
+                                if (role.image) {
+                                    builtInRoleImages.add(role.image);
+                                }
+                            });
                             
-                            // 检测是否为移动端
-                            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-                            
-                            // 优化移动端下载逻辑
-                            if (isMobile) {
-                                // 方案1：尝试使用Blob对象和download属性
-                                try {
-                                    const blob = dataURLToBlob(dataUrl);
-                                    const url = URL.createObjectURL(blob);
-                                    const link = document.createElement('a');
-                                    link.href = url;
-                                    link.download = filename;
-                                    link.style.display = 'none';
+                            // 收集所有外部图片，但跳过已有角色的图片
+                            scriptImages.forEach(img => {
+                                const src = img.src || img.dataset.src;
+                                if (src && (src.startsWith('http://') || src.startsWith('https://'))) {
+                                    // 检查是否是已有角色的图片
+                                    const isBuiltInRoleImage = Array.from(builtInRoleImages).some(builtInImg => 
+                                        src === builtInImg || 
+                                        src.includes(builtInImg) || 
+                                        builtInImg.includes(src.split('/').pop())
+                                    );
                                     
-                                    // 添加到文档并触发点击
-                                    document.body.appendChild(link);
-                                    
-                                    // 移动端需要模拟真实点击
-                                    if (navigator.userAgent.match(/iPad|iPhone|iPod/)) {
-                                        // iOS设备特殊处理
-                                        const event = document.createEvent('MouseEvents');
-                                        event.initMouseEvent('click', true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
-                                        link.dispatchEvent(event);
+                                    if (!isBuiltInRoleImage) {
+                                        externalImages.push(img);
                                     } else {
-                                        // Android设备
-                                        link.click();
-                                    }
-                                    
-                                    setTimeout(() => {
-                                        document.body.removeChild(link);
-                                        URL.revokeObjectURL(url);
-                                    }, 100);
-                                    
-                                    // 提示用户
-                                    setTimeout(() => {
-                                        alert('请在弹出的下载提示中选择保存图片');
-                                    }, 500);
-                                } catch (e) {
-                                    console.error('Blob下载失败:', e);
-                                    // 方案2：在新窗口打开图片，让用户长按保存
-                                    const newWindow = window.open();
-                                    if (newWindow) {
-                                        newWindow.document.write('<html><head><title>' + filename + '</title></head><body style="margin:0;display:flex;justify-content:center;align-items:center;background:#f0f0f0;"><img src="' + dataUrl + '" style="max-width:100%;height:auto;" onclick="window.close()"></body></html>');
-                                        newWindow.document.close();
-                                        alert('图片已在新窗口打开，请长按图片保存到相册');
-                                    } else {
-                                        // 方案3：显示错误提示
-                                        alert('无法自动下载图片，请截图保存');
+                                        console.log(`[图片生成] 跳过已有角色图片: ${src.substring(0, 50)}...`);
                                     }
                                 }
-                            } else {
-                                // 桌面端：直接下载
-                                const link = document.createElement('a');
-                                link.download = filename;
-                                link.href = dataUrl;
-                                link.style.display = 'none';
-                                document.body.appendChild(link);
-                                link.click();
-                                setTimeout(() => {
-                                    document.body.removeChild(link);
-                                }, 100);
+                            });
+                            
+                            if (externalImages.length > 0) {
+                                console.log(`[图片生成] 发现 ${externalImages.length} 个外部图片需要转换`);
+                                
+                                // 显示进度弹窗
+                                const progressModal = document.createElement('div');
+                                progressModal.style.cssText = `
+                                    position: fixed;
+                                    top: 50%;
+                                    left: 50%;
+                                    transform: translate(-50%, -50%);
+                                    background: white;
+                                    padding: 30px;
+                                    border-radius: 12px;
+                                    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+                                    z-index: 10001;
+                                    text-align: center;
+                                    min-width: 300px;
+                                `;
+                                progressModal.innerHTML = `
+                                    <h3 style="margin-top:0;color:#333;">正在转换图片...</h3>
+                                    <div id="generate-progress-text" style="color:#666;margin:15px 0;">准备中...</div>
+                                    <div style="background:#e0e0e0;border-radius:10px;height:20px;overflow:hidden;">
+                                        <div id="generate-progress-bar" style="background:linear-gradient(90deg,#6b46c1,#9f7aea);height:100%;width:0%;transition:width 0.3s;"></div>
+                                    </div>
+                                `;
+                                document.body.appendChild(progressModal);
+                                
+                                // 逐个转换图片
+                                for (let i = 0; i < externalImages.length; i++) {
+                                    const img = externalImages[i];
+                                    const src = img.src || img.dataset.src;
+                                    try {
+                                        if (window.urlToBase64) {
+                                            const base64 = await window.urlToBase64(src);
+                                            img.src = base64;
+                                            if (img.dataset.src) {
+                                                img.dataset.src = base64;
+                                            }
+                                        }
+                                        console.log(`[图片生成] Base64转换成功: ${src.substring(0, 50)}...`);
+                                    } catch (error) {
+                                        console.error(`[图片生成] Base64转换失败:`, error);
+                                        // 转换失败，使用默认图片
+                                        img.src = './images/townfolk.png';
+                                        if (img.dataset.src) {
+                                            img.dataset.src = './images/townfolk.png';
+                                        }
+                                    }
+                                    
+                                    // 更新进度
+                                    const percent = Math.round(((i + 1) / externalImages.length) * 100);
+                                    document.getElementById('generate-progress-bar').style.width = percent + '%';
+                                    document.getElementById('generate-progress-text').textContent = 
+                                        `正在转换图片 (${i + 1}/${externalImages.length})`;
+                                }
+                                
+                                // 关闭进度弹窗
+                                if (progressModal.parentNode) {
+                                    document.body.removeChild(progressModal);
+                                }
                             }
+                        };
+
+                        // 执行图片转换并生成
+                        convertImagesToBase64().then(() => {
+                            htmlToImage.toCanvas(scriptPage, {
+                                backgroundColor: hexToRgba(customBgColor, bgOpacity),
+                                canvasWidth: Math.ceil(a4Width),
+                                canvasHeight: Math.ceil(a4Height)
+                            }).then(function(canvas) {
+                                // 恢复原始样式
+                                scriptPage.style.maxHeight = originalMaxHeight;
+                                scriptPage.style.overflowY = originalOverflowY;
+                                scriptPage.style.width = originalWidth;
+                                scriptPage.style.height = originalHeight;
+                                
+                                // 使用更兼容移动端的下载方式
+                                const dataUrl = canvas.toDataURL('image/png');
+                                const filename = editionName + '_剧本图.png';
+                                
+                                // 检测是否为移动端
+                                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+                                
+                                // 优化移动端下载逻辑
+                                if (isMobile) {
+                                    // 方案1：尝试使用Blob对象和download属性
+                                    try {
+                                        const blob = dataURLToBlob(dataUrl);
+                                        const url = URL.createObjectURL(blob);
+                                        const link = document.createElement('a');
+                                        link.href = url;
+                                        link.download = filename;
+                                        link.style.display = 'none';
+                                        
+                                        // 添加到文档并触发点击
+                                        document.body.appendChild(link);
+                                        
+                                        // 移动端需要模拟真实点击
+                                        if (navigator.userAgent.match(/iPad|iPhone|iPod/)) {
+                                            // iOS设备特殊处理
+                                            const event = document.createEvent('MouseEvents');
+                                            event.initMouseEvent('click', true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
+                                            link.dispatchEvent(event);
+                                        } else {
+                                            // Android设备
+                                            link.click();
+                                        }
+                                        
+                                        setTimeout(() => {
+                                            document.body.removeChild(link);
+                                            URL.revokeObjectURL(url);
+                                        }, 100);
+                                        
+                                        // 提示用户
+                                        setTimeout(() => {
+                                            alert('请在弹出的下载提示中选择保存图片');
+                                        }, 500);
+                                    } catch (e) {
+                                        console.error('Blob下载失败:', e);
+                                        // 方案2：在新窗口打开图片，让用户长按保存
+                                        const newWindow = window.open();
+                                        if (newWindow) {
+                                            newWindow.document.write('<html><head><title>' + filename + '</title></head><body style="margin:0;display:flex;justify-content:center;align-items:center;background:#f0f0f0;"><img src="' + dataUrl + '" style="max-width:100%;height:auto;" onclick="window.close()"></body></html>');
+                                            newWindow.document.close();
+                                            alert('图片已在新窗口打开，请长按图片保存到相册');
+                                        } else {
+                                            // 方案3：显示错误提示
+                                            alert('无法自动下载图片，请截图保存');
+                                        }
+                                    }
+                                } else {
+                                    // 桌面端：直接下载
+                                    const link = document.createElement('a');
+                                    link.download = filename;
+                                    link.href = dataUrl;
+                                    link.style.display = 'none';
+                                    document.body.appendChild(link);
+                                    link.click();
+                                    setTimeout(() => {
+                                        document.body.removeChild(link);
+                                    }, 100);
+                                }
+                            });
                         }).catch(function(error) {
                             console.error('生成图片失败:', error);
                             alert('生成图片失败，请重试');
@@ -2401,83 +2507,189 @@ async function generateJinxAndConfigImage() {
                             scriptPage.style.height = a4Height + 'px';
                         }
 
-                        htmlToImage.toCanvas(scriptPage, {
-                            backgroundColor: hexToRgba(customBgColor, bgOpacity),
-                            canvasWidth: Math.ceil(a4Width),
-                            canvasHeight: Math.ceil(a4Height)
-                        }).then(function(canvas) {
-                            // 恢复原始样式
-                            scriptPage.style.maxHeight = originalMaxHeight;
-                            scriptPage.style.overflowY = originalOverflowY;
-                            scriptPage.style.width = originalWidth;
-                            scriptPage.style.height = originalHeight;
+                        // 生成图片前，将外部图片URL转换为Base64
+                        const convertImagesToBase64 = async () => {
+                            const scriptImages = scriptPage.querySelectorAll('img');
+                            const externalImages = [];
                             
-                            // 使用更兼容移动端的下载方式
-                            const dataUrl = canvas.toDataURL('image/png');
-                            const filename = editionName + '_剧本图.png';
+                            // 获取所有已有角色的图片URL（内置角色）
+                            const builtInRoleImages = new Set();
+                            const builtInRoles = [
+                                ...(window.townsfolkRoles || []),
+                                ...(window.outsidersRoles || []),
+                                ...(window.minionsRoles || []),
+                                ...(window.demonsRoles || []),
+                                ...(window.fabledRoles || []),
+                                ...(window.travellersRoles || [])
+                            ];
+                            builtInRoles.forEach(role => {
+                                if (role.image) {
+                                    builtInRoleImages.add(role.image);
+                                }
+                            });
                             
-                            // 检测是否为移动端
-                            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-                            
-                            // 优化移动端下载逻辑
-                            if (isMobile) {
-                                // 方案1：尝试使用Blob对象和download属性
-                                try {
-                                    const blob = dataURLToBlob(dataUrl);
-                                    const url = URL.createObjectURL(blob);
-                                    const link = document.createElement('a');
-                                    link.href = url;
-                                    link.download = filename;
-                                    link.style.display = 'none';
+                            // 收集所有外部图片，但跳过已有角色的图片
+                            scriptImages.forEach(img => {
+                                const src = img.src || img.dataset.src;
+                                if (src && (src.startsWith('http://') || src.startsWith('https://'))) {
+                                    // 检查是否是已有角色的图片
+                                    const isBuiltInRoleImage = Array.from(builtInRoleImages).some(builtInImg => 
+                                        src === builtInImg || 
+                                        src.includes(builtInImg) || 
+                                        builtInImg.includes(src.split('/').pop())
+                                    );
                                     
-                                    // 添加到文档并触发点击
-                                    document.body.appendChild(link);
-                                    
-                                    // 移动端需要模拟真实点击
-                                    if (navigator.userAgent.match(/iPad|iPhone|iPod/)) {
-                                        // iOS设备特殊处理
-                                        const event = document.createEvent('MouseEvents');
-                                        event.initMouseEvent('click', true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
-                                        link.dispatchEvent(event);
+                                    if (!isBuiltInRoleImage) {
+                                        externalImages.push(img);
                                     } else {
-                                        // Android设备
-                                        link.click();
-                                    }
-                                    
-                                    setTimeout(() => {
-                                        document.body.removeChild(link);
-                                        URL.revokeObjectURL(url);
-                                    }, 100);
-                                    
-                                    // 提示用户
-                                    setTimeout(() => {
-                                        alert('请在弹出的下载提示中选择保存图片');
-                                    }, 500);
-                                } catch (e) {
-                                    console.error('Blob下载失败:', e);
-                                    // 方案2：在新窗口打开图片，让用户长按保存
-                                    const newWindow = window.open();
-                                    if (newWindow) {
-                                        newWindow.document.write('<html><head><title>' + filename + '</title></head><body style="margin:0;display:flex;justify-content:center;align-items:center;background:#f0f0f0;"><img src="' + dataUrl + '" style="max-width:100%;height:auto;" onclick="window.close()"></body></html>');
-                                        newWindow.document.close();
-                                        alert('图片已在新窗口打开，请长按图片保存到相册');
-                                    } else {
-                                        // 方案3：显示错误提示
-                                        alert('无法自动下载图片，请截图保存');
+                                        console.log(`[图片生成] 跳过已有角色图片: ${src.substring(0, 50)}...`);
                                     }
                                 }
-                            } else {
-                                // 桌面端：直接下载
-                                const link = document.createElement('a');
-                                link.download = filename;
-                                link.href = dataUrl;
-                                link.style.display = 'none';
-                                document.body.appendChild(link);
-                                link.click();
-                                setTimeout(() => {
-                                    document.body.removeChild(link);
-                                }, 100);
+                            });
+                            
+                            if (externalImages.length > 0) {
+                                console.log(`[图片生成] 发现 ${externalImages.length} 个外部图片需要转换`);
+                                
+                                // 显示进度弹窗
+                                const progressModal = document.createElement('div');
+                                progressModal.style.cssText = `
+                                    position: fixed;
+                                    top: 50%;
+                                    left: 50%;
+                                    transform: translate(-50%, -50%);
+                                    background: white;
+                                    padding: 30px;
+                                    border-radius: 12px;
+                                    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+                                    z-index: 10001;
+                                    text-align: center;
+                                    min-width: 300px;
+                                `;
+                                progressModal.innerHTML = `
+                                    <h3 style="margin-top:0;color:#333;">正在转换图片...</h3>
+                                    <div id="generate-progress-text" style="color:#666;margin:15px 0;">准备中...</div>
+                                    <div style="background:#e0e0e0;border-radius:10px;height:20px;overflow:hidden;">
+                                        <div id="generate-progress-bar" style="background:linear-gradient(90deg,#6b46c1,#9f7aea);height:100%;width:0%;transition:width 0.3s;"></div>
+                                    </div>
+                                `;
+                                document.body.appendChild(progressModal);
+                                
+                                // 逐个转换图片
+                                for (let i = 0; i < externalImages.length; i++) {
+                                    const img = externalImages[i];
+                                    const src = img.src || img.dataset.src;
+                                    try {
+                                        if (window.urlToBase64) {
+                                            const base64 = await window.urlToBase64(src);
+                                            img.src = base64;
+                                            if (img.dataset.src) {
+                                                img.dataset.src = base64;
+                                            }
+                                        }
+                                        console.log(`[图片生成] Base64转换成功: ${src.substring(0, 50)}...`);
+                                    } catch (error) {
+                                        console.error(`[图片生成] Base64转换失败:`, error);
+                                        // 转换失败，使用默认图片
+                                        img.src = './images/townfolk.png';
+                                        if (img.dataset.src) {
+                                            img.dataset.src = './images/townfolk.png';
+                                        }
+                                    }
+                                    
+                                    // 更新进度
+                                    const percent = Math.round(((i + 1) / externalImages.length) * 100);
+                                    document.getElementById('generate-progress-bar').style.width = percent + '%';
+                                    document.getElementById('generate-progress-text').textContent = 
+                                        `正在转换图片 (${i + 1}/${externalImages.length})`;
+                                }
+                                
+                                // 关闭进度弹窗
+                                if (progressModal.parentNode) {
+                                    document.body.removeChild(progressModal);
+                                }
                             }
+                        };
+
+                        // 执行图片转换并生成
+                        convertImagesToBase64().then(() => {
+                            htmlToImage.toCanvas(scriptPage, {
+                                backgroundColor: hexToRgba(customBgColor, bgOpacity),
+                                canvasWidth: Math.ceil(a4Width),
+                                canvasHeight: Math.ceil(a4Height)
+                            }).then(function(canvas) {
+                                // 恢复原始样式
+                                scriptPage.style.maxHeight = originalMaxHeight;
+                                scriptPage.style.overflowY = originalOverflowY;
+                                scriptPage.style.width = originalWidth;
+                                scriptPage.style.height = originalHeight;
+                                
+                                // 使用更兼容移动端的下载方式
+                                const dataUrl = canvas.toDataURL('image/png');
+                                const filename = editionName + '_剧本图.png';
+                                
+                                // 检测是否为移动端
+                                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+                                
+                                // 优化移动端下载逻辑
+                                if (isMobile) {
+                                    // 方案1：尝试使用Blob对象和download属性
+                                    try {
+                                        const blob = dataURLToBlob(dataUrl);
+                                        const url = URL.createObjectURL(blob);
+                                        const link = document.createElement('a');
+                                        link.href = url;
+                                        link.download = filename;
+                                        link.style.display = 'none';
+                                        
+                                        // 添加到文档并触发点击
+                                        document.body.appendChild(link);
+                                        
+                                        // 移动端需要模拟真实点击
+                                        if (navigator.userAgent.match(/iPad|iPhone|iPod/)) {
+                                            // iOS设备特殊处理
+                                            const event = document.createEvent('MouseEvents');
+                                            event.initMouseEvent('click', true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
+                                            link.dispatchEvent(event);
+                                        } else {
+                                            // Android设备
+                                            link.click();
+                                        }
+                                        
+                                        setTimeout(() => {
+                                            document.body.removeChild(link);
+                                            URL.revokeObjectURL(url);
+                                        }, 100);
+                                        
+                                        // 提示用户
+                                        setTimeout(() => {
+                                            alert('请在弹出的下载提示中选择保存图片');
+                                        }, 500);
+                                    } catch (e) {
+                                        console.error('Blob下载失败:', e);
+                                        // 方案2：在新窗口打开图片，让用户长按保存
+                                        const newWindow = window.open();
+                                        if (newWindow) {
+                                            newWindow.document.write('<html><head><title>' + filename + '</title></head><body style="margin:0;display:flex;justify-content:center;align-items:center;background:#f0f0f0;"><img src="' + dataUrl + '" style="max-width:100%;height:auto;" onclick="window.close()"></body></html>');
+                                            newWindow.document.close();
+                                            alert('图片已在新窗口打开，请长按图片保存到相册');
+                                        } else {
+                                            // 方案3：显示错误提示
+                                            alert('无法自动下载图片，请截图保存');
+                                        }
+                                    }
+                                } else {
+                                    // 桌面端：直接下载
+                                    const link = document.createElement('a');
+                                    link.download = filename;
+                                    link.href = dataUrl;
+                                    link.style.display = 'none';
+                                    document.body.appendChild(link);
+                                    link.click();
+                                    setTimeout(() => {
+                                        document.body.removeChild(link);
+                                    }, 100);
+                                }
+                            });
                         }).catch(function(error) {
                             console.error('生成图片失败:', error);
                             alert('生成图片失败，请重试');
