@@ -1,3371 +1,1964 @@
-// 剧本图生成工具函数
-// 此文件包含生成剧本图、细节图等功能
-// 存储用户手动添加的相克规则
-let userAddedJinxRules = [];
-// 辅助函数：将十六进制颜色转换为 rgba 格式
-function hexToRgba(hex, opacity) {
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    if (result) {
-        const r = parseInt(result[1], 16);
-        const g = parseInt(result[2], 16);
-        const b = parseInt(result[3], 16);
-        return `rgba(${r}, ${g}, ${b}, ${opacity})`;
-    }
-    return hex;
+// ========== 剧本图生成相关函数 ==========
+
+function showScriptPreview(dataUrl) {
+    const existing = document.getElementById('script-preview-modal');
+    if (existing) existing.remove();
+
+    const dateStr = new Date().toISOString().slice(0, 10);
+    const fileName = '剧本图_' + dateStr + '.png';
+
+    const modal = document.createElement('div');
+    modal.id = 'script-preview-modal';
+    modal.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.7);z-index:99999;display:flex;align-items:center;justify-content:center;';
+    modal.innerHTML = `
+        <div style="background:#fff;border-radius:12px;max-width:96vw;max-height:96vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.3);overflow:hidden;">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid #e2e8f0;flex-shrink:0;">
+                <span style="font-size:16px;font-weight:bold;color:#2d3748;">剧本图预览</span>
+                <button onclick="this.closest('#script-preview-modal').remove()" style="background:none;border:none;font-size:24px;cursor:pointer;color:#a0aec0;line-height:1;padding:0 4px;">&times;</button>
+            </div>
+            <div style="overflow:auto;padding:16px;flex:1;display:flex;align-items:flex-start;justify-content:center;">
+                <img src="${dataUrl}" style="max-width:100%;height:auto;border-radius:4px;box-shadow:0 4px 12px rgba(0,0,0,0.1);" alt="剧本图预览">
+            </div>
+            <div style="display:flex;gap:10px;justify-content:flex-end;padding:14px 20px;border-top:1px solid #e2e8f0;flex-shrink:0;">
+                <button onclick="this.closest('#script-preview-modal').remove()" style="padding:8px 24px;border:1px solid #cbd5e0;border-radius:6px;background:#fff;color:#4a5568;cursor:pointer;font-size:14px;">关闭</button>
+                <button id="script-preview-download-btn" data-url="${dataUrl}" data-filename="${fileName}" style="padding:8px 24px;border:none;border-radius:6px;background:linear-gradient(135deg, #e8963a 0%, #e8590c 100%);color:#fff;cursor:pointer;font-size:14px;font-weight:bold;">下载图片</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    modal.querySelector('#script-preview-download-btn').addEventListener('click', function() {
+        const link = document.createElement('a');
+        link.download = this.dataset.filename;
+        link.href = this.dataset.url;
+        link.click();
+    });
+
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) modal.remove();
+    });
 }
 
-// 辅助函数：将DataURL转换为Blob对象
-function dataURLToBlob(dataUrl) {
-    const arr = dataUrl.split(',');
-    const mime = arr[0].match(/:(.*?);/)[1];
-    const bstr = atob(arr[1]);
-    let n = bstr.length;
-    const u8arr = new Uint8Array(n);
-    while (n--) {
-        u8arr[n] = bstr.charCodeAt(n);
+function generateScriptImageByScheme() {
+    if (window.currentScheme === 'scheme1') {
+        generateScriptImage();
+    } else if (window.currentScheme === 'scheme2') {
+        generateScheme2Image();
+    } else if (window.currentScheme === 'scheme3') {
+        generateScheme3Image();
     }
-    return new Blob([u8arr], { type: mime });
 }
 
-// 辅助函数：将URL转换为本地路径（用于生成剧本图）
-function convertToLocalPath(imageUrl) {
-    if (!imageUrl) return '';
-    // 如果是完整的URL，转换为本地路径
-    if (imageUrl.includes('https://oss.gstonegames.com/data_file/clocktower/web/icons/')) {
-        const fileName = imageUrl.split('/').pop();
-        return `images/${fileName}`;
+// ========== 方案一：A4专业排版剧本图 ==========
+function generateScriptImage() {
+    const selectedRoles = getSelectedRoles();
+    if (selectedRoles.length === 0) {
+        alert('请先选择角色！');
+        return;
     }
-    // 如果是上传的图片URL，保持原样
-    if (imageUrl.includes('upload/')) {
-        return imageUrl;
-    }
-    // 其他情况保持原样
-    return imageUrl;
-}
 
-async function generateScriptImageV2() {
-            try {
-                // 防止重复点击
-                let isGeneratingScriptImage = false;
-                if (isGeneratingScriptImage) {
-                    console.log('剧本图生成中，请稍候...');
-                    return;
-                }
-                isGeneratingScriptImage = true;
-                
-                // 获取数据
-                selectedRoles = getSelectedRoles();
-                console.log('剧本图V2生成 - 被选中的角色数量:', selectedRoles.length);
-                console.log('剧本图V2生成 - 被选中的角色:', selectedRoles.map(role => role.name));
-                
-                // 用于显示的角色列表（只用被选中的角色）
-                const allRoles = selectedRoles;
-                console.log('剧本图V2生成 - 使用selectedRoles作为allRoles，角色数量:', allRoles.length);
-                console.log('剧本图V2生成 - allRoles中的角色:', allRoles.map(role => role.name));
-                
-                // 创建一个包含所有角色的完整列表，用于查找剧本信息中保存的角色ID
-                // 使用window对象安全访问全局变量，避免const变量提升问题
-                const allRolesForLookup = [
-                    ...(window.townsfolkRoles || []),
-                    ...(window.outsidersRoles || []),
-                    ...(window.minionsRoles || []),
-                    ...(window.demonsRoles || []),
-                    ...(window.fabledRoles || []),
-                    ...(window.travellersRoles || [])
-                ];
-                // 如果有自制角色，也添加到列表中
-                if (typeof dirRolesJson !== 'undefined') {
-                    allRolesForLookup.push(...dirRolesJson);
-                }
-                if (typeof window.dirRolesJson !== 'undefined') {
-                    allRolesForLookup.push(...window.dirRolesJson);
-                }
-                console.log('剧本图V2生成 - allRolesForLookup用于查找的角色数量:', allRolesForLookup.length);
-                const editionName = metaInfoJson.name || '未知剧本';
-                const authorName = metaInfoJson.author || '';
-                const scriptLogo = metaInfoJson.logo || document.getElementById('logo')?.value?.trim() || '';
-                
-                // 获取自定义阵营名称和颜色
-                const customTeamNames = {
-                    townsfolk: document.getElementById('custom-townsfolk-name')?.value?.trim() || '镇民',
-                    outsider: document.getElementById('custom-outsider-name')?.value?.trim() || '外来者',
-                    minion: document.getElementById('custom-minion-name')?.value?.trim() || '爪牙',
-                    demon: document.getElementById('custom-demon-name')?.value?.trim() || '恶魔'
-                };
-                
-                const customTeamColors = {
-                    townsfolk: document.getElementById('custom-townsfolk-color')?.value || '#1e3a5f',
-                    outsider: document.getElementById('custom-outsider-color')?.value || '#0d5c5c',
-                    minion: document.getElementById('custom-minion-color')?.value || '#8b4513',
-                    demon: document.getElementById('custom-demon-color')?.value || '#8b0000'
-                };
-                
-                // 获取二维码图片
-                const qrcodeImage = metaInfoJson.almanac || document.getElementById('qrcode-image-input')?.value?.trim() || '';
-                
-                // 获取玩家数量配置图片（方案一使用）
-                const configImage = document.getElementById('config-image-input')?.value?.trim() || 'https://i.postimg.cc/021k6s9F/playercount.png';
-                
-                // 获取剧本自制规则
-                const bootleggerRulesArray = Array.isArray(metaInfoJson.bootlegger) ? metaInfoJson.bootlegger : (metaInfoJson.bootlegger ? [metaInfoJson.bootlegger] : []);
-                const bootleggerRules = bootleggerRulesArray.join('\n');
-                
-                // 获取显示选项
-                const showNightOrder = document.getElementById('showNightOrder')?.checked ?? true;
-                const showConfigTable = document.getElementById('showConfigTable')?.checked ?? true;
-                const showCustomRules = document.getElementById('showCustomRules')?.checked ?? false;
-                const showTravellersFabled = document.getElementById('showTravellersFabled')?.checked ?? true;
-                const showJinxRules = document.getElementById('showJinxRules')?.checked ?? true;
-                const reverseOtherNight = document.getElementById('reverseOtherNight')?.checked ?? false;
-                
-                // 获取布局方案
-                const scriptLayout = document.getElementById('script-layout')?.value || 'scheme1';
-                
-                // 获取背景颜色设置
-                const customBgColor = document.getElementById('bg-color-setting')?.value || '#f6f6f4';
-                const bgOpacity = parseInt(document.getElementById('bg-opacity-setting')?.value || '100') / 100;
-                
-                // 直接使用剧本信息中的状态设置来决定是否显示状态栏
-                // 1. 默认情况下：显示状态栏（中毒醉酒和疯狂）
-                // 2. 用户添加了自定义状态：显示自定义状态和勾选的中毒醉酒疯狂
-                // 3. 用户明确保存了空状态和没有勾选醉酒中毒以及疯狂：不显示状态栏
-                // 检查是否是首次生成，没有保存过剧本信息
-                const isFirstTime = !metaInfoJson || !metaInfoJson.name;
-                // 检查是否有状态信息
-                const hasState = metaInfoJson.state && metaInfoJson.state.length > 0;
-                // 检查是否保存了空状态
-                const hasEmptyState = metaInfoJson.state && metaInfoJson.state.length === 0;
-                // 决定是否显示状态栏
-                const showStatusBar = isFirstTime || hasState;
-                console.log('是否显示状态栏:', showStatusBar, '是否首次生成:', isFirstTime, '是否有状态:', hasState, '是否保存了空状态:', hasEmptyState);
-                
-                // 获取相克规则
-                const jinxRules = [];
-                const roleNames = allRoles.map(role => role.name);
-                
-                console.log('剧本图V2生成 - 角色名称列表:', roleNames);
-                console.log('剧本图V2生成 - jinxes变量是否存在:', typeof jinxes !== 'undefined');
-                console.log('剧本图V2生成 - jinxes长度:', typeof jinxes !== 'undefined' ? jinxes.length : 0);
-                
-                // 检查是否存在相克规则库
-                if (typeof jinxes !== 'undefined') {
-                    jinxes.forEach(rule => {
-                        if (roleNames.includes(rule.jinxRole1) && roleNames.includes(rule.jinxRole2)) {
-                            if (!rule.jinxRule.includes('（试运行相克规则）')) {
-                                jinxRules.push(rule);
-                            }
-                        }
-                    });
-                }
-                
-                // 检查是否存在用户添加的相克规则
-                if (typeof userAddedJinxRules !== 'undefined') {
-                    userAddedJinxRules.forEach(rule => {
-                        if (roleNames.includes(rule.jinxRole1) && roleNames.includes(rule.jinxRole2)) {
-                            if (!rule.jinxRule.includes('（试运行相克规则）')) {
-                                jinxRules.push(rule);
-                            }
-                        }
-                    });
-                }
-                
-                // 检查是否存在全局相克规则
-                if (typeof window.jinxes !== 'undefined') {
-                    window.jinxes.forEach(rule => {
-                        if (roleNames.includes(rule.jinxRole1) && roleNames.includes(rule.jinxRole2)) {
-                            if (!rule.jinxRule.includes('（试运行相克规则）')) {
-                                jinxRules.push(rule);
-                            }
-                        }
-                    });
-                }
-                
-                // 检查是否存在用户在JSON编辑器中添加的相克规则（存储在dirRolesJson中）
-                console.log('【剧本图调试】检查dirRolesJson中的相克规则, dirRolesJson类型:', typeof dirRolesJson, ', window.dirRolesJson类型:', typeof window.dirRolesJson);
-                if (typeof dirRolesJson !== 'undefined') {
-                    console.log('【剧本图调试】dirRolesJson内容:', dirRolesJson);
-                    console.log('【剧本图调试】dirRolesJson中的相克规则数量:', dirRolesJson.filter(item => item.team === 'a jinxed' || item.team === '相克').length);
-                    dirRolesJson.forEach(item => {
-                        // 检查是否是相克规则项（通过team字段或id后缀判断）
-                        if ((item.team === 'a jinxed' || item.team === '相克') && item.name && item.ability) {
-                            // 尝试从名称中提取两个角色名称
-                            const nameParts = item.name.split(' & ');
-                            if (nameParts.length === 2) {
-                                const jinxRole1 = nameParts[0];
-                                const jinxRole2 = nameParts[1];
-                                if (roleNames.includes(jinxRole1) && roleNames.includes(jinxRole2)) {
-                                    const jinxRule = {
-                                        jinxRole1: jinxRole1,
-                                        jinxRole2: jinxRole2,
-                                        jinxRule: item.ability
-                                    };
-                                    jinxRules.push(jinxRule);
-                                }
-                            }
-                        }
-                    });
-                }
-                
-                console.log('剧本图V2生成 - 匹配的相克规则数量:', jinxRules.length);
-                console.log('剧本图V2生成 - 匹配的相克规则:', jinxRules);
-                
-                // 获取首夜和其他夜晚顺序
-                let allFirstNight = [];
-                let allOtherNight = [];
-                
-                console.log('剧本图V2生成 - metaInfoJson.firstNight:', metaInfoJson.firstNight);
-                console.log('剧本图V2生成 - metaInfoJson.otherNight:', metaInfoJson.otherNight);
-                
-                // 定义元信息角色映射
-                const metaRolesMap = {
-                    'minioninfo': { firstNight: 2000, name: '爪牙信息', image: 'images/180px-Mi.png' },
-                    'demoninfo': { firstNight: 3000, name: '恶魔信息', image: 'images/180px-Di.png' },
-                    'twilight': { firstNight: -100, otherNight: -100, name: '黄昏', image: 'images/dusk-CLd-DXn-QC.png' },
-                    'dawn': { firstNight: 12700, otherNight: 15000, name: '黎明', image: 'images/dawn.png' },
-                    '黄昏': { firstNight: -100, otherNight: -100, name: '黄昏', image: 'images/dusk-CLd-DXn-QC.png' },
-                    '黎明': { firstNight: 12700, otherNight: 15000, name: '黎明', image: 'images/dawn.png' }
-                };
-                
-                // 优先使用metaInfoJson中的夜间顺序
-                console.log('【夜间顺序调试】metaInfoJson.firstNight:', metaInfoJson.firstNight);
-                console.log('【夜间顺序调试】allRolesForLookup长度:', allRolesForLookup.length);
-                console.log('【夜间顺序调试】allRoles长度:', allRoles.length);
-                console.log('【夜间顺序调试】allRoles中的前5个角色ID:', allRoles.slice(0, 5).map(r => r.id));
-                console.log('【夜间顺序调试】firstNight > 0的角色数量:', allRoles.filter(r => r.firstNight > 0).length);
-                if (metaInfoJson.firstNight && metaInfoJson.firstNight.length > 0 && metaInfoJson.firstNight[0] !== "") {
-                    console.log('使用metaInfoJson中的首夜顺序');
-                    console.log('【首夜调试】metaInfoJson.firstNight内容:', metaInfoJson.firstNight);
-                    console.log('【首夜调试】allRolesForLookup中的角色ID前10个:', allRolesForLookup.slice(0, 10).map(r => r.id));
-                    console.log('【首夜调试】selectedRoles中的角色ID前10个:', selectedRoles.slice(0, 10).map(r => r.id));
-                    // 按照metaInfoJson.firstNight中的顺序构建首夜顺序
-                    const orderedFirstNight = metaInfoJson.firstNight.map(roleId => {
-                        // 先检查是否是元信息角色
-                        if (metaRolesMap[roleId]) {
-                            console.log('首夜角色ID:', roleId, '找到元信息角色:', metaRolesMap[roleId].name);
-                            return metaRolesMap[roleId];
-                        }
-                        // 查找对应的角色（使用allRolesForLookup获取角色数据）
-                        let role = allRolesForLookup.find(role => role.id === roleId) || null;
-                        console.log('【首夜调试】在allRolesForLookup中查找', roleId, '结果:', role ? role.name : 'null');
-                        if (!role && typeof dirRolesJson !== 'undefined') {
-                            role = dirRolesJson.find(role => role.id === roleId) || null;
-                            console.log('【首夜调试】在dirRolesJson中查找', roleId, '结果:', role ? role.name : 'null');
-                        }
-                        if (!role && typeof window.dirRolesJson !== 'undefined') {
-                            role = window.dirRolesJson.find(role => role.id === roleId) || null;
-                            console.log('【首夜调试】在window.dirRolesJson中查找', roleId, '结果:', role ? role.name : 'null');
-                        }
-                        // 找到角色后，检查是否在selectedRoles中（是否被勾选）
-                        if (role) {
-                            const isSelected = allRoles.some(selectedRole => selectedRole.id === roleId);
-                            if (isSelected) {
-                                console.log('首夜角色ID:', roleId, '找到角色:', role.name, '已被勾选');
-                                return role;
-                            } else {
-                                console.log('首夜角色ID:', roleId, '找到角色:', role.name, '但未被勾选，跳过');
-                                return null;
-                            }
-                        }
-                        console.log('首夜角色ID:', roleId, '未找到角色');
-                        console.log('调试信息 - allRolesForLookup中的角色ID数量:', allRolesForLookup.length);
-                        console.log('调试信息 - selectedRoles中的角色ID:', allRoles.map(r => r.id));
-                        return null;
-                    }).filter(Boolean);
-                    
-                    // 构建首夜顺序，保持剧本信息中的原始顺序
-                    allFirstNight = [...orderedFirstNight];
-                    
-                    // 检查并添加缺失的元信息角色
-                    if (!allFirstNight.some(item => item.name === '黄昏')) {
-                        allFirstNight.unshift(metaRolesMap['twilight']);
-                    }
-                    if (!allFirstNight.some(item => item.name === '爪牙信息')) {
-                        allFirstNight.push(metaRolesMap['minioninfo']);
-                    }
-                    if (!allFirstNight.some(item => item.name === '恶魔信息')) {
-                        allFirstNight.push(metaRolesMap['demoninfo']);
-                    }
-                    if (!allFirstNight.some(item => item.name === '黎明')) {
-                        allFirstNight.push(metaRolesMap['dawn']);
-                    }
-                    console.log('首夜顺序:', allFirstNight.map(item => item.name));
-                    console.log('添加黄昏和黎明后的首夜顺序:', allFirstNight.map(item => item.name));
-                    
-                    // 如果过滤后没有角色，使用默认顺序
-                    if (allFirstNight.length === 0) {
-                        console.log('metaInfoJson中的首夜顺序为空，使用默认顺序');
-                        // 按照角色的firstNight属性排序
-                        // 只包含firstNight大于0的角色
-                        const firstNightRoles = allRoles.filter(role => role.firstNight > 0).sort((a, b) => {
-                            // 首先按照firstNight排序
-                            const orderA = a.firstNight || 0;
-                            const orderB = b.firstNight || 0;
-                            if (orderA !== orderB) {
-                                return orderA - orderB;
-                            }
-                            // 如果firstNight相同，按照otherNight排序
-                            const otherOrderA = a.otherNight || 0;
-                            const otherOrderB = b.otherNight || 0;
-                            return otherOrderA - otherOrderB;
-                        });
-                        // 添加元信息角色
-                        const metaFirstNight = [
-                            metaRolesMap['twilight'],
-                            metaRolesMap['minioninfo'],
-                            metaRolesMap['demoninfo'],
-                            metaRolesMap['dawn']
-                        ];
-                        allFirstNight = [...firstNightRoles, ...metaFirstNight].sort((a, b) => {
-                            const orderA = a.firstNight || 0;
-                            const orderB = b.firstNight || 0;
-                            return orderA - orderB;
-                        });
-                        console.log('默认首夜顺序:', allFirstNight.map(item => item.name));
-                    }
+    const config = getScriptConfig();
+
+    const teamNames = { 
+        'townsfolk': config.townsfolkName, 
+        'outsider': config.outsiderName, 
+        'minion': config.minionName, 
+        'demon': config.demonName, 
+        'traveller': '旅行者', 
+        'fabled': '传奇角色' 
+    };
+    
+    const teamColors = {
+        'townsfolk': config.townsfolkColor,
+        'outsider': config.outsiderColor,
+        'minion': config.minionColor,
+        'demon': config.demonColor
+    };
+
+    const bootleggerInput = document.getElementById('bootlegger');
+    const bootleggerText = bootleggerInput ? bootleggerInput.value.trim() : '';
+
+    const twilightRole = { id: 'twilight', name: '黄昏', firstNight: 0, otherNight: 0, image: 'images/dusk-CLd-DXn-QC.png' };
+    const minionInfoRole = { id: 'minioninfo', name: '爪牙信息', firstNight: 2000, otherNight: 0, image: 'images/180px-Mi.png' };
+    const demonInfoRole = { id: 'demoninfo', name: '恶魔信息', firstNight: 3000, otherNight: 0, image: 'images/180px-Di.png' };
+    const dawnRole = { id: 'dawn', name: '黎明', firstNight: 9999, otherNight: 9999, image: 'images/dawn.png' };
+    
+    const getNightOrderFromPanel = (containerId) => {
+        const container = document.getElementById(containerId);
+        if (!container) return [];
+        
+        const buttons = container.querySelectorAll('.draggable-button');
+        const roleIds = Array.from(buttons)
+            .map(btn => btn.getAttribute('data-role-id'))
+            .filter(id => id && id.trim() !== '');
+        
+        return roleIds.map(roleId => {
+            if (roleId === 'twilight') return twilightRole;
+            if (roleId === 'minioninfo') return minionInfoRole;
+            if (roleId === 'demoninfo') return demonInfoRole;
+            if (roleId === 'dawn') return dawnRole;
+            
+            const role = selectedRoles.find(r => r.id === roleId);
+            if (role) return role;
+            const dirRole = window.dirRolesJson.find(r => r.id === roleId);
+            return dirRole || null;
+        }).filter(r => r !== null);
+    };
+    
+    let firstNightRoles = getNightOrderFromPanel('first-night-buttons-container');
+    let otherNightRoles = getNightOrderFromPanel('other-night-buttons-container');
+    
+    if (firstNightRoles.length === 0) {
+        firstNightRoles = selectedRoles
+            .filter(r => r.firstNight > 0)
+            .sort((a, b) => a.firstNight - b.firstNight);
+        firstNightRoles = [twilightRole, ...firstNightRoles, minionInfoRole, demonInfoRole, dawnRole];
+    }
+    if (otherNightRoles.length === 0) {
+        otherNightRoles = selectedRoles
+            .filter(r => r.otherNight > 0)
+            .sort((a, b) => a.otherNight - b.otherNight);
+        otherNightRoles = [twilightRole, ...otherNightRoles, dawnRole];
+    }
+
+    function buildNightOrderIcons(roles, containerHeight = 500, fixedSize = 48) {
+        if (!roles || roles.length === 0) return '';
+        
+        const iconCount = roles.length;
+        const spacing = 8;
+        const size = fixedSize.toFixed(1);
+        
+        let html = '';
+        roles.forEach((role, index) => {
+            const imgSrc = role.image || '';
+            html += `<div style="text-align:center;margin-bottom:${index < iconCount - 1 ? spacing + 'px' : '0'};">`;
+            if (imgSrc) {
+                html += `<img src="${imgSrc}" style="width:${size}px;height:${size}px;border-radius:4px;object-fit:cover;display:block;margin:0 auto;" title="${role.name}" onerror="this.style.display='none'">`;
+            } else {
+                html += `<div style="width:${size}px;height:${size}px;border-radius:4px;background:#e2e8f0;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:${Math.max(6, size * 0.15)}px;color:#a0aec0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${role.name}</div>`;
+            }
+            html += `</div>`;
+        });
+        return html;
+    }
+
+    const totalHeight = 1123;
+    const topPadding = 110;
+    const bottomPadding = 100;
+    const availableHeight = totalHeight - topPadding - bottomPadding;
+    
+    const maxRoleCount = Math.max(firstNightRoles.length, otherNightRoles.length);
+    
+    function calculateNightIconSize(roleCount, containerHeight, minSize = 24, maxSize = 48) {
+        if (roleCount <= 0) return maxSize;
+        const spacing = 8;
+        return Math.min(
+            maxSize,
+            Math.max(
+                minSize,
+                (containerHeight - (roleCount - 1) * spacing) / roleCount * 0.9
+            )
+        );
+    }
+    
+    const iconSize = calculateNightIconSize(maxRoleCount, availableHeight);
+    
+    const firstNightIcons = buildNightOrderIcons(firstNightRoles, availableHeight, iconSize);
+    const otherNightIcons = buildNightOrderIcons(otherNightRoles, availableHeight, iconSize);
+    
+    function calculateRoleScale(roleCount) {
+        if (roleCount <= 8) return 1.50;
+        if (roleCount <= 12) return 1.35;
+        if (roleCount <= 16) return 1.20;
+        if (roleCount <= 22) return 1.10;
+        if (roleCount <= 28) return 1.00;
+        if (roleCount <= 34) return 0.90;
+        return 0.80;
+    }
+    
+    const totalRoleCount = selectedRoles.length;
+    const roleScale = calculateRoleScale(totalRoleCount);
+    
+    const baseImgSize = 52;
+    const baseNameSize = 11;
+    const baseAbilitySize = 8.5;
+    const baseJinxSize = 7;
+    const baseTeamTitleSize = 11;
+    const baseGap = 6;
+    const baseColumnGap = 10;
+    const baseCardGap = 4;
+    const baseJinxImgSize = 12;
+    
+    const imgSize = Math.round(baseImgSize * roleScale);
+    const nameSize = Math.round(baseNameSize * roleScale * 10) / 10;
+    const abilitySize = Math.round(baseAbilitySize * roleScale * 10) / 10;
+    const jinxSize = Math.round(baseJinxSize * roleScale * 10) / 10;
+    const teamTitleSize = Math.round(baseTeamTitleSize * roleScale * 10) / 10;
+    const gap = Math.round(baseGap * roleScale);
+    const columnGap = Math.round(baseColumnGap * roleScale);
+    const cardGap = Math.round(baseCardGap * roleScale);
+    const jinxImgSize = Math.round(baseJinxImgSize * roleScale);
+
+    function buildRoleCard(role, jinxesForRole, teamColor) {
+        const imgSrc = role.image || '';
+        const nameColor = teamColor || '#c1121f';
+        let html = `<div style="display:flex;align-items:flex-start;gap:${gap}px;margin-bottom:0;width:100%;">`;
+        if (imgSrc) {
+            html += `<img src="${imgSrc}" style="width:${imgSize}px;height:${imgSize}px;border-radius:3px;flex-shrink:0;object-fit:cover;" onerror="this.style.display='none'">`;
+        }
+        html += `<div style="flex:1;min-width:0;">`;
+        html += `<div style="font-weight:bold;font-size:${nameSize}px;color:${nameColor};margin-bottom:1px;letter-spacing:0.3px;">${role.name}</div>`;
+        html += `<div style="font-size:${abilitySize}px;color:#1a1a1a;line-height:1.5;">${role.ability || ''}</div>`;
+        
+        if (jinxesForRole && jinxesForRole.length > 0) {
+            html += `<div style="font-size:${jinxSize}px;color:#718096;margin-top:2px;line-height:1.4;">`;
+            jinxesForRole.forEach(jinx => {
+                const role2 = selectedRoles.find(r => r.name === jinx.jinxRole2);
+                const role2Img = role2 ? role2.image : '';
+                if (role2Img) {
+                    html += `<div style="margin-bottom:1px;display:flex;align-items:center;gap:2px;">`;
+                    html += `<img src="${role2Img}" style="width:${jinxImgSize}px;height:${jinxImgSize}px;border-radius:2px;object-fit:cover;flex-shrink:0;" onerror="this.style.display='none'">`;
+                    html += `<span>${jinx.jinxRule}</span>`;
+                    html += `</div>`;
                 } else {
-                    console.log('使用角色默认的首夜顺序');
-                    // 否则按照角色的firstNight属性排序
-                    // 只包含firstNight大于0的角色
-                    const firstNightRoles = allRoles.filter(role => role.firstNight > 0).sort((a, b) => {
-                        // 首先按照firstNight排序
-                        const orderA = a.firstNight || 0;
-                        const orderB = b.firstNight || 0;
-                        if (orderA !== orderB) {
-                            return orderA - orderB;
-                        }
-                        // 如果firstNight相同，按照otherNight排序
-                        const otherOrderA = a.otherNight || 0;
-                        const otherOrderB = b.otherNight || 0;
-                        return otherOrderA - otherOrderB;
-                    });
-                    // 添加元信息角色
-                    const metaFirstNight = [
-                        metaRolesMap['twilight'],
-                        metaRolesMap['minioninfo'],
-                        metaRolesMap['demoninfo'],
-                        metaRolesMap['dawn']
-                    ];
-                    allFirstNight = [...firstNightRoles, ...metaFirstNight].sort((a, b) => {
-                        const orderA = a.firstNight || 0;
-                        const orderB = b.firstNight || 0;
-                        return orderA - orderB;
-                    });
-                    console.log('默认首夜顺序:', allFirstNight.map(item => item.name));
+                    html += `<div style="margin-bottom:1px;">${jinx.jinxRule}</div>`;
                 }
-                
-                if (metaInfoJson.otherNight && metaInfoJson.otherNight.length > 0 && metaInfoJson.otherNight[0] !== "") {
-                    console.log('使用metaInfoJson中的其他夜晚顺序');
-                    // 按照metaInfoJson.otherNight中的顺序构建其他夜晚顺序
-                    const orderedOtherNight = metaInfoJson.otherNight.map(roleId => {
-                        // 先检查是否是元信息角色
-                        if (metaRolesMap[roleId]) {
-                            console.log('其他夜晚角色ID:', roleId, '找到元信息角色:', metaRolesMap[roleId].name);
-                            return metaRolesMap[roleId];
-                        }
-                        // 查找对应的角色（使用allRolesForLookup获取角色数据）
-                        let role = allRolesForLookup.find(role => role.id === roleId) || null;
-                        if (!role && typeof dirRolesJson !== 'undefined') {
-                            role = dirRolesJson.find(role => role.id === roleId) || null;
-                        }
-                        if (!role && typeof window.dirRolesJson !== 'undefined') {
-                            role = window.dirRolesJson.find(role => role.id === roleId) || null;
-                        }
-                        // 找到角色后，检查是否在selectedRoles中（是否被勾选）
-                        if (role) {
-                            const isSelected = allRoles.some(selectedRole => selectedRole.id === roleId);
-                            if (isSelected) {
-                                console.log('其他夜晚角色ID:', roleId, '找到角色:', role.name, '已被勾选');
-                                return role;
-                            } else {
-                                console.log('其他夜晚角色ID:', roleId, '找到角色:', role.name, '但未被勾选，跳过');
-                                return null;
-                            }
-                        }
-                        console.log('其他夜晚角色ID:', roleId, '未找到角色');
-                        console.log('调试信息 - allRolesForLookup中的角色ID数量:', allRolesForLookup.length);
-                        console.log('调试信息 - selectedRoles中的角色ID:', allRoles.map(r => r.id));
-                        return null;
-                    }).filter(Boolean);
-                    
-                    // 构建其他夜晚顺序，保持剧本信息中的原始顺序
-                    allOtherNight = [...orderedOtherNight];
-                    
-                    // 检查并添加缺失的元信息角色
-                    if (!allOtherNight.some(item => item.name === '黄昏')) {
-                        allOtherNight.unshift(metaRolesMap['twilight']);
-                    }
-                    if (!allOtherNight.some(item => item.name === '黎明')) {
-                        allOtherNight.push(metaRolesMap['dawn']);
-                    }
-                    console.log('其他夜晚顺序:', allOtherNight.map(item => item.name));
-                    console.log('添加黄昏和黎明后的其他夜晚顺序:', allOtherNight.map(item => item.name));
-                    
-                    // 如果过滤后没有角色，使用默认顺序
-                    if (allOtherNight.length === 0) {
-                        console.log('metaInfoJson中的其他夜晚顺序为空，使用默认顺序');
-                        // 否则按照角色的otherNight属性排序
-                        // 只包含otherNight大于0的角色
-                        const otherNightRoles = allRoles.filter(role => role.otherNight > 0).sort((a, b) => {
-                            // 首先按照otherNight排序
-                            const orderA = a.otherNight || 0;
-                            const orderB = b.otherNight || 0;
-                            if (orderA !== orderB) {
-                                return orderA - orderB;
-                            }
-                            // 如果otherNight相同，按照firstNight排序
-                            const firstOrderA = a.firstNight || 0;
-                            const firstOrderB = b.firstNight || 0;
-                            return firstOrderA - firstOrderB;
-                        });
-                        // 添加元信息角色
-                        const metaOtherNight = [
-                            metaRolesMap['twilight'],
-                            metaRolesMap['dawn']
-                        ];
-                        allOtherNight = [...otherNightRoles, ...metaOtherNight].sort((a, b) => {
-                            const orderA = a.otherNight || 0;
-                            const orderB = b.otherNight || 0;
-                            return orderA - orderB;
-                        });
-                        console.log('默认其他夜晚顺序:', allOtherNight.map(item => item.name));
-                    }
-                } else {
-                    console.log('使用角色默认的其他夜晚顺序');
-                    // 否则按照角色的otherNight属性排序
-                    // 只包含otherNight大于0的角色
-                    const otherNightRoles = allRoles.filter(role => role.otherNight > 0).sort((a, b) => {
-                        // 首先按照otherNight排序
-                        const orderA = a.otherNight || 0;
-                        const orderB = b.otherNight || 0;
-                        if (orderA !== orderB) {
-                            return orderA - orderB;
-                        }
-                        // 如果otherNight相同，按照firstNight排序
-                        const firstOrderA = a.firstNight || 0;
-                        const firstOrderB = b.firstNight || 0;
-                        return firstOrderA - firstOrderB;
-                    });
-                    // 添加元信息角色
-                    const metaOtherNight = [
-                        metaRolesMap['twilight'],
-                        metaRolesMap['dawn']
-                    ];
-                    allOtherNight = [...otherNightRoles, ...metaOtherNight].sort((a, b) => {
-                        const orderA = a.otherNight || 0;
-                        const orderB = b.otherNight || 0;
-                        return orderA - orderB;
-                    });
-                    console.log('默认其他夜晚顺序:', allOtherNight.map(item => item.name));
-                }
-                
-                // 角色排序函数
-                const sortRolesByAbility = (roles) => {
-                    const abilityOrder = [
-                        '在你的首个夜晚，你会得知',
-                        '在夜晚时',
-                        '在夜晚',
-                        '每个黄昏 *',
-                        '每个夜晚',
-                        '每个夜晚 *',
-                        '每个白天',
-                        '每局游戏限一次，在夜晚时',
-                        '每局游戏限一次，在夜晚时 *',
-                        '每局游戏限一次，在白天时',
-                        '每局游戏限一次',
-                        '在你的首个夜晚',
-                        '在你的首个白天',
-                        '你认为',
-                        '你是',
-                        '你拥有',
-                        '你不知道',
-                        '你可能',
-                        '你',
-                        '当你死亡时',
-                        '当你得知你死亡时',
-                        '当',
-                        '如果你死亡',
-                        '如果你死亡',
-                        '如果你 "疯狂" 地',
-                        '如果你',
-                        '如果恶魔死亡',
-                        '如果恶魔杀死了',
-                        '如果恶魔',
-                        '如果… 都',
-                        '如果大于等于五名玩家存活时',
-                        '如果',
-                        '所有玩家都',
-                        '所有',
-                        '当… 首次',
-                        '善良',
-                        '邪恶',
-                        '玩家',
-                        '爪牙'
-                    ];
-                    
-                    return roles.sort((a, b) => {
-                        const abilityA = a.ability || '';
-                        const abilityB = b.ability || '';
-                        
-                        let orderA = abilityOrder.length;
-                        let orderB = abilityOrder.length;
-                        
-                        for (let i = 0; i < abilityOrder.length; i++) {
-                            if (abilityA.includes(abilityOrder[i])) {
-                                orderA = i;
-                                break;
-                            }
-                        }
-                        
-                        for (let i = 0; i < abilityOrder.length; i++) {
-                            if (abilityB.includes(abilityOrder[i])) {
-                                orderB = i;
-                                break;
-                            }
-                        }
-                        
-                        if (orderA !== orderB) {
-                            return orderA - orderB;
-                        }
-                        
-                        return abilityA.length - abilityB.length;
-                    });
-                };
-                
-                // 获取自定义阵营
-                const validCustomTeams = [];
-                const customTeamRoleIds = new Set();
-                if (typeof customTeams !== 'undefined') {
-                    customTeams.forEach((team, index) => {
-                        const name = team.name || '';
-                        const color = team.color || '#6b5a45';
-                        const roles = team.roles || [];
-                        if (roles.length > 0) {
-                            validCustomTeams.push({ name, color, roles, index });
-                            // 收集自定义阵营中的角色ID
-                            roles.forEach(role => {
-                                customTeamRoleIds.add(role.id);
-                            });
-                        }
-                    });
-                }
-                
-                // 按阵营分组角色（保持已选角色的排序顺序）
-                const townsfolkRoles = [];
-                const outsiderRoles = [];
-                const minionRoles = [];
-                const demonRoles = [];
-                const fabledRoles = [];
-                const travellerRoles = [];
-                
-                // 按原有顺序分组，保持已选角色的排序，跳过已添加到自定义阵营的角色
-                allRoles.forEach(role => {
-                    // 跳过已添加到自定义阵营的角色
-                    if (customTeamRoleIds.has(role.id)) {
-                        return;
-                    }
-                    
-                    if (role.team === 'townsfolk' || role.team === '镇民') {
-                        townsfolkRoles.push(role);
-                    } else if (role.team === 'outsider' || role.team === '外来者') {
-                        outsiderRoles.push(role);
-                    } else if (role.team === 'minion' || role.team === '爪牙') {
-                        minionRoles.push(role);
-                    } else if (role.team === 'demon' || role.team === '恶魔') {
-                        demonRoles.push(role);
-                    } else if (role.team === 'fabled' || role.team === '传奇角色') {
-                        fabledRoles.push(role);
-                    } else if (role.team === 'traveller' || role.team === '旅行者') {
-                        travellerRoles.push(role);
-                    }
-                });
-                
-                // 检测是否为移动端
-                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-                
-                // 创建预览容器
-                const previewContainer = document.createElement('div');
-                previewContainer.id = 'script-image-preview-v2';
-                previewContainer.style.cssText = `
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background: rgba(0, 0, 0, 0.85);
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: flex-start;
-                    align-items: center;
-                    z-index: 10000;
-                    padding: ${isMobile ? '10px' : '20px'};
-                    box-sizing: border-box;
-                    overflow: auto;
-                `;
+            });
+            html += `</div>`;
+        }
+        
+        html += `</div></div>`;
+        return html;
+    }
 
-                // 获取字号设置
-                const fontSizeInput = document.getElementById('font-size-setting');
-                const fontSize = fontSizeInput?.value || 'small';
-                // 移动端使用更大的字号倍率，提升可读性
-                const fontSizeMultiplier = isMobile ? 4.6: (fontSize === 'large' ? 1.2 : 1.0);
+    function buildTeamSection(team, allJinxes, customTeamInfo = null) {
+        const occupiedRoleIds = typeof getCustomTeams === 'function' ? 
+            getCustomTeams().flatMap(t => t.roleIds || []) : [];
+        
+        let roles;
+        if (customTeamInfo && customTeamInfo.roleIds) {
+            roles = selectedRoles.filter(r => customTeamInfo.roleIds.includes(r.id));
+        } else {
+            roles = selectedRoles.filter(r => r.team === team && !occupiedRoleIds.includes(r.id));
+        }
+        if (!roles || roles.length === 0) return '';
+        
+        let teamColor, teamDisplayName;
+        if (customTeamInfo) {
+            teamColor = customTeamInfo.color;
+            teamDisplayName = customTeamInfo.name;
+        } else {
+            teamColor = teamColors[team] || ((team === 'townsfolk' || team === 'outsider') ? scriptConfig.goodColor : scriptConfig.evilColor);
+            teamDisplayName = teamNames[team] || team;
+        }
+        
+        const isHorizontal = document.getElementById('roles-horizontal')?.checked || false;
+        
+        let html = `<div style="margin-bottom: ${Math.round(12 * roleScale)}px; display: flex; flex-direction: column;">`;
+        html += `<div style="display:flex;align-items:center;margin-bottom:${Math.round(4 * roleScale)}px;">`;
+        html += `<span style="color:${teamColor};font-size:${teamTitleSize}px;font-weight:bold;flex-shrink:0;letter-spacing:1px;">${teamDisplayName}</span>`;
+        html += `<div style="flex:1;height:1px;background:#c0c0c0;margin-left:8px;"></div>`;
+        html += `</div>`;
+        
+        if (isHorizontal) {
+            html += `<div style="display:flex;gap:${columnGap}px;flex-wrap:wrap;">`;
+            roles.forEach(role => {
+                const jinxesForRole = allJinxes.filter(jinx => jinx.jinxRole1 === role.name);
+                html += `<div style="flex-shrink:0;">`;
+                html += buildRoleCard(role, jinxesForRole, teamColor);
+                html += `</div>`;
+            });
+            html += `</div>`;
+        } else {
+            const halfLength = Math.ceil(roles.length / 2);
+            const leftColumnRoles = roles.slice(0, halfLength);
+            const rightColumnRoles = roles.slice(halfLength);
+            
+            html += `<div style="display:flex;gap:${columnGap}px;flex:1;">`;
+            html += `<div style="flex:1;display:flex;flex-direction:column;gap:${cardGap}px;">`;
+            leftColumnRoles.forEach(role => {
+                const jinxesForRole = allJinxes.filter(jinx => jinx.jinxRole1 === role.name);
+                html += buildRoleCard(role, jinxesForRole, teamColor);
+            });
+            html += `</div>`;
+            html += `<div style="flex:1;display:flex;flex-direction:column;gap:${cardGap}px;">`;
+            rightColumnRoles.forEach(role => {
+                const jinxesForRole = allJinxes.filter(jinx => jinx.jinxRole1 === role.name);
+                html += buildRoleCard(role, jinxesForRole, teamColor);
+            });
+            html += `</div>`;
+            html += `</div>`;
+        }
+        html += `</div>`;
+        return html;
+    }
 
-                // 创建剧本图容器 - 固定宽度设置
-                const scriptPage = document.createElement('div');
-                scriptPage.style.cssText = `
-                    background: ${hexToRgba(customBgColor, bgOpacity)};
-                    width: ${isMobile ? '1240px' : '8.27in'};
-                    padding: ${isMobile ? '8px' : '0.3in'};
-                    box-sizing: border-box;
-                    padding: 0.3in;
-                    position: relative;
-                    font-family: 'Assistant', 'Microsoft YaHei', sans-serif;
-                    margin: ${isMobile ? '0' : 'auto'};
-                `;
-                
-                // 构建首夜顺序HTML（左侧垂直排列）
-                const firstNightHtml = allFirstNight.map(role => `
-                    <img src="${convertToLocalPath(role.image)}" style="width: 45px; height: 45px; margin: -5px 0; object-fit: cover; display: block;">
-                `).join('');
-                
-                // 构建其他夜晚顺序HTML（右侧垂直排列）
-                const otherNightHtml = allOtherNight.map(role => `
-                    <img src="${convertToLocalPath(role.image)}" style="width: 45px; height: 45px; margin: -5px 0; object-fit: cover; display: block;${!reverseOtherNight ? '' : ' transform: rotate(180deg);'}">
-                `).join('');
-                
-                // 为每个角色创建相克规则映射
-                const roleJinxMap = {};
-                allRoles.forEach(role => {
-                    roleJinxMap[role.name] = jinxRules.filter(rule =>
-                        rule.jinxRole1 === role.name || rule.jinxRole2 === role.name
-                    );
-                });
+    const scriptConfig = config;
 
-                // 用于跟踪已经展示过的相克规则（避免重复显示）
-                const displayedJinxRules = new Set();
+    const scriptTitle = (metaInfoJson && metaInfoJson.name && metaInfoJson.name.trim()) ? metaInfoJson.name.trim() : '未知剧本';
+    const authorText = (metaInfoJson && metaInfoJson.author && metaInfoJson.author.trim()) ? metaInfoJson.author.trim() : '';
+    
+    const qrcodeImageSrc = scriptConfig.qrcodeImage || '';
+    const showQrCode = qrcodeImageSrc && (qrcodeImageSrc.startsWith('data:image') || qrcodeImageSrc.startsWith('http') || qrcodeImageSrc.startsWith('images/'));
 
-                // 构建角色卡片HTML
-                const createRoleCard = (role, color = '#0b6aaf') => {
-                    // 获取当前角色的相克规则
-                    const jinxRulesForRole = roleJinxMap[role.name] || [];
+    const selectedRoleNames = selectedRoles.map(r => r.name);
+    const allJinxes = scriptConfig.showJinxRules ? getDeduplicatedJinxes(selectedRoleNames) : [];
 
-                    // 过滤出未展示过的相克规则，并标记为已展示
-                    const undisplayedJinxRules = jinxRulesForRole.filter(rule => {
-                        // 创建规则的唯一标识（按角色名字母顺序排序，确保一致性）
-                        const ruleKey = [rule.jinxRole1, rule.jinxRole2].sort().join('|');
-                        if (displayedJinxRules.has(ruleKey)) {
-                            return false; // 已经展示过，不显示
-                        }
-                        displayedJinxRules.add(ruleKey); // 标记为已展示
-                        return true;
-                    });
+    const container = document.getElementById('script-image-render');
+    container.innerHTML = `
+        <div style="width: 794px; height: 1123px; background: ${scriptConfig.bgColor}; font-family: 'Microsoft YaHei', 'SimSun', 'PingFang SC', sans-serif; color: #1a1a1a; position: relative; display: flex; flex-direction: row; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+            
+            ${scriptConfig.showNightOrder ? `
+            <div style="width: 70px; display: flex; flex-direction: column; align-items: center; padding-top: 110px; padding-bottom: 100px; position: relative;">
+                <div style="display: flex; flex-direction: column; align-items: center; flex: 1;">
+                    ${firstNightIcons}
+                </div>
+                <div style="position: absolute; right: -5px; top: 50%; transform: translateY(-50%) translateX(50%); writing-mode: vertical-rl; text-orientation: mixed; font-size: 9px; font-weight: bold; color: #3d4852; letter-spacing: 4px; background: ${scriptConfig.bgColor}; padding: 2px 4px; z-index: 10;">FIRST NIGHT</div>
+            </div>
+            ` : ''}
 
-                    // 构建该角色的相克规则文本HTML（显示在角色卡片下方，白色底框突出显示）
-                    const jinxRulesHtml = showJinxRules && undisplayedJinxRules.length > 0 ? `
-                        <div style="margin-top: 6px; padding: 8px 10px; background: rgba(255,255,255,0.95); font-size: 12px; line-height: 1.5; color: #5a4a3a;">
-                            ${undisplayedJinxRules.map(rule => {
-                                const otherRoleName = rule.jinxRole1 === role.name ? rule.jinxRole2 : rule.jinxRole1;
-                                const otherRole = allRoles.find(r => r.name === otherRoleName);
-                                return `<div style="margin-bottom: 3px; display: flex; align-items: center; gap: 6px;">${otherRole ? `<img src="${convertToLocalPath(otherRole.image)}" style="width: 24px; height: 24px; object-fit: cover; flex-shrink: 0;">` : ''}<span style="font-size: 12px; font-weight: bold; color: #333;">${otherRoleName}</span><span style="color: #999;">:</span><span style="font-size: 12px; font-weight: normal; color: #5a4a3a; line-height: 1.5;">${rule.jinxRule}</span></div>`;
-                            }).join('')}
+            <div style="flex: 1; display: flex; flex-direction: column; padding: 0; position: relative;">
+                <div style="padding: 12px 22px 4px 22px;">
+                    <div style="display: flex; align-items: flex-start; justify-content: space-between;">
+                        <div style="flex: 1;">
+                            ${scriptConfig.titleImage ? `<img src="${scriptConfig.titleImage}" style="max-width:300px;max-height:60px;height:auto;" onerror="this.style.display='none';this.parentElement.innerHTML='<div style=\\'font-size:30px;font-weight:bold;color:${scriptConfig.titleColor};font-family:SimSun,STSong,serif;letter-spacing:5px;line-height:1.2;\\'>${scriptTitle}</div>';" alt="${scriptTitle}">` : `<div style="font-size: 30px; font-weight: bold; color: ${scriptConfig.titleColor}; font-family: 'SimSun', 'STSong', serif; letter-spacing: 5px; line-height: 1.2;">${scriptTitle}</div>`}
+                            ${authorText ? `<div style="font-size: 10px; color: #6b7280; margin-top: 2px; letter-spacing: 1px;">${authorText}</div>` : ''}
                         </div>
-                    ` : '';
-
-                    return `
-                        <div style="display: flex; gap: 10px; padding: 8px; align-items: flex-start; background: rgb(246, 246, 244);">
-                            <img src="${convertToLocalPath(role.image)}" style="width: 120px; height: 120px; object-fit: cover; flex-shrink: 0; display: block;">
-                            <div style="flex: 1; min-width: 0; font-family: 'Microsoft YaHei', Heiti;">
-                                <div style="font-size: 24px; font-weight: bold; color: ${color}; margin-bottom: 2px;">${role.name}</div>
-                                <div style="font-size: 20px; font-weight: bold; color: #4a3728; line-height: 1.4;">${role.ability || ''}</div>
-                                ${jinxRulesHtml}
-                            </div>
-                        </div>
-                    `;
-                };
-                
-                // 构建阵营区域HTML
-                const createTeamSection = (title, roles, color = '#0b6aaf') => {
-                    if (roles.length === 0) return '';
-                    
-                    // 检查是否启用横向排列
-                    const horizontalLayout = document.getElementById('horizontalLayout');
-                    const useHorizontalLayout = horizontalLayout && horizontalLayout.checked;
-                    
-                    if (useHorizontalLayout) {
-                        // 横向排列（wrap方式）
-                        return `
-                            <div style="margin-bottom: 15px; max-width: 100%;">
-                                <!-- 阵营标题 -->
-                                <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                                    <span style="font-family: 'Philo', serif; font-size: 40px; font-weight: bold; color: ${color}; text-transform: uppercase;">${title}</span>
-                                    <div style="flex: 1; height: 2px; background: ${color}; margin-left: 10px;"></div>
-                                </div>
-                                <!-- 角色列表 -->
-                                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                                    ${roles.map(role => `
-                                        <div style="flex: 0 1 calc(50% - 4px); min-width: 250px; max-width: calc(50% - 4px); box-sizing: border-box;">
-                                            ${createRoleCard(role, color)}
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            </div>
-                        `;
-                    } else {
-                        // 竖向排列（默认）：先填满第一列，再填满第二列
-                        const midIndex = Math.ceil(roles.length / 2);
-                        const leftColumn = roles.slice(0, midIndex);
-                        const rightColumn = roles.slice(midIndex);
-                        
-                        return `
-                            <div style="margin-bottom: 15px; max-width: 100%;">
-                                <!-- 阵营标题 -->
-                                <div style="display: flex; align-items: center; margin-bottom: 8px;">
-                                    <span style="font-family: 'Philo', serif; font-size: 40px; font-weight: bold; color: ${color}; text-transform: uppercase;">${title}</span>
-                                    <div style="flex: 1; height: 2px; background: ${color}; margin-left: 10px;"></div>
-                                </div>
-                                <!-- 角色列表 -->
-                                <div style="display: flex; gap: 12px;">
-                                    <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
-                                        ${leftColumn.map(role => `
-                                            <div style="box-sizing: border-box;">
-                                                ${createRoleCard(role, color)}
-                                            </div>
-                                        `).join('')}
-                                    </div>
-                                    <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
-                                        ${rightColumn.map(role => `
-                                            <div style="box-sizing: border-box;">
-                                                ${createRoleCard(role, color)}
-                                            </div>
-                                        `).join('')}
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                    }
-                };
-                
-                // 构建玩家数量表格
-                const playerCountTable = `
-                    <div style="font-size: 12px; border-collapse: collapse; width: 100%; white-space: nowrap;">
-                        <div style="display: flex; background: #5c4033; color: white; font-weight: bold;">
-                            <div style="width: 50px; padding: 5px 8px; text-align: center; border: 1px solid #3d2817;">玩家</div>
-                            <div style="flex: 1; padding: 5px 8px; text-align: center; border: 1px solid #3d2817;">5</div>
-                            <div style="flex: 1; padding: 5px 8px; text-align: center; border: 1px solid #3d2817;">6</div>
-                            <div style="flex: 1; padding: 5px 8px; text-align: center; border: 1px solid #3d2817;">7</div>
-                            <div style="flex: 1; padding: 5px 8px; text-align: center; border: 1px solid #3d2817;">8</div>
-                            <div style="flex: 1; padding: 5px 8px; text-align: center; border: 1px solid #3d2817;">9</div>
-                            <div style="flex: 1; padding: 5px 8px; text-align: center; border: 1px solid #3d2817;">10</div>
-                            <div style="flex: 1; padding: 5px 8px; text-align: center; border: 1px solid #3d2817;">11</div>
-                            <div style="flex: 1; padding: 5px 8px; text-align: center; border: 1px solid #3d2817;">12</div>
-                            <div style="flex: 1; padding: 5px 8px; text-align: center; border: 1px solid #3d2817;">13</div>
-                            <div style="flex: 1; padding: 5px 8px; text-align: center; border: 1px solid #3d2817;">14</div>
-                            <div style="flex: 1; padding: 5px 8px; text-align: center; border: 1px solid #3d2817;">15</div>
-                        </div>
-                        <div style="display: flex; background: white; color: #5c4033;">
-                            <div style="width: 50px; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0; color: #1e3a5f; font-weight: bold;">镇民</div>
-                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">3</div>
-                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">3</div>
-                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">5</div>
-                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">5</div>
-                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">5</div>
-                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">7</div>
-                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">7</div>
-                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">7</div>
-                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">9</div>
-                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">9</div>
-                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">9</div>
-                        </div>
-                        <div style="display: flex; background: #f5f0e6; color: #5c4033;">
-                            <div style="width: 50px; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0; color: #0d5c5c; font-weight: bold;">外来者</div>
-                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">0</div>
-                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">1</div>
-                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">0</div>
-                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">1</div>
-                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">2</div>
-                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">0</div>
-                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">1</div>
-                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">2</div>
-                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">0</div>
-                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">1</div>
-                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">2</div>
-                        </div>
-                        <div style="display: flex; background: white; color: #5c4033;">
-                            <div style="width: 50px; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0; color: #8b4513; font-weight: bold;">爪牙</div>
-                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">1</div>
-                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">1</div>
-                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">1</div>
-                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">1</div>
-                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">1</div>
-                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">2</div>
-                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">2</div>
-                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">2</div>
-                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">3</div>
-                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">3</div>
-                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">3</div>
-                        </div>
-                        <div style="display: flex; background: white; color: #5c4033;">
-                            <div style="width: 50px; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0; color: #8b0000; font-weight: bold;">恶魔</div>
-                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">1</div>
-                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">1</div>
-                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">1</div>
-                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">1</div>
-                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">1</div>
-                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">1</div>
-                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">1</div>
-                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">1</div>
-                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">1</div>
-                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">1</div>
-                            <div style="flex: 1; padding: 4px 8px; text-align: center; border: 1px solid #d4c4b0;">1</div>
-                        </div>
-                    </div>
-                `;
-                
-                // 构建标题区域HTML
-                const titleSection = `
-                    <!-- 左侧：剧本标题和图标 -->
-                    <div style="flex: 1; display: flex; align-items: center; gap: 15px; max-width: 50%;">
-                        ${scriptLogo ? `<img src="${scriptLogo}" style="max-width: 400px; max-height: 200px; object-fit: contain;">` : ''}
-                        <div style="display: flex; flex-direction: column;">
-                            ${scriptLogo ? `
-                                <div style="font-family: 'Philo', serif; font-size: 12px; color: #800000; font-weight: bold; font-style: italic;">
-                                    <span style="font-style: normal; font-size: 10px; color: #666;">by </span>${authorName || ''}
-                                </div>
-                            ` : `
-                                <div style="font-family: 'Philo', serif; font-size: 24px; color: #800000; font-weight: bold;">
-                                    ${editionName}
-                                </div>
-                                ${authorName ? `
-                                    <div style="font-family: 'Philo', serif; font-size: 12px; color: #800000; font-weight: bold; font-style: italic; margin-top: 3px;">
-                                        <span style="font-style: normal; font-size: 10px; color: #666;">by </span>${authorName}
-                                    </div>
-                                ` : ''}
-                            `}
-                        </div>
-                    </div>
-                `;
-                
-                // 构建配置表和二维码区域HTML
-                const configSection = `
-                    <!-- 中间：二维码 -->
-                    ${qrcodeImage ? `
-                        <div style="display: flex; flex-direction: column; align-items: center; margin: 0 10px;">
-                            <img src="${qrcodeImage}" alt="二维码" style="max-height: 80px; max-width: 80px; object-fit: contain;">
-                            <div style="text-align: center; color: #b8860b; font-size: 10px; margin-top: 3px; font-weight: bold;">扫码查看运作</div>
-                        </div>
-                    ` : ''}
-                    <!-- 右侧：玩家数量配置图片和传奇角色/旅行者 -->
-                    <div style="display: flex; gap: 10px; margin-right: 0; flex-shrink: 0;">
-                        ${showConfigTable ? `
-                        <div style="width: 300px; flex-shrink: 0;">
-                            ${configImage ? `<img src="${configImage}" alt="玩家数量配置" style="width: 100%; height: auto; object-fit: contain;">` : playerCountTable}
+                        ${showQrCode ? `
+                        <div style="display: flex; align-items: center; justify-content: center;">
+                            <img src="${qrcodeImageSrc}" style="max-width: 120px; max-height: 120px; height: auto; border: 1px solid #e0e0e0; border-radius: 4px;" onerror="this.style.display='none'" alt="二维码">
                         </div>
                         ` : ''}
-                        ${showTravellersFabled && (fabledRoles.length > 0 || travellerRoles.length > 0) ? `
-                            <div style="display: flex; flex-direction: column; align-items: center; flex-shrink: 0;">
-                                ${fabledRoles.map(role => `
-                                    <img src="${convertToLocalPath(role.image)}" style="width: 25px; height: 25px; object-fit: cover; margin: 1px 0;">
-                                `).join('')}
-                                ${travellerRoles.map(role => `
-                                    <img src="${convertToLocalPath(role.image)}" style="width: 25px; height: 25px; object-fit: cover; margin: 1px 0;">
-                                `).join('')}
+                        <div style="display: flex; align-items: flex-start; gap: 8px;">
+                            ${scriptConfig.showPlayerConfig ? `
+                            <div style="width: 310px;">
+                                <img src="images/playercount.png" style="width: 100%; height: auto;" onerror="this.style.display='none'">
                             </div>
-                        ` : ''}
-                    </div>
-                `;
-                
-                // 构建角色列表区域HTML
-                const rolesSection = `
-                    <div style="display: flex; flex: 1; position: relative; max-width: 100%; box-sizing: border-box;">
-                        ${showNightOrder ? `
-                        <!-- 左侧首夜顺序 -->
-                        <div style="width: 25px; display: flex; flex-direction: column; align-items: center; padding-right: 2px;">
-                            ${firstNightHtml}
-                        </div>
-                        
-                        <!-- 左侧分割线（首夜） -->
-                        <div style="display: flex; flex-direction: column; align-items: center; padding: 0 1px;">
-                            <div style="flex: 1; width: 1px; background: #333;"></div>
-                            <div style="font-family: 'Philo', serif; font-size: 12px; padding: 4px 0; color: #333; font-weight: bold; line-height: 1.5; white-space: pre;">首<br>夜</div>
-                            <div style="flex: 1; width: 1px; background: #333;"></div>
-                        </div>
-                        ` : ''}
-                        
-                        <!-- 中间角色列表 -->
-                        <div style="flex: 1; padding: 0 5px; max-width: 100%; box-sizing: border-box;">
-                            ${createTeamSection(customTeamNames.townsfolk, townsfolkRoles, customTeamColors.townsfolk)}
-                            ${createTeamSection(customTeamNames.outsider, outsiderRoles, customTeamColors.outsider)}
-                            ${createTeamSection(customTeamNames.minion, minionRoles, customTeamColors.minion)}
-                            ${createTeamSection(customTeamNames.demon, demonRoles, customTeamColors.demon)}
-                            ${validCustomTeams.map(team => createTeamSection(team.name, team.roles, team.color)).join('')}
-                        </div>
-                        
-                        ${showNightOrder ? `
-                        <!-- 右侧分割线（他夜） -->
-                        <div style="display: flex; flex-direction: column; align-items: center; padding: 0 1px;">
-                            <div style="flex: 1; width: 1px; background: #333;"></div>
-                            <div style="font-family: 'Philo', serif; font-size: 12px; padding: 4px 0; color: #333; font-weight: bold; line-height: 1.5; white-space: pre; transform: rotate(180deg);">他<br>夜</div>
-                            <div style="flex: 1; width: 1px; background: #333;"></div>
-                        </div>
-                        
-                        <!-- 右侧其他夜顺序 -->
-                        <div style="width: 25px; display: flex; flex-direction: ${!reverseOtherNight ? 'column' : 'column-reverse'}; align-items: center; padding-left: 2px;">
-                            ${otherNightHtml}
-                        </div>
-                        ` : ''}
-                    </div>
-                `;
-                
-                // 构建状态和规则区域HTML
-                const statusAndRulesSection = `
-                    ${showStatusBar ? `
-                    <!-- 异常状态说明 -->
-                    <div style="margin-top: 10px; padding: 8px 5px; max-width: 100%; box-sizing: border-box;">
-                        <div style="font-weight: bold; color: ${customTeamColors.demon}; margin-bottom: 6px; font-size: 12px; display: flex; align-items: center;">
-                            <span>异常状态</span>
-                            <div style="flex: 1; height: 1px; background: ${customTeamColors.demon}; margin-left: 8px;"></div>
-                        </div>
-                        <div style="font-size: 10px; line-height: 1.4; color: #333; max-width: 100%; box-sizing: border-box; font-family: 'Microsoft YaHei', Heiti; font-weight: bold;">
-                            ${!metaInfoJson.state || metaInfoJson.state.length === 0 ? `
-                            <!-- 默认状态：显示中毒醉酒和疯狂 -->
-                            <div style="margin-bottom: 4px;"><b style="color: #9932cc;">疯狂</b> - 当一名玩家需要"疯狂"地证明某件事情时，意味着他应该去努力说服其他玩家那件事情是真的。</div>
-                            <div><b style="color: ${customTeamColors.demon};">中毒/醉酒</b> - 中毒的玩家会失去自身能力，但他不会知道，仍以为自己具有能力。如果中毒的玩家能力会给他提供信息，那么信息可能正确可能错误，说书人会合理欺骗你。醉酒同理。</div>
-                            ` : `
-                            <!-- 显示保存的状态 -->
-                            ${metaInfoJson.state.map(state => `
-                                <div style="margin-bottom: 4px;"><b style="color: ${state.name === '疯狂' ? '#9932cc' : customTeamColors.demon};">${state.name}</b> - ${state.description}</div>
-                            `).join('')}
-                            `}
-                        </div>
-                    </div>
-                    ` : ''}
-                    
-                    ${showCustomRules && bootleggerRulesArray.length > 0 ? `
-                    <!-- 剧本自制规则 -->
-                    <div style="margin-top: 10px; padding: 8px 5px; max-width: 100%; box-sizing: border-box;">
-                        <div style="font-weight: bold; color: ${customTeamColors.demon}; margin-bottom: 6px; font-size: 12px; display: flex; align-items: center;">
-                            <span>剧本自制规则</span>
-                            <div style="flex: 1; height: 1px; background: ${customTeamColors.demon}; margin-left: 8px;"></div>
-                        </div>
-                        <div style="font-size: 10px; line-height: 1.4; color: #333; max-width: 100%; box-sizing: border-box;">
-                            ${bootleggerRulesArray.map(rule => {
-                                // 尝试解析规则，将第一个部分作为标题
-                                const parts = rule.split(' - ');
-                                if (parts.length > 1) {
-                                    return `<div style="margin-bottom: 4px;"><b style="color: ${customTeamColors.demon};">${parts[0]}</b> - ${parts.slice(1).join(' - ')}</div>`;
-                                } else {
-                                    // 如果没有标题部分，整个作为描述
-                                    return `<div style="margin-bottom: 4px;">${rule}</div>`;
-                                }
-                            }).join('')}
-                        </div>
-                    </div>
-                    ` : ''}
-                `;
-                
-                // 根据布局方案组装完整的剧本图HTML
-                // 方案二：构建夜间顺序（统一在右侧，去重，不旋转，左边首夜数字，右边他夜数字）
-                const nightOrderMap = new Map();
-                
-                // 添加首夜顺序
-                allFirstNight.forEach((role, index) => {
-                    const existing = nightOrderMap.get(role.name) || { image: role.image, firstNight: null, otherNight: null };
-                    existing.firstNight = index + 1;
-                    nightOrderMap.set(role.name, existing);
-                });
-                
-                // 添加他夜顺序
-                allOtherNight.forEach((role, index) => {
-                    const existing = nightOrderMap.get(role.name) || { image: role.image, firstNight: null, otherNight: null };
-                    existing.otherNight = index + 1;
-                    nightOrderMap.set(role.name, existing);
-                });
-                
-                // 合并顺序：以首夜为主，先按首夜顺序，再按他夜顺序（只在他夜出现的角色）
-                const combinedOrder = [];
-                allFirstNight.forEach(role => {
-                    if (!combinedOrder.find(r => r.name === role.name)) {
-                        combinedOrder.push({ name: role.name, image: role.image });
-                    }
-                });
-                allOtherNight.forEach(role => {
-                    if (!combinedOrder.find(r => r.name === role.name)) {
-                        combinedOrder.push({ name: role.name, image: role.image });
-                    }
-                });
-                
-                // 构建夜间顺序HTML
-                const nightOrderCombined = combinedOrder.map(item => {
-                    const info = nightOrderMap.get(item.name);
-                    return `
-                        <div style="display: flex; align-items: center; gap: 2px; margin: 1px 0;">
-                            <span style="font-size: 10px; color: #8b0000; width: 12px; text-align: right;">${info.firstNight || ''}</span>
-                            <img src="${convertToLocalPath(item.image)}" style="width: 32px; height: 32px; object-fit: cover; border: 1px solid #e0e0e0;">
-                            <span style="font-size: 10px; color: #8b0000; width: 12px; text-align: left;">${info.otherNight || ''}</span>
-                        </div>
-                    `;
-                }).join('');
-                
-                // 处理技能描述中的高亮文字（使用全局 highlightMap 关键词映射）
-                const highlightAbility = (text) => {
-                    if (!text) return '';
-                    let result = text;
-                    // 使用全局定义的 highlightMap 进行关键词高亮
-                    if (typeof highlightMap !== 'undefined' && Array.isArray(highlightMap)) {
-                        for (const item of highlightMap) {
-                            for (const keyword of item.keywords) {
-                                // 使用零宽断言避免重复替换
-                                const regex = new RegExp(`(?<!<span[^>]*>)(${keyword})(?!<\/span>)`, 'g');
-                                result = result.replace(regex, `<span style="color: ${item.color}; font-weight: bold;">$1</span>`);
-                            }
-                        }
-                    }
-                    return result;
-                };
-                
-                // 预先处理所有角色的技能描述（使用新变量避免修改常量）
-                const highlightedTownsfolk = townsfolkRoles.map(r => ({...r, ability: highlightAbility(r.ability)}));
-                const highlightedOutsider = outsiderRoles.map(r => ({...r, ability: highlightAbility(r.ability)}));
-                const highlightedMinion = minionRoles.map(r => ({...r, ability: highlightAbility(r.ability)}));
-                const highlightedDemon = demonRoles.map(r => ({...r, ability: highlightAbility(r.ability)}));
-                const highlightedCustomTeams = validCustomTeams.map(t => ({...t, roles: t.roles.map(r => ({...r, ability: highlightAbility(r.ability)}))}));
-                
-                // 方案二和方案三角色列表布局函数
-                const createRoleGrid = (roles, nameColor = '#333', jinxRules = [], allRolesList = []) => {
-                    if (roles.length === 0) return '';
-                    
-                    const horizontalLayout = document.getElementById('horizontalLayout');
-                    const useHorizontalLayout = horizontalLayout && horizontalLayout.checked;
-                    
-                    // 获取角色的相克规则
-                    const getJinxRuleForRole = (roleName) => {
-                        if (!showJinxRules || jinxRules.length === 0) return null;
-                        return jinxRules.find(rule => rule.jinxRole1 === roleName || rule.jinxRole2 === roleName);
-                    };
-                    
-                    // 获取相克的另一个角色
-                    const getOtherRole = (jinxRule, currentRoleName) => {
-                        const otherRoleName = jinxRule.jinxRole1 === currentRoleName ? jinxRule.jinxRole2 : jinxRule.jinxRole1;
-                        return allRolesList.find(r => r.name === otherRoleName);
-                    };
-                    
-                    // 生成单个角色卡片HTML
-                    const createRoleCard = (role) => {
-                        const jinxRule = getJinxRuleForRole(role.name);
-                        const otherRole = jinxRule ? getOtherRole(jinxRule, role.name) : null;
-                        const jinxRuleDisplay = jinxRule ? `
-                            <div style="margin-top: 8px; padding: 8px 10px; background: rgba(217, 196, 161, 0.5); border-radius: 4px; display: flex; align-items: flex-start; gap: 8px;">
-                                ${otherRole ? `<img src="${convertToLocalPath(otherRole.image)}" alt="${otherRole.name}" style="width: 24px; height: 24px; object-fit: cover; border-radius: 3px; flex-shrink: 0;">` : ''}
-                                <div style="flex: 1;">
-                                    <span style="font-size: 11px; color: #8b7355; font-weight: bold;">(相克规则：</span>
-                                    <span style="font-size: 11px; color: #5a4a3a;">${jinxRule.jinxRule}</span>
-                                    <span style="font-size: 11px; color: #8b7355; font-weight: bold;">)</span>
-                                </div>
-                            </div>
-                        ` : '';
-                        
-                        return `
-                            <div style="display: flex; gap: 10px; padding: 8px; align-items: flex-start; background: transparent;">
-                                <div style="width: 120px; height: 120px; flex-shrink: 0; overflow: hidden;">
-                                    <img src="${convertToLocalPath(role.image)}" alt="${role.name}" style="width: 100%; height: 100%; object-fit: cover; display: block;">
-                                </div>
-                                <div style="flex: 1; min-width: 0;">
-                                    <div style="font-size: 36px; font-weight: bold; color: ${nameColor}; margin-bottom: 2px; font-family: 'Microsoft YaHei', Heiti;">${role.name}</div>
-                                    <div style="font-size: 24px; font-weight: bold; color: #4a3728; line-height: 1.4;">${role.ability || ''}</div>
-                                    ${jinxRuleDisplay}
-                                </div>
-                            </div>
-                        `;
-                    };
-                    
-                    if (useHorizontalLayout) {
-                        // 横向排列：两列Grid布局，同时填充
-                        return `
-                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px 12px; padding: 8px;">
-                                ${roles.map(createRoleCard).join('')}
-                            </div>
-                        `;
-                    } else {
-                        // 竖向排列（默认）：先填满第一列，再填满第二列
-                        const midIndex = Math.ceil(roles.length / 2);
-                        const leftColumn = roles.slice(0, midIndex);
-                        const rightColumn = roles.slice(midIndex);
-                        
-                        return `
-                            <div style="display: flex; gap: 12px; padding: 8px;">
-                                <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
-                                    ${leftColumn.map(createRoleCard).join('')}
-                                </div>
-                                <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
-                                    ${rightColumn.map(createRoleCard).join('')}
-                                </div>
-                            </div>
-                        `;
-                    }
-                };
-                
-                let scriptHtml = '';
-                if (scriptLayout === 'scheme2') {
-                    // 方案二：参考产品布局 - 左侧角色区域，右侧夜间顺序
-                    // 方案二：参考产品布局 - 左侧角色区域，右侧夜间顺序
-                    scriptHtml = `
-                        <div style="width: 100%; height: 100%; min-height: 1754px; background: ${hexToRgba(customBgColor, bgOpacity)}; box-sizing: border-box; font-family: 'Microsoft YaHei', 'SimSun', sans-serif; position: relative;">
-
-                            <!-- 主内容区域 -->
-                            <div style="display: flex; gap: 12px; position: relative; z-index: 1;">
-                                <!-- 左侧：角色列表 -->
-                                <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
-                                    <!-- 镇民区域（包含标题、作者、旅行者/传奇、二维码、配置表） -->
-                                    <div style="display: flex;">
-                                        <div style="width: 40px; background: linear-gradient(180deg, ${customTeamColors.townsfolk} 0%, ${hexToRgba(customTeamColors.townsfolk, 0.8)} 100%); display: flex; align-items: center; justify-content: center; border-radius: 6px 0 0 6px; flex-shrink: 0;">
-                                            <span style="writing-mode: vertical-rl; text-orientation: upright; color: white; font-size: 22px; font-weight: bold; letter-spacing: 6px;">${customTeamNames.townsfolk}</span>
-                                        </div>
-                                        <div style="flex: 1; display: flex; flex-direction: column; background: rgba(255,255,255,0.7); border-radius: 0 6px 6px 0;">
-                                            <!-- 剧本标题、作者、旅行者/传奇和配置表 -->
-                                            <div style="display: flex; gap: 20px; padding: 10px; border-bottom: 2px solid #c9b896;">
-                                                <!-- 左侧：标题和旅行者/传奇 -->
-                                                <div style="display: flex; flex-direction: column; justify-content: center; flex-shrink: 0;">
-                                                    <!-- 旅行者和传奇角色图标 -->
-                                                    ${showTravellersFabled && (travellerRoles.length > 0 || fabledRoles.length > 0) ? `
-                                                        <div style="display: flex; justify-content: flex-start; gap: 10px; margin-bottom: 8px;">
-                                                            ${travellerRoles.length > 0 ? `
-                                                                <div style="display: flex; gap: 5px;">
-                                                                    ${travellerRoles.map(role => `
-                                                                        <img src="${convertToLocalPath(role.image)}" alt="${role.name}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 3px; box-shadow: 0 1px 3px rgba(0,0,0,0.15);">
-                                                                    `).join('')}
-                                                                </div>
-                                                            ` : ''}
-                                                            ${fabledRoles.length > 0 ? `
-                                                                <div style="display: flex; gap: 5px;">
-                                                                    ${fabledRoles.map(role => `
-                                                                        <img src="${convertToLocalPath(role.image)}" alt="${role.name}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 3px; box-shadow: 0 1px 3px rgba(0,0,0,0.15);">
-                                                                    `).join('')}
-                                                                </div>
-                                                            ` : ''}
-                                                        </div>
-                                                    ` : ''}
-                                                    <h1 style="font-size: 32px; margin: 0 0 4px 0; color: #1e3a5f; font-weight: bold; font-family: 'SimSun', '宋体', serif; letter-spacing: 2px; white-space: nowrap;">${editionName}</h1>
-                                                    <div style="font-size: 12px; color: #6b5a45; font-style: italic; white-space: nowrap;">${authorName ? `剧本作者：${authorName}` : ''}</div>
-                                                </div>
-                                                <!-- 右侧：玩家数量配置表 -->
-                                                ${showConfigTable ? `
-                                                <div style="flex: 1; background: white; border-radius: 4px; overflow: hidden; border: 1px solid #c9b896;">
-                                                    ${playerCountTable}
-                                                </div>
-                                                ` : ''}
-                                            </div>
-                                            <!-- 镇民角色列表 -->
-                                            ${createRoleGrid(highlightedTownsfolk)}
-                                        </div>
-                                    </div>
-
-                                    <!-- 外来者区域 -->
-                                    <div style="display: flex; border-top: 2px solid #d4c1a4;">
-                                        <div style="width: 36px; background: linear-gradient(180deg, ${customTeamColors.outsider} 0%, ${hexToRgba(customTeamColors.outsider, 0.8)} 100%); display: flex; align-items: center; justify-content: center; border-radius: 6px 0 0 6px; flex-shrink: 0;">
-                                            <span style="writing-mode: vertical-rl; text-orientation: upright; color: white; font-size: 18px; font-weight: bold; letter-spacing: 4px;">${customTeamNames.outsider}</span>
-                                        </div>
-                                        <div style="flex: 1; background: rgba(255,255,255,0.7); border-radius: 0 6px 6px 0;">
-                                            ${createRoleGrid(highlightedOutsider)}
-                                        </div>
-                                    </div>
-
-                                    <!-- 爪牙区域 -->
-                                    <div style="display: flex; border-top: 2px solid #d4c1a4;">
-                                        <div style="width: 36px; background: linear-gradient(180deg, ${customTeamColors.minion} 0%, ${hexToRgba(customTeamColors.minion, 0.8)} 100%); display: flex; align-items: center; justify-content: center; border-radius: 6px 0 0 6px; flex-shrink: 0;">
-                                            <span style="writing-mode: vertical-rl; text-orientation: upright; color: white; font-size: 18px; font-weight: bold; letter-spacing: 4px;">${customTeamNames.minion}</span>
-                                        </div>
-                                        <div style="flex: 1; background: rgba(255,255,255,0.7); border-radius: 0 6px 6px 0;">
-                                            ${createRoleGrid(highlightedMinion, '#c41e3a')}
-                                        </div>
-                                    </div>
-
-                                    <!-- 自定义阵营区域 -->
-                                    ${highlightedCustomTeams.map(team => `
-                                    <div style="display: flex; border-top: 2px solid #d4c1a4;">
-                                        <div style="width: 36px; background: linear-gradient(180deg, ${team.color} 0%, ${hexToRgba(team.color, 0.8)} 100%); display: flex; align-items: center; justify-content: center; border-radius: 6px 0 0 6px; flex-shrink: 0;">
-                                            <span style="writing-mode: vertical-rl; text-orientation: upright; color: white; font-size: 18px; font-weight: bold; letter-spacing: 4px;">${team.name}</span>
-                                        </div>
-                                        <div style="flex: 1; background: rgba(255,255,255,0.7); border-radius: 0 6px 6px 0;">
-                                            ${createRoleGrid(team.roles)}
-                                        </div>
-                                    </div>
-                                    `).join('')}
-
-                                    <!-- 恶魔区域（包含相克规则和状态栏） -->
-                                    <div style="display: flex; border-top: 2px solid #d4c1a4;">
-                                        <div style="width: 36px; background: linear-gradient(180deg, ${customTeamColors.demon} 0%, ${hexToRgba(customTeamColors.demon, 0.8)} 100%); display: flex; align-items: center; justify-content: center; border-radius: 6px 0 0 6px; flex-shrink: 0;">
-                                            <span style="writing-mode: vertical-rl; text-orientation: upright; color: white; font-size: 18px; font-weight: bold; letter-spacing: 4px;">${customTeamNames.demon}</span>
-                                        </div>
-                                        <div style="flex: 1; display: flex; flex-direction: column;">
-                                            <!-- 恶魔角色列表 -->
-                                            <div style="background: rgba(255,255,255,0.7); border-radius: 0 6px 0 0;">
-                                                ${createRoleGrid(highlightedDemon, '#c41e3a')}
-                                            </div>
-
-                                            <!-- 相克规则 -->
-                                            ${showJinxRules && jinxRules.length > 0 ? `
-                                                <div style="background: rgba(255,255,255,0.7); padding: 10px; border-top: 2px dashed #c9b896;">
-                                                    <div style="display: flex; flex-direction: column; gap: 6px;">
-                                                        ${jinxRules.map(rule => {
-                                                            const role1 = allRoles.find(r => r.name === rule.jinxRole1);
-                                                            const role2 = allRoles.find(r => r.name === rule.jinxRole2);
-                                                            return `
-                                                                <div style="display: flex; align-items: center; gap: 6px; padding: 8px 10px; background: rgba(255,255,255,0.95); font-weight: bold; font-family: 'Microsoft YaHei', Heiti;">
-                                                                    <div style="display: flex; align-items: center; gap: 3px; flex-shrink: 0;">
-                                                                        ${role1 ? `<div style="width: 24px; height: 24px; border-radius: 3px; overflow: hidden;"><img src="${convertToLocalPath(role1.image)}" alt="${role1.name}" style="width: 100%; height: 100%; object-fit: cover; display: block;"></div>` : ''}
-                                                                        <span style="font-size: 12px; color: #333;">${rule.jinxRole1}</span>
-                                                                    </div>
-                                                                    <span style="color: #b8860b; font-weight: bold; flex-shrink: 0;">×</span>
-                                                                    <div style="display: flex; align-items: center; gap: 3px; flex-shrink: 0;">
-                                                                        ${role2 ? `<div style="width: 24px; height: 24px; border-radius: 3px; overflow: hidden;"><img src="${convertToLocalPath(role2.image)}" alt="${role2.name}" style="width: 100%; height: 100%; object-fit: cover; display: block;"></div>` : ''}
-                                                                        <span style="font-size: 12px; color: #333;">${rule.jinxRole2}</span>
-                                                                    </div>
-                                                                    <span style="color: #999; flex-shrink: 0;">:</span>
-                                                                    <span style="font-size: 12px; color: #5a4a3a; line-height: 1.5; flex: 1;">${rule.jinxRule}</span>
-                                                                </div>
-                                                            `;
-                                                        }).join('')}
-                                                    </div>
-                                                </div>
-                                            ` : ''}
-
-                                            <!-- 状态栏 -->
-                                            ${showStatusBar ? `
-                                                <div style="background: rgba(248,244,237,0.8); padding: 12px; border-radius: 0 0 6px 0; border-top: 1px solid #d4c1a4;">
-                                                    <div style="display: flex; flex-direction: column; gap: 8px; font-weight: bold; font-family: 'Microsoft YaHei', Heiti;">
-                                                        ${!metaInfoJson.state || metaInfoJson.state.length === 0 ? `
-                                                            <div style="padding: 8px 12px; background: rgba(255,255,255,0.95); border-radius: 4px; border-left: 3px solid #9932cc;">
-                                                                <div style="font-size: 14px; color: #9932cc; margin-bottom: 3px;">疯狂</div>
-                                                                <div style="font-size: 12px; color: #5a4a3a; line-height: 1.5;">当一名玩家需要"疯狂"地证明某件事情时，意味着他应该去努力说服其他玩家那件事情是真的。</div>
-                                                            </div>
-                                                            <div style="padding: 8px 12px; background: rgba(255,255,255,0.95); border-radius: 4px; border-left: 3px solid ${customTeamColors.demon};">
-                                                                <div style="font-size: 14px; color: ${customTeamColors.demon}; margin-bottom: 3px;">中毒/醉酒</div>
-                                                                <div style="font-size: 12px; color: #5a4a3a; line-height: 1.5;">中毒的玩家会失去自身能力，但他不会知道，仍以为自己具有能力。如果中毒的玩家能力会给他提供信息，那么信息可能正确可能错误，说书人会合理欺骗你。醉酒同理。</div>
-                                                            </div>
-                                                        ` : `
-                                                            ${metaInfoJson.state.map(state => `
-                                                                <div style="padding: 8px 12px; background: rgba(255,255,255,0.95); border-radius: 4px; border-left: 3px solid ${state.name === '疯狂' ? '#9932cc' : customTeamColors.demon};">
-                                                                    <div style="font-size: 14px; color: ${state.name === '疯狂' ? '#9932cc' : customTeamColors.demon}; margin-bottom: 3px;">${state.name}</div>
-                                                                    <div style="font-size: 12px; color: #5a4a3a; line-height: 1.5;">${state.description}</div>
-                                                                </div>
-                                                            `).join('')}
-                                                        `}
-                                                    </div>
-                                                </div>
-                                            ` : ''}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                ${showNightOrder ? `
-                                <!-- 右侧：夜间行动顺序 -->
-                                <div style="width: 70px; display: flex; flex-direction: column; align-items: center; background: rgba(255,255,255,0.6); padding: 10px 6px; border-left: 2px solid #d4c1a4; flex-shrink: 0;">
-                                    <div style="color: #4a3728; font-size: 14px; font-weight: bold; margin-bottom: 10px; text-align: center; line-height: 1.3; writing-mode: vertical-rl; text-orientation: upright; letter-spacing: 2px;">夜间顺序</div>
-                                    <div style="display: flex; flex-direction: column; gap: 6px; align-items: center;">
-                                        ${combinedOrder.map((item, index) => {
-                                            const info = nightOrderMap.get(item.name);
-                                            return `
-                                                <div style="display: flex; flex-direction: row; align-items: center; gap: 3px;">
-                                                    ${info.firstNight ? `<span style="font-size: 10px; color: #333; font-weight: bold; min-width: 12px; text-align: center;">${info.firstNight}</span>` : '<span style="font-size: 10px; min-width: 12px;"></span>'}
-                                                    <div style="display: flex; flex-direction: column; align-items: center; gap: 2px;">
-                                                        <div style="width: 40px; height: 40px; border-radius: 3px; border: 1px solid #b8a88a; overflow: hidden;">
-                                                            <img src="${convertToLocalPath(item.image)}" alt="${item.name}" style="width: 100%; height: 100%; object-fit: cover;">
-                                                        </div>
-                                                        ${info.firstNight ? `<div style="width: 100%; height: 3px; background-color: ${info.otherNight ? '#9932cc' : '#555'}; border-radius: 1px;"></div>` : '<div style="width: 100%; height: 3px; background-color: transparent;"></div>'}
-                                                    </div>
-                                                    ${info.otherNight ? `<span style="font-size: 10px; color: #9932cc; font-weight: bold; min-width: 12px; text-align: center;">${info.otherNight}</span>` : '<span style="font-size: 10px; min-width: 12px;"></span>'}
-                                                </div>
-                                            `;
-                                        }).join('')}
-                                    </div>
-                                    <div style="margin-top: 10px; font-size: 9px; color: #8b7355; text-align: center; writing-mode: vertical-rl; letter-spacing: 1px;">*代表非首夜</div>
-                                </div>
-                                ` : ''}
-                            </div>
-
-                            <!-- 自制规则 -->
-                            ${showCustomRules && bootleggerRulesArray.length > 0 ? `
-                                <div style="margin-top: 15px; padding: 15px; background: rgba(255,255,255,0.8); border-radius: 6px;">
-                                    <div style="font-weight: bold; color: ${customTeamColors.demon}; margin-bottom: 10px; font-size: 14px; font-family: 'SimSun', '宋体', serif;">剧本自制规则</div>
-                                    <div style="font-size: 12px; line-height: 1.5; color: #4a3728;">
-                                        ${bootleggerRulesArray.map((rule, idx) => {
-                                            const parts = rule.split(' - ');
-                                            if (parts.length > 1) {
-                                                return `<div style="${idx > 0 ? 'margin-top: 6px;' : ''}"><b style="color: ${customTeamColors.demon};">${parts[0]}</b> - ${parts.slice(1).join(' - ')}</div>`;
-                                            } else {
-                                                return `<div style="${idx > 0 ? 'margin-top: 6px;' : ''}">${rule}</div>`;
-                                            }
-                                        }).join('')}
-                                    </div>
-                                </div>
                             ` : ''}
                         </div>
-                    `;
-                } else if (scriptLayout === 'scheme3') {
-                    // 方案三：竞赛风格布局 - 左右侧边栏竖贯通，顶部标题全域，双列角色排布
-                    scriptHtml = `
-                        <div style="width: 100%; height: 100%; min-height: 1754px; background: ${hexToRgba(customBgColor, bgOpacity)}; box-sizing: border-box; font-family: 'Microsoft YaHei', 'SimSun', sans-serif; position: relative;">
-                            <!-- 角落装饰图片 -->
-                            <img src="images/10002.png" alt="装饰" style="position: absolute; top: 0; left: 0; width: 180px; height: auto; z-index: 10; transform: rotate(180deg);" />
-                            <img src="images/10003.png" alt="装饰" style="position: absolute; top: 0; right: 0; width: 180px; height: auto; z-index: 10;" />
-                            <img src="images/10004.png" alt="装饰" style="position: absolute; bottom: 0; left: 0; width: 180px; height: auto; z-index: 10;" />
-                            <img src="images/10002.png" alt="装饰" style="position: absolute; bottom: 0; right: 0; width: 180px; height: auto; z-index: 10;" />
+                    </div>
+                </div>
 
-                            <!-- 主体布局：三栏结构 -->
-                            <div style="display: flex; min-height: 100%;">
-                                <!-- 左侧边栏 - 首夜顺序 -->
-                                <div style="width: 130px; background: linear-gradient(90deg, #172e3e 85%, #387298 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px 0; flex-shrink: 0; min-height: 100%;">
-                                    <div style="color: white; font-size: 22px; font-weight: bold; letter-spacing: 4px; margin-bottom: 18px; text-align: center; line-height: 1.7; text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;">首个<br>夜晚</div>
-                                    ${allFirstNight.map(role => `
-                                        <img src="${convertToLocalPath(role.image)}" alt="${role.name}" style="width: 91px; height: 91px; object-fit: cover; margin: 0; border-radius: 3px;">
-                                    `).join('')}
+                <div style="flex: 1; padding: 0 22px 8px 22px; position: relative; border-left: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; overflow-y: auto;">
+                    ${buildTeamSection('townsfolk', allJinxes)}
+                    ${buildTeamSection('outsider', allJinxes)}
+                    ${buildTeamSection('minion', allJinxes)}
+                    ${buildTeamSection('demon', allJinxes)}
+                    ${(() => {
+                        const activeCustomTeams = typeof getCustomTeams === 'function' ? getCustomTeams() : [];
+                        let html = '';
+                        activeCustomTeams.forEach(team => {
+                            html += buildTeamSection(team.id, allJinxes, { name: team.name, color: team.color, roleIds: team.roleIds });
+                        });
+                        return html;
+                    })()}
+                </div>
+
+                ${(() => {
+                    let statesData = [];
+                    
+                    const basicStates = [];
+                    
+                    const drunkPoisonedChecked = document.querySelector('input[name="state-type"][value="drunk_poisoned"]')?.checked;
+                    const madnessChecked = document.querySelector('input[name="state-type"][value="madness"]')?.checked;
+                    
+                    if (drunkPoisonedChecked) {
+                        basicStates.push({ name: '醉酒与中毒', description: '醉酒或中毒的玩家会失去能力，但会认为自己仍具有能力，说书人会做出这些玩家仍然具有能力的行为。如果醉酒或中毒玩家的角色能力会给他提供信息，说书人可能会给出错误信息。醉酒或中毒的玩家不会得知自己醉酒或中毒。' });
+                    }
+                    if (madnessChecked) {
+                        basicStates.push({ name: '疯狂', description: '当一名玩家需要"疯狂"疯狂地证明某件事情时，意味着他应该去努力说服其他玩家那件事情是真的。' });
+                    }
+                    
+                    statesData = [...basicStates];
+                    
+                    const jsonEditor = document.getElementById('json-editor-textarea');
+                    if (jsonEditor && jsonEditor.value) {
+                        try {
+                            const jsonData = JSON.parse(jsonEditor.value);
+                            const meta = Array.isArray(jsonData) ? jsonData.find(item => item.id === '_meta') : jsonData._meta;
+                            if (meta && meta.states) {
+                                const jsonStates = Array.isArray(meta.states) ? meta.states : [];
+                                jsonStates.forEach(state => {
+                                    const stateName = state.name || state.stateName || '';
+                                    const stateDesc = state.description || state.stateDescription || state.stateDesc || '';
+                                    if (stateName && stateDesc) {
+                                        const exists = statesData.some(s => s.name === stateName);
+                                        if (!exists) {
+                                            statesData.push({ name: stateName, description: stateDesc });
+                                        }
+                                    }
+                                });
+                            }
+                        } catch(e) {}
+                    }
+                    
+                    const stateInputGroups = document.querySelectorAll('#state-container .state-input-group');
+                    stateInputGroups.forEach(group => {
+                        const stateName = group.querySelector('input[type="text"]')?.value.trim();
+                        const stateDesc = group.querySelector('textarea')?.value.trim();
+                        if (stateName && stateDesc) {
+                            const exists = statesData.some(s => s.name === stateName);
+                            if (!exists) {
+                                statesData.push({ name: stateName, description: stateDesc });
+                            }
+                        }
+                    });
+                    
+                    if (statesData.length === 0 && !bootleggerText) {
+                        return '';
+                    }
+                    
+                    let html = '<div style="padding: 12px 22px 16px 22px;">';
+                    html += '<div style="display: flex; align-items: center; margin-bottom: 8px;">';
+                    html += '<span style="font-weight: bold; color: #c1121f; font-size: 8px; letter-spacing: 1px;">异常状态</span>';
+                    html += '<div style="flex: 1; height: 1px; background: #c1121f; margin-left: 8px;"></div>';
+                    html += '</div>';
+                    html += '<div style="font-size: 7px; line-height: 1.5; color: #4a5568;">';
+                    
+                    statesData.forEach(state => {
+                        let stateColor = '#dd6b20';
+                        if (state.name.includes('疯狂')) {
+                            stateColor = '#7c3aed';
+                        } else if (state.name.includes('醉酒') || state.name.includes('中毒')) {
+                            stateColor = '#c1121f';
+                        }
+                        html += `<div style="margin-bottom: 4px;"><strong style="color: ${stateColor};">${state.name}</strong></div>`;
+                        html += `<div style="padding-left: 6px;">${state.description}</div>`;
+                    });
+                    
+                    if (bootleggerText) {
+                        html += '<div style="margin-bottom: 4px;"><strong style="color: #d97706;">私货商人</strong></div>';
+                        html += '<div style="padding-left: 6px;">' + bootleggerText.replace(/\n/g, '<br>') + '</div>';
+                    }
+                    
+                    html += '</div></div>';
+                    return html;
+                })()}
+            </div>
+
+            <div style="width: 70px; display: flex; flex-direction: column; align-items: center; padding-top: 110px; padding-bottom: 100px; position: relative;">
+                <div style="position: absolute; top: 12px; display: flex; flex-direction: column; gap: 3px;">
+                    ${(() => {
+                        const travellerRoles = selectedRoles.filter(r => r.team === 'traveller');
+                        const fabledRoles = selectedRoles.filter(r => r.team === 'fabled');
+                        let html = '';
+                        
+                        travellerRoles.forEach(role => {
+                            const imgSrc = role.image || '';
+                            if (imgSrc) {
+                                html += `<img src="${imgSrc}" style="width: 32px; height: 32px; border-radius: 3px; object-fit: cover;" title="${role.name}" onerror="this.style.display='none'">`;
+                            }
+                        });
+                        
+                        fabledRoles.forEach(role => {
+                            const imgSrc = role.image || '';
+                            if (imgSrc) {
+                                html += `<img src="${imgSrc}" style="width: 32px; height: 32px; border-radius: 3px; object-fit: cover;" title="${role.name}" onerror="this.style.display='none'">`;
+                            }
+                        });
+                        
+                        return html;
+                    })()}
+                </div>
+                
+                ${scriptConfig.showNightOrder ? `
+                <div style="display: flex; flex-direction: column; align-items: center; flex: 1;">
+                    ${otherNightIcons}
+                </div>
+                <div style="position: absolute; left: 4px; top: 50%; transform: translateY(-50%) translateX(-50%); writing-mode: vertical-rl; text-orientation: mixed; font-size: 9px; font-weight: bold; color: #3d4852; letter-spacing: 4px; background: ${scriptConfig.bgColor}; padding: 2px 4px; z-index: 10;">OTHER NIGHTS</div>
+                ` : ''}
+            </div>
+
+            <div style="position: absolute; bottom: 12px; right: 12px; font-size: 9px; color: #6b7280;">*代表非首个夜晚</div>
+
+        </div>
+    `;
+
+    const images = container.querySelectorAll('img');
+    let loadedCount = 0;
+    const totalImages = images.length;
+
+    if (totalImages === 0) {
+        captureAndDownload();
+        return;
+    }
+
+    images.forEach(img => {
+        if (img.complete) {
+            loadedCount++;
+            if (loadedCount === totalImages) captureAndDownload();
+        } else {
+            img.onload = () => {
+                loadedCount++;
+                if (loadedCount === totalImages) captureAndDownload();
+            };
+            img.onerror = () => {
+                img.style.display = 'none';
+                loadedCount++;
+                if (loadedCount === totalImages) captureAndDownload();
+            };
+        }
+    });
+
+    function captureAndDownload() {
+        const innerEl = container.firstElementChild;
+        const origMinH = innerEl.style.minHeight;
+        const origOverflow = innerEl.style.overflow;
+        innerEl.style.minHeight = 'auto';
+        innerEl.style.overflow = 'visible';
+
+        html2canvas(innerEl, {
+            backgroundColor: scriptConfig.bgColor,
+            scale: 2,
+            useCORS: true,
+            allowTaint: true,
+            logging: false
+        }).then(fullCanvas => {
+            innerEl.style.minHeight = origMinH;
+            innerEl.style.overflow = origOverflow;
+
+            const A4_W = 794 * 2;
+            const A4_H = 1123 * 2;
+            const a4Canvas = document.createElement('canvas');
+            a4Canvas.width = A4_W;
+            a4Canvas.height = A4_H;
+            const ctx = a4Canvas.getContext('2d');
+
+            ctx.fillStyle = scriptConfig.bgColor;
+            ctx.fillRect(0, 0, A4_W, A4_H);
+
+            const scale = Math.min(1, A4_W / fullCanvas.width, A4_H / fullCanvas.height);
+            const drawW = Math.round(fullCanvas.width * scale);
+            const drawH = Math.round(fullCanvas.height * scale);
+            const offsetX = Math.round((A4_W - drawW) / 2);
+            const offsetY = Math.round((A4_H - drawH) / 2);
+
+            ctx.drawImage(fullCanvas, offsetX, offsetY, drawW, drawH);
+
+            const dataUrl = a4Canvas.toDataURL('image/png');
+            showScriptPreview(dataUrl);
+        }).catch(err => {
+            console.error('生成剧本图失败:', err);
+            alert('生成失败，请重试。');
+        });
+    }
+}
+
+function generateScheme2Image() {
+    const selectedRoles = getSelectedRoles();
+    
+    // 根据角色数量计算缩放比例（与方案一相同的策略）
+    // <= 8个角色: 150% (大幅放大)
+    // 9-12个角色: 135% (较大放大)
+    // 13-16个角色: 120% (中等放大)
+    // 17-22个角色: 110% (轻微放大)
+    // 23-28个角色: 100% (基准)
+    // 29-34个角色: 90%
+    // > 34个角色: 80%
+    const totalRoleCount = selectedRoles.length;
+    let roleScale = 1.00;
+    if (totalRoleCount <= 8) roleScale = 1.50;
+    else if (totalRoleCount <= 12) roleScale = 1.35;
+    else if (totalRoleCount <= 16) roleScale = 1.20;
+    else if (totalRoleCount <= 22) roleScale = 1.10;
+    else if (totalRoleCount <= 28) roleScale = 1.00;
+    else if (totalRoleCount <= 34) roleScale = 0.90;
+    else roleScale = 0.80;
+    
+    // 基准尺寸
+    const baseImgSize = 42;
+    const baseNameSize = 12.5;
+    const baseAbilitySize = 10;
+    const baseCardGap = 10;
+    const baseColumnGap = 10;
+    const baseTeamLabelWidth = 35;
+    const baseNightIconSize = 30;
+    const baseNightLabelSize = 11;
+    
+    // 计算实际尺寸
+    const imgSize = Math.round(baseImgSize * roleScale);
+    const nameSize = Math.round(baseNameSize * roleScale * 10) / 10;
+    const abilitySize = Math.round(baseAbilitySize * roleScale * 10) / 10;
+    const cardGap = Math.round(baseCardGap * roleScale);
+    const columnGap = Math.round(baseColumnGap * roleScale);
+    const teamLabelWidth = Math.round(baseTeamLabelWidth * roleScale);
+    const nightIconSize = Math.round(baseNightIconSize * roleScale);
+    const nightLabelSize = Math.round(baseNightLabelSize * roleScale * 10) / 10;
+    
+    // 使用统一的配置获取函数
+    const config = getScriptConfig();
+    
+    // 团队配置 - 从配置读取
+    const teamConfig = {
+        'townsfolk': { 
+            label: config.townsfolkName, 
+            barColor: config.townsfolkColor, 
+            nameColor: config.townsfolkColor 
+        },
+        'outsider': { 
+            label: config.outsiderName, 
+            barColor: config.outsiderColor, 
+            nameColor: config.outsiderColor 
+        },
+        'minion': { 
+            label: config.minionName, 
+            barColor: config.minionColor, 
+            nameColor: config.minionColor 
+        },
+        'demon': { 
+            label: config.demonName, 
+            barColor: config.demonColor, 
+            nameColor: config.demonColor 
+        }
+    };
+    
+    // 获取标题 - 优先从metaInfoJson获取，与buildParchmentMainSection保持一致
+    let scriptTitle = (typeof metaInfoJson !== 'undefined' && metaInfoJson && metaInfoJson.name && metaInfoJson.name.trim()) ? metaInfoJson.name.trim() : '';
+    if (!scriptTitle && window.currentScriptName) scriptTitle = window.currentScriptName;
+    if (!scriptTitle) scriptTitle = '未知剧本';
+    
+    // 获取用户配置的背景颜色
+    const bgColor = config.bgColor;
+    
+    // 使用已获取的配置
+    const scriptConfig = config;
+    
+    // 获取二维码图片
+    const qrcodeImageSrc = scriptConfig.qrcodeImage || '';
+    const showQrCode = qrcodeImageSrc && (qrcodeImageSrc.startsWith('data:image') || qrcodeImageSrc.startsWith('http') || qrcodeImageSrc.startsWith('images/'));
+    
+    // 获取状态信息 - 同时从JSON编辑器和UI表单获取
+    let statesData = [];
+    
+    // 根据复选框状态添加基础状态
+    const basicStates = [];
+    
+    const drunkPoisonedChecked = document.querySelector('input[name="state-type"][value="drunk_poisoned"]')?.checked;
+    const madnessChecked = document.querySelector('input[name="state-type"][value="madness"]')?.checked;
+    
+    if (drunkPoisonedChecked) {
+        basicStates.push({ name: '醉酒与中毒', description: '醉酒或中毒的玩家会失去能力，但会认为自己仍具有能力，说书人会做出这些玩家仍然具有能力的行为。如果醉酒或中毒玩家的角色能力会给他提供信息，说书人可能会给出错误信息。醉酒或中毒的玩家不会得知自己醉酒或中毒。' });
+    }
+    if (madnessChecked) {
+        basicStates.push({ name: '疯狂', description: '当一名玩家需要"疯狂"疯狂地证明某件事情时，意味着他应该去努力说服其他玩家那件事情是真的。' });
+    }
+    
+    // 先添加基础状态
+    statesData = [...basicStates];
+    
+    // 从JSON编辑器获取自定义状态
+    const jsonEditor = document.getElementById('json-editor-textarea');
+    if (jsonEditor && jsonEditor.value) {
+        try {
+            const jsonData = JSON.parse(jsonEditor.value);
+            const meta = Array.isArray(jsonData) ? jsonData.find(item => item.id === '_meta') : jsonData._meta;
+            if (meta && meta.states) {
+                const jsonStates = Array.isArray(meta.states) ? meta.states : [];
+                jsonStates.forEach(state => {
+                    const stateName = state.name || state.stateName || '';
+                    const stateDesc = state.description || state.stateDescription || state.stateDesc || '';
+                    if (stateName && stateDesc) {
+                        const exists = statesData.some(s => s.name === stateName);
+                        if (!exists) {
+                            statesData.push({ name: stateName, description: stateDesc });
+                        }
+                    }
+                });
+            }
+        } catch(e) {}
+    }
+    
+    // 从UI表单获取自定义状态（兼容用户未保存到JSON的情况）
+    const stateInputGroups = document.querySelectorAll('#state-container .state-input-group');
+    stateInputGroups.forEach(group => {
+        const stateName = group.querySelector('input[type="text"]')?.value.trim();
+        const stateDesc = group.querySelector('textarea')?.value.trim();
+        if (stateName && stateDesc) {
+            const exists = statesData.some(s => s.name === stateName);
+            if (!exists) {
+                statesData.push({ name: stateName, description: stateDesc });
+            }
+        }
+    });
+    
+    // 获取夜间顺序
+    const getNightOrderFromPanel = (containerId) => {
+        const container = document.getElementById(containerId);
+        if (!container) return [];
+        const buttons = container.querySelectorAll('.draggable-button');
+        const roleIds = Array.from(buttons).map(btn => btn.getAttribute('data-role-id')).filter(id => id);
+        return roleIds.map(roleId => {
+            if (roleId === 'twilight') return { name: '黄昏', image: 'images/dusk-CLd-DXn-QC.png' };
+            if (roleId === 'minioninfo') return { name: '爪牙信息', image: 'images/180px-Mi.png' };
+            if (roleId === 'demoninfo') return { name: '恶魔信息', image: 'images/180px-Di.png' };
+            if (roleId === 'dawn') return { name: '黎明', image: 'images/dawn.png' };
+            return selectedRoles.find(r => r.id === roleId) || null;
+        }).filter(r => r);
+    };
+    
+    let firstNightRoles = getNightOrderFromPanel('first-night-buttons-container');
+    let otherNightRoles = getNightOrderFromPanel('other-night-buttons-container');
+    
+    if (firstNightRoles.length === 0) {
+        firstNightRoles = selectedRoles.filter(r => r.firstNight > 0).sort((a, b) => a.firstNight - b.firstNight);
+    }
+    if (otherNightRoles.length === 0) {
+        otherNightRoles = selectedRoles.filter(r => r.otherNight > 0).sort((a, b) => a.otherNight - b.otherNight);
+    }
+    
+    // 构建夜间顺序图标（合并首夜和他夜，左侧首夜数字，右侧他夜数字）
+    function buildNightIconsCombined() {
+        // 获取所有夜间行动的角色，合并首夜和他夜
+        const allNightRoles = [];
+        
+        // 创建角色到他夜顺序的映射
+        const otherNightOrder = {};
+        
+        firstNightRoles.forEach((role) => {
+            if (role.id || role.name) {
+                const key = role.id || role.name;
+                if (!allNightRoles.find(r => (r.id || r.name) === key)) {
+                    allNightRoles.push(role);
+                }
+            }
+        });
+        
+        otherNightRoles.forEach((role, index) => {
+            if (role.id || role.name) {
+                const key = role.id || role.name;
+                otherNightOrder[key] = index + 1;
+                if (!allNightRoles.find(r => (r.id || r.name) === key)) {
+                    allNightRoles.push(role);
+                }
+            }
+        });
+        
+        if (allNightRoles.length === 0) return '';
+        
+        const numberSize = Math.round(10 * roleScale);
+        const labelSize = Math.round(10 * roleScale);
+        
+        // 两列布局：左侧图标列（包含注释），右侧他夜列
+        let html = `<div style="display:flex;gap:2px;">`;
+        
+        // 左侧图标列
+        html += `<div style="display:flex;flex-direction:column;align-items:center;">`;
+        html += `<div style="display:flex;flex-direction:column;align-items:center;font-size:${labelSize}px;font-weight:bold;color:#4a5568;margin-bottom:${Math.round(8 * roleScale)}px;"><div>首</div><div>夜</div></div>`;
+        allNightRoles.forEach(role => {
+            const imgSrc = role.image || '';
+            if (imgSrc) {
+                html += `<div style="height:${nightIconSize}px;display:flex;align-items:center;justify-content:center;">`;
+                html += `<img src="${imgSrc}" style="width:${nightIconSize}px;height:${nightIconSize}px;border-radius:3px;object-fit:cover;" title="${role.name}" onerror="this.style.display='none'">`;
+                html += `</div>`;
+            }
+        });
+        // *代表非首个夜晚注释（垂直排列）
+        html += `<div style="display:flex;flex-direction:column;align-items:center;margin-top:${Math.round(4 * roleScale)}px;">`;
+        html += `<span style="font-size:${labelSize}px;font-weight:bold;color:#000000;">*</span>`;
+        html += `<span style="font-size:${labelSize}px;color:#000000;">代</span>`;
+        html += `<span style="font-size:${labelSize}px;color:#000000;">表</span>`;
+        html += `<span style="font-size:${labelSize}px;color:#000000;">非</span>`;
+        html += `<span style="font-size:${labelSize}px;color:#000000;">首</span>`;
+        html += `<span style="font-size:${labelSize}px;color:#000000;">个</span>`;
+        html += `<span style="font-size:${labelSize}px;color:#000000;">夜</span>`;
+        html += `<span style="font-size:${labelSize}px;color:#000000;">晚</span>`;
+        html += `</div>`;
+        html += `</div>`;
+        
+        // 右侧他夜列
+        html += `<div style="display:flex;flex-direction:column;align-items:center;">`;
+        html += `<div style="font-size:${labelSize}px;font-weight:bold;color:#c53030;margin-bottom:${Math.round(8 * roleScale)}px;writing-mode:vertical-rl;text-orientation:mixed;">他夜</div>`;
+        allNightRoles.forEach(role => {
+            const key = role.id || role.name;
+            const otherOrder = otherNightOrder[key];
+            html += `<div style="font-size:${numberSize}px;font-weight:bold;color:#c53030;width:${Math.round(22 * roleScale)}px;text-align:center;height:${nightIconSize}px;display:flex;align-items:center;justify-content:center;">${otherOrder || ''}</div>`;
+        });
+        html += `</div>`;
+        
+        html += `</div>`;
+        return html;
+    }
+    
+    // 关键词高亮
+    function highlightAbility(text) {
+        if (!text) return '';
+        const keywords = [
+            { word: '善良角色', color: '#3182ce' },
+            { word: '邪恶角色', color: '#e53e3e' },
+            { word: '镇民角色', color: '#3182ce' },
+            { word: '外来者角色', color: '#38a169' },
+            { word: '爪牙角色', color: '#dd6b20' },
+            { word: '恶魔角色', color: '#e53e3e' },
+            { word: '镇民', color: '#3182ce' },
+            { word: '外来者', color: '#38a169' },
+            { word: '爪牙', color: '#dd6b20' },
+            { word: '恶魔', color: '#e53e3e' },
+            { word: '存活', color: '#e53e3e' },
+            { word: '死亡', color: '#e53e3e' },
+            { word: '中毒', color: '#e53e3e' },
+            { word: '醉酒', color: '#e53e3e' },
+            { word: '处决', color: '#e53e3e' },
+            { word: '提名', color: '#e53e3e' },
+            { word: '邪恶', color: '#e53e3e' },
+            { word: '善良', color: '#3182ce' },
+        ];
+        keywords.sort((a, b) => b.word.length - a.word.length);
+        let result = text;
+        keywords.forEach(kw => {
+            const escaped = kw.word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const regex = new RegExp(escaped, 'g');
+            result = result.replace(regex, '<span style="color:' + kw.color + ';font-weight:bold;">' + kw.word + '</span>');
+        });
+        return result;
+    }
+    
+    // 状态描述关键词高亮（学习方案一）
+    function highlightStateDescription(text) {
+        if (!text) return '';
+        const keywords = [
+            { word: '努力说服', color: '#2563eb' },
+            { word: '可能正确可能错误', color: '#2563eb' },
+            { word: '错误信息', color: '#2563eb' },
+            { word: '失去能力', color: '#e53e3e' },
+            { word: '不会得知', color: '#e53e3e' },
+        ];
+        keywords.sort((a, b) => b.word.length - a.word.length);
+        let result = text;
+        keywords.forEach(kw => {
+            const escaped = kw.word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const regex = new RegExp(escaped, 'g');
+            result = result.replace(regex, '<span style="color:' + kw.color + ';font-weight:bold;">' + kw.word + '</span>');
+        });
+        return result;
+    }
+
+    // 构建角色卡片
+    function buildParchmentRoleCard(role, teamColor) {
+        const imgSrc = role.image || '';
+        return `
+            <div style="display:flex;align-items:flex-start;gap:${Math.round(6 * roleScale)}px;margin-bottom:${cardGap}px;">
+                ${imgSrc ? `<img src="${imgSrc}" style="width:${imgSize}px;height:${imgSize}px;border-radius:3px;object-fit:cover;flex-shrink:0;" onerror="this.style.display='none'">` : ''}
+                <div style="flex:1;min-width:0;">
+                    <div style="font-weight:bold;font-size:${nameSize}px;color:${teamColor};font-family:SimHei,Heiti SC,sans-serif;line-height:1.3;">${role.name}</div>
+                    <div style="font-size:${abilitySize}px;color:#4a5568;line-height:1.5;margin-top:1px;">${highlightAbility(role.ability || '')}</div>
+                </div>
+            </div>
+        `;
+    }
+    
+    // 获取相克规则（根据配置决定是否获取）
+    const allJinxes = scriptConfig.showJinxRules !== false ? getDeduplicatedJinxes(selectedRoles.map(r => r.name)) : [];
+
+    // 构建阵营区块
+    function buildTeamSection(teamId, customConfig = null) {
+        // 获取所有被自定义阵营占用的角色ID
+        const occupiedRoleIds = typeof getCustomTeams === 'function' ? 
+            getCustomTeams().flatMap(t => t.roleIds || []) : [];
+        
+        let roles;
+        if (customConfig && customConfig.roleIds) {
+            // 自定义阵营：根据roleIds筛选角色
+            roles = selectedRoles.filter(r => customConfig.roleIds.includes(r.id));
+        } else {
+            // 标准阵营：根据team属性筛选，并排除已被自定义阵营占用的角色
+            roles = selectedRoles.filter(r => r.team === teamId && !occupiedRoleIds.includes(r.id));
+        }
+        if (!roles || roles.length === 0) return '';
+        
+        const config = customConfig || teamConfig[teamId];
+        const halfLength = Math.ceil(roles.length / 2);
+        const leftRoles = roles.slice(0, halfLength);
+        const rightRoles = roles.slice(halfLength);
+        
+        const borderTop = customConfig ? '' : (teamId !== 'townsfolk' ? `border-top:2px solid ${config.barColor};` : '');
+        
+        let html = `<div style="display:flex;${borderTop}">`;
+        
+        // 左侧彩色条
+        html += `<div style="width:${teamLabelWidth}px;background:${config.barColor};display:flex;align-items:center;justify-content:center;flex-shrink:0;">`;
+        html += `<span style="writing-mode:vertical-rl;text-orientation:upright;font-size:${Math.round(11 * roleScale)}px;font-weight:bold;color:white;font-family:SimHei,Heiti SC,sans-serif;letter-spacing:1px;">${config.label}</span>`;
+        html += `</div>`;
+        
+        // 右侧内容区域
+        html += `<div style="flex:1;display:flex;flex-direction:column;">`;
+        
+        // 角色区域（两列）
+        html += `<div style="display:flex;gap:${columnGap}px;padding:${Math.round(4 * roleScale)}px ${Math.round(8 * roleScale)}px;">`;
+        html += `<div style="flex:1;display:flex;flex-direction:column;">`;
+        leftRoles.forEach(role => { html += buildParchmentRoleCard(role, config.nameColor); });
+        html += `</div>`;
+        html += `<div style="flex:1;display:flex;flex-direction:column;">`;
+        rightRoles.forEach(role => { html += buildParchmentRoleCard(role, config.nameColor); });
+        html += `</div>`;
+        html += `</div>`;
+        
+        // 恶魔区域特殊：包含相克规则和状态
+        if (teamId === 'demon') {
+            // 相克规则
+            if (scriptConfig.showJinxRules !== false && allJinxes && allJinxes.length > 0) {
+                html += `<div style="padding:${Math.round(6 * roleScale)}px ${Math.round(8 * roleScale)}px;border-top:2px solid #e2e8f0;">`;
+                html += `<div style="font-size:${abilitySize}px;color:#4a5568;line-height:1.6;">`;
+                allJinxes.forEach(jinx => {
+                    const role1 = selectedRoles.find(r => r.name === jinx.jinxRole1);
+                    const role2 = selectedRoles.find(r => r.name === jinx.jinxRole2);
+                    html += `<div style="display:flex;align-items:center;gap:3px;margin-bottom:3px;">`;
+                    if (role1 && role1.image) html += `<img src="${role1.image}" style="width:14px;height:14px;border-radius:2px;" onerror="this.style.display='none'">`;
+                    html += `<span style="font-weight:bold;color:#e53e3e;">${jinx.jinxRole1}</span>`;
+                    html += `<span style="color:#a0aec0;">×</span>`;
+                    if (role2 && role2.image) html += `<img src="${role2.image}" style="width:14px;height:14px;border-radius:2px;" onerror="this.style.display='none'">`;
+                    html += `<span style="font-weight:bold;color:#e53e3e;">${jinx.jinxRole2}</span>`;
+                    html += `<span style="margin-left:3px;">${jinx.jinxRule}</span>`;
+                    html += `</div>`;
+                });
+                html += `</div>`;
+                html += `</div>`;
+            }
+            
+            // 状态信息
+            if (statesData && statesData.length > 0) {
+                html += `<div style="padding:${Math.round(6 * roleScale)}px ${Math.round(8 * roleScale)}px;border-top:2px solid #e2e8f0;">`;
+                html += `<div style="font-size:${abilitySize}px;color:#4a5568;line-height:1.6;">`;
+                statesData.forEach(state => {
+                    const stateName = state.name || state.stateName || '';
+                    let stateDesc = state.description || state.stateDescription || state.stateDesc || '';
+                    if (stateName && stateDesc) {
+                        html += `<div style="margin-bottom:4px;">`;
+                        
+                        // 根据状态名称设置颜色（学习方案一）
+                        let stateColor = '#dd6b20'; // 默认橙色
+                        if (stateName.includes('疯狂')) {
+                            stateColor = '#7c3aed'; // 紫色
+                        } else if (stateName.includes('醉酒') || stateName.includes('中毒')) {
+                            stateColor = '#c1121f'; // 红色
+                        }
+                        
+                        html += `<span style="font-weight:bold;color:${stateColor};">${stateName}</span>`;
+                        
+                        // 对状态描述进行关键词高亮
+                        stateDesc = highlightStateDescription(stateDesc);
+                        
+                        html += `<span style="margin-left:4px;">${stateDesc}</span>`;
+                        html += `</div>`;
+                    }
+                });
+                html += `</div>`;
+                html += `</div>`;
+            }
+        }
+        
+        html += `</div>`;
+        html += `</div>`;
+        return html;
+    }
+
+    // 构建主体区域
+    function buildParchmentMainSection() {
+        let html = `<div style="flex:1;display:flex;flex-direction:column;">`;
+        
+        const travellerRoles = selectedRoles.filter(r => r.team === 'traveller');
+        const fabledRoles = selectedRoles.filter(r => r.team === 'fabled');
+        
+        // 顶部区域：标题 + 配置表 + 旅行者/传奇角色
+        html += `<div style="display:flex;align-items:flex-start;">`;
+        
+        // 左侧：标题区域（镇民条 + 标题 + 二维码 + 配置表）
+        html += `<div style="flex:1;display:flex;">`;
+        html += `<div style="width:${teamLabelWidth}px;background:${config.townsfolkColor};display:flex;align-items:center;justify-content:center;flex-shrink:0;">`;
+        html += `</div>`;
+        html += `<div style="flex:1;display:flex;align-items:flex-start;padding:${Math.round(10 * roleScale)}px ${Math.round(8 * roleScale)}px;">`;
+        html += `<div style="flex:1;">`;
+        html += `${scriptConfig.titleImage ? `<img src="${scriptConfig.titleImage}" style="max-width:300px;max-height:60px;height:auto;" onerror="this.style.display='none';this.parentElement.innerHTML='<div style=\\'font-size:${Math.round(24 * roleScale)}px;font-weight:bold;color:#2d3748;font-family:SimHei,Heiti SC,sans-serif;\\'>${scriptTitle}</div>';" alt="${scriptTitle}">` : `<div style="font-size:${Math.round(24 * roleScale)}px;font-weight:bold;color:#2d3748;font-family:SimHei,Heiti SC,sans-serif;">${scriptTitle}</div>`}`;
+        html += `</div>`;
+        if (showQrCode) {
+            html += `<div style="display:flex;align-items:center;justify-content:center;">`;
+            html += `<img src="${qrcodeImageSrc}" style="max-width:${Math.round(120 * roleScale)}px;max-height:${Math.round(120 * roleScale)}px;height:auto;border:1px solid #e0e0e0;border-radius:4px;" onerror="this.style.display='none'" alt="二维码">`;
+            html += `</div>`;
+        }
+        if (scriptConfig.showPlayerConfig !== false) {
+            html += `<div style="width:${Math.round(220 * roleScale)}px;flex-shrink:0;">`;
+            html += `<img src="images/playercount.png" style="width:100%;height:auto;" onerror="this.style.display='none';this.parentElement.innerHTML='<div style=\\'font-size:10px;color:#999;\\'>配置表加载失败</div>';">`;
+            html += `</div>`;
+        }
+        html += `</div>`;
+        html += `</div>`;
+        
+        // 右侧：旅行者和传奇角色图片（竖着排列，在顺序正上方）
+        const showTraveller = scriptConfig.showTraveller !== false;
+        const showFabled = scriptConfig.showFabled !== false;
+        const hasTravelOrFabled = (showTraveller && travellerRoles.length > 0) || (showFabled && fabledRoles.length > 0);
+        
+        if (hasTravelOrFabled) {
+            html += `<div style="width:${Math.round(80 * roleScale)}px;flex-shrink:0;">`;
+            html += `<div style="display:flex;flex-direction:column;align-items:center;">`;
+            
+            if (showTraveller) {
+                travellerRoles.forEach(role => {
+                    if (role.image) {
+                        html += `<img src="${role.image}" style="width:${nightIconSize}px;height:${nightIconSize}px;border-radius:3px;object-fit:cover;margin-bottom:2px;" title="${role.name}" onerror="this.style.display='none'">`;
+                    }
+                });
+            }
+            
+            if (showFabled) {
+                fabledRoles.forEach(role => {
+                    if (role.image) {
+                        html += `<img src="${role.image}" style="width:${nightIconSize}px;height:${nightIconSize}px;border-radius:3px;object-fit:cover;margin-bottom:2px;" title="${role.name}" onerror="this.style.display='none'">`;
+                    }
+                });
+            }
+            
+            html += `</div>`;
+        }
+        html += `</div>`;
+        
+        html += `</div>`;
+        
+        // 第二行：角色区域 + 夜间顺序
+        html += `<div style="display:flex;gap:${Math.round(6 * roleScale)}px;">`;
+        
+        // 角色区域（镇民角色 + 其他阵营）
+        html += `<div style="flex:1;display:flex;flex-direction:column;">`;
+        
+        ['townsfolk', 'outsider', 'minion', 'demon'].forEach(teamId => {
+            html += buildTeamSection(teamId);
+        });
+        
+        // 添加自定义阵营
+        const activeCustomTeams = typeof getCustomTeams === 'function' ? getCustomTeams() : [];
+        activeCustomTeams.forEach(team => {
+            html += buildTeamSection(team.id, { label: team.name, barColor: team.color, nameColor: team.color, roleIds: team.roleIds });
+        });
+        
+        html += `</div>`;
+        
+        // 夜间顺序（与图片右侧对齐）
+        if (scriptConfig.showNightOrder !== false) {
+            html += `<div style="width:${Math.round(80 * roleScale)}px;flex-shrink:0;display:flex;justify-content:flex-end;">`;
+            html += buildNightIconsCombined();
+            html += `</div>`;
+        }
+        
+        html += `</div>`;
+        
+        html += `</div>`;
+        
+        return html;
+    }
+    
+    // 创建容器
+    const container = document.createElement('div');
+    container.style.cssText = 'position:fixed;left:-9999px;top:0;z-index:-1;';
+    document.body.appendChild(container);
+    
+    container.innerHTML = `
+        <div style="width:794px;background:${bgColor};font-family:SimSun,STSong,serif;color:#2d3748;position:relative;display:flex;flex-direction:column;">
+            <!-- 内容区域 -->
+            <div style="flex:1;display:flex;flex-direction:column;padding:0 12px 12px 0;">
+                <!-- 主体区域 -->
+                ${buildParchmentMainSection()}
+            </div>
+        </div>
+    `;
+    
+    // 等待图片加载后截图
+    const images = container.querySelectorAll('img');
+    let loadedCount = 0;
+    const totalImages = images.length;
+    
+    function captureAndDownload() {
+        const innerEl = container.firstElementChild;
+        html2canvas(innerEl, {
+            backgroundColor: bgColor,
+            scale: 2,
+            useCORS: true,
+            allowTaint: true,
+            logging: false
+        }).then(fullCanvas => {
+            const A4_W = 794 * 2;
+            const A4_H = 1123 * 2;
+            const a4Canvas = document.createElement('canvas');
+            a4Canvas.width = A4_W;
+            a4Canvas.height = A4_H;
+            const ctx = a4Canvas.getContext('2d');
+            
+            ctx.fillStyle = bgColor;
+            ctx.fillRect(0, 0, A4_W, A4_H);
+            
+            const scale = Math.min(1, A4_W / fullCanvas.width, A4_H / fullCanvas.height);
+            const drawW = Math.round(fullCanvas.width * scale);
+            const drawH = Math.round(fullCanvas.height * scale);
+            const offsetX = Math.round((A4_W - drawW) / 2);
+            const offsetY = 0;
+            
+            ctx.drawImage(fullCanvas, offsetX, offsetY, drawW, drawH);
+            
+            const dataUrl = a4Canvas.toDataURL('image/png');
+            showScriptPreview(dataUrl);
+            container.remove();
+        }).catch(err => {
+            console.error('生成方案二剧本图失败:', err);
+            alert('生成失败，请重试。');
+            container.remove();
+        });
+    }
+    
+    if (totalImages === 0) {
+        captureAndDownload();
+        return;
+    }
+    
+    images.forEach(img => {
+        if (img.complete) {
+            loadedCount++;
+            if (loadedCount === totalImages) captureAndDownload();
+        } else {
+            img.onload = () => { loadedCount++; if (loadedCount === totalImages) captureAndDownload(); };
+            img.onerror = () => { img.style.display = 'none'; loadedCount++; if (loadedCount === totalImages) captureAndDownload(); };
+        }
+    });
+}
+
+        // ========== 方案三生成函数（完全照搬方案一） ==========
+        function generateScheme3Image() {
+            const selectedRoles = getSelectedRoles();
+            if (selectedRoles.length === 0) {
+                alert('请先选择角色！');
+                return;
+            }
+
+            // 使用统一的配置获取函数
+            const config = getScriptConfig();
+
+            // 团队中文映射（方案三专用：带阵营前缀）
+            const teamNames = { 
+                'townsfolk': '善良阵营·镇民', 
+                'outsider': '善良阵营·外来者', 
+                'minion': '邪恶阵营·爪牙', 
+                'demon': '邪恶阵营·恶魔', 
+                'traveller': '旅行者', 
+                'fabled': '传奇角色' 
+            };
+            
+            // 阵营颜色映射（从配置读取）
+            const teamColors = {
+                'townsfolk': config.townsfolkColor,
+                'outsider': config.outsiderColor,
+                'minion': config.minionColor,
+                'demon': config.demonColor,
+                'traveller': '#7c3aed',
+                'fabled': '#d4a017'
+            };
+
+            // 获取自制规则（方案三专用）
+            const bootleggerInput = document.getElementById('bootlegger');
+            const bootleggerText = bootleggerInput ? bootleggerInput.value.trim() : '';
+
+            // 从夜序面板获取夜间顺序（优先使用用户自定义的顺序）
+            // 特殊角色定义
+            const twilightRole = { id: 'twilight', name: '黄昏', firstNight: 0, otherNight: 0, image: 'images/dusk-CLd-DXn-QC.png' };
+            const minionInfoRole = { id: 'minioninfo', name: '爪牙信息', firstNight: 2000, otherNight: 0, image: 'images/180px-Mi.png' };
+            const demonInfoRole = { id: 'demoninfo', name: '恶魔信息', firstNight: 3000, otherNight: 0, image: 'images/180px-Di.png' };
+            const dawnRole = { id: 'dawn', name: '黎明', firstNight: 9999, otherNight: 9999, image: 'images/dawn.png' };
+            
+            const getNightOrderFromPanel = (containerId) => {
+                const container = document.getElementById(containerId);
+                if (!container) return [];
+                
+                const buttons = container.querySelectorAll('.draggable-button');
+                const roleIds = Array.from(buttons)
+                    .map(btn => btn.getAttribute('data-role-id'))
+                    .filter(id => id && id.trim() !== '');
+                
+                // 根据角色ID获取角色信息（包括特殊角色）
+                return roleIds.map(roleId => {
+                    // 检查是否是特殊角色
+                    if (roleId === 'twilight') return twilightRole;
+                    if (roleId === 'minioninfo') return minionInfoRole;
+                    if (roleId === 'demoninfo') return demonInfoRole;
+                    if (roleId === 'dawn') return dawnRole;
+                    
+                    const role = selectedRoles.find(r => r.id === roleId);
+                    if (role) return role;
+                    // 如果在selectedRoles中找不到，可能是自制角色
+                    const dirRole = window.dirRolesJson.find(r => r.id === roleId);
+                    return dirRole || null;
+                }).filter(r => r !== null);
+            };
+            
+            // 获取夜间顺序角色（优先使用面板设置）
+            let firstNightRoles = getNightOrderFromPanel('first-night-buttons-container');
+            let otherNightRoles = getNightOrderFromPanel('other-night-buttons-container');
+            
+            // 如果面板中没有设置，则使用默认顺序
+            if (firstNightRoles.length === 0) {
+                firstNightRoles = selectedRoles
+                    .filter(r => r.firstNight > 0)
+                    .sort((a, b) => a.firstNight - b.firstNight);
+                // 添加特殊角色
+                firstNightRoles = [twilightRole, ...firstNightRoles, minionInfoRole, demonInfoRole, dawnRole];
+            }
+            if (otherNightRoles.length === 0) {
+                otherNightRoles = selectedRoles
+                    .filter(r => r.otherNight > 0)
+                    .sort((a, b) => a.otherNight - b.otherNight);
+                // 添加特殊角色
+                otherNightRoles = [twilightRole, ...otherNightRoles, dawnRole];
+            }
+
+            // 构建夜间行动顺序图标列（方案三专用：垂直间距为0）
+            function buildNightOrderIcons(roles, containerHeight = 500, fixedSize = 48) {
+                if (!roles || roles.length === 0) return '';
+                
+                const iconCount = roles.length;
+                const spacing = 0; // 图标之间的间距
+                const size = fixedSize.toFixed(1);
+                
+                let html = '';
+                roles.forEach((role, index) => {
+                    const imgSrc = role.image || '';
+                    html += `<div style="text-align:center;margin-bottom:${index < iconCount - 1 ? spacing + 'px' : '0'};">`;
+                    if (imgSrc) {
+                        html += `<img src="${imgSrc}" style="width:${size}px;height:${size}px;border-radius:4px;object-fit:cover;display:block;margin:0 auto;" title="${role.name}" onerror="this.style.display='none'">`;
+                    } else {
+                        html += `<div style="width:${size}px;height:${size}px;border-radius:4px;background:#e2e8f0;margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:${Math.max(6, size * 0.15)}px;color:#a0aec0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${role.name}</div>`;
+                    }
+                    html += `</div>`;
+                });
+                return html;
+            }
+
+            // 计算夜间顺序区域的可用高度（总高度 - 顶部padding - 底部padding）
+            const totalHeight = 1123;
+            const topPadding = 110;
+            const bottomPadding = 100;
+            const availableHeight = totalHeight - topPadding - bottomPadding;
+            
+            // 计算图标大小，两侧使用相同的尺寸（取两侧角色数量的较大值）
+            const maxRoleCount = Math.max(firstNightRoles.length, otherNightRoles.length);
+            const iconSize = calculateNightIconSize(maxRoleCount, availableHeight);
+            
+            const firstNightIcons = buildNightOrderIcons(firstNightRoles, availableHeight, iconSize);
+            const otherNightIcons = buildNightOrderIcons(otherNightRoles, availableHeight, iconSize);
+            
+            // 计算图标大小的辅助函数（方案三专用：间距为0）
+            function calculateNightIconSize(roleCount, containerHeight, minSize = 24, maxSize = 48) {
+                if (roleCount <= 0) return maxSize;
+                const spacing = 0;
+                return Math.min(
+                    maxSize,
+                    Math.max(
+                        minSize,
+                        (containerHeight - (roleCount - 1) * spacing) / roleCount * 0.9
+                    )
+                );
+            }
+
+            // 根据角色数量计算缩放比例
+            // 角色数量与缩放比例映射：
+            // <= 8个角色: 150% (大幅放大)
+            // 9-12个角色: 135% (较大放大)
+            // 13-16个角色: 120% (中等放大)
+            // 17-22个角色: 110% (轻微放大)
+            // 23-28个角色: 100% (基准)
+            // 29-34个角色: 90%
+            // > 34个角色: 80%
+            function calculateRoleScale(roleCount) {
+                if (roleCount <= 8) return 1.50;
+                if (roleCount <= 12) return 1.35;
+                if (roleCount <= 16) return 1.20;
+                if (roleCount <= 22) return 1.10;
+                if (roleCount <= 28) return 1.00;
+                if (roleCount <= 34) return 0.90;
+                return 0.80;
+            }
+            
+            const totalRoleCount = selectedRoles.length;
+            const roleScale = calculateRoleScale(totalRoleCount);
+            
+            // 基准尺寸
+            const baseImgSize = 52;
+            const baseNameSize = 11;
+            const baseAbilitySize = 8.5;
+            const baseJinxSize = 7;
+            const baseTeamTitleSize = 11;
+            const baseGap = 6;
+            const baseColumnGap = 10;
+            const baseCardGap = 4;
+            const baseJinxImgSize = 12;
+            
+            // 计算实际尺寸
+            const imgSize = Math.round(baseImgSize * roleScale);
+            const nameSize = Math.round(baseNameSize * roleScale * 10) / 10;
+            const abilitySize = Math.round(baseAbilitySize * roleScale * 10) / 10;
+            const jinxSize = Math.round(baseJinxSize * roleScale * 10) / 10;
+            const teamTitleSize = Math.round(baseTeamTitleSize * roleScale * 10) / 10;
+            const gap = Math.round(baseGap * roleScale);
+            const columnGap = Math.round(baseColumnGap * roleScale);
+            const cardGap = Math.round(baseCardGap * roleScale);
+            const jinxImgSize = Math.round(baseJinxImgSize * roleScale);
+
+            // 构建角色卡片 HTML
+            function buildRoleCard(role, jinxesForRole, teamColor) {
+                const imgSrc = role.image || '';
+                // 默认颜色为红色
+                const nameColor = teamColor || '#c1121f';
+                let html = `<div style="display:flex;align-items:flex-start;gap:${gap}px;margin-bottom:0;width:100%;">`;
+                if (imgSrc) {
+                    html += `<img src="${imgSrc}" style="width:${imgSize}px;height:${imgSize}px;border-radius:3px;flex-shrink:0;object-fit:cover;" onerror="this.style.display='none'">`;
+                }
+                html += `<div style="flex:1;min-width:0;">`;
+                html += `<div style="font-weight:bold;font-size:${nameSize}px;color:${nameColor};margin-bottom:1px;letter-spacing:0.3px;">${role.name}</div>`;
+                html += `<div style="font-size:${abilitySize}px;color:#1a1a1a;line-height:1.5;">${role.ability || ''}</div>`;
+                
+                // 如果该角色有相克规则，显示在角色下面
+                if (jinxesForRole && jinxesForRole.length > 0) {
+                    html += `<div style="font-size:${jinxSize}px;color:#1a1a1a;margin-top:2px;line-height:1.4;background-color:rgb(197,184,172);border-radius:4px;padding:3px 4px;">`;
+                    jinxesForRole.forEach(jinx => {
+                        // 找到角色2的图片
+                        const role2 = selectedRoles.find(r => r.name === jinx.jinxRole2);
+                        const role2Img = role2 ? role2.image : '';
+                        if (role2Img) {
+                            html += `<div style="margin-bottom:1px;display:flex;align-items:center;gap:2px;">`;
+                            html += `<img src="${role2Img}" style="width:${jinxImgSize}px;height:${jinxImgSize}px;border-radius:2px;object-fit:cover;flex-shrink:0;" onerror="this.style.display='none'">`;
+                            html += `<span>${jinx.jinxRule}</span>`;
+                            html += `</div>`;
+                        } else {
+                            html += `<div style="margin-bottom:1px;">${jinx.jinxRule}</div>`;
+                        }
+                    });
+                    html += `</div>`;
+                }
+                
+                html += `</div></div>`;
+                return html;
+            }
+
+            // 构建阵营角色列表
+            function buildTeamSection(team, allJinxes, customTeamInfo = null) {
+                // 获取所有被自定义阵营占用的角色ID
+                const occupiedRoleIds = typeof getCustomTeams === 'function' ? 
+                    getCustomTeams().flatMap(t => t.roleIds || []) : [];
+                
+                // 使用全局 selectedRoles 的顺序（已选角色已按规则排序或用户自定义排序）
+                let roles;
+                if (customTeamInfo && customTeamInfo.roleIds) {
+                    // 自定义阵营：根据roleIds筛选角色
+                    roles = selectedRoles.filter(r => customTeamInfo.roleIds.includes(r.id));
+                } else {
+                    // 标准阵营：根据team属性筛选，并排除已被自定义阵营占用的角色
+                    roles = selectedRoles.filter(r => r.team === team && !occupiedRoleIds.includes(r.id));
+                }
+                if (!roles || roles.length === 0) return '';
+                
+                // 根据阵营类型设置颜色（使用用户配置或自定义阵营信息）
+                let teamColor, teamDisplayName;
+                if (customTeamInfo) {
+                    teamColor = customTeamInfo.color;
+                    teamDisplayName = customTeamInfo.name;
+                } else {
+                    teamColor = teamColors[team] || ((team === 'townsfolk' || team === 'outsider') ? scriptConfig.goodColor : scriptConfig.evilColor);
+                    teamDisplayName = teamNames[team] || team;
+                }
+                
+                // 获取角色横向排列设置
+                const isHorizontal = document.getElementById('roles-horizontal')?.checked || false;
+                
+                // 使用固定的 margin-bottom 控制阵营间距，移除基于角色数量的 flex 值
+                let html = `<div style="margin-bottom: ${Math.round(12 * roleScale)}px; display: flex; flex-direction: column;">`;
+                // 阵营标题 + 分隔线
+                html += `<div style="display:flex;align-items:center;margin-bottom:${Math.round(4 * roleScale)}px;">`;
+                html += `<span style="color:${teamColor};font-size:${teamTitleSize}px;font-weight:bold;flex-shrink:0;letter-spacing:1px;">${teamDisplayName}</span>`;
+                html += `<div style="flex:1;height:1px;background:#c0c0c0;margin-left:8px;"></div>`;
+                html += `</div>`;
+                
+                if (isHorizontal) {
+                    // 横向排列 - 所有角色在一行
+                    html += `<div style="display:flex;gap:${columnGap}px;flex-wrap:wrap;">`;
+                    roles.forEach(role => {
+                        const jinxesForRole = allJinxes.filter(jinx => jinx.jinxRole1 === role.name);
+                        html += `<div style="flex-shrink:0;">`;
+                        html += buildRoleCard(role, jinxesForRole, teamColor);
+                        html += `</div>`;
+                    });
+                    html += `</div>`;
+                } else {
+                    // 角色列表 - 双列竖向排列（先填完第一列再填第二列）
+                    const halfLength = Math.ceil(roles.length / 2);
+                    const leftColumnRoles = roles.slice(0, halfLength);
+                    const rightColumnRoles = roles.slice(halfLength);
+                    
+                    // 使用flex创建两列，先填充左列再填充右列
+                    html += `<div style="display:flex;gap:${columnGap}px;flex:1;">`;
+                    // 左列
+                    html += `<div style="flex:1;display:flex;flex-direction:column;gap:${cardGap}px;">`;
+                    leftColumnRoles.forEach(role => {
+                        const jinxesForRole = allJinxes.filter(jinx => jinx.jinxRole1 === role.name);
+                        html += buildRoleCard(role, jinxesForRole, teamColor);
+                    });
+                    html += `</div>`;
+                    // 右列
+                    html += `<div style="flex:1;display:flex;flex-direction:column;gap:${cardGap}px;">`;
+                    rightColumnRoles.forEach(role => {
+                        const jinxesForRole = allJinxes.filter(jinx => jinx.jinxRole1 === role.name);
+                        html += buildRoleCard(role, jinxesForRole, teamColor);
+                    });
+                    html += `</div>`;
+                    html += `</div>`;
+                }
+                html += `</div>`;
+                return html;
+            }
+
+            // 使用已获取的配置
+            const scriptConfig = config;
+            console.log('titleImage:', scriptConfig.titleImage ? '已设置（长度：' + scriptConfig.titleImage.length + '）' : '未设置');
+
+            // 剧本名
+            const scriptTitle = (metaInfoJson && metaInfoJson.name && metaInfoJson.name.trim()) ? metaInfoJson.name.trim() : '未知剧本';
+            const authorText = (metaInfoJson && metaInfoJson.author && metaInfoJson.author.trim()) ? metaInfoJson.author.trim() : '';
+            
+            // 获取二维码图片
+            const qrcodeImageSrc = scriptConfig.qrcodeImage || '';
+            const showQrCode = qrcodeImageSrc && (qrcodeImageSrc.startsWith('data:image') || qrcodeImageSrc.startsWith('http') || qrcodeImageSrc.startsWith('images/'));
+
+            // 获取去重后的相克规则（根据配置决定是否获取）
+            const selectedRoleNames = selectedRoles.map(r => r.name);
+            const allJinxes = scriptConfig.showJinxRules ? getDeduplicatedJinxes(selectedRoleNames) : [];
+
+            // 构建完整剧本图 HTML - A4专业排版
+            const container = document.getElementById('script-image-render');
+            container.innerHTML = `
+                <div style="width: 794px; height: 1123px; background: ${scriptConfig.bgColor}; font-family: 'Microsoft YaHei', 'SimSun', 'PingFang SC', sans-serif; color: #1a1a1a; position: relative; display: flex; flex-direction: row; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+                    <!-- 四个角落装饰图片 -->
+                    <img src="images/10002.png" style="position: absolute; top: -60px; left: -40px; width: 150px; height: auto; transform: rotate(180deg); z-index: 10; pointer-events: none;" onerror="this.style.display='none'" alt="左上角装饰">
+                    <img src="images/10003.png" style="position: absolute; top: 0; right: 0; width: 150px; height: auto; z-index: 10; pointer-events: none;" onerror="this.style.display='none'" alt="右上角装饰">
+                    <img src="images/10004.png" style="position: absolute; bottom: 0; left: 0; width: 150px; height: auto; z-index: 10; pointer-events: none;" onerror="this.style.display='none'" alt="左下角装饰">
+                    <img src="images/10002.png" style="position: absolute; bottom: 0; right: 0; width: 150px; height: auto; z-index: 10; pointer-events: none;" onerror="this.style.display='none'" alt="右下角装饰">
+                    
+                    ${scriptConfig.showNightOrder ? `
+                    <!-- ===== 左侧：首夜顺序 ===== -->
+                    <div style="width: 65px; display: flex; flex-direction: column; align-items: center; padding-top: 110px; padding-bottom: 100px; position: relative; background-color: rgb(14, 41, 60);">
+                        <div style="display: flex; flex-direction: column; align-items: center; flex: 1;">
+                            <!-- 顶部文字：首个夜晚 -->
+                            <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 8px;">
+                                <span style="font-size: 12px; font-weight: bold; color: white; letter-spacing: 2px;">首个</span>
+                                <span style="font-size: 12px; font-weight: bold; color: white; letter-spacing: 2px;">夜晚</span>
+                            </div>
+                            ${firstNightIcons}
+                        </div>
+                    </div>
+                    <!-- 左侧夜间顺序右侧色条 -->
+                    <div style="width: 5px; background-color: rgb(3, 115, 173);"></div>
+                    ` : ''}
+
+                    <!-- ===== 中间主体 ===== -->
+                    <div style="flex: 1; display: flex; flex-direction: column; padding: 0; position: relative; background-color: rgb(238, 226, 213);">
+                        <!-- 顶部：标题区域 -->
+                        <div style="padding: 12px 22px 4px 22px;">
+                            <div style="display: flex; align-items: flex-start; justify-content: space-between;">
+                                <div style="flex: 1;">
+                                    ${scriptConfig.titleImage ? `<img src="${scriptConfig.titleImage}" style="max-width:300px;max-height:60px;height:auto;" onerror="this.style.display='none';this.parentElement.innerHTML='<div style=\\'font-size:30px;font-weight:bold;color:${scriptConfig.titleColor};font-family:SimSun,STSong,serif;letter-spacing:5px;line-height:1.2;\\'>${scriptTitle}</div>';" alt="${scriptTitle}">` : `<div style="font-size: 30px; font-weight: bold; color: ${scriptConfig.titleColor}; font-family: 'SimSun', 'STSong', serif; letter-spacing: 5px; line-height: 1.2;">${scriptTitle}</div>`}
+                                    ${authorText ? `<div style="font-size: 10px; color: #6b7280; margin-top: 2px; letter-spacing: 1px;">${authorText}</div>` : ''}
                                 </div>
-
-                                <!-- 中间主内容区域 -->
-                                <div style="flex: 1; display: flex; flex-direction: column; background: #ede4d5;">
-                                    <!-- 顶部标题区域 -->
-                                    <div style="background: #ede4d5; padding: 20px 30px; position: relative; min-height: 120px; display: flex; align-items: center; justify-content: center;">
-                                        <img src="images/zhuangshi.png" alt="装饰" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100%; max-height: 120px; object-fit: contain; opacity: 0.6;" />
-                                        <div style="position: relative; z-index: 1; text-align: center;">
-                                            <h1 style="font-size: 100px; margin: 0 0 8px 0; color: #1e3a5f; font-weight: bold; font-family: 'SimSun', '宋体', serif; letter-spacing: 4px;">${editionName}</h1>
-                                            <div style="font-size: 16px; color: #6b5a45; text-align: right;">剧本作者：${authorName || ''}</div>
+                                ${showQrCode ? `
+                                <div style="display: flex; align-items: center; justify-content: center;">
+                                    <img src="${qrcodeImageSrc}" style="max-width: 120px; max-height: 120px; height: auto; border: 1px solid #e0e0e0; border-radius: 4px;" onerror="this.style.display='none'" alt="二维码">
+                                </div>
+                                ` : ''}
+                                <div style="display: flex; align-items: flex-start; gap: 8px;">
+                                    ${scriptConfig.showPlayerConfig ? `
+                                    <div style="width: 310px; position: relative;">
+                                        <img src="${bootleggerText ? 'images/sihuoshangren.png' : 'images/playercount.png'}" style="width: 100%; height: auto;" onerror="this.style.display='none'">
+                                        ${bootleggerText ? `
+                                        <div style="position: absolute; top: 55%; left: 10%; width: 80%; text-align: left; color: #333; line-height: 1.5; font-size: ${Math.max(6, 10 - bootleggerText.length / 40)}px;">
+                                            ${bootleggerText.replace(/\n/g, '<br>')}
                                         </div>
-                                        ${showCustomRules && bootleggerRulesArray.length > 0 ? `
-                                            <div style="position: absolute; right: 30px; top: 50%; transform: translateY(-50%); width: 360px; min-height: 180px; padding: 25px 20px; background-image: url('images/sihuoshangren.png'); background-size: 100% 100%; background-repeat: no-repeat; border-radius: 8px; display: flex; align-items: flex-end; padding-bottom: 40px;">
-                                                <div style="font-size: 13px; line-height: 1.6; color: #4a3728; width: 100%; padding-left: 15px;">
-                                                    ${bootleggerRulesArray.map((rule, idx) => {
-                                                        const parts = rule.split(' - ');
-                                                        if (parts.length > 1) {
-                                                            return `<div style="${idx > 0 ? 'margin-top: 8px;' : ''}"><b style="color: ${customTeamColors.demon};">${parts[0]}</b> - ${parts.slice(1).join(' - ')}</div>`;
-                                                        } else {
-                                                            return `<div style="${idx > 0 ? 'margin-top: 8px;' : ''}">${rule}</div>`;
-                                                        }
-                                                    }).join('')}
-                                                </div>
-                                            </div>
                                         ` : ''}
                                     </div>
-
-                                    <!-- 善良阵营·镇民区域 -->
-                                    <div style="background: #ede4d5; padding: 15px 20px;">
-                                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
-                                            <h2 style="font-size: 18px; margin: 0; color: ${customTeamColors.townsfolk}; font-weight: bold;">善良阵营 · 镇民</h2>
-                                            <div style="flex: 1; height: 1px; background: rgb(121, 111, 98);"></div>
-                                        </div>
-                                        ${createRoleGrid(highlightedTownsfolk, customTeamColors.townsfolk, jinxRules, allRoles)}
-                                    </div>
-
-                                    <!-- 善良阵营·外来者区域 -->
-                                    <div style="background: #ede4d5; padding: 15px 20px;">
-                                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
-                                            <h2 style="font-size: 18px; margin: 0; color: ${customTeamColors.outsider}; font-weight: bold;">善良阵营 · 外来者</h2>
-                                            <div style="flex: 1; height: 1px; background: rgb(121, 111, 98);"></div>
-                                        </div>
-                                        ${createRoleGrid(highlightedOutsider, customTeamColors.outsider, jinxRules, allRoles)}
-                                    </div>
-
-                                    <!-- 邪恶阵营·爪牙区域 -->
-                                    <div style="background: #ede4d5; padding: 15px 20px;">
-                                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
-                                            <h2 style="font-size: 18px; margin: 0; color: ${customTeamColors.minion}; font-weight: bold;">邪恶阵营 · 爪牙</h2>
-                                            <div style="flex: 1; height: 1px; background: rgb(121, 111, 98);"></div>
-                                        </div>
-                                        ${createRoleGrid(highlightedMinion, customTeamColors.minion, jinxRules, allRoles)}
-                                    </div>
-
-                                    <!-- 邪恶阵营·恶魔区域 -->
-                                    <div style="background: #ede4d5; padding: 15px 20px;">
-                                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
-                                            <h2 style="font-size: 18px; margin: 0; color: ${customTeamColors.demon}; font-weight: bold;">邪恶阵营 · 恶魔</h2>
-                                            <div style="flex: 1; height: 1px; background: rgb(121, 111, 98);"></div>
-                                        </div>
-                                        ${createRoleGrid(highlightedDemon, customTeamColors.demon, jinxRules, allRoles)}
-                                    </div>
-
-                                    <!-- 旅行者/传奇角色区域 -->
-                                    ${showTravellersFabled && (travellerRoles.length > 0 || fabledRoles.length > 0) ? `
-                                        <div style="background: #ede4d5; padding: 15px 20px;">
-                                            <div style="display: flex; justify-content: center; gap: 12px;">
-                                                ${travellerRoles.length > 0 ? `
-                                                    <div style="display: flex; gap: 8px; align-items: center;">
-                                                        <span style="font-size: 12px; color: ${customTeamColors.traveller}; font-weight: bold;">旅行者:</span>
-                                                        ${travellerRoles.map(role => `
-                                                            <img src="${convertToLocalPath(role.image)}" alt="${role.name}" style="width: 45px; height: 45px; object-fit: cover; border-radius: 4px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
-                                                        `).join('')}
-                                                    </div>
-                                                ` : ''}
-                                                ${fabledRoles.length > 0 ? `
-                                                    <div style="display: flex; gap: 8px; align-items: center;">
-                                                        <span style="font-size: 12px; color: ${customTeamColors.fabled}; font-weight: bold;">传奇:</span>
-                                                        ${fabledRoles.map(role => `
-                                                            <img src="${convertToLocalPath(role.image)}" alt="${role.name}" style="width: 45px; height: 45px; object-fit: cover; border-radius: 4px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);">
-                                                        `).join('')}
-                                                    </div>
-                                                ` : ''}
-                                            </div>
-                                        </div>
                                     ` : ''}
-
-                                    <!-- 底部装饰区域 - 橄榄枝 + *号说明 + 状态栏覆盖在上面 -->
-                                    <div style="display: flex; justify-content: center; align-items: center; padding: 0px 0 0 0; margin-top: auto; background: #ede4d5; position: relative; min-height: 180px;">
-                                        <img src="images/dibu.png" alt="装饰" style="width: 100%; min-height: 180px; height: auto; object-fit: contain;" />
-                                        
-                                        <!-- 状态栏 - 覆盖在底部图片上 -->
-                                        <div style="position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%); width: 70%;">
-                                            <div style="background: rgba(195, 183, 168, 0.9); padding: 12px 18px; border-radius: 10px; border: 2px solid rgb(117, 105, 100);">
-                                                <div style="display: flex; flex-direction: column; gap: 10px;">
-                                                    <!-- 疯狂 -->
-                                                    <div>
-                                                        <div style="font-size: 14px; color: #9932cc; font-weight: bold; margin-bottom: 3px;">疯狂</div>
-                                                        <div style="font-size: 12px; color: #4a3728; line-height: 1.4;">${highlightAbility('当你陷入「疯狂」时，意味着你需要向其他玩家有诚意且努力的证明某件事情，如不这么做会受到惩罚。')}</div>
-                                                    </div>
-                                                    <!-- 中毒/醉酒 -->
-                                                    <div>
-                                                        <div style="font-size: 14px; color: ${customTeamColors.demon}; font-weight: bold; margin-bottom: 3px;">中毒 / 醉酒</div>
-                                                        <div style="font-size: 12px; color: #4a3728; line-height: 1.4;">${highlightAbility('中毒的玩家会失去能力，但会认为自己仍具有能力，说书人会做出这些玩家仍然具有能力的行为。如果中毒玩家的角色能力会给他提供信息，说书人可能会给出错误信息，中毒的玩家不会得知自己中毒。醉酒同理。')}</div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- 右侧边栏 - 他夜顺序 -->
-                                <div style="width: 130px; background: linear-gradient(-90deg, #172e3e 85%, #387298 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px 0; flex-shrink: 0; min-height: 100%;">
-                                    <div style="color: white; font-size: 22px; font-weight: bold; letter-spacing: 4px; margin-bottom: 18px; text-align: center; line-height: 1.7; text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;">其他<br>夜晚</div>
-                                    ${allOtherNight.map(role => `
-                                        <img src="${convertToLocalPath(role.image)}" alt="${role.name}" style="width: 91px; height: 91px; object-fit: cover; margin: 0; border-radius: 3px;">
-                                    `).join('')}
                                 </div>
                             </div>
                         </div>
-                    `;
-                } else {
-                    // 方案一：经典布局 - 标题在上，夜间顺序在两侧
-                    scriptHtml = `
-                        <div style="width: 1240px; min-height: 1754px; display: flex; flex-direction: column; height: 100%; width: 100%; position: relative; max-width: 100%; box-sizing: border-box;">
-                            <!-- 顶部区域：标题和玩家数量表格 -->
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; max-width: 100%; box-sizing: border-box;">
-                                ${titleSection}
-                                ${configSection}
-                            </div>
-                            
-                            <!-- 中间主体区域 -->
-                            ${rolesSection}
-                            
-                            ${statusAndRulesSection}
-                            
-                            <!-- 底部注释 -->
-                            <div style="position: absolute; bottom: 5px; ${showStatusBar ? 'right: 10px;' : 'left: 50%; transform: translateX(-50%);'}; font-size: 10px; color: #333; font-weight: bold;">*指非首个夜晚</div>
-                        </div>
-                    `;
-                }
-                
-                // 组装完整的剧本图HTML
-                scriptPage.innerHTML = scriptHtml;
-                
-                // 调整预览容器尺寸以匹配下载时的尺寸
-                setTimeout(() => {
-                    // 临时移除max-height和overflow限制以获取完整内容
-                    const originalMaxHeight = scriptPage.style.maxHeight;
-                    const originalOverflowY = scriptPage.style.overflowY;
-                    
-                    scriptPage.style.maxHeight = 'none';
-                    scriptPage.style.overflowY = 'visible';
-                    
-                    // 根据内容计算实际高度
-                    const fullHeight = scriptPage.scrollHeight;
-                    
-                    // 只设置高度，保持宽度不变
-                    scriptPage.style.height = fullHeight + 'px';
-                    
-                    // 恢复原始样式
-                    scriptPage.style.maxHeight = originalMaxHeight;
-                    scriptPage.style.overflowY = originalOverflowY;
-                }, 100);
-                
-                // 创建按钮容器 - 悬浮在屏幕正中
-                const buttonContainer = document.createElement('div');
-                buttonContainer.style.cssText = `
-                    position: fixed;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    display: flex;
-                    gap: 12px;
-                    z-index: 10001;
-                    padding: 15px 20px;
-                    background: rgba(255, 255, 255, 0.95);
-                    border-radius: 12px;
-                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-                    justify-content: center;
-                    flex-shrink: 0;
-                `;
-                
-                // 下载按钮
-                const downloadButton = document.createElement('button');
-                downloadButton.innerHTML = '下载图片';
-                downloadButton.style.cssText = `
-                    padding: ${isMobile ? '15px 25px' : '10px 20px'};
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                    color: white;
-                    border: none;
-                    border-radius: ${isMobile ? '12px' : '8px'};
-                    cursor: pointer;
-                    font-size: ${isMobile ? '16px' : '14px'};
-                    font-weight: 500;
-                    min-height: ${isMobile ? '50px' : 'auto'};
-                    min-width: ${isMobile ? '120px' : 'auto'};
-                    touch-action: manipulation;
-                `;
-                downloadButton.onclick = function() {
-                    console.log('【调试】下载按钮被点击');
-                    // 保存原始样式
-                    const originalMaxHeight = scriptPage.style.maxHeight;
-                    const originalOverflowY = scriptPage.style.overflowY;
-                    const originalWidth = scriptPage.style.width;
-                    const originalHeight = scriptPage.style.height;
-                    console.log('【调试】原始样式 - maxHeight:', originalMaxHeight, 'overflowY:', originalOverflowY, 'width:', originalWidth, 'height:', originalHeight);
-                    
-                    // 临时移除max-height和overflow限制以获取完整内容
-                    scriptPage.style.maxHeight = 'none';
-                    scriptPage.style.overflowY = 'visible';
 
-                    // 强制使用A4比例
-                    const isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-                    const a4Ratio = 1.414;
-                    let a4Width = 1240;
-                    let a4Height = a4Width * a4Ratio;
-                    scriptPage.style.width = a4Width + 'px';
-                    scriptPage.style.height = a4Height + 'px';
-
-
-                    // 方案二和方案三没有内边距
-                    if (scriptLayout === 'scheme2' || scriptLayout === 'scheme3')
-                        scriptPage.style.padding = '0';
-                    else
-                        scriptPage.style.padding = '0.3in';
-                    
-                    // 等待DOM更新后再调用渲染
-                    const DOM_RERNDER_TIMEOUT = 300;
-                    setTimeout(() => {
-                        // 如果高度不够容纳内容，就以高度为准重新计算宽度
-                        const fullHeight = Math.max(scriptPage.scrollHeight, scriptPage.offsetHeight);
-                        if (fullHeight > a4Height) {
-                            a4Height = fullHeight;
-                            a4Width = a4Height / a4Ratio;
-                            scriptPage.style.width = a4Width + 'px';
-                            scriptPage.style.height = a4Height + 'px';
-                        }
-
-                        // 生成图片前，将外部图片URL转换为Base64
-                        const convertImagesToBase64 = async () => {
-                            const scriptImages = scriptPage.querySelectorAll('img');
-                            const externalImages = [];
-                            
-                            // 获取所有已有角色的图片URL（内置角色）
-                            const builtInRoleImages = new Set();
-                            const builtInRoles = [
-                                ...(window.townsfolkRoles || []),
-                                ...(window.outsidersRoles || []),
-                                ...(window.minionsRoles || []),
-                                ...(window.demonsRoles || []),
-                                ...(window.fabledRoles || []),
-                                ...(window.travellersRoles || [])
-                            ];
-                            builtInRoles.forEach(role => {
-                                if (role.image) {
-                                    builtInRoleImages.add(role.image);
+                        <!-- 角色区域（带左右边框线） -->
+                        <div style="flex: 1; padding: 0 22px 0 22px; position: relative; border-left: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; display: flex; flex-direction: column; overflow-y: auto;">
+                            ${buildTeamSection('townsfolk', allJinxes)}
+                            ${buildTeamSection('outsider', allJinxes)}
+                            ${buildTeamSection('minion', allJinxes)}
+                            ${buildTeamSection('demon', allJinxes)}
+                            ${(() => {
+                                // 添加旅行者阵营
+                                const showTraveller = scriptConfig.showTraveller !== false;
+                                const travellerRoles = selectedRoles.filter(r => r.team === 'traveller');
+                                if (showTraveller && travellerRoles.length > 0) {
+                                    return buildTeamSection('traveller', allJinxes);
                                 }
-                            });
-                            
-                            // 收集所有外部图片，但跳过已有角色的图片
-                            scriptImages.forEach(img => {
-                                const src = img.src || img.dataset.src;
-                                if (src && (src.startsWith('http://') || src.startsWith('https://'))) {
-                                    // 检查是否是已有角色的图片
-                                    const isBuiltInRoleImage = Array.from(builtInRoleImages).some(builtInImg => 
-                                        src === builtInImg || 
-                                        src.includes(builtInImg) || 
-                                        builtInImg.includes(src.split('/').pop())
-                                    );
-                                    
-                                    if (!isBuiltInRoleImage) {
-                                        externalImages.push(img);
-                                    } else {
-                                        console.log(`[图片生成] 跳过已有角色图片: ${src.substring(0, 50)}...`);
-                                    }
+                                return '';
+                            })()}
+                            ${(() => {
+                                // 添加传奇角色阵营
+                                const showFabled = scriptConfig.showFabled !== false;
+                                const fabledRoles = selectedRoles.filter(r => r.team === 'fabled');
+                                if (showFabled && fabledRoles.length > 0) {
+                                    return buildTeamSection('fabled', allJinxes);
                                 }
-                            });
+                                return '';
+                            })()}
+                            ${(() => {
+                                // 添加自定义阵营
+                                const activeCustomTeams = typeof getCustomTeams === 'function' ? getCustomTeams() : [];
+                                let html = '';
+                                activeCustomTeams.forEach(team => {
+                                    html += buildTeamSection(team.id, allJinxes, { name: team.name, color: team.color, roleIds: team.roleIds });
+                                });
+                                return html;
+                            })()}
                             
-                            if (externalImages.length > 0) {
-                                console.log(`[图片生成] 发现 ${externalImages.length} 个外部图片需要转换`);
+                            ${(() => {
+                                // 获取状态信息 - 同时从JSON编辑器和UI表单获取（与方案二一致）
+                                let statesData = [];
                                 
-                                // 显示进度弹窗
-                                const progressModal = document.createElement('div');
-                                progressModal.style.cssText = `
-                                    position: fixed;
-                                    top: 50%;
-                                    left: 50%;
-                                    transform: translate(-50%, -50%);
-                                    background: white;
-                                    padding: 30px;
-                                    border-radius: 12px;
-                                    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-                                    z-index: 10001;
-                                    text-align: center;
-                                    min-width: 300px;
-                                `;
-                                progressModal.innerHTML = `
-                                    <h3 style="margin-top:0;color:#333;">正在转换图片...</h3>
-                                    <div id="generate-progress-text" style="color:#666;margin:15px 0;">准备中...</div>
-                                    <div style="background:#e0e0e0;border-radius:10px;height:20px;overflow:hidden;">
-                                        <div id="generate-progress-bar" style="background:linear-gradient(90deg,#6b46c1,#9f7aea);height:100%;width:0%;transition:width 0.3s;"></div>
-                                    </div>
-                                `;
-                                document.body.appendChild(progressModal);
+                                const basicStates = [];
                                 
-                                // 逐个转换图片
-                                for (let i = 0; i < externalImages.length; i++) {
-                                    const img = externalImages[i];
-                                    const src = img.src || img.dataset.src;
+                                const drunkPoisonedChecked = document.querySelector('input[name="state-type"][value="drunk_poisoned"]')?.checked;
+                                const madnessChecked = document.querySelector('input[name="state-type"][value="madness"]')?.checked;
+                                
+                                if (drunkPoisonedChecked) {
+                                    basicStates.push({ name: '醉酒与中毒', description: '醉酒或中毒的玩家会失去能力，但会认为自己仍具有能力，说书人会做出这些玩家仍然具有能力的行为。如果醉酒或中毒玩家的角色能力会给他提供信息，说书人可能会给出错误信息。醉酒或中毒的玩家不会得知自己醉酒或中毒。' });
+                                }
+                                if (madnessChecked) {
+                                    basicStates.push({ name: '疯狂', description: '当一名玩家需要"疯狂"疯狂地证明某件事情时，意味着他应该去努力说服其他玩家那件事情是真的。' });
+                                }
+                                
+                                statesData = [...basicStates];
+                                
+                                const jsonEditor = document.getElementById('json-editor-textarea');
+                                if (jsonEditor && jsonEditor.value) {
                                     try {
-                                        if (window.urlToBase64) {
-                                            const base64 = await window.urlToBase64(src);
-                                            img.src = base64;
-                                            if (img.dataset.src) {
-                                                img.dataset.src = base64;
-                                            }
+                                        const jsonData = JSON.parse(jsonEditor.value);
+                                        const meta = Array.isArray(jsonData) ? jsonData.find(item => item.id === '_meta') : jsonData._meta;
+                                        if (meta && meta.states) {
+                                            const jsonStates = Array.isArray(meta.states) ? meta.states : [];
+                                            jsonStates.forEach(state => {
+                                                const stateName = state.name || state.stateName || '';
+                                                const stateDesc = state.description || state.stateDescription || state.stateDesc || '';
+                                                if (stateName && stateDesc) {
+                                                    const exists = statesData.some(s => s.name === stateName);
+                                                    if (!exists) {
+                                                        statesData.push({ name: stateName, description: stateDesc });
+                                                    }
+                                                }
+                                            });
                                         }
-                                        console.log(`[图片生成] Base64转换成功: ${src.substring(0, 50)}...`);
-                                    } catch (error) {
-                                        console.error(`[图片生成] Base64转换失败:`, error);
-                                        // 转换失败，使用默认图片
-                                        img.src = './images/townfolk.png';
-                                        if (img.dataset.src) {
-                                            img.dataset.src = './images/townfolk.png';
-                                        }
-                                    }
-                                    
-                                    // 更新进度
-                                    const percent = Math.round(((i + 1) / externalImages.length) * 100);
-                                    document.getElementById('generate-progress-bar').style.width = percent + '%';
-                                    document.getElementById('generate-progress-text').textContent = 
-                                        `正在转换图片 (${i + 1}/${externalImages.length})`;
+                                    } catch(e) {}
                                 }
                                 
-                                // 关闭进度弹窗
-                                if (progressModal.parentNode) {
-                                    document.body.removeChild(progressModal);
-                                }
-                            }
-                        };
-
-                        // 执行图片转换并生成
-                        convertImagesToBase64().then(() => {
-                            htmlToImage.toCanvas(scriptPage, {
-                                backgroundColor: hexToRgba(customBgColor, bgOpacity),
-                                canvasWidth: Math.ceil(a4Width),
-                                canvasHeight: Math.ceil(a4Height)
-                            }).then(function(canvas) {
-                                // 恢复原始样式
-                                scriptPage.style.maxHeight = originalMaxHeight;
-                                scriptPage.style.overflowY = originalOverflowY;
-                                scriptPage.style.width = originalWidth;
-                                scriptPage.style.height = originalHeight;
-                                
-                                // 使用更兼容移动端的下载方式
-                                const dataUrl = canvas.toDataURL('image/png');
-                                const filename = editionName + '_剧本图.png';
-                                
-                                // 检测是否为移动端
-                                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-                                
-                                // 优化移动端下载逻辑
-                                if (isMobile) {
-                                    // 方案1：尝试使用Blob对象和download属性
-                                    try {
-                                        const blob = dataURLToBlob(dataUrl);
-                                        const url = URL.createObjectURL(blob);
-                                        const link = document.createElement('a');
-                                        link.href = url;
-                                        link.download = filename;
-                                        link.style.display = 'none';
-                                        
-                                        // 添加到文档并触发点击
-                                        document.body.appendChild(link);
-                                        
-                                        // 移动端需要模拟真实点击
-                                        if (navigator.userAgent.match(/iPad|iPhone|iPod/)) {
-                                            // iOS设备特殊处理
-                                            const event = document.createEvent('MouseEvents');
-                                            event.initMouseEvent('click', true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
-                                            link.dispatchEvent(event);
-                                        } else {
-                                            // Android设备
-                                            link.click();
-                                        }
-                                        
-                                        setTimeout(() => {
-                                            document.body.removeChild(link);
-                                            URL.revokeObjectURL(url);
-                                        }, 100);
-                                        
-                                        // 提示用户
-                                        setTimeout(() => {
-                                            alert('请在弹出的下载提示中选择保存图片');
-                                        }, 500);
-                                    } catch (e) {
-                                        console.error('Blob下载失败:', e);
-                                        // 方案2：在新窗口打开图片，让用户长按保存
-                                        const newWindow = window.open();
-                                        if (newWindow) {
-                                            newWindow.document.write('<html><head><title>' + filename + '</title></head><body style="margin:0;display:flex;justify-content:center;align-items:center;background:#f0f0f0;"><img src="' + dataUrl + '" style="max-width:100%;height:auto;" onclick="window.close()"></body></html>');
-                                            newWindow.document.close();
-                                            alert('图片已在新窗口打开，请长按图片保存到相册');
-                                        } else {
-                                            // 方案3：显示错误提示
-                                            alert('无法自动下载图片，请截图保存');
+                                const stateInputGroups = document.querySelectorAll('#state-container .state-input-group');
+                                stateInputGroups.forEach(group => {
+                                    const stateName = group.querySelector('input[type="text"]')?.value.trim();
+                                    const stateDesc = group.querySelector('textarea')?.value.trim();
+                                    if (stateName && stateDesc) {
+                                        const exists = statesData.some(s => s.name === stateName);
+                                        if (!exists) {
+                                            statesData.push({ name: stateName, description: stateDesc });
                                         }
                                     }
-                                } else {
-                                    // 桌面端：直接下载
-                                    const link = document.createElement('a');
-                                    link.download = filename;
-                                    link.href = dataUrl;
-                                    link.style.display = 'none';
-                                    document.body.appendChild(link);
-                                    link.click();
-                                    setTimeout(() => {
-                                        document.body.removeChild(link);
-                                    }, 100);
+                                });
+                                
+                                // 获取自制规则
+                                const bootleggerInput = document.getElementById('bootlegger');
+                                const bootleggerText = bootleggerInput ? bootleggerInput.value.trim() : '';
+                                
+                                // 如果没有任何状态且没有自制规则，不显示异常状态区域
+                                if (statesData.length === 0 && !bootleggerText) {
+                                    return '';
                                 }
-                            });
-                        }).catch(function(error) {
-                            console.error('生成图片失败:', error);
-                            alert('生成图片失败，请重试');
-                            // 恢复原始样式
-                            scriptPage.style.maxHeight = originalMaxHeight;
-                            scriptPage.style.overflowY = originalOverflowY;
-                            scriptPage.style.width = originalWidth;
-                            scriptPage.style.height = originalHeight;
-                        });
-                    }, DOM_RERNDER_TIMEOUT);
-                };
-                buttonContainer.appendChild(downloadButton);
-                
-                // 关闭按钮
-                const closeButton = document.createElement('button');
-                closeButton.innerHTML = '关闭';
-                closeButton.style.cssText = `
-                    padding: ${isMobile ? '15px 25px' : '10px 20px'};
-                    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
-                    color: white;
-                    border: none;
-                    border-radius: ${isMobile ? '12px' : '8px'};
-                    cursor: pointer;
-                    font-size: ${isMobile ? '16px' : '14px'};
-                    font-weight: 500;
-                    min-height: ${isMobile ? '50px' : 'auto'};
-                    min-width: ${isMobile ? '120px' : 'auto'};
-                    touch-action: manipulation;
-                `;
-                closeButton.onclick = function() {
-                    document.body.removeChild(previewContainer);
-                };
-                buttonContainer.appendChild(closeButton);
-                
-                // 先添加按钮容器，再添加剧本图页面，让按钮显示在上方
-                previewContainer.appendChild(buttonContainer);
-                previewContainer.appendChild(scriptPage);
-                document.body.appendChild(previewContainer);
-                
-            } catch (error) {
-                alert('生成剧本图失败，请检查角色数据');
-                console.error('生成剧本图错误:', error);
-            } finally {
-                isGeneratingScriptImage = false;
-            }
-        }
-
-async function generateJinxAndConfigImage() {
-            try {
-                // 获取剧本基本信息
-                const scriptName = metaInfoJson.name || '未知剧本';
-                
-                // 固定字号倍率
-                const fontSizeMultiplier = 1.0;
-                
-                // 获取背景颜色设置
-                const detailBgColor = document.getElementById('bg-color-setting')?.value || '#f6f6f4';
-                const detailBgOpacity = parseInt(document.getElementById('bg-opacity-setting')?.value || '100') / 100;
-                
-                // 获取其他夜晚顺序倒序设置
-                const reverseOtherNight = document.getElementById('reverseOtherNight')?.checked ?? false;
-                
-                // 获取当前选中的角色
-                const selectedRoles = getSelectedRoles();
-                const selectedRoleIds = selectedRoles.map(role => role.id);
-                const selectedDirRoles = dirRolesJson.filter(role => {
-                    if (selectedRoleIds.includes(role.id)) {
-                        return false;
-                    }
-                    const checkbox = document.querySelector(`#dir-columns input[type="checkbox"][value="${role.id}"]`);
-                    return checkbox && checkbox.checked;
-                });
-                const allRoles = [...selectedRoles, ...selectedDirRoles];
-                const roleNames = allRoles.map(role => role.name);
-                
-                // 获取相克规则
-                const getJinxRulesForPreview = () => {
-                    const jinxRules = [];
-                    if (typeof jinxes !== 'undefined') {
-                        jinxes.forEach(rule => {
-                            if (roleNames.includes(rule.jinxRole1) && roleNames.includes(rule.jinxRole2)) {
-                                jinxRules.push(rule);
-                            }
-                        });
-                    }
-                    if (typeof userAddedJinxRules !== 'undefined') {
-                        userAddedJinxRules.forEach(rule => {
-                            if (roleNames.includes(rule.jinxRole1) && roleNames.includes(rule.jinxRole2)) {
-                                jinxRules.push(rule);
-                            }
-                        });
-                    }
-                    if (typeof window.jinxes !== 'undefined') {
-                        window.jinxes.forEach(rule => {
-                            if (roleNames.includes(rule.jinxRole1) && roleNames.includes(rule.jinxRole2)) {
-                                jinxRules.push(rule);
-                            }
-                        });
-                    }
-                    if (typeof window.trialJinxes !== 'undefined') {
-                        window.trialJinxes.forEach(rule => {
-                            if (roleNames.includes(rule.jinxRole1) && roleNames.includes(rule.jinxRole2)) {
-                                jinxRules.push(rule);
-                            }
-                        });
-                    }
-                    if (typeof trialJinxes !== 'undefined') {
-                        trialJinxes.forEach(rule => {
-                            if (roleNames.includes(rule.jinxRole1) && roleNames.includes(rule.jinxRole2)) {
-                                jinxRules.push(rule);
-                            }
-                        });
-                    }
-                    if (typeof dirRolesJson !== 'undefined') {
-                        console.log('【细节图调试】dirRolesJson内容:', dirRolesJson);
-                        console.log('【细节图调试】dirRolesJson中的相克规则数量:', dirRolesJson.filter(item => item.team === 'a jinxed' || item.team === '相克').length);
-                        dirRolesJson.forEach(item => {
-                            if ((item.team === 'a jinxed' || item.team === '相克') && item.name && item.ability) {
-                                const nameParts = item.name.split(' & ');
-                                if (nameParts.length === 2) {
-                                    const jinxRole1 = nameParts[0];
-                                    const jinxRole2 = nameParts[1];
-                                    if (roleNames.includes(jinxRole1) && roleNames.includes(jinxRole2)) {
-                                        const jinxRule = {
-                                            jinxRole1: jinxRole1,
-                                            jinxRole2: jinxRole2,
-                                            jinxRule: item.ability
-                                        };
-                                        jinxRules.push(jinxRule);
+                                
+                                // 方案三：状态栏改为角色卡片大小，居中显示，用圆角矩形包围
+                                let html = '<div style="display: flex; justify-content: center; padding-top: 8px;">';
+                                html += '<div style="display: flex; align-items: flex-start; gap: ' + gap + 'px; max-width: 50%; background-color: rgb(197, 184, 172); border-radius: 8px; padding: ' + gap + 'px;">';
+                                html += '<img src="images/state-icon.png" style="width: ' + imgSize + 'px; height: ' + imgSize + 'px; border-radius: 3px; flex-shrink: 0; object-fit: cover; background: #e2e8f0;" onerror="this.style.display=\'none\'">';
+                                html += '<div style="flex: 1; min-width: 0;">';
+                                html += '<div style="font-size: ' + abilitySize + 'px; color: #1a1a1a; line-height: 1.5;">';
+                                
+                                statesData.forEach(state => {
+                                    let stateColor = '#dd6b20';
+                                    if (state.name.includes('疯狂')) {
+                                        stateColor = '#7c3aed';
+                                    } else if (state.name.includes('醉酒') || state.name.includes('中毒')) {
+                                        stateColor = '#c1121f';
                                     }
-                                }
-                            }
-                        });
-                    }
-                    return jinxRules;
-                };
-                
-                const jinxRules = getJinxRulesForPreview();
-                
-                // 过滤出旅行者和传奇角色
-                const travellerRoles = allRoles.filter(role =>
-                    role.team === 'traveller' || role.team === '旅行者'
-                );
-                const fabledRoles = allRoles.filter(role =>
-                    role.team === 'fabled' || role.team === '传奇角色'
-                );
-                
-                // 获取自制规则
-                const bootleggerRules = Array.isArray(metaInfoJson.bootlegger) ? metaInfoJson.bootlegger : (metaInfoJson.bootlegger ? [metaInfoJson.bootlegger] : []);
-                
-                // 获取首夜和其他夜晚顺序 - 添加黄昏、爪牙、恶魔等元信息
-                // 优先使用metaInfoJson中的夜间顺序数组
-                let firstNightRoles = [];
-                let otherNightRoles = [];
-                
-                // 创建角色名称映射，将旧角色名映射到新角色名
-                const roleNameMap = {
-                    "旧小怪宝": "小怪宝",
-                    "旧麻风病人": "麻风病人",
-                    "旧赌徒": "赌徒",
-                    "旧卖花女孩": "卖花女孩",
-                    "旧掘墓人": "掘墓人",
-                    "旧守鸦人": "守鸦人",
-                    "旧刺客": "刺客",
-                    "旧下毒者": "下毒者",
-                    "旧女巫": "女巫",
-                    "旧洗脑师": "洗脑师",
-                    "旧恐惧之灵": "恐惧之灵",
-                    "旧鹰身女妖": "鹰身女妖",
-                    "旧灵言师": "灵言师",
-                    "旧狐媚娘": "狐媚娘",
-                    "旧普卡": "普卡",
-                    "旧牙噶巴卜": "牙噶巴卜",
-                    "旧酿酒师": "酿酒师",
-                    "旧俑匠": "俑匠",
-                    "旧熊孩子": "熊孩子",
-                    "旧小精灵": "小精灵",
-                    "旧巡山人": "巡山人",
-                    "旧洗衣妇": "洗衣妇",
-                    "旧图书管理员": "图书管理员",
-                    "旧调查员": "调查员",
-                    "旧厨师": "厨师",
-                    "旧共情者": "共情者",
-                    "旧占卜师": "占卜师",
-                    "旧管家": "管家",
-                    "旧逆臣": "逆臣",
-                    "旧祖母": "祖母",
-                    "旧钟表匠": "钟表匠",
-                    "旧筑梦师": "筑梦师",
-                    "旧女裁缝": "女裁缝",
-                    "旧事务官": "事务官",
-                    "旧骑士": "骑士",
-                    "旧贵族": "贵族",
-                    "旧气球驾驶员": "气球驾驶员",
-                    "旧阴阳师": "阴阳师",
-                    "旧郎中": "郎中",
-                    "旧店小二": "店小二",
-                    "旧村夫": "村夫",
-                    "旧赏金猎人": "赏金猎人",
-                    "旧守夜人": "守夜人",
-                    "旧异教领袖": "异教领袖",
-                    "旧间谍": "间谍",
-                    "旧食人魔": "食人魔",
-                    "旧女祭司": "女祭司",
-                    "旧修行者": "修行者",
-                    "旧钦天监": "钦天监",
-                    "旧将军": "将军",
-                    "旧方士": "方士",
-                    "旧侍女": "侍女",
-                    "旧引路人": "引路人",
-                    "旧数学家": "数学家",
-                    "旧利维坦": "利维坦",
-                    "旧维齐尔": "维齐尔",
-                    "旧哈迪寂亚": "哈迪寂亚",
-                    "旧画皮": "画皮",
-                    "旧痢蛭": "痢蛭",
-                    "旧暴乱": "暴乱",
-                    "旧国王": "国王",
-                    "旧农夫": "农夫",
-                    "旧戏法师": "戏法师",
-                    "旧半兽人": "半兽人",
-                    "旧炼金术士": "炼金术士",
-                    "旧瘟疫医生": "瘟疫医生",
-                    "旧麻脸巫婆": "麻脸巫婆",
-                    "旧街头风琴手": "街头风琴手",
-                    "旧炸弹人": "炸弹人",
-                    "旧姑获鸟": "姑获鸟"
-                };
-                
-                // 定义特殊角色映射
-                const specialRolesMap = {
-                    'twilight': { firstNight: 0, name: '黄昏', image: 'images/dusk-CLd-DXn-QC.jpg' },
-                    'minioninfo': { firstNight: 2000, name: '爪牙信息', image: 'images/180px-Mi.png' },
-                    'demoninfo': { firstNight: 3000, name: '恶魔信息', image: 'images/180px-Di.png' },
-                    'dawn': { firstNight: 9999, name: '黎明', image: 'images/dawn.jpg' }
-                };
-                
-                // 处理首夜顺序
-                if (metaInfoJson.firstNight && metaInfoJson.firstNight.length > 0 && metaInfoJson.firstNight[0] !== "") {
-                    // 使用metaInfoJson中的首夜顺序
-                    metaInfoJson.firstNight.forEach((roleId, index) => {
-                        // 检查是否是特殊角色
-                        if (specialRolesMap[roleId]) {
-                            firstNightRoles.push({ ...specialRolesMap[roleId], firstNight: index + 1 });
-                            return;
-                        }
-                        // 查找角色信息
-                        let role = allRoles.find(r => r.id === roleId);
-                        // 如果没找到，尝试使用旧角色名映射
-                        if (!role) {
-                            const newName = roleNameMap[roleId];
-                            if (newName) {
-                                role = allRoles.find(r => r.name === newName);
-                            }
-                        }
-                        if (role) {
-                            firstNightRoles.push({ ...role, firstNight: index + 1 });
-                        }
-                    });
-                } else {
-                    // 使用角色自身的firstNight属性
-                    firstNightRoles = allRoles.filter(role => role.firstNight > 0).sort((a, b) => a.firstNight - b.firstNight);
-                }
-                
-                // 处理其他夜晚顺序
-                if (metaInfoJson.otherNight && metaInfoJson.otherNight.length > 0 && metaInfoJson.otherNight[0] !== "") {
-                    // 使用metaInfoJson中的他夜顺序
-                    metaInfoJson.otherNight.forEach((roleId, index) => {
-                        // 检查是否是特殊角色
-                        if (specialRolesMap[roleId]) {
-                            otherNightRoles.push({ ...specialRolesMap[roleId], otherNight: index + 1 });
-                            return;
-                        }
-                        // 查找角色信息
-                        let role = allRoles.find(r => r.id === roleId);
-                        // 如果没找到，尝试使用旧角色名映射
-                        if (!role) {
-                            const newName = roleNameMap[roleId];
-                            if (newName) {
-                                role = allRoles.find(r => r.name === newName);
-                            }
-                        }
-                        if (role) {
-                            otherNightRoles.push({ ...role, otherNight: index + 1 });
-                        }
-                    });
-                } else {
-                    // 使用角色自身的otherNight属性
-                    otherNightRoles = allRoles.filter(role => role.otherNight > 0).sort((a, b) => a.otherNight - b.otherNight);
-                }
-                
-                // 添加元信息图标到首夜顺序（黄昏、爪牙信息、恶魔信息、黎明）
-                let metaFirstNight, metaOtherNight;
-                
-                if (metaInfoJson.firstNight && metaInfoJson.firstNight.length > 0 && metaInfoJson.firstNight[0] !== "") {
-                    // 使用metaInfoJson中的顺序时，只添加黄昏和黎明
-                    metaFirstNight = [
-                        { firstNight: -100, name: '黄昏', image: 'images/dusk-CLd-DXn-QC.png' },
-                        { firstNight: 12700, name: '黎明', image: 'images/dawn.png' }
-                    ];
-                } else {
-                    // 使用默认顺序时，添加所有元信息图标
-                    metaFirstNight = [
-                        { firstNight: -100, name: '黄昏', image: 'images/dusk-CLd-DXn-QC.png' },
-                        { firstNight: 2000, name: '爪牙信息', image: 'images/180px-Mi.png' },
-                        { firstNight: 3000, name: '恶魔信息', image: 'images/180px-Di.png' },
-                        { firstNight: 12700, name: '黎明', image: 'images/dawn.png' }
-                    ];
-                }
-                
-                if (metaInfoJson.otherNight && metaInfoJson.otherNight.length > 0 && metaInfoJson.otherNight[0] !== "") {
-                    // 使用metaInfoJson中的顺序时，只添加黄昏和黎明
-                    metaOtherNight = [
-                        { otherNight: -100, name: '黄昏', image: 'images/dusk-CLd-DXn-QC.png' },
-                        { otherNight: 15000, name: '黎明', image: 'images/dawn.png' }
-                    ];
-                } else {
-                    // 使用默认顺序时，添加所有元信息图标
-                    metaOtherNight = [
-                        { otherNight: -100, name: '黄昏', image: 'images/dusk-CLd-DXn-QC.png' },
-                        { otherNight: 15000, name: '黎明', image: 'images/dawn.png' }
-                    ];
-                }
-                
-                // 合并首夜顺序
-                const allFirstNight = [...firstNightRoles, ...metaFirstNight].sort((a, b) => {
-                    const orderA = a.firstNight || 0;
-                    const orderB = b.firstNight || 0;
-                    return orderA - orderB;
-                });
-                
-                // 合并他夜顺序
-                const allOtherNight = [...otherNightRoles, ...metaOtherNight].sort((a, b) => {
-                    const orderA = a.otherNight || 0;
-                    const orderB = b.otherNight || 0;
-                    return orderA - orderB;
-                });
-                
-                // 去重，确保每个角色只出现一次
-                const uniqueFirstNight = [];
-                const seenFirstNight = new Set();
-                allFirstNight.forEach(role => {
-                    if (!seenFirstNight.has(role.name)) {
-                        seenFirstNight.add(role.name);
-                        uniqueFirstNight.push(role);
-                    }
-                });
-                
-                const uniqueOtherNight = [];
-                const seenOtherNight = new Set();
-                allOtherNight.forEach(role => {
-                    if (!seenOtherNight.has(role.name)) {
-                        seenOtherNight.add(role.name);
-                        uniqueOtherNight.push(role);
-                    }
-                });
-                
-                // 更新夜间顺序
-                firstNightRoles = uniqueFirstNight;
-                otherNightRoles = uniqueOtherNight;
-                
-                // 排序夜间顺序
-                firstNightRoles = firstNightRoles.filter(role => role && role.firstNight !== undefined).sort((a, b) => a.firstNight - b.firstNight);
-                otherNightRoles = otherNightRoles.filter(role => role && role.otherNight !== undefined).sort((a, b) => a.otherNight - b.otherNight);
-                
-                // 检测是否为移动端
-                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-                
-                // 创建预览容器
-                const previewContainer = document.createElement('div');
-                previewContainer.id = 'detail-image-preview';
-                previewContainer.style.cssText = `
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background: rgba(0, 0, 0, 0.85);
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: flex-start;
-                    align-items: center;
-                    z-index: 10000;
-                    padding: ${isMobile ? '10px' : '20px'};
-                    box-sizing: border-box;
-                    overflow: auto;
-                `;
-                
-                // 创建打印页面容器 - 与剧本图保持一致的A4尺寸
-                const printPage = document.createElement('div');
-                printPage.style.cssText = `
-                    width: ${isMobile ? '520px' : '8.27in'};
-                    height: ${isMobile ? '870px' : '11.69in'};
-                    margin: ${isMobile ? '0' : '0 auto'};
-                    background: ${hexToRgba(detailBgColor, detailBgOpacity)};
-                    box-sizing: border-box;
-                    position: relative;
-                    overflow: auto;
-                    font-family: 'Assistant', 'Microsoft YaHei', sans-serif;
-                    flex-shrink: 0;
-                `;
-                
-                // 固定A4尺寸，移动端不需要
-                if (!isMobile) {
-                    printPage.style.width = '8.27in';
-                    printPage.style.height = '11.69in';
-                }
-                
-                // 直接使用已经处理好的夜间顺序
-                const allFirstNightRoles = firstNightRoles;
-                const allOtherNightRoles = otherNightRoles;
-                
-                // 构建首夜顺序HTML（左侧）
-                const firstNightHtml = allFirstNightRoles.map(role => `
-                    <img src="${convertToLocalPath(role.image)}" style="width: 45px; height: 45px; margin: -5px 0; object-fit: cover; display: block;">
-                `).join('');
-                
-                // 构建其他夜晚顺序HTML（右侧）
-                const otherNightHtml = allOtherNightRoles.map(role => `
-                    <img src="${convertToLocalPath(role.image)}" style="width: 45px; height: 45px; margin: -5px 0; object-fit: cover; display: block; transform: rotate(180deg);">
-                `).join('');
-                
-                // 构建剧本标题（顶部居中）
-                const scriptNameHtml = `
-                    <div style="font-family: 'Philo', serif; font-size: 34px; text-align: center; color: #800000; margin: 20px 0 30px 0; position: relative; font-weight: bold;">
-                        ${scriptName}
-                    </div>
-                `;
-                
-                // 构建Fabled/Loric标题区域
-                const showFabled = fabledRoles.length > 0;
-                const fabledHeaderHtml = showFabled ? `
-                    <div style="margin: 0 auto; width: 98%; height: 40px; position: relative; bottom: -10px; left: 15px;">
-                        <div style="background: black; width: 96%; height: 1px;"></div>
-                        <div style="font-family: 'Philo', serif; width: 140px; position: relative; top: -17px; right: 10px; font-size: 5mm; color: black; background-color: white; margin: 0 auto; display: flex; justify-content: center;">
-                            传奇角色
-                        </div>
-                    </div>
-                ` : '';
-                
-                // 构建Fabled角色HTML - 使用npcRow样式
-                const fabledHtml = fabledRoles.map(role => `
-                    <div style="display: flex; flex-direction: row; position: relative; bottom: -10px; margin: -10px 0;">
-                        <div style="float: left; align-items: center;">
-                            <img src="${convertToLocalPath(role.image)}" height="60" style="object-fit: cover;">
-                        </div>
-                        <div style="display: flex; flex-direction: column; justify-content: center; min-height: 60px;">
-                            <b style="font-family: 'Philo', serif; float: left; font-size: 4mm; position: relative; bottom: -5px; color: #7a6550;">${role.name}</b>
-                            <p style="font-family: 'Assistant', sans-serif; float: right; font-size: 3.4mm; line-height: 1.2; align-items: right; position: relative; bottom: -3px; margin: 0;">${role.ability || ''}</p>
-                        </div>
-                    </div>
-                `).join('');
-                
-                // 构建相克规则HTML（使用djinn图标）
-                const jinxHtml = jinxRules.length > 0 ? `
-                    <div style="display: flex; flex-direction: row; position: relative; bottom: -10px; margin: -10px 0;">
-                        <img src="images/djinn.png" height="${60 * fontSizeMultiplier}" style="object-fit: cover;">
-                    </div>
-                    ${jinxRules.map(rule => `
-                        <div style="display: flex; flex-direction: row; align-items: center; height: ${50 * fontSizeMultiplier}px; position: relative; bottom: 4px; margin: -5px 0 0 0;">
-                            <b style="padding-right: 30px;"></b>
-                            <img src="${convertToLocalPath(allRoles.find(r => r.name === rule.jinxRole1)?.image || '')}" style="float: left; height: ${40 * fontSizeMultiplier}px; position: relative; bottom: -10px; margin: 0 -5px 0 0;">
-                            <img src="${convertToLocalPath(allRoles.find(r => r.name === rule.jinxRole2)?.image || '')}" style="float: left; height: ${40 * fontSizeMultiplier}px; position: relative; bottom: -10px; margin: 0 -5px 0 0;">
-                            <p style="font-family: 'Assistant', sans-serif; font-size: ${3.4 * fontSizeMultiplier}mm; padding-left: 10px; position: relative; bottom: -20px; margin: 0;">${rule.jinxRule}</p>
-                        </div>
-                    `).join('')}
-                ` : '';
-                
-                // 构建私货商人规则HTML
-                const bootleggerHtml = bootleggerRules.length > 0 ? `
-                    <div style="display: flex; flex-direction: row; position: relative; bottom: -10px; margin: -10px 0;">
-                        <img src="images/Bootlegger.png" height="${60 * fontSizeMultiplier}" style="object-fit: cover;">
-                    </div>
-                    ${bootleggerRules.map(rule => `
-                        <div style="display: flex; flex-direction: row; align-items: flex-start; margin: -20px 0 -15px 0;">
-                            <b style="padding-right: 70px;"></b>
-                            <p style="margin: 0; flex-shrink: 0;">⦁</p>
-                            <p style="font-family: 'Assistant', sans-serif; font-size: ${3.4 * fontSizeMultiplier}mm; padding-left: 10px; padding-top: 0px; margin: 0; flex: 1; word-wrap: break-word; line-height: 1.3;">${rule}</p>
-                        </div>
-                    `).join('')}
-                ` : '';
-                
-                // 构建旅行者标题区域
-                const travellerHeaderHtml = travellerRoles.length > 0 ? `
-                    <div style="margin: 0 auto; width: 98%; height: ${40 * fontSizeMultiplier}px; position: relative; bottom: -10px; left: 15px;">
-                        <div style="background: black; width: 96%; height: 1px;"></div>
-                        <div style="font-family: 'Philo', serif; width: ${140 * fontSizeMultiplier}px; position: relative; top: -17px; right: 10px; font-size: ${5 * fontSizeMultiplier}mm; color: black; background-color: white; margin: 0 auto; display: flex; justify-content: center;">
-                            旅行者
-                        </div>
-                    </div>
-                ` : '';
-                
-                // 构建旅行者角色HTML
-                const travellerListHtml = travellerRoles.map(role => `
-                    <div style="display: flex; flex-direction: row; position: relative; bottom: -10px; margin: -10px 0;">
-                        <div style="float: left; align-items: center;">
-                            <img src="${convertToLocalPath(role.image)}" height="${60 * fontSizeMultiplier}" style="object-fit: cover;">
-                        </div>
-                        <div style="display: flex; flex-direction: column; justify-content: center; min-height: ${60 * fontSizeMultiplier}px;">
-                            <b style="font-family: 'Philo', serif; float: left; font-size: ${4 * fontSizeMultiplier}mm; position: relative; bottom: -5px; color: #500050;">${role.name}</b>
-                            <p style="font-family: 'Assistant', sans-serif; float: right; font-size: ${3.4 * fontSizeMultiplier}mm; line-height: 1.2; align-items: right; position: relative; bottom: -3px; margin: 0;">${role.ability || ''}</p>
-                        </div>
-                    </div>
-                `).join('');
-                
-                // 构建玩家数量表格HTML
-                const playerCountHtml = `
-                    <div style="margin: 20px auto 0; text-align: center; max-width: 100%;">
-                        <img src="https://i.postimg.cc/021k6s9F/playercount.png" style="width: ${isMobile ? '100%' : 620 * fontSizeMultiplier}px; max-width: 100%; height: auto;">
-                    </div>
-                `;
-                
-                // 构建底部角色图标行
-                const townsfolkRolesList = allRoles.filter(r => r.team === 'townsfolk' || r.team === '镇民');
-                const outsiderRolesList = allRoles.filter(r => r.team === 'outsider' || r.team === '外来者');
-                const minionRolesList = allRoles.filter(r => r.team === 'minion' || r.team === '爪牙');
-                const demonRolesList = allRoles.filter(r => r.team === 'demon' || r.team === '恶魔');
-                
-                const charBottomHtml = `
-                    <div style="text-align: center; display: table; margin-left: auto; margin-right: auto; max-width: 100%; width: ${isMobile ? '100%' : 620 * fontSizeMultiplier}px; border: ${4 * fontSizeMultiplier}px solid rgba(201, 192, 184); margin-top: -2px; position: relative; z-index: 1; box-sizing: border-box;">
-                        <div style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; align-items: center; padding: ${4 * fontSizeMultiplier}px 0; box-sizing: border-box; overflow: hidden;">
-                            ${townsfolkRolesList.map(role => `
-                                <img src="${convertToLocalPath(role.image)}" style="height: ${29 * fontSizeMultiplier}px; width: ${29 * fontSizeMultiplier}px; margin: 0px -5px 0px 0px; filter: grayscale(0%); flex-shrink: 0;">
-                            `).join('')}
-                            ${outsiderRolesList.map(role => `
-                                <img src="${convertToLocalPath(role.image)}" style="height: ${29 * fontSizeMultiplier}px; width: ${29 * fontSizeMultiplier}px; margin: 0px -5px 0px 0px; filter: grayscale(0%); flex-shrink: 0;">
-                            `).join('')}
-                            ${minionRolesList.map(role => `
-                                <img src="${convertToLocalPath(role.image)}" style="height: ${29 * fontSizeMultiplier}px; width: ${29 * fontSizeMultiplier}px; margin: 0px -5px 0px 0px; filter: grayscale(0%); flex-shrink: 0;">
-                            `).join('')}
-                            ${demonRolesList.map(role => `
-                                <img src="${convertToLocalPath(role.image)}" style="height: ${29 * fontSizeMultiplier}px; width: ${29 * fontSizeMultiplier}px; margin: 0px -5px 0px 0px; filter: grayscale(0%); flex-shrink: 0;">
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
-                
-                // 组装完整的细节图HTML - 模仿剧本图的布局样式
-                printPage.innerHTML = `
-                    <div style="display: flex; flex-direction: column; height: 100%; width: 100% position: relative; max-width: 100%; box-sizing: border-box;">
-                        <!-- 顶部区域：剧本标题 -->
-                        <div style="display: flex; justify-content: center; margin-bottom: 20px; padding-top: 10px;">
-                            <div style="font-family: 'Philo', serif; font-size: ${34 * fontSizeMultiplier}px; text-align: center; color: #800000; font-weight: bold;">
-                                ${scriptName}
-                            </div>
-                        </div>
-                        
-                        <!-- 中间主体区域 -->
-                        <div style="display: flex; flex: 1; position: relative; max-width: 100%; box-sizing: border-box; margin: 0 ${isMobile ? '10px' : '20px'};">
-                            <!-- 左侧首夜顺序 -->
-                            <div style="width: ${isMobile ? 20 * fontSizeMultiplier : 40 * fontSizeMultiplier}px; display: flex; flex-direction: column; align-items: center; padding-right: 5px;">
-                                ${firstNightHtml}
-                                <div style="font-family: 'Philo', serif; font-size: ${10 * fontSizeMultiplier}px; padding: 5px 0; color: #333; font-weight: bold; line-height: 1.5; white-space: pre;">首<br>夜</div>
-                            </div>
-                            
-                            <!-- 左侧分割线（首夜） -->
-                            <div style="display: flex; flex-direction: column; align-items: center; padding: 0 2px;">
-                                <div style="flex: 1; width: 1px; background: #333;"></div>
-                                <div style="flex: 1; width: 1px; background: #333;"></div>
-                            </div>
-                            
-                            <!-- 中间内容区域 -->
-                            <div style="flex: 1; padding: 0 10px; max-width: 100%; box-sizing: border-box;">
-                                <!-- 传奇角色 -->
-                                ${fabledRoles.length > 0 ? `
-                                    <div style="margin-bottom: 20px;">
-                                        <div style="font-family: 'Philo', serif; font-size: 16px; font-weight: bold; color: #7a6550; padding-bottom: 3px; margin-bottom: 10px; display: flex; align-items: center;">
-                                            <span>传奇角色</span>
-                                            <div style="flex: 1; height: 1px; background: #7a6550; margin-left: 10px;"></div>
-                                        </div>
-                                        <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-                                            ${fabledRoles.map(role => `
-                                                <div style="flex: 0 1 ${isMobile ? '100%' : 'calc(50% - 10px)'} ; min-width: ${isMobile ? '100%' : '250px'}; max-width: 100%; box-sizing: border-box;">
-                                                    <div style="display: flex; align-items: flex-start;">
-                                                        <img src="${convertToLocalPath(role.image)}" style="width: ${isMobile ? 50 : 60}px; height: ${isMobile ? 50 : 60}px; object-fit: cover; margin-right: 10px; flex-shrink: 0;">
-                                                        <div style="flex: 1; min-width: 0;">
-                                                            <div style="font-weight: bold; font-size: ${13 * fontSizeMultiplier}px; color: #7a6550; margin-bottom: 2px;">${role.name}</div>
-                                                            <div style="font-size: ${11 * fontSizeMultiplier}px; line-height: 1.3; color: #333;">${role.ability || ''}</div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            `).join('')}
-                                        </div>
-                                    </div>
-                                ` : ''}
+                                    html += `<strong style="color: ${stateColor};">${state.name}</strong>：${state.description}<br>`;
+                                });
                                 
-                                <!-- 相克规则 -->
-                                ${jinxRules.length > 0 ? `
-                                    <div style="margin-bottom: 20px;">
-                                        <div style="font-family: 'Philo', serif; font-size: ${16 * fontSizeMultiplier}px; font-weight: bold; color: #760A0D; padding-bottom: 3px; margin-bottom: 10px; display: flex; align-items: center;">
-                                            <span>相克规则</span>
-                                            <div style="flex: 1; height: 1px; background: #760A0D; margin-left: 10px;"></div>
-                                        </div>
-                                        <div style="padding: 10px;">
-                                            <!-- 灯神图标和说明 -->
-                                            <div style="display: flex; align-items: flex-start; margin-bottom: 15px; gap: 10px;">
-                                                <img src="images/djinn.png" style="width: ${isMobile ? 50 * fontSizeMultiplier : 60 * fontSizeMultiplier}px; height: ${isMobile ? 50 * fontSizeMultiplier : 60 * fontSizeMultiplier}px; object-fit: cover; flex-shrink: 0;">
-                                                <div style="flex: 1;">
-                                                    <div style="font-weight: bold; font-size: ${14 * fontSizeMultiplier}px; color: #760A0D; margin-bottom: 5px;">灯神</div>
-                                                    <div style="font-size: ${11 * fontSizeMultiplier}px; line-height: 1.4; color: #333;">使用灯神的相克规则。所有玩家都会知道其内容。</div>
-                                                </div>
-                                            </div>
-                                            <!-- 相克规则列表 -->
-                                            ${jinxRules.map(rule => `
-                                                <div style="margin-bottom: 10px; display: flex; align-items: flex-start; gap: 10px;">
-                                                    <div style="display: flex; flex-direction: row; gap: 5px; flex-shrink: 0;">
-                                                        <img src="${convertToLocalPath(allRoles.find(r => r.name === rule.jinxRole1)?.image || '')}" style="width: ${isMobile ? 30 * fontSizeMultiplier : 40 * fontSizeMultiplier}px; height: ${isMobile ? 30 * fontSizeMultiplier : 40 * fontSizeMultiplier}px; object-fit: cover; border-radius: 3px;">
-                                                        <img src="${convertToLocalPath(allRoles.find(r => r.name === rule.jinxRole2)?.image || '')}" style="width: ${isMobile ? 30 * fontSizeMultiplier : 40 * fontSizeMultiplier}px; height: ${isMobile ? 30 * fontSizeMultiplier : 40 * fontSizeMultiplier}px; object-fit: cover; border-radius: 3px;">
-                                                    </div>
-                                                    <div style="flex: 1; font-size: ${11 * fontSizeMultiplier}px; line-height: 1.4; color: #333;">
-                                                        ${rule.jinxRule}
-                                                    </div>
-                                                </div>
-                                            `).join('')}
-                                        </div>
-                                    </div>
-                                ` : ''}
-                                
-                                <!-- 私货商人 -->
-                                ${bootleggerRules.length > 0 ? `
-                                    <div style="margin-bottom: 20px;">
-                                        <div style="font-family: 'Philo', serif; font-size: ${16 * fontSizeMultiplier}px; font-weight: bold; color: #760A0D; padding-bottom: 3px; margin-bottom: 10px; display: flex; align-items: center;">
-                                            <span>私货商人</span>
-                                            <div style="flex: 1; height: 1px; background: #760A0D; margin-left: 10px;"></div>
-                                        </div>
-                                        <div style="padding: 10px;">
-                                            <!-- 私货商人图标和标题 -->
-                                            <div style="display: flex; align-items: center; margin-bottom: 10px; gap: 10px;">
-                                                <img src="${fabledRoles.find(role => role.name.includes('私货商人'))?.image || 'images/Bootlegger.png'}" style="width: ${isMobile ? 30 * fontSizeMultiplier : 40 * fontSizeMultiplier}px; height: ${isMobile ? 30 * fontSizeMultiplier : 40 * fontSizeMultiplier}px; object-fit: cover; flex-shrink: 0;">
-                                                <div style="font-weight: bold; font-size: ${14 * fontSizeMultiplier}px; color: #760A0D;">剧本自制规则</div>
-                                            </div>
-                                            <!-- 私货商人规则列表 -->
-                                            <div style="margin-left: ${isMobile ? 40 : 50}px;">
-                                                ${bootleggerRules.map(rule => `
-                                                    <div style="margin-bottom: 6px; display: flex; align-items: flex-start; gap: 8px;">
-                                                        <div style="flex-shrink: 0; margin-top: 2px; font-weight: bold;">•</div>
-                                                        <div style="flex: 1; font-size: ${11 * fontSizeMultiplier}px; line-height: 1.4; color: #333;">
-                                                            ${rule}
-                                                        </div>
-                                                    </div>
-                                                `).join('')}
-                                            </div>
-                                        </div>
-                                    </div>
-                                ` : ''}
-                                
-                                <!-- 旅行者 -->
-                                ${travellerRoles.length > 0 ? `
-                                    <div style="margin-bottom: 20px;">
-                                        <div style="font-family: 'Philo', serif; font-size: 16px; font-weight: bold; color: #500050; padding-bottom: 3px; margin-bottom: 10px; display: flex; align-items: center;">
-                                            <span>旅行者</span>
-                                            <div style="flex: 1; height: 1px; background: #500050; margin-left: 10px;"></div>
-                                        </div>
-                                        <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-                                            ${travellerRoles.map(role => `
-                                                <div style="flex: 0 1 ${isMobile ? '100%' : 'calc(50% - 10px)'} ; min-width: ${isMobile ? '100%' : '250px'}; max-width: 100%; box-sizing: border-box;">
-                                                    <div style="display: flex; align-items: flex-start;">
-                                                        <img src="${convertToLocalPath(role.image)}" style="width: ${isMobile ? 50 : 60}px; height: ${isMobile ? 50 : 60}px; object-fit: cover; margin-right: 10px; flex-shrink: 0;">
-                                                        <div style="flex: 1; min-width: 0;">
-                                                            <div style="font-weight: bold; font-size: ${13 * fontSizeMultiplier}px; color: #500050; margin-bottom: 2px;">${role.name}</div>
-                                                            <div style="font-size: ${11 * fontSizeMultiplier}px; line-height: 1.3; color: #333;">${role.ability || ''}</div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            `).join('')}
-                                        </div>
-                                    </div>
-                                ` : ''}
-                            </div>
-                            
-                            <!-- 右侧分割线（他夜） -->
-                            <div style="display: flex; flex-direction: column; align-items: center; padding: 0 2px;">
-                                <div style="flex: 1; width: 1px; background: #333;"></div>
-                                <div style="flex: 1; width: 1px; background: #333;"></div>
-                            </div>
-                            
-                            <!-- 右侧其他夜顺序 -->
-                            <div style="width: ${isMobile ? 20 * fontSizeMultiplier : 40 * fontSizeMultiplier}px; display: flex; flex-direction: ${!reverseOtherNight ? 'column' : 'column-reverse'}; align-items: center; padding-left: 5px;">
-                                ${otherNightHtml}
-                                <div style="font-family: 'Philo', serif; font-size: ${10 * fontSizeMultiplier}px; padding: 5px 0; color: #333; font-weight: bold; line-height: 1.5; white-space: pre;${!reverseOtherNight ? '' : ' transform: rotate(180deg);'}">他<br>夜</div>
-                            </div>
-                        </div>
-                        
-                        <!-- 底部区域 -->
-                        <div style="margin-top: 20px; padding-bottom: 10px;">
-                            <!-- 玩家数量表格 -->
-                            ${playerCountHtml}
-                            
-                            <!-- 底部角色图标行 -->
-                            ${charBottomHtml}
-                        </div>
-                    </div>
-                `;
-                
-                // 创建按钮容器 - 悬浮在屏幕正中
-                const buttonContainer = document.createElement('div');
-                buttonContainer.style.cssText = `
-                    position: fixed;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    display: flex;
-                    gap: 12px;
-                    z-index: 10001;
-                    padding: 15px 20px;
-                    background: rgba(255, 255, 255, 0.95);
-                    border-radius: 12px;
-                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-                    justify-content: center;
-                    flex-shrink: 0;
-                `;
-                
-                // 下载按钮
-                const downloadButton = document.createElement('button');
-                downloadButton.innerHTML = '下载图片';
-                downloadButton.style.cssText = `
-                    padding: ${isMobile ? '15px 25px' : '10px 20px'};
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                    color: white;
-                    border: none;
-                    border-radius: ${isMobile ? '12px' : '8px'};
-                    cursor: pointer;
-                    font-size: ${isMobile ? '16px' : '14px'};
-                    font-weight: 500;
-                    min-height: ${isMobile ? '50px' : 'auto'};
-                    min-width: ${isMobile ? '120px' : 'auto'};
-                    touch-action: manipulation;
-                `;
-                downloadButton.onclick = function() {
-                    console.log('【调试】下载按钮被点击');
-                    // 保存原始样式
-                    const originalMaxHeight = scriptPage.style.maxHeight;
-                    const originalOverflowY = scriptPage.style.overflowY;
-                    const originalWidth = scriptPage.style.width;
-                    const originalHeight = scriptPage.style.height;
-                    console.log('【调试】原始样式 - maxHeight:', originalMaxHeight, 'overflowY:', originalOverflowY, 'width:', originalWidth, 'height:', originalHeight);
-                    
-                    // 临时移除max-height和overflow限制以获取完整内容
-                    scriptPage.style.maxHeight = 'none';
-                    scriptPage.style.overflowY = 'visible';
-
-                    // 强制使用A4比例
-                    const isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-                    const a4Ratio = 1.414;
-                    let a4Width = 1240;
-                    let a4Height = a4Width * a4Ratio;
-                    scriptPage.style.width = a4Width + 'px';
-                    scriptPage.style.height = a4Height + 'px';
-
-
-                    // 方案二和方案三没有内边距
-                    if (scriptLayout === 'scheme2' || scriptLayout === 'scheme3')
-                        scriptPage.style.padding = '0';
-                    else
-                        scriptPage.style.padding = '0.3in';
-                    
-                    // 等待DOM更新后再调用渲染
-                    const DOM_RERNDER_TIMEOUT = 300;
-                    setTimeout(() => {
-                        // 如果高度不够容纳内容，就以高度为准重新计算宽度
-                        const fullHeight = Math.max(scriptPage.scrollHeight, scriptPage.offsetHeight);
-                        if (fullHeight > a4Height) {
-                            a4Height = fullHeight;
-                            a4Width = a4Height / a4Ratio;
-                            scriptPage.style.width = a4Width + 'px';
-                            scriptPage.style.height = a4Height + 'px';
-                        }
-
-                        // 生成图片前，将外部图片URL转换为Base64
-                        const convertImagesToBase64 = async () => {
-                            const scriptImages = scriptPage.querySelectorAll('img');
-                            const externalImages = [];
-                            
-                            // 获取所有已有角色的图片URL（内置角色）
-                            const builtInRoleImages = new Set();
-                            const builtInRoles = [
-                                ...(window.townsfolkRoles || []),
-                                ...(window.outsidersRoles || []),
-                                ...(window.minionsRoles || []),
-                                ...(window.demonsRoles || []),
-                                ...(window.fabledRoles || []),
-                                ...(window.travellersRoles || [])
-                            ];
-                            builtInRoles.forEach(role => {
-                                if (role.image) {
-                                    builtInRoleImages.add(role.image);
-                                }
-                            });
-                            
-                            // 收集所有外部图片，但跳过已有角色的图片
-                            scriptImages.forEach(img => {
-                                const src = img.src || img.dataset.src;
-                                if (src && (src.startsWith('http://') || src.startsWith('https://'))) {
-                                    // 检查是否是已有角色的图片
-                                    const isBuiltInRoleImage = Array.from(builtInRoleImages).some(builtInImg => 
-                                        src === builtInImg || 
-                                        src.includes(builtInImg) || 
-                                        builtInImg.includes(src.split('/').pop())
-                                    );
-                                    
-                                    if (!isBuiltInRoleImage) {
-                                        externalImages.push(img);
-                                    } else {
-                                        console.log(`[图片生成] 跳过已有角色图片: ${src.substring(0, 50)}...`);
-                                    }
-                                }
-                            });
-                            
-                            if (externalImages.length > 0) {
-                                console.log(`[图片生成] 发现 ${externalImages.length} 个外部图片需要转换`);
-                                
-                                // 显示进度弹窗
-                                const progressModal = document.createElement('div');
-                                progressModal.style.cssText = `
-                                    position: fixed;
-                                    top: 50%;
-                                    left: 50%;
-                                    transform: translate(-50%, -50%);
-                                    background: white;
-                                    padding: 30px;
-                                    border-radius: 12px;
-                                    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-                                    z-index: 10001;
-                                    text-align: center;
-                                    min-width: 300px;
-                                `;
-                                progressModal.innerHTML = `
-                                    <h3 style="margin-top:0;color:#333;">正在转换图片...</h3>
-                                    <div id="generate-progress-text" style="color:#666;margin:15px 0;">准备中...</div>
-                                    <div style="background:#e0e0e0;border-radius:10px;height:20px;overflow:hidden;">
-                                        <div id="generate-progress-bar" style="background:linear-gradient(90deg,#6b46c1,#9f7aea);height:100%;width:0%;transition:width 0.3s;"></div>
-                                    </div>
-                                `;
-                                document.body.appendChild(progressModal);
-                                
-                                // 逐个转换图片
-                                for (let i = 0; i < externalImages.length; i++) {
-                                    const img = externalImages[i];
-                                    const src = img.src || img.dataset.src;
-                                    try {
-                                        if (window.urlToBase64) {
-                                            const base64 = await window.urlToBase64(src);
-                                            img.src = base64;
-                                            if (img.dataset.src) {
-                                                img.dataset.src = base64;
-                                            }
-                                        }
-                                        console.log(`[图片生成] Base64转换成功: ${src.substring(0, 50)}...`);
-                                    } catch (error) {
-                                        console.error(`[图片生成] Base64转换失败:`, error);
-                                        // 转换失败，使用默认图片
-                                        img.src = './images/townfolk.png';
-                                        if (img.dataset.src) {
-                                            img.dataset.src = './images/townfolk.png';
-                                        }
-                                    }
-                                    
-                                    // 更新进度
-                                    const percent = Math.round(((i + 1) / externalImages.length) * 100);
-                                    document.getElementById('generate-progress-bar').style.width = percent + '%';
-                                    document.getElementById('generate-progress-text').textContent = 
-                                        `正在转换图片 (${i + 1}/${externalImages.length})`;
+                                // 自制规则
+                                if (bootleggerText) {
+                                    html += '<strong style="color: #d97706;">私货商人</strong>：' + bootleggerText.replace(/\n/g, '<br>');
                                 }
                                 
-                                // 关闭进度弹窗
-                                if (progressModal.parentNode) {
-                                    document.body.removeChild(progressModal);
-                                }
-                            }
-                        };
+                                html += '</div>';
+                                html += '</div>';
+                                html += '</div>';
+                                html += '</div>';
+                                return html;
+                            })()}
+                        </div>
 
-                        // 执行图片转换并生成
-                        convertImagesToBase64().then(() => {
-                            htmlToImage.toCanvas(scriptPage, {
-                                backgroundColor: hexToRgba(customBgColor, bgOpacity),
-                                canvasWidth: Math.ceil(a4Width),
-                                canvasHeight: Math.ceil(a4Height)
-                            }).then(function(canvas) {
-                                // 恢复原始样式
-                                scriptPage.style.maxHeight = originalMaxHeight;
-                                scriptPage.style.overflowY = originalOverflowY;
-                                scriptPage.style.width = originalWidth;
-                                scriptPage.style.height = originalHeight;
-                                
-                                // 使用更兼容移动端的下载方式
-                                const dataUrl = canvas.toDataURL('image/png');
-                                const filename = editionName + '_剧本图.png';
-                                
-                                // 检测是否为移动端
-                                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-                                
-                                // 优化移动端下载逻辑
-                                if (isMobile) {
-                                    // 方案1：尝试使用Blob对象和download属性
-                                    try {
-                                        const blob = dataURLToBlob(dataUrl);
-                                        const url = URL.createObjectURL(blob);
-                                        const link = document.createElement('a');
-                                        link.href = url;
-                                        link.download = filename;
-                                        link.style.display = 'none';
-                                        
-                                        // 添加到文档并触发点击
-                                        document.body.appendChild(link);
-                                        
-                                        // 移动端需要模拟真实点击
-                                        if (navigator.userAgent.match(/iPad|iPhone|iPod/)) {
-                                            // iOS设备特殊处理
-                                            const event = document.createEvent('MouseEvents');
-                                            event.initMouseEvent('click', true, true, window, 1, 0, 0, 0, 0, false, false, false, false, 0, null);
-                                            link.dispatchEvent(event);
-                                        } else {
-                                            // Android设备
-                                            link.click();
-                                        }
-                                        
-                                        setTimeout(() => {
-                                            document.body.removeChild(link);
-                                            URL.revokeObjectURL(url);
-                                        }, 100);
-                                        
-                                        // 提示用户
-                                        setTimeout(() => {
-                                            alert('请在弹出的下载提示中选择保存图片');
-                                        }, 500);
-                                    } catch (e) {
-                                        console.error('Blob下载失败:', e);
-                                        // 方案2：在新窗口打开图片，让用户长按保存
-                                        const newWindow = window.open();
-                                        if (newWindow) {
-                                            newWindow.document.write('<html><head><title>' + filename + '</title></head><body style="margin:0;display:flex;justify-content:center;align-items:center;background:#f0f0f0;"><img src="' + dataUrl + '" style="max-width:100%;height:auto;" onclick="window.close()"></body></html>');
-                                            newWindow.document.close();
-                                            alert('图片已在新窗口打开，请长按图片保存到相册');
-                                        } else {
-                                            // 方案3：显示错误提示
-                                            alert('无法自动下载图片，请截图保存');
-                                        }
-                                    }
-                                } else {
-                                    // 桌面端：直接下载
-                                    const link = document.createElement('a');
-                                    link.download = filename;
-                                    link.href = dataUrl;
-                                    link.style.display = 'none';
-                                    document.body.appendChild(link);
-                                    link.click();
-                                    setTimeout(() => {
-                                        document.body.removeChild(link);
-                                    }, 100);
-                                }
-                            });
-                        }).catch(function(error) {
-                            console.error('生成图片失败:', error);
-                            alert('生成图片失败，请重试');
-                            // 恢复原始样式
-                            scriptPage.style.maxHeight = originalMaxHeight;
-                            scriptPage.style.overflowY = originalOverflowY;
-                            scriptPage.style.width = originalWidth;
-                            scriptPage.style.height = originalHeight;
-                        });
-                    }, DOM_RERNDER_TIMEOUT);
-                };
-                buttonContainer.appendChild(downloadButton);
-                
-                // 关闭按钮
-                const closeButton = document.createElement('button');
-                closeButton.innerHTML = '关闭';
-                closeButton.style.cssText = `
-                    padding: ${isMobile ? '15px 25px' : '10px 20px'};
-                    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
-                    color: white;
-                    border: none;
-                    border-radius: ${isMobile ? '12px' : '8px'};
-                    cursor: pointer;
-                    font-size: ${isMobile ? '16px' : '14px'};
-                    font-weight: 500;
-                    min-height: ${isMobile ? '50px' : 'auto'};
-                    min-width: ${isMobile ? '120px' : 'auto'};
-                    touch-action: manipulation;
-                `;
-                closeButton.onclick = function() {
-                    document.body.removeChild(previewContainer);
-                };
-                buttonContainer.appendChild(closeButton);
-                
-                // 先添加按钮容器，再添加剧本图页面，让按钮显示在上方
-                previewContainer.appendChild(buttonContainer);
-                previewContainer.appendChild(printPage);
-                document.body.appendChild(previewContainer);
-                
-            } catch (error) {
-                alert('生成细节图失败，请检查角色数据');
-                console.error('生成细节图错误:', error);
-            }
-        }
+                        <!-- 底部装饰图片 -->
+                        <div style="display: flex; justify-content: center; margin-top: auto;">
+                            <img src="images/dibu.png" style="width: 100%; height: auto; max-height: 60px; object-fit: contain;" onerror="this.style.display='none'" alt="底部装饰">
+                        </div>
+                    </div>
 
+                    <!-- 右侧夜间顺序左侧色条 -->
+                    <div style="width: 5px; background-color: rgb(3, 115, 173);"></div>
 
-
-function toggleScriptConfig() {
-            const content = document.getElementById('script-config-content');
-            const toggle = document.getElementById('script-config-toggle');
-            if (content.style.display === 'none') {
-                content.style.display = 'block';
-                toggle.textContent = '▼';
-            } else {
-                content.style.display = 'none';
-                toggle.textContent = '▶';
-            }
-        }
-
-function toggleScriptConfigModal() {
-            const existingModal = document.getElementById('script-config-modal');
-            if (existingModal) {
-                document.body.removeChild(existingModal);
-                return;
-            }
-            
-            const modal = document.createElement('div');
-            modal.id = 'script-config-modal';
-            modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: flex; justify-content: center; align-items: center; z-index: 10000;';
-            
-            const modalContent = document.createElement('div');
-            modalContent.className = 'script-config-modal';
-            modalContent.style.cssText = 'background: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 800px; max-height: 80vh; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.3);';
-            
-            modalContent.innerHTML = `
-                <h2 style="margin-top: 0; color: #6b46c1; margin-bottom: 24px;">🎨 剧本图设置</h2>
-                
-                <!-- 方案选择 -->
-                <div style="margin-bottom: 20px; padding: 15px; background: linear-gradient(135deg, #f0f4ff 0%, #e8efff 100%); border-radius: 10px; border: 1px solid #d0d7ff;">
-                    <h4 style="margin: 0 0 10px 0; color: #4f46e5; font-size: 14px; font-weight: bold;">布局方案</h4>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 10px; background: white; border-radius: 8px; border: 2px solid transparent; transition: all 0.2s;">
-                            <input type="radio" name="scriptLayout" value="scheme1" style="width: 18px; height: 18px;">
-                            <div>
-                                <div style="font-weight: 600; color: #333;">方案一</div>
-                                <div style="font-size: 12px; color: #666;">仿国外脚本布局</div>
+                    <!-- ===== 右侧：其他夜晚顺序 ===== -->
+                    <div style="width: 65px; display: flex; flex-direction: column; align-items: center; padding-top: 20px; padding-bottom: 100px; position: relative; background-color: rgb(14, 41, 60);">
+                        ${scriptConfig.showNightOrder ? `
+                        <!-- 其他夜晚顺序（与首夜顺序平齐） -->
+                        <div style="display: flex; flex-direction: column; align-items: center; flex: 1;">
+                            <!-- 顶部文字：其他夜晚 -->
+                            <div style="display: flex; flex-direction: column; align-items: center; margin-bottom: 8px;">
+                                <span style="font-size: 12px; font-weight: bold; color: white; letter-spacing: 2px;">其他</span>
+                                <span style="font-size: 12px; font-weight: bold; color: white; letter-spacing: 2px;">夜晚</span>
                             </div>
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 10px; background: white; border-radius: 8px; border: 2px solid transparent; transition: all 0.2s;">
-                            <input type="radio" name="scriptLayout" value="scheme2" style="width: 18px; height: 18px;">
-                            <div>
-                                <div style="font-weight: 600; color: #333;">方案二</div>
-                                <div style="font-size: 12px; color: #666;">自制彩色布局</div>
-                            </div>
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 10px; background: white; border-radius: 8px; border: 2px solid transparent; transition: all 0.2s;">
-                            <input type="radio" name="scriptLayout" value="scheme3" style="width: 18px; height: 18px;">
-                            <div>
-                                <div style="font-weight: 600; color: #333;">方案三</div>
-                                <div style="font-size: 12px; color: #666;">仿博物馆风格布局</div>
-                            </div>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- 显示选项 -->
-                <div style="margin-bottom: 20px;">
-                    <h4 style="margin: 0 0 10px 0; color: var(--text-color); font-size: 14px; font-weight: bold;">显示选项</h4>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
-                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
-                            <input type="checkbox" id="modal-showNightOrder" checked style="width: 16px; height: 16px;">
-                            <span>显示夜间顺序</span>
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
-                            <input type="checkbox" id="modal-showConfigTable" checked style="width: 16px; height: 16px;">
-                            <span>显示配置表</span>
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
-                            <input type="checkbox" id="modal-showCustomRules" style="width: 16px; height: 16px;">
-                            <span>显示剧本自制规则</span>
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
-                            <input type="checkbox" id="modal-showTravellersFabled" checked style="width: 16px; height: 16px;">
-                            <span>显示传奇和旅行者</span>
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
-                            <input type="checkbox" id="modal-showJinxRules" checked style="width: 16px; height: 16px;">
-                            <span>显示相克规则</span>
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
-                            <input type="checkbox" id="modal-horizontalLayout" style="width: 16px; height: 16px;">
-                            <span>角色横向排列</span>
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
-                            <input type="checkbox" id="modal-reverseOtherNight" checked style="width: 16px; height: 16px;">
-                            <span>其他夜晚顺序倒序（默认）</span>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- 背景颜色设置 -->
-                <div style="margin-bottom: 20px;">
-                    <h4 style="margin: 0 0 10px 0; color: var(--text-color); font-size: 14px; font-weight: bold;">背景颜色</h4>
-                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                        <input type="color" id="modal-bg-color" value="#f6f6f4" style="width: 60px; height: 36px; border: 1px solid var(--border-color); border-radius: 4px; cursor: pointer;">
-                        <input type="text" id="modal-bg-color-text" value="#f6f6f4" style="flex: 1; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px;" placeholder="输入颜色值，如 #f6f6f4 或 rgb(246, 246, 244)">
-                    </div>
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <label style="font-size: 14px; color: #666; min-width: 60px;">透明度:</label>
-                        <input type="range" id="modal-bg-opacity" min="0" max="100" value="100" style="flex: 1; cursor: pointer;">
-                        <span id="modal-bg-opacity-value" style="font-size: 14px; color: #666; min-width: 40px; text-align: right;">100%</span>
-                    </div>
-                </div>
-
-                <!-- 剧本标题图片 -->
-                <div style="margin-bottom: 20px;">
-                    <h4 style="margin: 0 0 10px 0; color: var(--text-color); font-size: 14px; font-weight: bold;">剧本标题图片（选填）</h4>
-                    <div style="display: flex; flex-direction: column; gap: 10px;">
-                        <div>
-                            <label style="font-size: 12px; color: #666; display: block; margin-bottom: 3px;">API密钥</label>
-                            <input type="password" id="modal-ai-api-key" placeholder="输入火山引擎API密钥" style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px; box-sizing: border-box;">
+                            ${otherNightIcons}
                         </div>
-                        <div>
-                            <label style="font-size: 12px; color: #666; display: block; margin-bottom: 3px;">模型端点ID</label>
-                            <input type="text" id="modal-ai-model-endpoint" placeholder="输入模型端点ID（如：ep-xxxx）" style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px; box-sizing: border-box;">
-                        </div>
-                        <button type="button" onclick="generateAiArtTextFromModal()" style="padding: 8px 16px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 4px; font-size: 14px; cursor: pointer; max-width: 200px;">
-                            生成并下载标题图片
-                        </button>
+                        ` : ''}
                     </div>
-                </div>
 
-                <!-- 阵营名称自定义 -->
-                <div style="margin-bottom: 20px;">
-                    <h4 style="margin: 0 0 10px 0; color: var(--text-color); font-size: 14px; font-weight: bold;">阵营名称自定义（留空使用默认名称）</h4>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                        <div style="display: flex; flex-direction: column; gap: 5px;">
-                            <label style="font-size: 14px; color: #1e3a5f; font-weight: bold;">镇民</label>
-                            <input type="text" id="modal-custom-townsfolk-name" placeholder="镇民" style="padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px;">
-                            <input type="color" id="modal-custom-townsfolk-color" value="#1e3a5f" style="width: 100%; height: 36px; border: 1px solid var(--border-color); border-radius: 4px; cursor: pointer;">
-                        </div>
-                        <div style="display: flex; flex-direction: column; gap: 5px;">
-                            <label style="font-size: 14px; color: #0d5c5c; font-weight: bold;">外来者</label>
-                            <input type="text" id="modal-custom-outsider-name" placeholder="外来者" style="padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px;">
-                            <input type="color" id="modal-custom-outsider-color" value="#0d5c5c" style="width: 100%; height: 36px; border: 1px solid var(--border-color); border-radius: 4px; cursor: pointer;">
-                        </div>
-                        <div style="display: flex; flex-direction: column; gap: 5px;">
-                            <label style="font-size: 14px; color: #8b4513; font-weight: bold;">爪牙</label>
-                            <input type="text" id="modal-custom-minion-name" placeholder="爪牙" style="padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px;">
-                            <input type="color" id="modal-custom-minion-color" value="#8b4513" style="width: 100%; height: 36px; border: 1px solid var(--border-color); border-radius: 4px; cursor: pointer;">
-                        </div>
-                        <div style="display: flex; flex-direction: column; gap: 5px;">
-                            <label style="font-size: 14px; color: #8b0000; font-weight: bold;">恶魔</label>
-                            <input type="text" id="modal-custom-demon-name" placeholder="恶魔" style="padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px;">
-                            <input type="color" id="modal-custom-demon-color" value="#8b0000" style="width: 100%; height: 36px; border: 1px solid var(--border-color); border-radius: 4px; cursor: pointer;">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 自定义阵营 -->
-                <div style="margin-bottom: 20px;">
-                    <h4 style="margin: 0 0 10px 0; color: var(--text-color); font-size: 14px; font-weight: bold;">自定义阵营（选填）</h4>
-                    <div id="modal-custom-teams-container" style="display: flex; flex-direction: column; gap: 15px;">
-                    </div>
-                    <button type="button" onclick="addCustomTeamModal()" style="margin-top: 10px; padding: 8px 16px; background: #28a745; color: white; border: none; border-radius: 4px; font-size: 14px; cursor: pointer;">
-                        添加阵营
-                    </button>
-                </div>
-
-                <div style="margin-top: 30px; text-align: right;">
-                    <button onclick="saveScriptConfig()" style="background: linear-gradient(135deg, #38a169 0%, #48bb78 100%); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-size: 14px; cursor: pointer; margin-right: 10px;">保存设置</button>
-                    <button onclick="document.body.removeChild(document.getElementById('script-config-modal'))" style="background: linear-gradient(135deg, #e53e3e 0%, #fc8181 100%); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-size: 14px; cursor: pointer;">关闭</button>
                 </div>
             `;
-            
-            modal.appendChild(modalContent);
-            document.body.appendChild(modal);
-            
-            // 加载当前设置到弹窗
-            loadScriptConfigToModal();
-            
-            // 点击背景关闭
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    document.body.removeChild(modal);
-                }
-            });
-        }
 
-function loadScriptConfigToModal() {
-            // 布局方案
-            const scriptLayout = document.getElementById('script-layout');
-            const layoutRadios = document.querySelectorAll('input[name="scriptLayout"]');
-            layoutRadios.forEach(radio => {
-                if (scriptLayout && scriptLayout.value === radio.value) {
-                    radio.checked = true;
-                } else if (!scriptLayout && radio.value === 'scheme1') {
-                    radio.checked = true;
-                }
-            });
-            
-            // 显示选项
-            const showNightOrder = document.getElementById('showNightOrder');
-            const showConfigTable = document.getElementById('showConfigTable');
-            const showCustomRules = document.getElementById('showCustomRules');
-            const showTravellersFabled = document.getElementById('showTravellersFabled');
-            const showJinxRules = document.getElementById('showJinxRules');
-            const horizontalLayout = document.getElementById('horizontalLayout');
-            const reverseOtherNight = document.getElementById('reverseOtherNight');
-            
-            if (showNightOrder) document.getElementById('modal-showNightOrder').checked = showNightOrder.checked;
-            if (showConfigTable) document.getElementById('modal-showConfigTable').checked = showConfigTable.checked;
-            if (showCustomRules) document.getElementById('modal-showCustomRules').checked = showCustomRules.checked;
-            if (showTravellersFabled) document.getElementById('modal-showTravellersFabled').checked = showTravellersFabled.checked;
-            if (showJinxRules) document.getElementById('modal-showJinxRules').checked = showJinxRules.checked;
-            if (horizontalLayout) document.getElementById('modal-horizontalLayout').checked = horizontalLayout.checked;
-            if (reverseOtherNight) document.getElementById('modal-reverseOtherNight').checked = reverseOtherNight.checked;
-            
-            // 背景颜色设置
-            const bgColorInput = document.getElementById('bg-color-setting');
-            const modalBgColor = document.getElementById('modal-bg-color');
-            const modalBgColorText = document.getElementById('modal-bg-color-text');
-            if (bgColorInput && modalBgColor && modalBgColorText) {
-                modalBgColor.value = bgColorInput.value;
-                modalBgColorText.value = bgColorInput.value;
-            }
-            
-            // 透明度设置
-            const bgOpacityInput = document.getElementById('bg-opacity-setting');
-            const modalBgOpacity = document.getElementById('modal-bg-opacity');
-            const modalBgOpacityValue = document.getElementById('modal-bg-opacity-value');
-            if (modalBgOpacity && modalBgOpacityValue) {
-                const opacity = bgOpacityInput ? parseInt(bgOpacityInput.value) : 100;
-                modalBgOpacity.value = opacity;
-                modalBgOpacityValue.textContent = opacity + '%';
-            }
-            
-            // 颜色选择器和文本框联动
-            modalBgColor.addEventListener('input', function() {
-                modalBgColorText.value = this.value;
-            });
-            modalBgColorText.addEventListener('input', function() {
-                const colorValue = this.value.trim();
-                if (/^#[0-9A-Fa-f]{6}$/.test(colorValue)) {
-                    modalBgColor.value = colorValue;
-                }
-            });
-            
-            // 透明度滑块联动
-            modalBgOpacity.addEventListener('input', function() {
-                modalBgOpacityValue.textContent = this.value + '%';
-            });
-            
-            // API设置
-            const apiKey = document.getElementById('ai-api-key');
-            const modelEndpoint = document.getElementById('ai-model-endpoint');
-            
-            if (apiKey) document.getElementById('modal-ai-api-key').value = apiKey.value;
-            if (modelEndpoint) document.getElementById('modal-ai-model-endpoint').value = modelEndpoint.value;
-            
-            // 阵营名称和颜色
-            const townsfolkName = document.getElementById('custom-townsfolk-name');
-            const townsfolkColor = document.getElementById('custom-townsfolk-color');
-            const outsiderName = document.getElementById('custom-outsider-name');
-            const outsiderColor = document.getElementById('custom-outsider-color');
-            const minionName = document.getElementById('custom-minion-name');
-            const minionColor = document.getElementById('custom-minion-color');
-            const demonName = document.getElementById('custom-demon-name');
-            const demonColor = document.getElementById('custom-demon-color');
-            
-            if (townsfolkName) document.getElementById('modal-custom-townsfolk-name').value = townsfolkName.value;
-            if (townsfolkColor) document.getElementById('modal-custom-townsfolk-color').value = townsfolkColor.value;
-            if (outsiderName) document.getElementById('modal-custom-outsider-name').value = outsiderName.value;
-            if (outsiderColor) document.getElementById('modal-custom-outsider-color').value = outsiderColor.value;
-            if (minionName) document.getElementById('modal-custom-minion-name').value = minionName.value;
-            if (minionColor) document.getElementById('modal-custom-minion-color').value = minionColor.value;
-            if (demonName) document.getElementById('modal-custom-demon-name').value = demonName.value;
-            if (demonColor) document.getElementById('modal-custom-demon-color').value = demonColor.value;
-            
-            // 加载自定义阵营
-            const container = document.getElementById('modal-custom-teams-container');
-            container.innerHTML = '';
-            
-            customTeams.forEach((team, index) => {
-                const teamGroup = document.createElement('div');
-                teamGroup.className = 'custom-team-group';
-                teamGroup.dataset.teamIndex = index;
-                teamGroup.style.cssText = `padding: 10px; background: rgba(0,0,0,0.03); border-radius: 6px; border: 1px solid #e9ecef;`;
-                
-                teamGroup.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
-                        <h4 style="margin: 0; font-size: 14px; color: #6b5a45;">阵营 ${index + 1}</h4>
-                        <button type="button" onclick="removeCustomTeam(${index})" style="padding: 4px 8px; background: #dc3545; color: white; border: none; border-radius: 3px; font-size: 12px; cursor: pointer;">
-                            删除
-                        </button>
-                    </div>
-                    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-                        <div style="flex: 1; min-width: 200px;">
-                            <label style="font-size: 14px; color: #6b5a45; font-weight: bold; display: block; margin-bottom: 5px;">阵营名称</label>
-                            <input type="text" class="custom-team-name" value="${team.name || ''}" placeholder="输入自定义阵营名称" style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px; box-sizing: border-box;">
-                        </div>
-                        <div style="flex: 1; min-width: 200px;">
-                            <label style="font-size: 14px; color: #6b5a45; font-weight: bold; display: block; margin-bottom: 5px;">阵营颜色</label>
-                            <input type="color" class="custom-team-color" value="${team.color || '#6b5a45'}" style="width: 100%; height: 36px; border: 1px solid var(--border-color); border-radius: 4px; cursor: pointer;">
-                        </div>
-                    </div>
-                    <div style="margin-top: 15px;">
-                        <label style="font-size: 14px; color: #6b5a45; font-weight: bold; display: block; margin-bottom: 5px;">从已选角色中添加</label>
-                        <div class="available-roles-container" style="display: flex; flex-wrap: wrap; gap: 8px; padding: 10px; background: rgba(0,0,0,0.03); border-radius: 4px; max-height: 120px; overflow-y: auto; margin-bottom: 10px;">
-                            ${(() => {
-                                const selectedRoles = getSelectedRoles();
-                                if (selectedRoles.length === 0) {
-                                    return '<span style="color: #999; font-size: 13px;">没有已选角色，请先在主界面选择角色</span>';
-                                }
-                                return selectedRoles.map(role => {
-                                    const isInTeam = team.roles && team.roles.some(r => r.id === role.id);
-                                    return `
-                                        <span style="display: inline-flex; align-items: center; gap: 5px; padding: 4px 8px; background: ${isInTeam ? 'rgba(107, 70, 193, 0.2)' : 'rgba(107, 70, 193, 0.1)'} ; border-radius: 4px; font-size: 12px; color: #6b46c1; cursor: ${isInTeam ? 'default' : 'pointer'} ; ${isInTeam ? 'opacity: 0.6;' : 'hover: background: rgba(107, 70, 193, 0.2);'}" ${!isInTeam ? `onclick="addRoleToCustomTeam(${index}, '${role.id}')"` : ''}>
-                                            <img src="${convertToLocalPath(role.image)}" style="width: 24px; height: 24px; object-fit: cover; border-radius: 3px;">
-                                            <span>${role.name}</span>
-                                        </span>
-                                    `;
-                                }).join('');
-                            })()}
-                        </div>
-                        <label style="font-size: 14px; color: #6b5a45; font-weight: bold; display: block; margin-bottom: 5px;">已添加的角色</label>
-                        <div class="custom-team-roles-container" style="display: flex; flex-wrap: wrap; gap: 8px; padding: 10px; background: rgba(0,0,0,0.05); border-radius: 4px; min-height: 40px;">
-                            ${team.roles && team.roles.length > 0 ? team.roles.map(role => `
-                                <span style="display: inline-flex; align-items: center; gap: 5px; padding: 4px 8px; background: rgba(107, 70, 193, 0.1); border-radius: 4px; font-size: 12px; color: #6b46c1;">
-                                    <img src="${convertToLocalPath(role.image)}" style="width: 24px; height: 24px; object-fit: cover; border-radius: 3px;">
-                                    <span>${role.name}</span>
-                                    <button onclick="removeRoleFromCustomTeam(${index}, '${role.id}')" style="margin-left: 5px; padding: 2px 6px; background: #dc3545; color: white; border: none; border-radius: 3px; font-size: 10px; cursor: pointer;">×</button>
-                                </span>
-                            `).join('') : '<span style="color: #999; font-size: 13px;">暂无角色，请从上方选择添加</span>'}
-                        </div>
-                    </div>
-                `;
-                
-                container.appendChild(teamGroup);
-            });
-        }
+            // 等待图片加载后截图
+            const images = container.querySelectorAll('img');
+            let loadedCount = 0;
+            const totalImages = images.length;
 
-function saveScriptConfig() {
-            // 布局方案
-            const layoutRadios = document.querySelectorAll('input[name="scriptLayout"]');
-            let selectedLayout = 'scheme1';
-            layoutRadios.forEach(radio => {
-                if (radio.checked) {
-                    selectedLayout = radio.value;
-                }
-            });
-            
-            // 保存布局方案到隐藏的input元素
-            let scriptLayoutInput = document.getElementById('script-layout');
-            if (!scriptLayoutInput) {
-                scriptLayoutInput = document.createElement('input');
-                scriptLayoutInput.type = 'hidden';
-                scriptLayoutInput.id = 'script-layout';
-                document.body.appendChild(scriptLayoutInput);
-            }
-            scriptLayoutInput.value = selectedLayout;
-            
-            // 显示选项
-            const showNightOrder = document.getElementById('showNightOrder');
-            const showConfigTable = document.getElementById('showConfigTable');
-            const showCustomRules = document.getElementById('showCustomRules');
-            const showTravellersFabled = document.getElementById('showTravellersFabled');
-            const showJinxRules = document.getElementById('showJinxRules');
-            const horizontalLayout = document.getElementById('horizontalLayout');
-            const reverseOtherNight = document.getElementById('reverseOtherNight');
-            
-            if (showNightOrder) showNightOrder.checked = document.getElementById('modal-showNightOrder').checked;
-            if (showConfigTable) showConfigTable.checked = document.getElementById('modal-showConfigTable').checked;
-            if (showCustomRules) showCustomRules.checked = document.getElementById('modal-showCustomRules').checked;
-            if (showTravellersFabled) showTravellersFabled.checked = document.getElementById('modal-showTravellersFabled').checked;
-            if (showJinxRules) showJinxRules.checked = document.getElementById('modal-showJinxRules').checked;
-            if (horizontalLayout) horizontalLayout.checked = document.getElementById('modal-horizontalLayout').checked;
-            if (reverseOtherNight) reverseOtherNight.checked = document.getElementById('modal-reverseOtherNight').checked;
-            
-            // 保存背景颜色设置到隐藏的input元素
-            let bgColorInput = document.getElementById('bg-color-setting');
-            if (!bgColorInput) {
-                bgColorInput = document.createElement('input');
-                bgColorInput.type = 'hidden';
-                bgColorInput.id = 'bg-color-setting';
-                document.body.appendChild(bgColorInput);
-            }
-            const modalBgColorText = document.getElementById('modal-bg-color-text');
-            if (modalBgColorText) {
-                bgColorInput.value = modalBgColorText.value.trim() || '#f6f6f4';
-            }
-            
-            // 保存透明度设置到隐藏的input元素
-            let bgOpacityInput = document.getElementById('bg-opacity-setting');
-            if (!bgOpacityInput) {
-                bgOpacityInput = document.createElement('input');
-                bgOpacityInput.type = 'hidden';
-                bgOpacityInput.id = 'bg-opacity-setting';
-                document.body.appendChild(bgOpacityInput);
-            }
-            const modalBgOpacity = document.getElementById('modal-bg-opacity');
-            if (modalBgOpacity) {
-                bgOpacityInput.value = modalBgOpacity.value;
-            }
-            
-            // API设置
-            const apiKey = document.getElementById('ai-api-key');
-            const modelEndpoint = document.getElementById('ai-model-endpoint');
-            
-            if (apiKey) apiKey.value = document.getElementById('modal-ai-api-key').value;
-            if (modelEndpoint) modelEndpoint.value = document.getElementById('ai-model-endpoint').value;
-            
-            // 阵营名称和颜色
-            const townsfolkName = document.getElementById('custom-townsfolk-name');
-            const townsfolkColor = document.getElementById('custom-townsfolk-color');
-            const outsiderName = document.getElementById('custom-outsider-name');
-            const outsiderColor = document.getElementById('custom-outsider-color');
-            const minionName = document.getElementById('custom-minion-name');
-            const minionColor = document.getElementById('custom-minion-color');
-            const demonName = document.getElementById('custom-demon-name');
-            const demonColor = document.getElementById('custom-demon-color');
-            
-            if (townsfolkName) townsfolkName.value = document.getElementById('modal-custom-townsfolk-name').value;
-            if (townsfolkColor) townsfolkColor.value = document.getElementById('modal-custom-townsfolk-color').value;
-            if (outsiderName) outsiderName.value = document.getElementById('modal-custom-outsider-name').value;
-            if (outsiderColor) outsiderColor.value = document.getElementById('modal-custom-outsider-color').value;
-            if (minionName) minionName.value = document.getElementById('modal-custom-minion-name').value;
-            if (minionColor) minionColor.value = document.getElementById('modal-custom-minion-color').value;
-            if (demonName) demonName.value = document.getElementById('modal-custom-demon-name').value;
-            if (demonColor) demonColor.value = document.getElementById('modal-custom-demon-color').value;
-            
-            // 保存自定义阵营
-            const teamGroups = document.querySelectorAll('.custom-team-group');
-            customTeams = [];
-            
-            teamGroups.forEach((group, index) => {
-                const nameInput = group.querySelector('.custom-team-name');
-                const colorInput = group.querySelector('.custom-team-color');
-                
-                // 获取已添加的角色
-                const roles = [];
-                const roleElements = group.querySelectorAll('.custom-team-roles-container span');
-                roleElements.forEach(element => {
-                    if (!element.querySelector('button')) return; // 跳过提示文本
-                    
-                    const roleId = element.querySelector('button').onclick.toString().match(/removeRoleFromCustomTeam\(\d+, '(.*?)'\)/)[1];
-                    const role = getSelectedRoles().find(r => r.id === roleId);
-                    if (role) {
-                        roles.push(role);
-                    }
-                });
-                
-                customTeams.push({
-                    name: nameInput.value.trim(),
-                    color: colorInput.value,
-                    roles: roles
-                });
-            });
-            
-            // 关闭弹窗
-            document.body.removeChild(document.getElementById('script-config-modal'));
-            
-            // 更新页面背景色为用户选择的颜色
-            if (bgColorInput) {
-                document.documentElement.style.setProperty('--background-color', bgColorInput.value);
-            }
-            
-            alert('设置已保存！');
-        }
-
-function generateAiArtTextFromModal() {
-            // 先保存API设置
-            const apiKey = document.getElementById('ai-api-key');
-            const modelEndpoint = document.getElementById('ai-model-endpoint');
-            
-            if (apiKey) apiKey.value = document.getElementById('modal-ai-api-key').value;
-            if (modelEndpoint) modelEndpoint.value = document.getElementById('modal-ai-model-endpoint').value;
-            
-            // 调用生成函数
-            generateAiArtText();
-        }
-
-function addCustomTeamModal() {
-            addCustomTeam();
-            loadScriptConfigToModal();
-        }
-
-function addCustomTeam() {
-            const container = document.getElementById('modal-custom-teams-container');
-            const newIndex = customTeams.length;
-            
-            // 添加到数据数组
-            customTeams.push({
-                name: '',
-                color: '#6b5a45',
-                roles: []
-            });
-            
-            // 创建新的阵营组
-            const teamGroup = document.createElement('div');
-            teamGroup.className = 'custom-team-group';
-            teamGroup.dataset.teamIndex = newIndex;
-            teamGroup.style.cssText = `padding: 10px; background: rgba(0,0,0,0.03); border-radius: 6px; border: 1px solid #e9ecef;`;
-            
-            teamGroup.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
-                        <h4 style="margin: 0; font-size: 14px; color: #6b5a45;">阵营 ${newIndex + 1}</h4>
-                        <button type="button" onclick="removeCustomTeam(${newIndex})" style="padding: 4px 8px; background: #dc3545; color: white; border: none; border-radius: 3px; font-size: 12px; cursor: pointer;">
-                            删除
-                        </button>
-                    </div>
-                    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-                        <div style="flex: 1; min-width: 200px;">
-                            <label style="font-size: 14px; color: #6b5a45; font-weight: bold; display: block; margin-bottom: 5px;">阵营名称</label>
-                            <input type="text" class="custom-team-name" placeholder="输入自定义阵营名称" style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px; box-sizing: border-box;">
-                        </div>
-                        <div style="flex: 1; min-width: 200px;">
-                            <label style="font-size: 14px; color: #6b5a45; font-weight: bold; display: block; margin-bottom: 5px;">阵营颜色</label>
-                            <input type="color" class="custom-team-color" value="#6b5a45" style="width: 100%; height: 36px; border: 1px solid var(--border-color); border-radius: 4px; cursor: pointer;">
-                        </div>
-                    </div>
-                    <div style="margin-top: 15px;">
-                        <label style="font-size: 14px; color: #6b5a45; font-weight: bold; display: block; margin-bottom: 5px;">从已选角色中添加</label>
-                        <div class="available-roles-container" style="display: flex; flex-wrap: wrap; gap: 8px; padding: 10px; background: rgba(0,0,0,0.03); border-radius: 4px; max-height: 120px; overflow-y: auto; margin-bottom: 10px;">
-                            ${(() => {
-                                const selectedRoles = getSelectedRoles();
-                                if (selectedRoles.length === 0) {
-                                    return '<span style="color: #999; font-size: 13px;">没有已选角色，请先在主界面选择角色</span>';
-                                }
-                                return selectedRoles.map(role => `
-                                    <span style="display: inline-flex; align-items: center; gap: 5px; padding: 4px 8px; background: rgba(107, 70, 193, 0.1); border-radius: 4px; font-size: 12px; color: #6b46c1; cursor: pointer; hover: background: rgba(107, 70, 193, 0.2);" onclick="addRoleToCustomTeam(${newIndex}, '${role.id}')">
-                                        <img src="${convertToLocalPath(role.image)}" style="width: 24px; height: 24px; object-fit: cover; border-radius: 3px;">
-                                        <span>${role.name}</span>
-                                    </span>
-                                `).join('');
-                            })()}
-                        </div>
-                        <label style="font-size: 14px; color: #6b5a45; font-weight: bold; display: block; margin-bottom: 5px;">已添加的角色</label>
-                        <div class="custom-team-roles-container" style="display: flex; flex-wrap: wrap; gap: 8px; padding: 10px; background: rgba(0,0,0,0.05); border-radius: 4px; min-height: 40px;">
-                            <span style="color: #999; font-size: 13px;">暂无角色，请从上方选择添加</span>
-                        </div>
-                    </div>
-                `;
-            
-            container.appendChild(teamGroup);
-            
-            // 更新所有阵营的角色选择区域
-            updateCustomTeamRolesContainers();
-        }
-
-function removeCustomTeam(index) {
-            if (customTeams.length <= 1) {
-                alert('至少需要保留一个自定义阵营');
+            if (totalImages === 0) {
+                captureAndDownload();
                 return;
             }
-            
-            // 从数据数组中删除
-            customTeams.splice(index, 1);
-            
-            // 从DOM中删除
-            const container = document.getElementById('modal-custom-teams-container');
-            const teamGroups = container.querySelectorAll('.custom-team-group');
-            if (teamGroups[index]) {
-                teamGroups[index].remove();
-            }
-            
-            // 更新剩余阵营的索引和标题
-            teamGroups.forEach((group, i) => {
-                if (i >= index) {
-                    group.dataset.teamIndex = i;
-                    const title = group.querySelector('h4');
-                    if (title) {
-                        title.textContent = `阵营 ${i + 1}`;
-                    }
-                    const deleteButton = group.querySelector('button');
-                    if (deleteButton) {
-                        deleteButton.onclick = () => removeCustomTeam(i);
-                    }
-                }
-            });
-            
-            // 更新所有阵营的角色选择区域
-            updateCustomTeamRolesContainers();
-        }
 
-function updateCustomTeamRolesContainers() {
-            const containers = document.querySelectorAll('.custom-team-roles-container');
-            containers.forEach((container, index) => {
-                const team = customTeams[index];
-                if (team && team.roles && team.roles.length > 0) {
-                    container.innerHTML = team.roles.map(role => `
-                        <span style="display: inline-flex; align-items: center; gap: 5px; padding: 4px 8px; background: rgba(107, 70, 193, 0.1); border-radius: 4px; font-size: 12px; color: #6b46c1;">
-                            <img src="${convertToLocalPath(role.image)}" style="width: 24px; height: 24px; object-fit: cover; border-radius: 3px;">
-                            <span>${role.name}</span>
-                            <button onclick="removeRoleFromCustomTeam(${index}, '${role.id}')" style="margin-left: 5px; padding: 2px 6px; background: #dc3545; color: white; border: none; border-radius: 3px; font-size: 10px; cursor: pointer;">×</button>
-                        </span>
-                    `).join('');
+            images.forEach(img => {
+                if (img.complete) {
+                    loadedCount++;
+                    if (loadedCount === totalImages) captureAndDownload();
                 } else {
-                    container.innerHTML = '<span style="color: #999; font-size: 13px;">请先选择角色，然后在此处添加</span>';
+                    img.onload = () => {
+                        loadedCount++;
+                        if (loadedCount === totalImages) captureAndDownload();
+                    };
+                    img.onerror = () => {
+                        img.style.display = 'none';
+                        loadedCount++;
+                        if (loadedCount === totalImages) captureAndDownload();
+                    };
                 }
             });
-        }
 
-function removeRoleFromCustomTeam(teamIndex, roleId) {
-            if (customTeams[teamIndex] && customTeams[teamIndex].roles) {
-                customTeams[teamIndex].roles = customTeams[teamIndex].roles.filter(role => role.id !== roleId);
-                updateCustomTeamRolesContainers();
+            function captureAndDownload() {
+                const innerEl = container.firstElementChild;
+                // 临时解除高度限制，让内容完全撑开
+                const origMinH = innerEl.style.minHeight;
+                const origOverflow = innerEl.style.overflow;
+                innerEl.style.minHeight = 'auto';
+                innerEl.style.overflow = 'visible';
+
+                html2canvas(innerEl, {
+                    backgroundColor: scriptConfig.bgColor,
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: true,
+                    logging: false
+                }).then(fullCanvas => {
+                    // 恢复原始样式
+                    innerEl.style.minHeight = origMinH;
+                    innerEl.style.overflow = origOverflow;
+
+                    // A4 @ 2x = 1588 × 2246
+                    const A4_W = 794 * 2;
+                    const A4_H = 1123 * 2;
+                    const a4Canvas = document.createElement('canvas');
+                    a4Canvas.width = A4_W;
+                    a4Canvas.height = A4_H;
+                    const ctx = a4Canvas.getContext('2d');
+
+                    // 使用配置的背景色
+                    ctx.fillStyle = scriptConfig.bgColor;
+                    ctx.fillRect(0, 0, A4_W, A4_H);
+
+                    // 等比缩放：取最小缩放比，确保全部内容不超出 A4
+                    const scale = Math.min(1, A4_W / fullCanvas.width, A4_H / fullCanvas.height);
+                    const drawW = Math.round(fullCanvas.width * scale);
+                    const drawH = Math.round(fullCanvas.height * scale);
+                    const offsetX = Math.round((A4_W - drawW) / 2);
+                    const offsetY = Math.round((A4_H - drawH) / 2);
+
+                    ctx.drawImage(fullCanvas, offsetX, offsetY, drawW, drawH);
+
+                    const dataUrl = a4Canvas.toDataURL('image/png');
+                    showScriptPreview(dataUrl);
+                }).catch(err => {
+                    console.error('生成剧本图失败:', err);
+                    alert('生成失败，请重试。');
+                });
             }
+
         }
 
-function addRoleToCustomTeam(teamIndex, roleId) {
-            // 获取已选角色
-            const selectedRoles = getSelectedRoles();
+// ========== 细节图生成函数 ==========
+function generateDetailImage() {
+    const selectedRoles = getSelectedRoles();
+    if (selectedRoles.length === 0) {
+        alert('请先选择角色！');
+        return;
+    }
+
+    const teamNames = { 'townsfolk': '镇民', 'outsider': '外来者', 'minion': '爪牙', 'demon': '恶魔', 'traveller': '旅行者', 'fabled': '传奇角色' };
+
+    const twilightRole = { id: 'twilight', name: '黄昏', firstNight: 0, otherNight: 0, image: 'images/dusk-CLd-DXn-QC.png' };
+    const minionInfoRole = { id: 'minioninfo', name: '爪牙信息', firstNight: 2000, otherNight: 0, image: 'images/180px-Mi.png' };
+    const demonInfoRole = { id: 'demoninfo', name: '恶魔信息', firstNight: 3000, otherNight: 0, image: 'images/180px-Di.png' };
+    const dawnRole = { id: 'dawn', name: '黎明', firstNight: 9999, otherNight: 9999, image: 'images/dawn.png' };
+
+    const getNightOrderFromPanel = (containerId) => {
+        const container = document.getElementById(containerId);
+        if (!container) return [];
+        const buttons = container.querySelectorAll('.draggable-button');
+        const roleIds = Array.from(buttons)
+            .map(btn => btn.getAttribute('data-role-id'))
+            .filter(id => id && id.trim() !== '');
+        return roleIds.map(roleId => {
+            if (roleId === 'twilight') return twilightRole;
+            if (roleId === 'minioninfo') return minionInfoRole;
+            if (roleId === 'demoninfo') return demonInfoRole;
+            if (roleId === 'dawn') return dawnRole;
             const role = selectedRoles.find(r => r.id === roleId);
-            
-            if (role && customTeams[teamIndex]) {
-                // 检查角色是否已经在阵营中
-                if (!customTeams[teamIndex].roles) {
-                    customTeams[teamIndex].roles = [];
-                }
-                
-                if (!customTeams[teamIndex].roles.some(r => r.id === roleId)) {
-                    customTeams[teamIndex].roles.push(role);
-                    // 重新加载模态框以更新UI
-                    loadScriptConfigToModal();
-                }
-            }
-        }
+            if (role) return role;
+            const dirRole = window.dirRolesJson.find(r => r.id === roleId);
+            return dirRole || null;
+        }).filter(r => r !== null);
+    };
 
-function handleBgImageUpload(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('modal-custom-bg-image').value = e.target.result;
-                };
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
+    let firstNightRoles = getNightOrderFromPanel('first-night-buttons-container');
+    let otherNightRoles = getNightOrderFromPanel('other-night-buttons-container');
 
+    if (firstNightRoles.length === 0) {
+        firstNightRoles = selectedRoles.filter(r => r.firstNight > 0).sort((a, b) => a.firstNight - b.firstNight);
+        firstNightRoles = [twilightRole, ...firstNightRoles, minionInfoRole, demonInfoRole, dawnRole];
+    }
+    if (otherNightRoles.length === 0) {
+        otherNightRoles = selectedRoles.filter(r => r.otherNight > 0).sort((a, b) => a.otherNight - b.otherNight);
+        otherNightRoles = [twilightRole, ...otherNightRoles, dawnRole];
+    }
+
+    const fabledRoles = selectedRoles.filter(r => r.team === 'fabled');
+    const travellerRoles = selectedRoles.filter(r => r.team === 'traveller');
+
+    const getDeduplicatedJinxes = (selectedRoleNames) => {
+        const jinxData = (typeof window.jinxes !== 'undefined') ? window.jinxes : jinxes;
+        const relevantJinxes = jinxData.filter(jinx => {
+            return selectedRoleNames.includes(jinx.jinxRole1) && selectedRoleNames.includes(jinx.jinxRole2);
+        });
+        const uniqueJinxes = [];
+        const seenRules = new Set();
+        relevantJinxes.forEach(jinx => {
+            const ruleKey = `${jinx.jinxRole1}-${jinx.jinxRole2}-${jinx.jinxRule}`;
+            if (!seenRules.has(ruleKey)) {
+                seenRules.add(ruleKey);
+                uniqueJinxes.push(jinx);
+            }
+        });
+        return uniqueJinxes;
+    };
+    const allJinxes = getDeduplicatedJinxes(selectedRoles.map(r => r.name));
+
+    const scriptConfig = getScriptConfig();
+    const scriptTitle = (scriptConfig && scriptConfig.title) ? scriptConfig.title.trim() : '未知剧本';
+    const authorText = (scriptConfig && scriptConfig.author) ? scriptConfig.author.trim() : '';
+
+    function buildNightOrderColumn(roles) {
+        if (!roles || roles.length === 0) return '';
+        let html = `<div style="display: flex; flex-direction: column; align-items: center;">`;
+        roles.forEach((role, index) => {
+            const imgSrc = role.image || '';
+            html += `<div style="margin-bottom: 6px;">`;
+            if (imgSrc) {
+                html += `<img src="${imgSrc}" style="width:36px;height:36px;border-radius:4px;object-fit:cover;" title="${role.name}" onerror="this.style.display='none'">`;
+            }
+            html += `</div>`;
+        });
+        html += `</div>`;
+        return html;
+    }
+
+    function buildSimpleRoleCard(role, color = '#666') {
+        const imgSrc = role.image || '';
+        let html = `<div style="display: flex; align-items: center; gap: 6px; padding: 4px 8px; background: #f8f9fa; border-radius: 4px;">`;
+        if (imgSrc) {
+            html += `<img src="${imgSrc}" style="width:28px;height:28px;border-radius:3px;object-fit:cover;" onerror="this.style.display='none'">`;
+        }
+        html += `<span style="font-size: 10px; font-weight: bold; color: ${color};">${role.name}</span>`;
+        html += `</div>`;
+        return html;
+    }
+
+    function buildJinxSection(jinxes) {
+        if (!jinxes || jinxes.length === 0) return '';
+        let html = `<div style="margin-top: 16px;">`;
+        html += `<div style="display: flex; align-items: center; margin-bottom: 8px;">`;
+        html += `<span style="font-size: 12px; font-weight: bold; color: #c1121f;">相克规则</span>`;
+        html += `<div style="flex: 1; height: 1px; background: #c1121f; margin-left: 8px;"></div>`;
+        html += `</div>`;
+        html += `<div style="font-size: 9px; color: #4a5568; line-height: 1.6;">`;
+        jinxes.forEach((jinx, index) => {
+            const role1 = selectedRoles.find(r => r.name === jinx.jinxRole1);
+            const role2 = selectedRoles.find(r => r.name === jinx.jinxRole2);
+            html += `<div style="margin-bottom: 6px;">`;
+            html += `<div style="display: flex; align-items: center; gap: 4px; margin-bottom: 2px;">`;
+            if (role1 && role1.image) {
+                html += `<img src="${role1.image}" style="width:18px;height:18px;border-radius:2px;object-fit:cover;" onerror="this.style.display='none'">`;
+            }
+            html += `<span style="font-weight: bold; color: #c1121f;">${jinx.jinxRole1}</span>`;
+            html += `<span style="color: #a0aec0; margin: 0 4px;">×</span>`;
+            if (role2 && role2.image) {
+                html += `<img src="${role2.image}" style="width:18px;height:18px;border-radius:2px;object-fit:cover;" onerror="this.style.display='none'">`;
+            }
+            html += `<span style="font-weight: bold; color: #c1121f;">${jinx.jinxRole2}</span>`;
+            html += `</div>`;
+            html += `<div style="padding-left: 22px;">${jinx.jinxRule}</div>`;
+            html += `</div>`;
+        });
+        html += `</div></div>`;
+        return html;
+    }
+
+    function buildPlayerConfigAndRoles() {
+        let html = `<div style="margin-top: 16px;">`;
+        html += `<div style="width: 100%;">`;
+        html += `<img src="images/playercount.png" style="width: 100%; height: auto;" alt="玩家配置图" onerror="this.style.display='none'">`;
+        html += `</div>`;
+        html += `<div style="margin-top: 8px; width: 100%;">`;
+        const sortedRoles = [...selectedRoles].sort((a, b) => {
+            const order = { townsfolk: 0, outsider: 1, minion: 2, demon: 3, traveller: 4, fabled: 5 };
+            return (order[a.team] || 99) - (order[b.team] || 99);
+        });
+        html += `<div style="display: flex; justify-content: center; gap: 4px; flex-wrap: wrap;">`;
+        sortedRoles.forEach(role => {
+            const imgSrc = role.image || '';
+            if (imgSrc) {
+                html += `<img src="${imgSrc}" style="width: 32px; height: 32px; border-radius: 4px; object-fit: cover;" title="${role.name}" onerror="this.style.display='none'">`;
+            }
+        });
+        html += `</div></div></div>`;
+        return html;
+    }
+
+    const tempContainer = document.createElement('div');
+    tempContainer.id = 'detail-image-container';
+    tempContainer.style.cssText = 'position: fixed; top: -9999px; left: -9999px; width: 800px; background: #fff;';
+    tempContainer.innerHTML = `
+        <style>
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body { font-family: 'SimSun', 'STSong', serif; background: #fff; }
+        </style>
+        <div style="width: 100%; max-width: 800px; margin: 0 auto; padding: 24px;">
+            <div style="text-align: center; margin-bottom: 24px;">
+                <div style="font-size: 42px; font-weight: bold; color: #c1121f; letter-spacing: 8px;">${scriptTitle}</div>
+                ${authorText ? `<div style="font-size: 12px; color: #6b7280; margin-top: 8px;">${authorText}</div>` : ''}
+            </div>
+            <div style="display: flex; gap: 24px;">
+                <div style="flex-shrink: 0;">
+                    ${buildNightOrderColumn(firstNightRoles)}
+                </div>
+                <div style="flex: 1;">
+                    ${fabledRoles.length > 0 ? `
+                    <div>
+                        <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                            <img src="images/fabled.png" style="width:20px;height:20px;border-radius:3px;" onerror="this.style.display='none'">
+                            <span style="font-size: 14px; font-weight: bold; color: #805ad5; margin-left: 6px;">传奇角色</span>
+                            <div style="flex: 1; height: 1px; background: #805ad5; margin-left: 8px;"></div>
+                        </div>
+                        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                            ${fabledRoles.map(r => buildSimpleRoleCard(r, '#805ad5')).join('')}
+                        </div>
+                    </div>
+                    ` : ''}
+                    ${travellerRoles.length > 0 ? `
+                    <div style="margin-top: 16px;">
+                        <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                            <img src="images/traveller.png" style="width:20px;height:20px;border-radius:3px;" onerror="this.style.display='none'">
+                            <span style="font-size: 14px; font-weight: bold; color: #9f7aea; margin-left: 6px;">旅行者</span>
+                            <div style="flex: 1; height: 1px; background: #9f7aea; margin-left: 8px;"></div>
+                        </div>
+                        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                            ${travellerRoles.map(r => buildSimpleRoleCard(r, '#9f7aea')).join('')}
+                        </div>
+                    </div>
+                    ` : ''}
+                    ${buildJinxSection(allJinxes)}
+                </div>
+                <div style="flex-shrink: 0;">
+                    ${buildNightOrderColumn(otherNightRoles)}
+                </div>
+            </div>
+            <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid #e2e8f0;">
+                ${buildPlayerConfigAndRoles()}
+            </div>
+        </div>
+    `;
+    document.body.appendChild(tempContainer);
+
+    html2canvas(tempContainer, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#ffffff'
+    }).then(canvas => {
+        const dataUrl = canvas.toDataURL('image/png');
+        document.body.removeChild(tempContainer);
+        showDetailPreview(dataUrl);
+    }).catch(err => {
+        if (document.getElementById('detail-image-container')) {
+            document.body.removeChild(tempContainer);
+        }
+        console.error('生成细节图失败:', err);
+        alert('生成失败，请重试。');
+    });
+}
+
+function showDetailPreview(dataUrl) {
+    const existing = document.getElementById('detail-preview-modal');
+    if (existing) existing.remove();
+
+    const dateStr = new Date().toISOString().slice(0, 10);
+    const fileName = '细节图_' + dateStr + '.png';
+
+    const modal = document.createElement('div');
+    modal.id = 'detail-preview-modal';
+    modal.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.7);z-index:99999;display:flex;align-items:center;justify-content:center;';
+    modal.innerHTML = `
+        <div style="background:#fff;border-radius:12px;max-width:96vw;max-height:96vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,0.3);overflow:hidden;">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;border-bottom:1px solid #e2e8f0;flex-shrink:0;">
+                <span style="font-size:16px;font-weight:bold;color:#2d3748;">细节图预览</span>
+                <button onclick="this.closest('#detail-preview-modal').remove()" style="background:none;border:none;font-size:24px;cursor:pointer;color:#a0aec0;line-height:1;padding:0 4px;">&times;</button>
+            </div>
+            <div style="overflow:auto;padding:16px;flex:1;display:flex;align-items:flex-start;justify-content:center;">
+                <img src="${dataUrl}" style="max-width:100%;height:auto;border-radius:4px;box-shadow:0 4px 12px rgba(0,0,0,0.1);" alt="细节图预览">
+            </div>
+            <div style="display:flex;gap:10px;justify-content:flex-end;padding:14px 20px;border-top:1px solid #e2e8f0;flex-shrink:0;">
+                <button onclick="this.closest('#detail-preview-modal').remove()" style="padding:8px 24px;border:1px solid #cbd5e0;border-radius:6px;background:#fff;color:#4a5568;cursor:pointer;font-size:14px;">关闭</button>
+                <button id="detail-preview-download-btn" data-url="${dataUrl}" data-filename="${fileName}" style="padding:8px 24px;border:none;border-radius:6px;background:linear-gradient(135deg, #10b981 0%, #059669 100%);color:#fff;cursor:pointer;font-size:14px;font-weight:bold;">下载图片</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    modal.querySelector('#detail-preview-download-btn').addEventListener('click', function() {
+        const link = document.createElement('a');
+        link.download = this.dataset.filename;
+        link.href = this.dataset.url;
+        link.click();
+    });
+}
