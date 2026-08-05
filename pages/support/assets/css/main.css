@@ -1,0 +1,435 @@
+
+body {
+    padding: 20px;
+    background-color: #f5f5f5;
+    overflow-y: scroll;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - 40px);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+}
+a {
+    text-decoration: none;
+}
+
+/* 返回主页按钮 */
+.back-home {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    padding: 10px 18px;
+    background: linear-gradient(135deg, #1a1a40, #3a0ca3);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+.back-home:hover {
+    background: linear-gradient(135deg, #2a2a60, #5a1cd3);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* 标题 */
+h1 {
+    text-align: center;
+    margin: 0 0 16px;
+    font-size: 2.2rem;
+    background: linear-gradient(90deg, #6a11cb, #3a0ca3);
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+}
+
+.intro {
+    max-width: 720px;
+    margin: 0 auto 28px;
+    text-align: center;
+    color: #555;
+    font-size: 15px;
+    line-height: 1.9;
+    padding: 0 16px;
+    box-sizing: border-box;
+}
+.intro b {
+    color: #3a0ca3;
+}
+
+/* 分区 */
+.section {
+    margin-bottom: 32px;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+.section-title {
+    max-width: 1200px;
+    margin: 0 auto 16px;
+    font-size: 20px;
+    font-weight: 600;
+    text-align: center;
+    box-sizing: border-box;
+}
+.section-title.channel  { color: #e0508a; }
+.section-title.cost     { color: #e67e22; }
+.section-title.about    { color: #3a0ca3; }
+
+/* ──── 赞助二维码 ──── */
+.qr-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+.qr-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    width: 300px;
+    padding: 18px 16px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(58, 12, 163, 0.12);
+    border-top: 4px solid #3a0ca3;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+.qr-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 28px rgba(58, 12, 163, 0.22);
+}
+.qr-card.afdian { border-top-color: #946ce6; }
+.qr-card.wechat { border-top-color: #2aae67; }
+.qr-card.alipay { border-top-color: #1677ff; }
+
+.qr-name {
+    font-size: 17px;
+    font-weight: 700;
+    color: #1a1a40;
+}
+/* 三张收款码素材都是竖版手机截图(约 3:4),容器按竖版留位 */
+.qr-card img {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    height: auto;
+    object-fit: contain;
+    border-radius: 8px;
+    background: #fafafa;
+    padding: 4px;
+    box-sizing: border-box;
+}
+.qr-tip {
+    font-size: 13px;
+    color: #888;
+}
+.qr-link {
+    font-size: 13px;
+    font-weight: 600;
+    color: #946ce6;
+    transition: color 0.2s ease;
+}
+.qr-link:hover {
+    color: #6a11cb;
+}
+
+/* 横滑提示 —— 仅移动端(轨道模式)显示,桌面端换行布局下隐藏 */
+.swipe-hint {
+    display: none;
+    margin: 12px 0 0;
+    text-align: center;
+    color: #aaa;
+    font-size: 12.5px;
+    letter-spacing: 0.5px;
+}
+
+.note-line {
+    max-width: 720px;
+    margin: 20px auto 0;
+    text-align: center;
+    color: #777;
+    font-size: 13px;
+    line-height: 1.8;
+}
+.note-line b {
+    color: #e0508a;
+}
+
+/* ──── 开销去向 ──── */
+.cost-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+    max-width: 1100px;
+    margin: 0 auto;
+}
+.cost-card {
+    width: 320px;
+    padding: 18px 20px;
+    background: linear-gradient(135deg, #1a1a40, #3a0ca3);
+    color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(58, 12, 163, 0.35);
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+.cost-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(90, 120, 255, 0.5);
+}
+.cost-icon {
+    font-size: 26px;
+    line-height: 1;
+    margin-bottom: 8px;
+}
+.cost-title {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+.cost-desc {
+    font-size: 13.5px;
+    line-height: 1.8;
+    opacity: 0.92;
+}
+
+/* ──── 我在做什么 ──── */
+.about-card {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px 32px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(58, 12, 163, 0.12);
+    box-sizing: border-box;
+}
+.about-card p {
+    margin: 0 0 14px;
+    color: #444;
+    font-size: 14.5px;
+    line-height: 1.9;
+}
+.about-card p:last-of-type {
+    margin-bottom: 0;
+}
+.about-card b {
+    color: #3a0ca3;
+}
+.about-card a {
+    color: #2575fc;
+}
+.about-card a:hover {
+    text-decoration: underline;
+}
+.about-card .upstream {
+    margin-top: 16px;
+    padding: 12px 14px;
+    background: #fff8e6;
+    border-left: 4px solid #e67e22;
+    border-radius: 6px;
+    font-size: 13.5px;
+    color: #6b5330;
+}
+.about-card .upstream b {
+    color: #b35c00;
+}
+
+.link-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 24px;
+}
+
+.about-card .mini-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+    text-decoration: none;
+    transition: all 0.25s ease;
+}
+.about-card .mini-btn:hover {
+    transform: translateY(-2px);
+    text-decoration: none;
+    filter: brightness(1.08);
+}
+/* 适配层仓库 */
+.about-card .mini-btn.repo {
+    background: linear-gradient(145deg, #24292f, #3a4149);
+    box-shadow: 0 4px 14px rgba(36, 41, 47, 0.35);
+}
+.about-card .mini-btn.repo:hover {
+    box-shadow: 0 6px 20px rgba(36, 41, 47, 0.45);
+}
+/* LGTBot 上游 */
+.about-card .mini-btn.upstream-btn {
+    background: linear-gradient(135deg, #3a0ca3, #6a11cb);
+    box-shadow: 0 4px 14px rgba(58, 12, 163, 0.4);
+}
+.about-card .mini-btn.upstream-btn:hover {
+    box-shadow: 0 6px 20px rgba(106, 17, 203, 0.5);
+}
+/* 官方群聊 */
+.about-card .mini-btn.group {
+    background: linear-gradient(135deg, #0a8fd8, #12b7f5);
+    box-shadow: 0 4px 14px rgba(18, 183, 245, 0.38);
+}
+.about-card .mini-btn.group:hover {
+    box-shadow: 0 6px 20px rgba(18, 183, 245, 0.5);
+}
+/* GitHub 图标 */
+.mini-icon {
+    width: 18px;
+    height: 18px;
+    filter: brightness(0) invert(1);
+    flex-shrink: 0;
+}
+.qq-num {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.22);
+    letter-spacing: 0.3px;
+}
+
+/* 结尾致谢 */
+.thanks {
+    margin: auto 0 0;
+    padding: 16px 0 28px;
+    text-align: center;
+    color: #3a0ca3;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+/* ICP 备案 */
+#site-footer {
+    font-size: 13px;
+    text-align: center;
+    color: #888;
+    padding: 30px 0 8px;
+}
+#site-footer a {
+    color: inherit;
+    text-decoration: none;
+}
+#site-footer img {
+    width: 15px;
+    height: 15px;
+    transform: translateY(1px);
+}
+
+/* ──── 响应式 ──── */
+@media (max-width: 768px) {
+    body {
+        padding: 5px;
+        min-height: calc(100vh - 10px);
+    }
+    .back-home {
+        top: 6px;
+        left: 6px;
+        padding: 6px 12px;
+        font-size: 14px;
+    }
+    h1 {
+        font-size: 1.8rem;
+        margin-top: 46px;
+    }
+    .intro {
+        font-size: 14px;
+        margin-bottom: 22px;
+    }
+    .section {
+        padding: 0 10px;
+        margin-bottom: 24px;
+    }
+    .section-title {
+        font-size: 18px;
+    }
+    /* ── 二维码改为横向滑动轨道 */
+    .qr-grid {
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        max-width: 100%;
+        gap: 12px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scroll-snap-type: x mandatory;
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+        padding: 4px calc((100% - 68vw) / 2);   /* 首尾卡片也能滚到正中 */
+        scrollbar-width: none;
+    }
+    .qr-grid::-webkit-scrollbar {
+        display: none;
+    }
+    .qr-card {
+        flex: 0 0 auto;
+        width: 68vw;
+        max-width: 300px;
+        padding: 14px 12px;
+        scroll-snap-align: center;
+    }
+    .qr-card img {
+        width: 100%;
+        max-width: none;
+        height: auto;
+    }
+    .swipe-hint {
+        display: block;
+    }
+    .cost-card {
+        width: 100%;
+        max-width: 420px;
+    }
+    .about-card {
+        padding: 18px 16px;
+    }
+    .about-card p {
+        font-size: 14px;
+    }
+}
+@media (max-width: 480px) {
+    .section {
+        padding: 0 5px;
+    }
+    /* 小屏进一步缩小卡片(二维码随卡片等比变小) */
+    .qr-grid {
+        padding: 4px calc((100% - 72vw) / 2);
+        gap: 10px;
+    }
+    .qr-card {
+        width: 72vw;
+        max-width: 270px;
+        padding: 12px 10px;
+        gap: 8px;
+    }
+    .qr-name {
+        font-size: 16px;
+    }
+    .qr-tip {
+        font-size: 12px;
+    }
+    .about-card .mini-btn {
+        font-size: 13px;
+        padding: 9px 14px;
+    }
+    .qq-num {
+        font-size: 11px;
+    }
+}

@@ -214,6 +214,8 @@ p {
     margin-top: 30px;
     display: flex;
     justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
 }
 
 /* 整体容器 */

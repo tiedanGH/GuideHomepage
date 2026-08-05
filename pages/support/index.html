@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#3a0ca3"/>
+    <meta name="description" content="支持 LGTBot QQ 机器人与本站的持续运营：服务器、带宽与开发维护。爱发电、微信、支付宝赞助渠道。"/>
+    <meta property="og:image" content="https://tiedan.site/assets/icons/favicon.png">
+
+    <title>赞助支持</title>
+    <link rel="icon" href="/assets/icons/heart.ico">
+    <link rel="apple-touch-icon" href="/assets/icons/heart.ico"/>
+
+    <link rel="stylesheet" href="assets/css/main.css?v=20260806b"/>
+
+    <script src="assets/js/main.js?v=20260806" defer></script>
+</head>
+<body>
+
+<a href="/" class="back-home">返回主页</a>
+
+<h1>赞助支持</h1>
+
+<p class="intro">
+    这里的机器人与网站都是我业余时间做的开源项目，<b>所有功能对所有人永久免费</b>。<br>
+    服务器、带宽和域名是实打实的持续开销，如果它们给你和朋友带来了乐趣，欢迎请我喝杯咖啡 ☕
+</p>
+
+<!-- ──── 赞助渠道 ──── -->
+<div class="section">
+    <h2 class="section-title channel">💗 赞助渠道 💗</h2>
+
+    <!-- 移动端由 CSS 转为横向滑动轨道(scroll-snap),JS 把初始位置对准中间的微信卡 -->
+    <div class="qr-grid" id="qrGrid">
+        <div class="qr-card afdian">
+            <div class="qr-name">爱发电</div>
+            <a href="https://afdian.com/a/tiedan-LGTBot/plan" target="_blank" rel="noreferrer noopener">
+                <img src="/assets/img/afdian.jpg" alt="爱发电赞助二维码" loading="lazy"/>
+            </a>
+            <div class="qr-tip">支持包月方案，可留言</div>
+            <a href="https://afdian.com/a/tiedan-LGTBot/plan" target="_blank" rel="noreferrer noopener"
+               class="qr-link">前往爱发电页面 →</a>
+        </div>
+
+        <div class="qr-card wechat">
+            <div class="qr-name">微信</div>
+            <img src="/assets/img/wechat.png" alt="微信赞助二维码" loading="lazy"/>
+            <div class="qr-tip">扫码任意金额</div>
+        </div>
+
+        <div class="qr-card alipay">
+            <div class="qr-name">支付宝</div>
+            <img src="/assets/img/alipay.png" alt="支付宝赞助二维码" loading="lazy"/>
+            <div class="qr-tip">扫码任意金额</div>
+        </div>
+    </div>
+
+    <!-- 仅移动端显示(CSS 控制) -->
+    <p class="swipe-hint">← 左右滑动查看其他渠道 →</p>
+
+    <p class="note-line">
+        赞助完全自愿，<b>不存在任何“付费解锁”内容</b>；如需在感谢名单中署名或匿名，扫码后可在私信或群里告知我哦~ 🌹
+    </p>
+</div>
+
+<!-- ──── 开销去向 ──── -->
+<div class="section">
+    <h2 class="section-title cost">🌸 你的支持会用在哪 🌸</h2>
+    <div class="cost-grid">
+        <div class="cost-card">
+            <div class="cost-icon">🖥️</div>
+            <div class="cost-title">服务器与带宽</div>
+            <div class="cost-desc">
+                机器人 7×24 常驻运行，游戏图片实时渲染、对局数据读写都在这台自费服务器上，图片外链与网页访问需要持续消耗流量。
+            </div>
+        </div>
+        <div class="cost-card">
+            <div class="cost-icon">🌐</div>
+            <div class="cost-title">域名与图床</div>
+            <div class="cost-desc">
+                域名、证书与对象存储的年费 —— 游戏里的棋盘、战绩大图都要有稳定可访问的地址，消息里才能正常显示图片。
+            </div>
+        </div>
+        <div class="cost-card">
+            <div class="cost-icon">🛠️</div>
+            <div class="cost-title">开发与维护</div>
+            <div class="cost-desc">
+                新游戏适配、QQ 平台限制的绕行方案、Bug 修复、崩溃排查与数据备份，都是一行行业余时间写出来的。
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ──── 我在做什么 ──── -->
+<div class="section">
+    <h2 class="section-title about">🎲 我在做什么 🎲</h2>
+    <div class="about-card">
+        <p>
+            <b>LGTBot × ElainaBot</b> —— 把开源桌游裁判引擎接入 <b>QQ 官方机器人</b>，
+            让「数字蜂巢」「欲罢不能」「决胜五子」「谁是牛头王」等 <b>50+ 款</b>文字推理与策略游戏，
+            在 QQ 群里 @ 一下机器人就能开局：不用下客户端、不用加小程序，拉几个朋友就能玩。
+        </p>
+        <p>
+            除了游戏适配，还有一整套支撑它稳定跑下去的东西：消息配额与刷新机制、图文合并渲染、
+            对局监控与数据统计面板、崩溃自动恢复、每日数据备份、多发行版预编译包与自动化构建
+            —— 让其他人也能低成本把这个机器人部署到自己的群。
+        </p>
+        <p class="upstream">
+            ⚠️ 游戏逻辑、引擎核心与图片渲染来自
+            <a href="https://github.com/Slontia/lgtbot" target="_blank" rel="noreferrer noopener">@Slontia 的开源项目 LGTBot</a>
+            （LGPLv2），著作权归原作者所有，也推荐去给上游点个 Star ⭐<br>
+            我做的是 QQ 平台的<b>适配层开发与机器人运营</b>，本页的支持用于这部分工作，
+            <b>而非售卖游戏本体</b>。
+        </p>
+        <div class="link-row">
+            <a href="https://github.com/tiedanGH/LGTBot_ElainaBot" target="_blank" rel="noreferrer noopener"
+               class="mini-btn repo">
+                <img src="/assets/icons/github.svg" class="mini-icon" alt=""/>
+                适配层仓库
+            </a>
+            <a href="https://github.com/Slontia/lgtbot" target="_blank" rel="noreferrer noopener"
+               class="mini-btn upstream-btn">
+                <img src="/assets/icons/github.svg" class="mini-icon" alt=""/>
+                LGTBot 上游
+            </a>
+            <a href="https://qm.qq.com/q/R3GXMpMU2m" target="_blank" rel="noreferrer noopener"
+               class="mini-btn group">
+                💬 官方群聊
+                <small class="qq-num">1059834024</small>
+            </a>
+        </div>
+    </div>
+</div>
+
+<p class="thanks">🌹 感谢每一位愿意支持的朋友 🌹</p>
+
+<footer id="site-footer" role="contentinfo">
+    <a href="https://beian.miit.gov.cn" target="_blank" rel="noreferrer noopener">苏ICP备2025218151号-1</a><br>
+    <img src="../../assets/img/gongan.png" alt=""/>
+    <a href="https://beian.mps.gov.cn/#/query/webSearch?code=32021102003220" rel="noreferrer" target="_blank">苏公网安备32021102003220号</a>
+</footer>
+
+</body>
+</html>
