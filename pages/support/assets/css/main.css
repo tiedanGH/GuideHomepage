@@ -283,6 +283,14 @@ h1 {
 .about-card .mini-btn.upstream-btn:hover {
     box-shadow: 0 6px 20px rgba(106, 17, 203, 0.5);
 }
+/* 邀请机器人 */
+.about-card .mini-btn.robot {
+    background: linear-gradient(135deg, #0e9f6e, #22c55e);
+    box-shadow: 0 4px 14px rgba(34, 197, 94, 0.38);
+}
+.about-card .mini-btn.robot:hover {
+    box-shadow: 0 6px 20px rgba(34, 197, 94, 0.5);
+}
 /* 官方群聊 */
 .about-card .mini-btn.group {
     background: linear-gradient(135deg, #0a8fd8, #12b7f5);
