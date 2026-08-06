@@ -3,6 +3,10 @@
 (function () {
     'use strict';
 
+    // 用户一旦亲手滑过轨道,就再也不自动归位
+    var userMoved = false;
+    var lastWidth = window.innerWidth;
+
     function centerMiddleCard() {
         var grid = document.getElementById('qrGrid');
         if (!grid) return;
@@ -21,13 +25,36 @@
         grid.style.scrollBehavior = prev || '';
     }
 
-    document.addEventListener('DOMContentLoaded', centerMiddleCard);
+    function centerIfUntouched() {
+        if (userMoved) return;
+        centerMiddleCard();
+    }
+
+    // 只监听"用户意图"事件,不监听 scroll
+    function markMoved() { userMoved = true; }
+
+    function bindTrack() {
+        var grid = document.getElementById('qrGrid');
+        if (!grid) return;
+        var opts = { passive: true };
+        grid.addEventListener('touchstart', markMoved, opts);
+        grid.addEventListener('pointerdown', markMoved, opts);
+        grid.addEventListener('wheel', markMoved, opts);
+        grid.addEventListener('keydown', markMoved);
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        bindTrack();
+        centerMiddleCard();
+    });
     // 二维码是 lazy 图,尺寸要等图片布局完成才准 → load 后再校正一次
-    window.addEventListener('load', centerMiddleCard);
+    window.addEventListener('load', centerIfUntouched);
     // 旋转屏幕 / 跨断点缩放后重新居中(去抖)
     var t = null;
     window.addEventListener('resize', function () {
+        if (window.innerWidth === lastWidth) return;
+        lastWidth = window.innerWidth;
         clearTimeout(t);
-        t = setTimeout(centerMiddleCard, 200);
+        t = setTimeout(centerIfUntouched, 200);
     });
 })();
